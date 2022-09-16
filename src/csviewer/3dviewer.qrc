@@ -1,0 +1,48 @@
+<RCC>
+    <qresource prefix="/">
+        <file>themes/global.css</file>
+        <file>resources/camera_active.png</file>
+        <file>resources/camera_list.png</file>
+        <file>resources/camera_normal.png</file>
+        <file>resources/slider.png</file>
+        <file>resources/arrow_down.png</file>
+        <file>resources/arrow_down_active.png</file>
+        <file>resources/arrow_up.png</file>
+        <file>resources/arrow_up_active.png</file>
+        <file>resources/double_arrow_down.png</file>
+        <file>resources/double_arrow_down_active.png</file>
+        <file>resources/double_arrow_up.png</file>
+        <file>resources/double_arrow_up_active.png</file>
+        <file>resources/triangle_arrow_down.png</file>
+        <file>resources/triangle_arrow_down_active.png</file>
+        <file>resources/triangle_arrow_up.png</file>
+        <file>resources/triangle_arrow_up_active.png</file>
+        <file>resources/switch_button_off.png</file>
+        <file>resources/switch_button_on.png</file>
+        <file>resources/arrow_down_mid.png</file>
+        <file>resources/arrow_down_mid_active.png</file>
+        <file>resources/3DViewer.ico</file>
+        <file>resources/usb.png</file>
+        <file>resources/internet.png</file>
+        <file>resources/settings.png</file>
+        <file>resources/pointCloud_blue.png</file>
+        <file>resources/pointCloud_color.png</file>
+        <file>resources/home.png</file>
+        <file>resources/disconnect.png</file>
+        <file>resources/pause_stream.png</file>
+        <file>resources/restart_camera.png</file>
+        <file>resources/resume_stream.png</file>
+        <file>resources/export.png</file>
+        <file>resources/camera.png</file>
+        <file>resources/checked.png</file>
+        <file>resources/unchecked.png</file>
+        <file>resources/export_active.png</file>
+        <file>resources/export_mid.png</file>
+        <file>resources/save.png</file>
+        <file>resources/save_active.png</file>
+        <file>resources/save_mid.png</file>
+    </qresource>
+    <qresource prefix="/ui">
+        <file>cameralist.ui</file>
+    </qresource>
+</RCC>

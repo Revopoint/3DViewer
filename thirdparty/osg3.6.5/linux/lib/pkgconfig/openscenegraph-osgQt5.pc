@@ -1,0 +1,14 @@
+# pkg-config source file
+
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib64
+includedir=${prefix}/include
+
+Name: openscenegraph-osgQt5
+Description: osgQt5 utility library.
+Version: 3.6.5
+Requires: openscenegraph-osgWidget openscenegraph-osgDB openscenegraph-osgUtil openscenegraph-osg openthreads
+Conflicts:
+Libs: -L${libdir} -losgQt5
+Cflags: -I${includedir}

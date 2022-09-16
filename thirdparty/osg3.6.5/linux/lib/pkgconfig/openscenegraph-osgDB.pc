@@ -1,0 +1,14 @@
+# pkg-config source file
+
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: openscenegraph-osgDB
+Description: File format reading library for Openscenegraph
+Version: 3.6.5
+Requires: openscenegraph-osg openthreads
+Conflicts:
+Libs: -L${libdir} -losgDB
+Cflags: -I${includedir}
