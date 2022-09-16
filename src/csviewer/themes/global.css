@@ -1,0 +1,538 @@
+/*******************************************************************************
+* This file is part of the 3DViewer
+*
+* Copyright 2022-2026 (C) Revopoint3D AS
+* All rights reserved.
+*
+* Revopoint3D Software License, v1.0
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistribution of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+*
+* 2. Redistribution in binary form must reproduce the above copyright notice,
+* this list of conditions and the following disclaimer in the documentation
+* and/or other materials provided with the distribution.
+*
+* 3. Neither the name of Revopoint3D AS nor the names of its contributors may be used
+* to endorse or promote products derived from this software without specific
+* prior written permission.
+*
+* 4. This software, with or without modification, must not be used with any
+* other 3D camera than from Revopoint3D AS.
+*
+* 5. Any software provided in binary form under this license must not be
+* reverse engineered, decompiled, modified and/or disassembled.
+*
+* THIS SOFTWARE IS PROVIDED BY REVOPOINT3D AS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+* MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL REVOPOINT3D AS OR CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+* Info:  https://www.revopoint3d.com
+******************************************************************************/
+
+
+/* QWidget */
+QWidget {
+    border: none;
+    border-style: outset;
+    color: rgb(60,60,60);
+    font: 14px;
+}
+
+QWidget:disabled {
+    color: rgb(140,140,140);
+}
+
+QWidget#centralwidget {
+    background: rgb(255, 255, 255);
+    border-bottom: 1px solid rgb(230, 230, 230);
+}
+
+QWidget#bottomControlArea {
+    border-top: 3px solid qlineargradient(y0:0, y1:1,stop: 0 rgb(229,229, 229), stop: 1 rgb(210,210, 210));
+}
+
+QWidget#topControlArea {
+
+}
+
+/* QMenuBar */
+QMenuBar {
+    background: rgb(229, 229, 229);
+    border: 1px solid rgb(210, 210, 210);
+}
+
+/* QFrame */
+QFrame {
+    background: rgb(229, 229, 229);
+}
+
+QFrame#CameraControlWidget {
+    background: rgb(201, 201, 201);
+    border-top: 1px solid rgb(220, 220, 220);
+    border-top: none;
+    border-bottom-right-radius: 3px;
+}
+
+QFrame#cameraTopItem {
+    background: rgb(201, 201, 201);
+    border-bottom: 1px solid rgb(180, 180, 180);
+}
+
+QStatusBar {
+    background: rgb(255, 255, 255);
+}
+
+/* QPushButton */
+QPushButton {
+    background: rgb(201, 201, 201);
+}
+
+QPushButton:hover {
+    background: rgb(190, 190, 190);
+    /*color:white;*/
+}
+
+/* QDialog*/
+QDialog#CSProgressBar {
+    background-color: rgb(229, 229, 229);
+}
+
+QPushButton:pressed {
+    background-color: rgb(201, 201, 201, 220);
+}
+
+QPushButton[isCSStyle] {
+    background-color: rgb(90, 112, 169);
+    border: 1px solid rgb(90, 90, 90);
+    border-radius: 4px;
+    color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 40px;
+    font: 16px;
+}
+
+QPushButton[isCSStyle]:disabled {
+    background-color: rgb(200, 200, 200);
+    border: none;
+}
+
+QPushButton[isCSStyle]:hover {
+    background-color: rgb(90, 112, 169,180);
+}
+
+QPushButton[isCSStyle]:pressed {
+    background-color: rgb(90, 112, 169, 200)
+}
+
+QPushButton#connectCameraBtn {
+    height: 54px;
+    font: 18px;
+}
+
+QPushButton#homeButton, QPushButton#textureButton, QPushButton#export3dButton {
+    background: transparent;
+    height: 40px;
+    width: 40px;
+}
+
+QPushButton#exportButton {
+    background-color: transparent;
+    background-image: url(:/resources/save.png);
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+}
+
+QPushButton#exportButton:hover {
+    background: url(:/resources/save_active.png);
+}
+
+QPushButton#connectCameraBtn {
+    height: 54px;
+    font: 18px;
+}
+
+QPushButton#closeButton {
+    background: transparent;
+    color: rgb(60,60,60);
+    qproperty-icon: url(:/resources/double_arrow_down.png);
+    qproperty-iconSize: 28px 28px;
+}
+
+QPushButton[isCameraButton] {
+    height: 46px;
+    font: 16px;
+    background-color: rgb(210, 210, 210);
+}
+
+QPushButton[isCameraButton]:checked {
+    background-color: rgb(90, 112, 169);
+    color:white;
+}
+
+QPushButton[isCameraButton]:hover:!checked{
+    background-color: rgb(200, 200, 200);
+}
+
+QPushButton[isSwitchButton] {
+    background: url(:/resources/switch_button_on.png);
+    width: 54px;
+    height: 30px;
+    color: white;
+}
+
+QPushButton#modeSwitchButton {
+    height: 50px;
+    border-top: 1px solid rgb(190, 190, 190);
+    font: 18px;
+    color: rgb(80,80,80);
+    border-bottom-right-radius: 3px;
+}
+
+QPushButton#roiEditBtn {
+    min-width: 90px;
+}
+
+QWidget#cameraBtnCtlArea QPushButton {
+    background-color: rgb(90, 112, 169);
+    width: 50px;
+    height: 50px;
+    border-radius: 25px;
+}
+
+QWidget#cameraBtnCtlArea QPushButton:disabled {
+    background-color: rgb(200, 200, 200);
+}
+
+QWidget#cameraBtnCtlArea QPushButton:hover {
+    background-color: rgb(90, 112, 169, 180);
+}
+
+QWidget#cameraBtnCtlArea QPushButton:pressed {
+    background-color: rgb(90, 112, 169, 100);
+}
+
+QWidget#cameraBtnCtlArea QPushButton:checked {
+}
+
+/* QLabel */
+QLabel {
+    background-color: transparent;
+}
+
+QLabel#fpsLabel {
+    font-size: 13px;
+    color: rgb(70, 70, 70);
+}
+
+QLabel[isImage] {
+    background: #000;
+}
+
+/* QListView */
+QListView {
+    show-decoration-selected: 1;
+}
+
+QListView::item{
+    height: 30px;
+    /*padding-left: 15px;
+    padding-right: 15px;
+    */
+}
+
+QListView::item:selected {
+    background-color: rgb(90, 112, 169);
+    color:white;
+}
+
+QListView::item:hover:!selected {
+    background-color: rgb(90, 112, 169, 100);
+}
+
+/*QTabWidget*/
+QTabWidget::pane {
+    position: absolute;
+    border: 1px solid #C4C4C3;
+    border-radius: 3px;
+}
+
+QTabWidget::tab-bar {
+    left: 0px; 
+    top:1px;
+}
+
+QTabBar::tab {
+    border: 1px solid #C4C4C3;
+    min-width: 80px;
+    min-height: 18px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 6px;
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    background: rgb(229, 229, 229);
+    border-bottom-width: 0;
+}
+
+QTabBar::tab:first {
+    border-right:none;
+}
+
+/*QComboBox*/
+QComboBox {
+    border: 1px solid rgb(190, 190, 190);
+    min-height: 36px;
+    background-color: white;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: rgb(244, 244, 244);
+    border: 1px solid rgb(200,200,200);
+}
+
+QComboBox QAbstractItemView::item {
+    height: 36px;
+    border-bottom: 1px solid rgb(200,200,200);
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 30px;
+    border-left: 1px solid rgb(190, 190, 190);
+}
+
+QComboBox::down-arrow {
+    image: url(:/resources/arrow_down.png);
+}
+
+QComboBox::down-arrow:on {
+    top: 1px;
+    left: 1px;
+}
+
+QComboBox:on {
+    padding-top: 1px;
+}
+
+/*QLineEdit*/
+QLineEdit {
+    border: 1px solid rgb(190, 190, 190);
+    height: 36px;
+    padding-left: 5px;
+    border-radius: 3px;
+}
+
+/*QSlider*/
+QSlider::sub-page:Horizontal {
+    background-color: rgb(90, 112, 169);
+    border-radius: 4px;
+}
+
+QSlider::groove:Horizontal {
+    border: 1px solid #999999;
+    height: 6px;
+    background: rgb(129,129,129);
+    border-radius: 4px;
+}
+
+QSlider::handle:Horizontal {
+    height: 6px;
+    width: 16px;
+    background: url(:/resources/slider.png);
+    margin-top: -5px;
+    margin-bottom: -5px;
+}
+
+/*QSpinBox*/
+QSpinBox {
+    border: 1px solid rgb(190, 190, 190);
+    background-color: white;
+    height: 36px;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+}
+
+QSpinBox::up-button, QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    border-left: 1px solid rgb(190, 190, 190);
+    width: 30px;
+    margin: 0;
+}
+
+QSpinBox::down-button {
+    subcontrol-position: bottom right;
+}
+
+QSpinBox::up-arrow{
+    image: url(:/resources/triangle_arrow_up.png);
+    width: 16px;
+    height: 16px;
+    padding-top: 7px;
+}
+
+QSpinBox::up-arrow:hover {
+    image: url(:/resources/triangle_arrow_up_active.png);
+}
+
+QSpinBox::up-arrow:disabled, QSpinBox::up-arrow:off {
+    image: url(:/resources/triangle_arrow_up.png);
+}
+
+QSpinBox::down-arrow {
+    image: url(:/resources/triangle_arrow_down.png);
+    width: 16px;
+    height: 16px;
+    padding-bottom: 7px;
+}
+
+QSpinBox::down-arrow:hover {
+    image: url(:/resources/triangle_arrow_down_active.png);
+}
+
+QSpinBox::down-arrow:disabled, QSpinBox::down-arrow:off {
+    image: url(:/resources/triangle_arrow_down.png);
+}
+
+/* QCheckBox*/
+QCheckBox {
+    height: 24px;
+}
+
+QCheckBox::indicator {
+    width:24px;
+    height: 24px;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/resources/unchecked.png);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/resources/checked.png);
+}
+
+/* QTableWidget*/
+QTableWidget {
+    border: 1px solid rgb(190, 190, 190);
+}
+
+QHeaderView::section {
+    background-color: white;
+    border: none;
+    border-right: 0.5px solid rgb(190, 190, 190);
+    border-bottom: 0.5px solid rgb(190, 190, 190);
+    height: 30px;
+}
+
+QHeaderView::section:last{
+    border-right: none;
+}
+
+QTableWidget::item::selected {
+    color: white;
+    background: rgb(90, 112, 169);
+}
+
+/*QScrollBar*/
+QScrollBar:vertical {
+    background: transparent;
+    width: 6px;
+}
+
+QScrollBar::handle:vertical {
+    background: rgb(200, 200, 200);
+    min-height: 20px;
+    border: 1px solid rgb(190, 190, 190);
+    border-radius: 3px;
+}
+
+QScrollBar::handle::vertical:hover {
+    background: rgb(90, 112, 169);
+}
+
+QScrollBar::add-line:vertical {
+    background: none;
+}
+
+QScrollBar::sub-line:vertical {
+    background: none;
+}
+
+QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+    background: none;
+}
+
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+    
+/* CSComboBox*/
+QWidget #CSHComboBox QLabel {
+    background: white;
+    border: 1px solid rgb(190, 190, 190);
+    border-right: none;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+    padding-right: 6px;
+    padding-left: 6px;
+}
+
+QWidget#CSHComboBox QComboBox {
+    border-left: none;
+}
+
+/*CSLine*/
+QFrame#CSLine {
+    background: rgb(200, 200, 200);
+}
+
+/*CSSpinBox*/
+QWidget#CSSpinBox QLabel {
+    padding-right: 6px;
+    padding-left: 6px;
+    background: white;
+    border: 1px solid rgb(190, 190, 190);
+    border-right: none;
+    border-top-left-radius: 3px;
+    border-bottom-left-radius: 3px;
+}
+
+/*CSSpinBox*/
+QWidget#CSSpinBox QSpinBox {
+    border-left: none;
+}
+
+/*CSSwitchButton*/
+QWidget#CWSwitchButton QPushButton {
+    width: 54px;
+    height: 30px;
+    color: white;
+}
+
+QWidget#CWSwitchButton QPushButton:!checked{
+    background: url(:/resources/switch_button_off.png);
+}
+
+QWidget#CWSwitchButton QPushButton:checked {
+    background: url(:/resources/switch_button_on.png);
+}
+

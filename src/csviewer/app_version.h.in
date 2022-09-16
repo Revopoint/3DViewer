@@ -1,0 +1,12 @@
+#pragma once
+#include <QDir>
+#include <QApplication>
+
+#cmakedefine APP_VERSION "${APP_VERSION}"
+#cmakedefine APP_NAME "${APP_NAME}"
+
+#define LOG_DIR "Logs"
+#define APP_PATH QApplication::applicationDirPath()
+#define LOG_ROOT_DIR (QDir::homePath() + QDir::separator() + APP_NAME + QDir::separator() + LOG_DIR)
+#define LOG_PREFIX APP_NAME
+

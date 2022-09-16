@@ -1,0 +1,3 @@
+[submodule "thirdparty/3DCamera"]
+	path = thirdparty/3DCamera
+	url = https://github.com/Revopoint/3DCamera.git

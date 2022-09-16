@@ -1,0 +1,14 @@
+# pkg-config source file
+
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: openscenegraph-osgGA
+Description: GUI event library for Openscenegraph
+Version: 3.6.5
+Requires: openscenegraph-osgDB openscenegraph-osgUtil openscenegraph-osg openthreads
+Conflicts:
+Libs: -L${libdir} -losgGA
+Cflags: -I${includedir}
