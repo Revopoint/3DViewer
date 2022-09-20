@@ -1,6 +1,7 @@
 #pragma once
 #include <QDir>
 #include <QApplication>
+#include <QFontDatabase>
 
 #cmakedefine APP_VERSION "${APP_VERSION}"
 #cmakedefine APP_NAME "${APP_NAME}"
