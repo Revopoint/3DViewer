@@ -636,7 +636,7 @@ bool CSCamera::softTrigger()
         qWarning("camera soft trigger failed(%d)!", ret);
     }
 
-    onGetFrame(1000);
+    onGetFrame(3000);
 
     return ret == SUCCESS;
 }
