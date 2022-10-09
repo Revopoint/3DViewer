@@ -53,6 +53,71 @@
 #include <osg/MatrixTransform>
 #include <osg/Point>
 #include <osgDB/ReadFile>
+#include <osgText/Text>
+#include <osg/Camera>
+#include <osg/Referenced>
+
+#include <osg/ShapeDrawable>
+
+#define AXIS_LEN  40
+#define AXIS_RADIUS 3
+
+typedef enum Axis
+{
+    X,
+    Y,
+    Z,
+    COUNT
+} Axis;
+
+class CSAxis : public osg::Camera
+{
+public:
+    CSAxis();
+    CSAxis(CSAxis const& copy, osg::CopyOp copyOp = osg::CopyOp::SHALLOW_COPY);
+    virtual ~CSAxis();
+    META_Node(osg, CSAxis);
+    inline void setMainCamera(Camera* camera) { mainCamera = camera; }
+    virtual void traverse(osg::NodeVisitor& nv);
+protected:
+    osg::observer_ptr<Camera> mainCamera;
+};
+
+CSAxis::CSAxis()
+{
+}
+
+CSAxis::CSAxis(CSAxis const& copy, osg::CopyOp copyOp)
+    : Camera(copy, copyOp)
+    , mainCamera(copy.mainCamera)
+{
+}
+
+CSAxis::~CSAxis()
+{
+}
+
+void CSAxis::traverse(osg::NodeVisitor& nv)
+{
+   osg::Viewport* viewPort =  mainCamera->getViewport();
+   const int halfWidth = viewPort->width() / 2;
+   const int halfHeight = viewPort->width() / 2;
+
+   const int space = 20;
+
+   this->setProjectionMatrixAsOrtho(-halfWidth, halfWidth, -halfHeight, halfHeight, -200.0, 200.0);
+   osg::Vec3 trans(halfWidth- AXIS_LEN - space, -halfHeight + AXIS_LEN + space, -AXIS_LEN);
+
+    if (mainCamera.valid() && nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
+    {
+        osg::Matrix matrix = mainCamera->getViewMatrix();
+        matrix.setTrans(trans);
+
+        this->setViewMatrix(matrix);
+    }
+
+    osg::Camera::traverse(nv);
+}
 
 RenderWidget3D::RenderWidget3D(QWidget* parent)
     : QWidget(parent)
@@ -145,6 +210,20 @@ void RenderWidget3D::initWindow()
     connect(homeButton, &QPushButton::clicked, this, [=]() {
             pViewer->home();
         });
+
+    osg::ref_ptr<osg::MatrixTransform> axis = makeCoordinate();
+
+    osg::ref_ptr<CSAxis> csAxes = new CSAxis;
+    csAxes->addChild(axis);
+    csAxes->setMainCamera(pViewer->getCamera());
+    csAxes->setRenderOrder(osg::Camera::POST_RENDER);
+    csAxes->setClearMask(GL_DEPTH_BUFFER_BIT);
+    csAxes->setAllowEventFocus(false);
+    csAxes->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+    
+    //coordAxis->setMatrix(matrix);
+
+    rootNode->addChild(csAxes);
 }
 
 void RenderWidget3D::updateNodeVertexs(cs::Pointcloud& pointCloud)
@@ -155,7 +234,7 @@ void RenderWidget3D::updateNodeVertexs(cs::Pointcloud& pointCloud)
     const int num_ver = qMin(pointCloud.getNormals().size(), pointCloud.getVertices().size());
     vertexArr->resize(num_ver);
     normalArr->resize(num_ver);
-    
+
     memcpy((void*)vertexArr->getDataPointer(), pointCloud.getVertices().data(), sizeof(cs::float3) * num_ver);
     memcpy((void*)normalArr->getDataPointer(), pointCloud.getNormals().data(), sizeof(cs::float3) * num_ver);
 
@@ -357,4 +436,72 @@ void RenderWidget3D::onTranslate()
 void RenderWidget3D::setTextureEnable(bool enable)
 {
     textureButton->setEnabled(enable);
+}
+
+osg::ref_ptr<osg::MatrixTransform> RenderWidget3D::makeCoordinate()
+{
+    osg::ref_ptr<osg::MatrixTransform> group = new osg::MatrixTransform();
+
+    osg::ref_ptr<osg::TessellationHints> hits = new osg::TessellationHints;
+    hits->setDetailRatio(10.0f);
+
+    float len = AXIS_LEN;
+    float radius = AXIS_RADIUS;
+
+    osg::Vec4 blue = osg::Vec4(0.0f, 0.0f, 1.0f, 1.0f);
+    osg::Vec4 red = osg::Vec4(1.0f, 0.0f, 0.0f, 1.0f);
+    osg::Vec4 green = osg::Vec4(0.0f, 1.0f, 0.0f, 1.0f);
+
+    osg::ref_ptr<osg::Sphere> sphere = new osg::Sphere(osg::Vec3(0, 0, 0), radius * 1.5);
+    osg::ref_ptr<osg::ShapeDrawable> sphereDrawable = new osg::ShapeDrawable(sphere.get());
+    sphereDrawable->setColor(osg::Vec4f(1.0, 1.0, 1.0, 1.0));
+    group->addChild(sphereDrawable);
+
+    for (int i = 0; i < 3; ++i) {
+        osg::ref_ptr<osg::Cylinder> cylinder = new osg::Cylinder(osg::Vec3(0.0, 0.0, len / 2), radius / 2, len);
+        osg::ref_ptr<osg::Cone> cone = new osg::Cone(osg::Vec3(0.0, 0.0, len), radius * 1.5, radius * 3);
+        osg::ref_ptr<osg::ShapeDrawable> cylinderDrawable = new osg::ShapeDrawable(cylinder.get());
+        osg::ref_ptr<osg::ShapeDrawable> coneDrawable = new osg::ShapeDrawable(cone.get());
+        osg::ref_ptr<osgText::Text> pTextXAuxis = new osgText::Text;
+
+        osg::ref_ptr<osg::MatrixTransform> axisTransform = new osg::MatrixTransform();
+
+        axisTransform->addChild(cylinderDrawable);
+        axisTransform->addChild(coneDrawable);
+        axisTransform->addChild(pTextXAuxis);
+
+        cylinderDrawable->setTessellationHints(hits);
+        coneDrawable->setTessellationHints(hits);
+
+        Axis axis = static_cast<Axis>(i);
+        switch (axis) {
+        case X:
+            axisTransform->setMatrix(osg::Matrix::rotate(osg::inDegrees(90.0), osg::Y_AXIS));
+            cylinderDrawable->setColor(red);
+            coneDrawable->setColor(red);
+            pTextXAuxis->setText("X");
+            break;
+        case Y:
+            axisTransform->setMatrix(osg::Matrix::rotate(osg::inDegrees(-90.0), osg::X_AXIS));
+            cylinderDrawable->setColor(green);
+            coneDrawable->setColor(green);
+            pTextXAuxis->setText("Y");
+            break;
+        case Z:
+            axisTransform->setMatrix(osg::Matrix::rotate(osg::inDegrees(90.0), osg::Z_AXIS));
+            cylinderDrawable->setColor(blue);
+            coneDrawable->setColor(blue);
+            pTextXAuxis->setText("Z");
+            break;
+        }
+
+        pTextXAuxis->setPosition(osg::Vec3(0.0f, 0.0f, len));
+        pTextXAuxis->setAxisAlignment(osgText::Text::SCREEN);
+        pTextXAuxis->setCharacterSize(14);
+        pTextXAuxis->setColor(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+        group->addChild(axisTransform.get());
+    }
+
+    return group;
 }

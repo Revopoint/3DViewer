@@ -17,12 +17,14 @@ if(WIN32)
         optimized osgGA debug osgGAd
         optimized osgDB debug osgDBd
         optimized OpenThreads debug OpenThreadsd
+        optimized osgText debug osgTextd         
     )
 else(WIN32)
     set(OSG_LIBRARY 
         osg
         osgGA
         osgViewer
+        osgText
         osgQOpenGL
         OpenThreads
     )

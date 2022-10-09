@@ -516,27 +516,27 @@
 <context>
     <name>RenderWidget3D</name>
     <message>
-        <location filename="../renderwidget3d.cpp" line="298"/>
-        <location filename="../renderwidget3d.cpp" line="353"/>
+        <location filename="../renderwidget3d.cpp" line="377"/>
+        <location filename="../renderwidget3d.cpp" line="432"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="303"/>
-        <location filename="../renderwidget3d.cpp" line="335"/>
-        <location filename="../renderwidget3d.cpp" line="350"/>
+        <location filename="../renderwidget3d.cpp" line="382"/>
+        <location filename="../renderwidget3d.cpp" line="414"/>
+        <location filename="../renderwidget3d.cpp" line="429"/>
         <source>Texture on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="313"/>
-        <location filename="../renderwidget3d.cpp" line="354"/>
+        <location filename="../renderwidget3d.cpp" line="392"/>
+        <location filename="../renderwidget3d.cpp" line="433"/>
         <source>Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="331"/>
-        <location filename="../renderwidget3d.cpp" line="346"/>
+        <location filename="../renderwidget3d.cpp" line="410"/>
+        <location filename="../renderwidget3d.cpp" line="425"/>
         <source>Texture off</source>
         <translation type="unfinished"></translation>
     </message>

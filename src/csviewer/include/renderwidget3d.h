@@ -71,6 +71,7 @@ private:
     void refresh();
     void updateButtonArea();
     void initButtons();
+    osg::ref_ptr<osg::MatrixTransform> makeCoordinate();
 signals:
     void show3DTextureChanged(bool texture);
     void exportPointCloud();
