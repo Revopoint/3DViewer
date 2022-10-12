@@ -81,6 +81,7 @@ struct StreamDataInfo
     STREAM_FORMAT format;
     int width;
     int height;
+    double timeStamp;
 }; 
 
 struct StreamData
@@ -99,17 +100,19 @@ Q_DECLARE_METATYPE(FrameData);
 
 enum CS_CAMERA_DATA_TYPE
 {
-    CAMERA_DATA_L = (1 << 0),
-    CAMERA_DATA_R = (1 << 1),
-    CAMERA_DATA_DEPTH = (1 << 2),
-    CAMERA_DATA_RGB = (1 << 3)
+    CAMERA_DATA_UNKNOW     = 0,
+    CAMERA_DATA_L          = (1 << 0),
+    CAMERA_DATA_R          = (1 << 1),
+    CAMERA_DATA_DEPTH      = (1 << 2),
+    CAMERA_DATA_RGB        = (1 << 3),
+    CAMERA_DTA_POINT_CLOUD = (1 << 4)
 };
 
 struct OutputInfo2D
 {
-    int cameraDataType;
-    QVector3D vertex;
-    float depthScale;
+    int cameraDataType = CAMERA_DATA_UNKNOW;
+    QVector3D vertex = { 1.0f, 1.0f, 1.0f };
+    float depthScale = 0.0f;
 };
 
 struct OutputData2D
@@ -161,6 +164,15 @@ struct CSCameraInfo
     int connectType;
     CameraInfo cameraInfo;
     QString sdkVersion;
+};
+
+struct CameraCaptureConfig
+{
+    int captureNumber = 1;
+    QVector<CS_CAMERA_DATA_TYPE> captureDataTypes;
+    QString saveFormat;
+    QString saveDir;
+    QString saveName;
 };
 
 #endif // _CS_TYPES_H

@@ -431,13 +431,13 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="restartCameraButton">
+          <widget class="QPushButton" name="captureSingleButton">
            <property name="text">
             <string/>
            </property>
            <property name="icon">
             <iconset resource="3dviewer.qrc">
-             <normaloff>:/resources/restart_camera.png</normaloff>:/resources/restart_camera.png</iconset>
+             <normaloff>:/resources/save_large.png</normaloff>:/resources/save_large.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -448,13 +448,13 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="disconnectCameraButton">
+          <widget class="QPushButton" name="captureMultipleButton">
            <property name="text">
             <string/>
            </property>
            <property name="icon">
             <iconset resource="3dviewer.qrc">
-             <normaloff>:/resources/disconnect.png</normaloff>:/resources/disconnect.png</iconset>
+             <normaloff>:/resources/video.png</normaloff>:/resources/video.png</iconset>
            </property>
            <property name="iconSize">
             <size>

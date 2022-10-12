@@ -41,6 +41,8 @@
         <file>resources/save.png</file>
         <file>resources/save_active.png</file>
         <file>resources/save_mid.png</file>
+        <file>resources/save_large.png</file>
+        <file>resources/video.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>cameralist.ui</file>

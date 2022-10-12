@@ -46,6 +46,7 @@
 #include <QImage>
 #include <memory>
 #include <cstypes.h>
+
 #include <hpp/Processing.hpp>
 
 class DataExporter;
@@ -56,6 +57,9 @@ class CameraThread;
 class ProcessThread;
 class Processor;
 class ICSCamera;
+class ProcessStrategy;
+class CameraCaptureTool;
+
 class CSApplication : public QObject
 {
     Q_OBJECT
@@ -64,14 +68,14 @@ public:
     ~CSApplication();
     void start();
     std::shared_ptr<ICSCamera> getCamera() const;
-public slots:
-    void onOutput2DUpdated(OutputData2D outputData, StreamData streamData);
-    void onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image, StreamData streamData);
 
-    //export data
-    void onExportPointCloud(QString filePath);
-    void onExportDepthData(QString filePath);
-    void onExportRgbData(QString filePath);
+    void startCapture(CameraCaptureConfig config);
+    void stopCapture();
+
+public slots:
+    void onShow3DUpdated(bool show);
+    void onShow3DTextureChanged(bool texture);
+    void onShowCoordChanged(bool show, QPointF pos);
 signals:
     void cameraListUpdated(const QStringList infoList);
     void connectCamera(QString serial);
@@ -87,31 +91,27 @@ signals:
     void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
     void removedCurrentCamera(QString serial);
 
-    void exportFinished(bool success);
-    void exportStreamData(StreamData streamData, QImage image, QString filePath);
-    void exportPointCloud(cs::Pointcloud pointCloud, QImage image, QString filePath);
+    // save frame data
+    void captureNumberUpdated(int captured, int dropped);
+    void captureStateChanged(int state, QString message);
+
+private slots:
+    void onCameraStateChanged(int state);
+    void onCameraParaUpdated(int paraId, QVariant value);
 private:
     CSApplication();    
     void initConnections();
     void disconnections();
+    void updateProcessStrategys();
 private:
     std::shared_ptr<CameraThread> cameraThread;
     std::shared_ptr<Processor> processor;
     std::shared_ptr<ProcessThread> processThread;
     std::shared_ptr<DataExporter> dataExporter;
     
-    // cached data
-    //1. depth
-    StreamData cachedDepthData;
-    QImage cachedDepthImage;
-
-    //2. rgb
-    StreamData cachedRgbData;
-    QImage cachedRgbImage;
-
-    //3. point cloud
-    cs::Pointcloud cachedPointcloud;
-    QImage cachedTextureImage;
+    bool show3D = false;
+    QMap<int, cs::ProcessStrategy*> processStrategys;
+    std::shared_ptr<CameraCaptureTool> cameraCaptureTool;
 };
 }
 

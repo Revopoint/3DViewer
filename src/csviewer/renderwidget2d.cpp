@@ -94,17 +94,6 @@ void RenderWidget2D::initFrame()
     hLayout->addWidget(fpsLabel);
     fpsLabel->setObjectName("fpsLabel");
     
-    exportButton = new QPushButton(this);
-    exportButton->setObjectName("exportButton");
-    exportButton->setToolTip(tr("Save"));
-
-    hLayout->addWidget(exportButton);
-
-    connect(exportButton, &QPushButton::clicked, [=]()
-        {
-            emit clickedExport(renderId);
-        });
-
     updateFps();
 }
 
@@ -200,7 +189,7 @@ void RenderWidget2D::updateImageSize()
 
 void RenderWidget2D::onTranslate()
 {
-    exportButton->setToolTip(tr("Save"));
+
 }
 
 DepthRenderWidget2D::DepthRenderWidget2D(int renderId, QWidget* parent)

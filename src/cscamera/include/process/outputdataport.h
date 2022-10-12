@@ -40,45 +40,39 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_PROCESSOR_H
-#define _CS_PROCESSOR_H
-#include <QObject>
-#include <QVector>
-#include <QMutex>
+#ifndef _CS_OUTPUTDATAPORT_H
+#define _CS_OUTPUTDATAPORT_H
 
-#include "cscameraapi.h"
+#include <QMap>
+
 #include "cstypes.h"
-#include "outputdataport.h"
+#include <hpp/Processing.hpp>
 
-namespace cs
+class OutputDataPort
 {
-class ProcessStrategy;
-
-class CS_CAMERA_EXPORT Processor: public QObject
-{
-    Q_OBJECT
 public:
-    class ProcessEndListener : public QObject
-    {
-    public:
-        virtual void process(const OutputDataPort& outputDataPort) = 0;
-    };
+    OutputDataPort();
+    OutputDataPort(const FrameData& frameData);
+    OutputDataPort(const OutputDataPort& other);
+    ~OutputDataPort();
 
-    Processor();
-    ~Processor();
+    bool isEmpty() const;
+    bool hasData(CS_CAMERA_DATA_TYPE dataType) const;
 
-    void process(const FrameData& frameData);
+    cs::Pointcloud getPointCloud();
+    OutputData2D getOutputData2D(CS_CAMERA_DATA_TYPE dataType);
+    QMap<CS_CAMERA_DATA_TYPE, OutputData2D> getOutputData2Ds();
+    FrameData getFrameData();
 
-    void addProcessStrategy(ProcessStrategy* strategy);
-    void removeProcessStrategy(ProcessStrategy* strategy);
 
-    void addProcessEndLisener(ProcessEndListener* listener);
-    void removeProcessEndLisener(ProcessEndListener* listener);
+    void setFrameData(const FrameData& frameData);
+    void setPointCloud(const cs::Pointcloud& pointCloud);
+    void addOutputData2D(const OutputData2D& outputData2D);
+    void addOutputData2D(const QVector<OutputData2D>& outputData2Ds);
 private:
-    QVector<ProcessStrategy*> processStrategys; 
-    QMutex mutex;
-    QVector<ProcessEndListener*> processEndLiseners;
+    FrameData frameData;
+    QMap<CS_CAMERA_DATA_TYPE, OutputData2D> outputData2DMap;
+    mutable cs::Pointcloud pointCloud;
 };
-}
 
-#endif //_CS_PROCESSOR_H
+#endif // _CS_OUTPUTDATAPORT_H

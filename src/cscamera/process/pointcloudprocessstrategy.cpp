@@ -49,12 +49,13 @@
 using namespace cs;
 
 PointCloudProcessStrategy::PointCloudProcessStrategy()
-    : withTexture(false)
+    : DepthProcessStrategy(STRATEGY_CLOUD_POINT)
+    , withTexture(false)
 {
 
 }
 
-void PointCloudProcessStrategy::doProcess(const FrameData& frameData)
+void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort& outputDataPort)
 {
     const auto& streamDatas = frameData.data;
     
@@ -132,6 +133,8 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData)
     }
     
     emit output3DUpdated(pc, texImage, depthData);
+
+    outputDataPort.setPointCloud(pc);
 }
 
 void PointCloudProcessStrategy::onLoadCameraPara()

@@ -104,8 +104,9 @@ void CSAxis::traverse(osg::NodeVisitor& nv)
    const int halfHeight = viewPort->width() / 2;
 
    const int space = 20;
-
    this->setProjectionMatrixAsOrtho(-halfWidth, halfWidth, -halfHeight, halfHeight, -200.0, 200.0);
+   setViewport(0, 0, halfWidth * 2, halfHeight * 2);
+
    osg::Vec3 trans(halfWidth- AXIS_LEN - space, -halfHeight + AXIS_LEN + space, -AXIS_LEN);
 
     if (mainCamera.valid() && nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
@@ -124,7 +125,6 @@ RenderWidget3D::RenderWidget3D(QWidget* parent)
     , osgQOpenGLWidgetPtr(new osgQOpenGLWidget(this))
     , homeButton(new QPushButton(this))
     , textureButton(new QPushButton(this))
-    , exportButton(new QPushButton(this))
     , buttonArea(new QWidget(this))
 {
     QHBoxLayout* pLayout = new QHBoxLayout(this);
@@ -157,7 +157,8 @@ void RenderWidget3D::initWindow()
     camera->setClearColor(osg::Vec4(229.0 / 255, 229.0 / 255, 229.0 / 255, 1.0));
     camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     camera->setComputeNearFarMode(osg::Camera::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
-    //camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(width()) / static_cast<double>(height()), 1.0f, 10000.0f);
+    camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(width()) / static_cast<double>(height()), 1.0f, 10000.0f);
+    camera->setViewport(0, 0, width(), height());
 
     pViewer->setKeyEventSetsDone(0);
     pViewer->setQuitEventSetsDone(false);
@@ -369,7 +370,7 @@ void RenderWidget3D::updateButtonArea()
 void RenderWidget3D::initButtons()
 {
     buttonArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    buttonArea->resize(120, 40);
+    buttonArea->resize(80, 40);
 
     homeButton->setObjectName("homeButton");
     homeButton->setIconSize(QSize(36, 36));
@@ -387,20 +388,9 @@ void RenderWidget3D::initButtons()
     icon1.addFile(QStringLiteral(":/resources/pointCloud_color.png"), QSize(), QIcon::Selected, QIcon::On);
     textureButton->setIcon(icon1);
 
-    exportButton->setObjectName("export3dButton");
-    exportButton->setIconSize(QSize(32, 32));
-    exportButton->setToolTip(tr("Save"));
-    exportButton->setIcon(QIcon(":/resources/save_mid.png"));
-
-    connect(exportButton, &QPushButton::clicked, this, [=]()
-        {
-            emit exportPointCloud();
-        });
-    
     QHBoxLayout* layout = new QHBoxLayout(buttonArea);
     layout->addWidget(textureButton);
     layout->addWidget(homeButton);
-    layout->addWidget(exportButton);
     layout->setMargin(0);
 
     connect(textureButton, &QPushButton::toggled, [=](bool toggled)
@@ -430,7 +420,6 @@ void RenderWidget3D::onTranslate()
     }
 
     homeButton->setToolTip(tr("Home"));
-    exportButton->setToolTip(tr("Save"));
 }
 
 void RenderWidget3D::setTextureEnable(bool enable)
@@ -459,7 +448,7 @@ osg::ref_ptr<osg::MatrixTransform> RenderWidget3D::makeCoordinate()
 
     for (int i = 0; i < 3; ++i) {
         osg::ref_ptr<osg::Cylinder> cylinder = new osg::Cylinder(osg::Vec3(0.0, 0.0, len / 2), radius / 2, len);
-        osg::ref_ptr<osg::Cone> cone = new osg::Cone(osg::Vec3(0.0, 0.0, len), radius * 1.5, radius * 3);
+        osg::ref_ptr<osg::Cone> cone = new osg::Cone(osg::Vec3(0.0, 0.0, len), radius * 2, radius * 4);
         osg::ref_ptr<osg::ShapeDrawable> cylinderDrawable = new osg::ShapeDrawable(cylinder.get());
         osg::ref_ptr<osg::ShapeDrawable> coneDrawable = new osg::ShapeDrawable(cone.get());
         osg::ref_ptr<osgText::Text> pTextXAuxis = new osgText::Text;

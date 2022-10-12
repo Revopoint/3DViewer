@@ -47,9 +47,10 @@
 
 using namespace cs;
 
-ProcessStrategy::ProcessStrategy()
+ProcessStrategy::ProcessStrategy(PROCESS_STRA_TYPE type)
     : QObject()
-    , isCameraParaDirty(false)
+    , isCameraParaDirty(true)
+    , strategyType(type)
 {
 
 }
@@ -65,7 +66,7 @@ void ProcessStrategy::setCameraParaState(bool dirty)
     isCameraParaDirty = dirty;
 }
 
-void ProcessStrategy::process(const FrameData& frameData)
+void ProcessStrategy::process(const FrameData& frameData, OutputDataPort& outputDataPort)
 {
     bool dirty = false;
     
@@ -79,5 +80,10 @@ void ProcessStrategy::process(const FrameData& frameData)
         onLoadCameraPara();
     }
 
-    doProcess(frameData);
+    doProcess(frameData, outputDataPort);
+}
+
+PROCESS_STRA_TYPE ProcessStrategy::getProcessStraType()
+{
+    return strategyType;
 }

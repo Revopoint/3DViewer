@@ -101,6 +101,7 @@ void ProcessThread::onFrameDataUpdated(FrameData frameData)
 
     if (cachedFrameData.size() >= MAX_CACHED_FRAME)
     {
+        qWarning() << "dequeue, skip one frame";
         cachedFrameData.dequeue();
     }
 

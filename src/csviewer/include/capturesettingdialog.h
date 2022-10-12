@@ -40,45 +40,49 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_PROCESSOR_H
-#define _CS_PROCESSOR_H
-#include <QObject>
+#ifndef _CS_CAPTURE_SETTING_DIALOG_H
+#define _CS_CAPTURE_SETTING_DIALOG_H
+#include <QDialog>
 #include <QVector>
-#include <QMutex>
+#include <cstypes.h>
 
-#include "cscameraapi.h"
-#include "cstypes.h"
-#include "outputdataport.h"
+namespace Ui {
+    class CaptureSettingWidget;
+}
 
-namespace cs
-{
-class ProcessStrategy;
-
-class CS_CAMERA_EXPORT Processor: public QObject
+class QCheckBox;
+class CaptureSettingDialog : public QDialog
 {
     Q_OBJECT
 public:
-    class ProcessEndListener : public QObject
-    {
-    public:
-        virtual void process(const OutputDataPort& outputDataPort) = 0;
-    };
+    CaptureSettingDialog(QWidget* parent = nullptr);
+    ~CaptureSettingDialog();
 
-    Processor();
-    ~Processor();
-
-    void process(const FrameData& frameData);
-
-    void addProcessStrategy(ProcessStrategy* strategy);
-    void removeProcessStrategy(ProcessStrategy* strategy);
-
-    void addProcessEndLisener(ProcessEndListener* listener);
-    void removeProcessEndLisener(ProcessEndListener* listener);
+public slots:
+    void onCaptureNumberUpdated(int number, int dropped);
+    void onCaptureStateChanged(int state, QString message);
+private slots:
+    void onStartCapture();
+    void onStopCapture();
+    
+    void onDataTypeChanged();
+    void onSaveFormatChanged(int index);
+    void onCaptureFrameNumberChanged();
+    void onFrameNumberLineEditChanged();
 private:
-    QVector<ProcessStrategy*> processStrategys; 
-    QMutex mutex;
-    QVector<ProcessEndListener*> processEndLiseners;
-};
-}
+    void initDefaultCaptureConfig();
+    void initDialog();
+    void initConnections();
+private:
+    Ui::CaptureSettingWidget* ui;
+    CameraCaptureConfig captureConfig;
 
-#endif //_CS_PROCESSOR_H
+    // min / max capture count
+    int minCaptureCount = 1;
+    int maxCaptureCount = 10000;
+    int defaultCaptureCount = 30;
+
+    QVector<QCheckBox*> dataTypeCheckBoxs;
+};
+
+#endif //_CS_CAPTURE_SETTING_DIALOG_H

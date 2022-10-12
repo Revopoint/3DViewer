@@ -77,7 +77,6 @@ protected:
     QWidget* topControlArea;
     QLabel* imageLabel;
     QLabel* fpsLabel;
-    QPushButton* exportButton;
 
     float ratioWH = 1.6f;
     int renderId;

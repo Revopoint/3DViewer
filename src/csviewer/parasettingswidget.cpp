@@ -52,6 +52,9 @@
 #include <QTime>
 #include <QThread>
 #include <QDialog>
+#include <QFileDialog>
+#include <QDir>
+
 #include <cameraproxy.h>
 #include <icscamera.h>
 #include <cameraparaid.h>
@@ -66,6 +69,7 @@
 #include "cswidgets/cstablewidget.h"
 
 #include "hdrsettingsdialog.h"
+#include "capturesettingdialog.h"
 
 #define HDR_TABLE_COLS 3
 using namespace cs::parameter;
@@ -75,6 +79,7 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
     , ui(new Ui::ParameterSettingsWidget)
     , cameraPtr(cs::CSApplication::getInstance()->getCamera())
     , roiRectF(0,0,0,0)
+    , captureSettingDialog(new CaptureSettingDialog)
 {
     ui->setupUi(this);
     initWidget();
@@ -85,6 +90,7 @@ ParaSettingsWidget::~ParaSettingsWidget()
 {
     delete ui;
     delete hdrSettingsDialog;
+    delete captureSettingDialog;
 }
 
 void ParaSettingsWidget::initDepthPara()
@@ -211,8 +217,8 @@ void ParaSettingsWidget::initWidget()
     // control button
     ui->previewButton->setCheckable(true);
     ui->previewButton->setEnabled(false);
-    ui->restartCameraButton->setEnabled(false);
-    ui->disconnectCameraButton->setEnabled(false);
+    ui->captureSingleButton->setEnabled(false);
+    ui->captureMultipleButton->setEnabled(false);
     ui->singleShotCheckBox->setEnabled(false);
     ui->singleShotButton->setEnabled(ui->singleShotCheckBox->isChecked());
 
@@ -235,8 +241,9 @@ void ParaSettingsWidget::initConnections()
     suc &= (bool)connect(ui->previewButton, &QPushButton::clicked, this, &ParaSettingsWidget::onPreviewStateChanged);
     suc &= (bool)connect(ui->previewButton, &QPushButton::toggled, this, &ParaSettingsWidget::onPreviewButtonToggled);
     
-    suc &= (bool)connect(ui->restartCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickedRestartCamera);
-    suc &= (bool)connect(ui->disconnectCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickedDisconnCamera);
+    suc &= (bool)connect(ui->captureSingleButton,    &QPushButton::clicked,  this, &ParaSettingsWidget::onClickCaptureSingle);
+    suc &= (bool)connect(ui->captureMultipleButton, &QPushButton::clicked,  this, &ParaSettingsWidget::onClickCaptureMultiple);
+
     suc &= (bool)connect(ui->singleShotButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickSingleShot);
     
     suc &= (bool)connect(ui->singleShotCheckBox, &QCheckBox::toggled, this, &ParaSettingsWidget::onSingleShotChanged);
@@ -373,8 +380,8 @@ void ParaSettingsWidget::updateControlButtonState(int cameraState)
         || cameraState == CAMERA_STOPPED_STREAM);
 
     ui->previewButton->setEnabled(enable);
-    ui->restartCameraButton->setEnabled(enable);
-    ui->disconnectCameraButton->setEnabled(enable);
+    ui->captureSingleButton->setEnabled(enable);
+    ui->captureMultipleButton->setEnabled(enable);
 
     enable = (cameraState == CAMERA_STARTED_STREAM);
 
@@ -702,8 +709,8 @@ void ParaSettingsWidget::onTranslate()
 
     // control button
     ui->previewButton->setToolTip(tr("Start preview"));
-    ui->restartCameraButton->setToolTip(tr("Restart camera"));
-    ui->disconnectCameraButton->setToolTip(tr("Disconnect camera"));
+    ui->captureSingleButton->setToolTip(tr("Capture single frame"));
+    ui->captureMultipleButton->setToolTip(tr("Capture multiple frames"));
     ui->singleShotButton->setToolTip(tr("Single Shot"));
 }
 
@@ -742,4 +749,34 @@ void ParaSettingsWidget::onClickedRestartCamera()
 void ParaSettingsWidget::onClickedDisconnCamera()
 {
     emit cs::CSApplication::getInstance()->disconnectCamera();
+}
+
+void ParaSettingsWidget::onClickCaptureSingle()
+{
+    qInfo() << "click capture single";
+    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), QDir::currentPath());
+
+    if (url.isValid())
+    {
+        QFileInfo fileInfo(url.toLocalFile());
+
+        CameraCaptureConfig config;
+        config.captureNumber = 1;
+        config.captureDataTypes = { CAMERA_DATA_L, CAMERA_DATA_R, CAMERA_DATA_L, CAMERA_DATA_DEPTH, CAMERA_DATA_RGB, CAMERA_DTA_POINT_CLOUD };
+        config.saveFormat = QString("Images(*.)");
+        config.saveDir = fileInfo.absolutePath();
+        config.saveName = fileInfo.fileName();
+
+        cs::CSApplication::getInstance()->startCapture(config);
+    }
+    else
+    {
+        qInfo() << "Cancel capture";
+    }
+}
+
+void ParaSettingsWidget::onClickCaptureMultiple()
+{
+    qInfo() << "click capture multiple";
+    captureSettingDialog->show();
 }

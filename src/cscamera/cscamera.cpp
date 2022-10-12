@@ -826,7 +826,7 @@ bool CSCamera::onProcessFrame(const IFramePtr& frame, FrameData& frameData)
         return false;
     }
 
-    StreamDataInfo streamDataInfo = { frame->getFormat(),frame->getWidth(), frame->getHeight() };
+    StreamDataInfo streamDataInfo = { frame->getFormat(),frame->getWidth(), frame->getHeight(), frame->getTimeStamp()};
     const int dataSize = frame->getSize();
 
     //copy data

@@ -58,6 +58,7 @@ class CSParaWidget;
 QT_END_NAMESPACE
 
 class HDRSettingsDialog;
+class CaptureSettingDialog;
 class ParaSettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -83,6 +84,9 @@ public slots:
     void onPreviewButtonToggled(bool toggled);
     void onClickedRestartCamera();
     void onClickedDisconnCamera();
+
+    void onClickCaptureSingle();
+    void onClickCaptureMultiple();
 private slots:
     void onClickDepthButton();
     void onClickRgbButton();
@@ -138,6 +142,7 @@ private:
 
     QMap<int, CSParaWidget*> paraWidgets;
     HDRSettingsDialog* hdrSettingsDialog;
+    CaptureSettingDialog* captureSettingDialog;
 
     QRectF roiRectF;
 };

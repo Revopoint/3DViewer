@@ -48,10 +48,6 @@ using namespace cs;
 using namespace cs::parameter;
 
 CameraProxy::CameraProxy()
-    : showDepthCoord(false)
-    , showRender3D(false)
-    , showDepthCoordPos(QPointF(-1.0f, -1.0f))
-    , show3DWithTexture(false)
 {
 }
 
@@ -276,48 +272,4 @@ void CameraProxy::getCameraParaItems(CAMERA_PARA_ID paraId, QList<QPair<QString,
         csCamera->getCameraParaItems(paraId, list);
     }
     lock.unlock();
-}
-
-bool CameraProxy::getShowDepthCoord() const
-{
-    return showDepthCoord;
-}
-
-void CameraProxy::setShowDepthCoord(bool show)
-{
-    showDepthCoord = show;
-    emit showDepthCoordChanged(showDepthCoord);
-}
-
-QPointF CameraProxy::getShowDepthCoordPos() const
-{
-    return showDepthCoordPos;
-}
-
-void CameraProxy::setShowDepthCoordPos(QPointF pos)
-{
-    showDepthCoordPos = pos;
-    emit showDepthCoordPosChanged(showDepthCoordPos);
-}
-
-bool CameraProxy::getShowRender3D() const
-{
-    return showRender3D;
-}
-
-void CameraProxy::setShowRender3D(bool show)
-{
-    showRender3D = show;
-    emit showRender3DChanged(showRender3D);
-}
-
-bool CameraProxy::getShow3DWithTexture() const
-{
-    return show3DWithTexture;
-}
-
-void CameraProxy::setShow3DWithTexture(bool with)
-{
-    show3DWithTexture = with;
-    emit show3DWithTextureChanged(with);
 }

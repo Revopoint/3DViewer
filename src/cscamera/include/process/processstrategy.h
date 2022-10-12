@@ -48,28 +48,39 @@
 #include <QMutex>
 
 #include "cstypes.h"
+#include "cscameraapi.h"
+#include "process/outputdataport.h"
+
 #include <hpp/Processing.hpp>
 
 namespace cs 
 {
 
+enum  PROCESS_STRA_TYPE
+{
+    STRATEGY_DEPTH,
+    STRATEGY_RGB,
+    STRATEGY_CLOUD_POINT
+};
+
 class ICSCamera;
-class ProcessStrategy : public QObject 
+class CS_CAMERA_EXPORT ProcessStrategy : public QObject
 {
     Q_OBJECT
 public:
-    ProcessStrategy();
+    ProcessStrategy(PROCESS_STRA_TYPE type);
     void setCamera(std::shared_ptr<ICSCamera> camera);
     void setCameraParaState(bool dirty);
 
-    void process(const FrameData& frameData);
+    PROCESS_STRA_TYPE getProcessStraType();
+    void process(const FrameData& frameData, OutputDataPort& outputDataPort);
     virtual void onLoadCameraPara() {}
 signals:
     void output2DUpdated(OutputData2D outputData, StreamData streamData = StreamData());
     void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image, StreamData streamData = StreamData());
 
 protected:
-    virtual void doProcess(const FrameData& frameData) = 0;
+    virtual void doProcess(const FrameData& frameData, OutputDataPort& outputDataPort) = 0;
 
     template<typename S, typename T>
     void copyData(S* src, T* dst, int size)
@@ -84,6 +95,7 @@ protected:
     std::shared_ptr<ICSCamera> cameraPtr;
     bool isCameraParaDirty;
     QMutex mutex;
+    PROCESS_STRA_TYPE strategyType;
 };
 
 }

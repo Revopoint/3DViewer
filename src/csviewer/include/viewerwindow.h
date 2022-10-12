@@ -54,6 +54,10 @@ namespace Ui {
 }
 QT_END_NAMESPACE
 
+namespace cs {
+    class ProcessStrategy;
+}
+
 class RenderWidget2D;
 class QFileDialog;
 class QTranslator;
@@ -92,21 +96,21 @@ private slots:
     void onPageChanged(int idx);
     void onRenderPageChanged(int idx);
     void onCameraStateChanged(int state);
+
     void onOutput2DUpdated(OutputData2D outputData);
     void onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
+
     void onRoiEditStateChanged(bool edit);
     void onRoiRectFUpdated(QRectF rect);
-    void onShowCoordChanged(bool show, QPointF pos);
-    void onShow3DTextureChanged(bool texture);
     void onShowStatusBarMessage(QString msg, int timeout);
-    void onClickedExport(int cameraType);
-    void onExportFinished(bool success);
+
+    //capture frame data
+    void onCaptureStateChanged(int state, QString message);
 private slots:
     // menu
     void onUpdateLanguage(QAction* action);
     void onTriggeredAbout(QAction* action);
     void onTriggeredRestartCamera();
-    void onExportPointCloud();
     void onTriggeredInformation();
     void onTriggeredLogDir();
     void onAppExit();
@@ -119,6 +123,7 @@ private slots:
 signals:
     void translateSignal(); 
     void renderInitialized();
+    void show3DUpdated(bool show);
 private:
     void initWindow();
     void initConnections();

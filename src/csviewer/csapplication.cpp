@@ -52,6 +52,11 @@
 #include "process/processor.h"
 #include "app_version.h"
 #include "dataexporter.h"
+#include "cameracapturetool.h"
+
+#include "process/pointcloudprocessstrategy.h"
+#include "process/depthprocessstrategy.h"
+#include "process/rgbprocessstrategy.h"
 
 using namespace cs;
 
@@ -67,6 +72,7 @@ CSApplication::CSApplication()
     : processor(std::make_shared<Processor>())
     , processThread(std::make_shared<ProcessThread>(processor)) 
     , dataExporter(std::make_shared<DataExporter>())
+    , cameraCaptureTool(std::make_shared<CameraCaptureTool>())
 {
     CameraThread::setSdkLogPath(LOG_ROOT_DIR + "/sdk.log");
     cameraThread = std::make_shared<CameraThread>();
@@ -75,20 +81,38 @@ CSApplication::CSApplication()
     qRegisterMetaType<FrameData>("FrameData");
     qRegisterMetaType<OutputData2D>("OutputData2D");
     qRegisterMetaType<cs::Pointcloud>("cs::Pointcloud");
+
+    processStrategys[cs::STRATEGY_DEPTH] = nullptr;
+    processStrategys[cs::STRATEGY_RGB] = nullptr;
+    processStrategys[cs::STRATEGY_CLOUD_POINT] = nullptr;
 }
 
 CSApplication::~CSApplication()
 {
     disconnections();
+
+    processor->removeProcessEndLisener(cameraCaptureTool.get());
+
+    for (auto straType : processStrategys.keys())
+    {
+        auto stra = processStrategys[straType];
+        if (stra)
+        {
+            processor->removeProcessStrategy(stra);
+            processStrategys[straType] = nullptr;
+            delete stra;
+        }
+    }
+
     qDebug() << "~CSApplication";
 }
 
 void CSApplication::start()
 {
     initConnections();
-    processor->setCamera(getCamera());
-
     cameraThread->start();
+
+    processor->addProcessEndLisener(cameraCaptureTool.get());
 }
 
 std::shared_ptr<ICSCamera> CSApplication::getCamera() const
@@ -103,10 +127,12 @@ void CSApplication::initConnections()
     bool suc = true;
     suc &= (bool)connect(cameraThread.get(), &CameraThread::cameraListUpdated,    this,  &CSApplication::cameraListUpdated);
     suc &= (bool)connect(cameraThread.get(), &CameraThread::cameraStateChanged,   this,  &CSApplication::cameraStateChanged);
-    suc &= (bool)connect(cameraThread.get(), &CameraThread::removedCurrentCamera, this, &CSApplication::removedCurrentCamera);
+    suc &= (bool)connect(cameraThread.get(), &CameraThread::cameraStateChanged,   this,  &CSApplication::onCameraStateChanged);
+    suc &= (bool)connect(cameraThread.get(), &CameraThread::removedCurrentCamera, this,  &CSApplication::removedCurrentCamera);
+    suc &= (bool)connect(cameraProxy.get(),  &ICSCamera::cameraParaUpdated,       this, &CSApplication::onCameraParaUpdated);
 
-    suc &= (bool)connect(processor.get(),    &Processor::output2DUpdated,        this,  &CSApplication::onOutput2DUpdated);
-    suc &= (bool)connect(processor.get(),    &Processor::output3DUpdated,        this,  &CSApplication::onOutput3DUpdated);
+    suc &= (bool)connect(cameraCaptureTool.get(), &CameraCaptureTool::captureNumberUpdated, this, &CSApplication::captureNumberUpdated);
+    suc &= (bool)connect(cameraCaptureTool.get(), &CameraCaptureTool::captureStateChanged,  this, &CSApplication::captureStateChanged);
 
     suc &= (bool)connect(this,  &CSApplication::connectCamera,      cameraThread.get(),  &CameraThread::onConnectCamera);
     suc &= (bool)connect(this,  &CSApplication::disconnectCamera,   cameraThread.get(),  &CameraThread::onDisconnectCamera);
@@ -116,18 +142,8 @@ void CSApplication::initConnections()
     suc &= (bool)connect(this,  &CSApplication::resumeStream,       cameraThread.get(),  &CameraThread::onResumeStream);
     suc &= (bool)connect(this,  &CSApplication::queryCameras,       cameraThread.get(),  &CameraThread::onQueryCameras);
    
-    suc &= (bool)connect(cameraProxy.get(),  &ICSCamera::framedDataUpdated,              processThread.get(), &ProcessThread::onFrameDataUpdated, Qt::DirectConnection);
-    suc &= (bool)connect(cameraProxy.get(),  SIGNAL(showDepthCoordChanged(bool)),        processor.get(),     SLOT(onShowDepthCoordChanged(bool)));
-    suc &= (bool)connect(cameraProxy.get(),  SIGNAL(showDepthCoordPosChanged(QPointF)),  processor.get(),     SLOT(onShowDepthCoordPosChanged(QPointF)));
-    suc &= (bool)connect(cameraProxy.get(),  SIGNAL(showRender3DChanged(bool)),          processor.get(),     SLOT(onShowRender3DChanged(bool)));
-    suc &= (bool)connect(cameraProxy.get(),  SIGNAL(show3DWithTextureChanged(bool)),     processor.get(),     SLOT(onShow3DWithTextureChanged(bool)));
-
-    suc &= (bool)connect(cameraProxy.get(),  &ICSCamera::cameraParaUpdated,              processor.get(),     &Processor::onCameraParaUpdated);
-
-    suc &= (bool)connect(this, &CSApplication::exportStreamData, dataExporter.get(), &DataExporter::onExportStreamData);
-    suc &= (bool)connect(this, &CSApplication::exportPointCloud, dataExporter.get(), &DataExporter::onExportPointCloud);
-    suc &= (bool)connect(dataExporter.get(), &DataExporter::exportFinished, this,    &CSApplication::exportFinished);
-
+    suc &= (bool)connect(cameraProxy.get(),  &ICSCamera::framedDataUpdated,          processThread.get(), &ProcessThread::onFrameDataUpdated, Qt::DirectConnection);
+    
     Q_ASSERT(suc);
 }
 
@@ -137,42 +153,111 @@ void CSApplication::disconnections()
     disconnect(cameraProxy.get(), &ICSCamera::framedDataUpdated, processThread.get(), &ProcessThread::onFrameDataUpdated);
 }
 
-void CSApplication::onOutput2DUpdated(OutputData2D outputData, StreamData streamData)
+void CSApplication::onCameraStateChanged(int state)
 {
-    // cache data, only depth and rgb
-    const int cameraDataType = outputData.info.cameraDataType;
-    if (cameraDataType == CAMERA_DATA_DEPTH || cameraDataType == (CAMERA_DATA_R | CAMERA_DATA_L))
+    CAMERA_STATE cameraState = (CAMERA_STATE)state;
+    switch (cameraState)
     {
-        cachedDepthData = streamData;
-        cachedDepthImage = outputData.image;
+    case CAMERA_CONNECTED:
+        updateProcessStrategys();
+        break;
+    default:
+        break;
     }
-    else if(cameraDataType == CAMERA_DATA_RGB)
+}
+
+void CSApplication::onCameraParaUpdated(int paraId, QVariant value)
+{
+    for (auto straType : processStrategys.keys())
     {
-        cachedRgbData = streamData;
-        cachedRgbImage = outputData.image;
+        auto stra = processStrategys[straType];
+        if (stra)
+        {
+            stra->setCameraParaState(true);
+        }
+    }
+}
+
+void CSApplication::updateProcessStrategys()
+{
+    // remove all process strategys
+    for (auto straType : processStrategys.keys())
+    {
+        auto stra = processStrategys[straType];
+        if (stra)
+        {
+            processor->removeProcessStrategy(stra);
+            processStrategys[straType] = nullptr;
+            delete stra;
+        }
     }
 
-    emit output2DUpdated(outputData);
+    if (show3D)
+    {
+        processStrategys[cs::STRATEGY_CLOUD_POINT] = new PointCloudProcessStrategy();
+    }
+    else
+    {
+        processStrategys[cs::STRATEGY_DEPTH] = new DepthProcessStrategy();
+
+        QVariant hasRgbV;
+        cameraThread->getCamera()->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+        if (hasRgbV.toBool())
+        {
+            processStrategys[cs::STRATEGY_RGB] = new RgbProcessStrategy();
+        }
+    }
+
+    // add process strategys
+    for (auto straType : processStrategys.keys())
+    {
+        auto stra = processStrategys[straType];
+        if (stra)
+        {
+            // init connections
+            bool suc = true;
+            suc &= (bool)connect(stra, &ProcessStrategy::output2DUpdated, this, &CSApplication::output2DUpdated);
+            suc &= (bool)connect(stra, &ProcessStrategy::output3DUpdated, this, &CSApplication::output3DUpdated);
+
+            Q_ASSERT(suc);
+
+            stra->setCamera(cameraThread->getCamera());
+            processor->addProcessStrategy(stra);
+        }
+    }
 }
 
-void CSApplication::onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image, StreamData streamData)
+void CSApplication::onShow3DUpdated(bool show)
 {
-    cachedPointcloud = pointCloud;
-    cachedTextureImage = image;
-    emit output3DUpdated(pointCloud, image);
+    show3D = show;
+    updateProcessStrategys();
 }
 
-void CSApplication::onExportPointCloud(QString filePath)
+void CSApplication::onShow3DTextureChanged(bool texture)
 {
-    emit exportPointCloud(cachedPointcloud, cachedTextureImage, filePath);
+    if (processStrategys[STRATEGY_CLOUD_POINT])
+    {
+        processStrategys[STRATEGY_CLOUD_POINT]->setProperty("withTexture", texture);
+    }   
 }
 
-void CSApplication::onExportDepthData(QString filePath)
+void CSApplication::onShowCoordChanged(bool show, QPointF pos)
 {
-    emit exportStreamData(cachedDepthData, cachedDepthImage, filePath);
+    auto stra = processStrategys[STRATEGY_DEPTH];
+
+    if (stra)
+    {
+        stra->setProperty("calcDepthCoord", show);
+        stra->setProperty("depthCoordCalcPos", pos);
+    }
 }
 
-void CSApplication::onExportRgbData(QString filePath)
+void CSApplication::startCapture(CameraCaptureConfig config)
 {
-    emit exportStreamData(cachedRgbData, cachedRgbImage, filePath);
+    cameraCaptureTool->startCapture(config);
+}
+
+void CSApplication::stopCapture()
+{
+    cameraCaptureTool->stopCapture();
 }

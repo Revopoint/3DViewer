@@ -70,6 +70,7 @@ QWidget#topControlArea {
 /* QMenuBar */
 QMenuBar {
     background: rgb(229, 229, 229);
+    /*background: rgb(179, 179, 179);*/
     border: 1px solid rgb(210, 210, 210);
 }
 

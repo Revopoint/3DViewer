@@ -41,136 +41,111 @@
 ******************************************************************************/
 
 #include "process/processor.h"
-#include "process/depthprocessstrategy.h"
-#include "process/rgbprocessstrategy.h"
-#include "process/pointcloudprocessstrategy.h"
+#include "process/processstrategy.h"
 
 #include <QDebug>
+#include <QMutexLocker>
 using namespace cs;
 
 Processor::Processor()
-    : calcPointCloud(false)
 {
-    initialize();
 }
 
 Processor::~Processor()
 {
-    for (auto strategy : processStrategyMap.values())
+    processStrategys.clear();
+    qDebug() << "~Processor";
+}
+
+void Processor::addProcessStrategy(ProcessStrategy* strategy)
+{
+    if (strategy == nullptr)
     {
-        delete strategy;
+        qWarning() << "strategy is null.";
+        return;
     }
 
-    processStrategyMap.clear();
+    QMutexLocker locker(&mutex);
+    if (processStrategys.contains(strategy))
+    {
+        qWarning() << "Already contained strategy : " << strategy;
+    }
+    else 
+    {
+        processStrategys.push_back(strategy);
+    }
+}
 
-    qDebug() << "~Processor";
+void Processor::removeProcessStrategy(ProcessStrategy* strategy)
+{
+    if (strategy == nullptr)
+    {
+        qWarning() << "strategy is null.";
+        return;
+    }
+
+    QMutexLocker locker(&mutex);
+    if (!processStrategys.contains(strategy))
+    {
+        qWarning() << "processStrategys do not contain strategy type: " << strategy->getProcessStraType();
+    }
+    else 
+    {
+        processStrategys.removeAll(strategy);
+    }
+}
+
+void Processor::addProcessEndLisener(ProcessEndListener* listener)
+{
+    if (listener == nullptr)
+    {
+        qWarning() << "listener is null.";
+        return;
+    }
+
+    QMutexLocker locker(&mutex);
+    if (processEndLiseners.contains(listener))
+    {
+        qWarning() << "Already contained listener : " << listener;
+    }
+    else
+    {
+        processEndLiseners.push_back(listener);
+    }
+}
+
+void Processor::removeProcessEndLisener(ProcessEndListener* listener)
+{
+    if (listener == nullptr)
+    {
+        qWarning() << "strategy is null.";
+        return;
+    }
+
+    QMutexLocker locker(&mutex);
+    if (!processEndLiseners.contains(listener))
+    {
+        qWarning() << "processEndLiseners do not contain listener: " << listener;
+    }
+    else
+    {
+        processEndLiseners.removeAll(listener);
+    }
 }
 
 void Processor::process(const FrameData& frameData)
 {
-    FRAME_DATA_TYPE dataType = frameData.frameDataType;
+    QMutexLocker locker(&mutex);
 
-    switch (dataType)
+    OutputDataPort outputDataPort(frameData);
+    for (auto stra : processStrategys)
     {
-    case TYPE_DEPTH:
-        onProcessDepthFrame(frameData);
-        break;
-    case TYPE_RGB:
-        processStrategyMap[STRATEGY_RGB]->process(frameData);
-        break;
-    case TYPE_DEPTH_RGB: 
-        onProcessPairFrame(frameData);
-        break;
-    default:
-        Q_ASSERT(false);
-        break;
-    }
-}
-
-void Processor::onProcessPairFrame(const FrameData& frameData)
-{
-    if (calcPointCloud)
-    {
-        processStrategyMap[STRATEGY_CLOUD_POINT]->process(frameData);
-    }
-    else 
-    {
-        processStrategyMap[STRATEGY_DEPTH]->process(frameData);
-        processStrategyMap[STRATEGY_RGB]->process(frameData);
-    }
-}
-
-void Processor::onProcessDepthFrame(const FrameData& frameData)
-{
-    if (calcPointCloud)
-    {
-        processStrategyMap[STRATEGY_CLOUD_POINT]->process(frameData);
-    }
-    else 
-    {
-        processStrategyMap[STRATEGY_DEPTH]->process(frameData);
-    }
-}
-
-void Processor::initialize()
-{
-    Q_ASSERT(processStrategyMap.size() == 0);
-    processStrategyMap.insert(STRATEGY_DEPTH, new DepthProcessStrategy());
-    processStrategyMap.insert(STRATEGY_RGB, new RgbProcessStrategy());
-    processStrategyMap.insert(STRATEGY_CLOUD_POINT, new PointCloudProcessStrategy());
-
-    bool suc = true;
-
-    for (auto strategy : processStrategyMap.values())
-    {
-        suc &= (bool)connect(strategy, &ProcessStrategy::output2DUpdated, this, &Processor::output2DUpdated);
-        suc &= (bool)connect(strategy, &ProcessStrategy::output3DUpdated, this, &Processor::output3DUpdated);    
+        stra->process(frameData, outputDataPort);
     }
 
-    Q_ASSERT(suc);
-}
-
-void Processor::setCamera(std::shared_ptr<ICSCamera> camera)
-{
-    for (auto strategy : processStrategyMap.values())
+    // to do some thing after process, for example save data
+    for (auto lisener : processEndLiseners)
     {
-        strategy->setCamera(camera);
-    }
-}
-
-void Processor::onShowDepthCoordChanged(bool show)
-{
-    if (processStrategyMap.contains(STRATEGY_DEPTH))
-    {
-        processStrategyMap[STRATEGY_DEPTH]->setProperty("calcDepthCoord", show);
-    }
-}
-
-void Processor::onShowDepthCoordPosChanged(QPointF pos)
-{
-    if (processStrategyMap.contains(STRATEGY_DEPTH))
-    {
-        processStrategyMap[STRATEGY_DEPTH]->setProperty("depthCoordCalcPos", pos);
-    }
-}
-
-void Processor::onShowRender3DChanged(bool show)
-{
-    calcPointCloud = show;
-}
-
-void Processor::onShow3DWithTextureChanged(bool withTexture)
-{
-    if (processStrategyMap.contains(STRATEGY_CLOUD_POINT))
-    {
-        processStrategyMap[STRATEGY_CLOUD_POINT]->setProperty("withTexture", withTexture);
-    }
-}
-
-void Processor::onCameraParaUpdated(int paraId)
-{
-    for (auto strategy : processStrategyMap.values())
-    {
-        strategy->setCameraParaState(true);
+        lisener->process(outputDataPort);
     }
 }

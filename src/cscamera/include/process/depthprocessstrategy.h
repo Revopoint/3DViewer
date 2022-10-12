@@ -48,18 +48,20 @@
 #include <QPair>
 #include <QList>
 #include "processstrategy.h"
+#include "cscameraapi.h"
 
 namespace cs
 {
 
-class DepthProcessStrategy : public ProcessStrategy
+class CS_CAMERA_EXPORT DepthProcessStrategy : public ProcessStrategy
 {
     Q_OBJECT
     Q_PROPERTY(bool calcDepthCoord READ getCalcDepthCoord WRITE setCalcDepthCoord)
     Q_PROPERTY(QPointF depthCoordCalcPos READ getDepthCoordCalcPos WRITE setDepthCoordCalcPos)
 public:
     DepthProcessStrategy();
-    void doProcess(const FrameData& frameData) override;
+    DepthProcessStrategy(PROCESS_STRA_TYPE type);
+    void doProcess(const FrameData& frameData, OutputDataPort& outputDataPort) override;
     void onLoadCameraPara() override;
 
     bool getCalcDepthCoord() const;
@@ -74,13 +76,13 @@ protected:
     Intrinsics depthIntrinsics;
 
 private:
-    void onProcessZ16(const StreamData& frameData);
-    void onProcessZ16Y8Y8(const StreamData& frameData);
-    void onProcessPAIR(const StreamData& frameData);
+    QVector<OutputData2D> onProcessZ16(const StreamData& frameData);
+    QVector<OutputData2D> onProcessZ16Y8Y8(const StreamData& frameData);
+    QVector<OutputData2D> onProcessPAIR(const StreamData& frameData);
    
-    void processDepthData(const ushort* dataPtr, int length, int width, int height, OutputData2D& outputData);
-    void onProcessLData(const char* dataPtr, int length, int width, int height);
-    void onProcessRData(const char* dataPtr, int length, int width, int height);
+    OutputData2D processDepthData(const ushort* dataPtr, int length, int width, int height);
+    OutputData2D onProcessLData(const char* dataPtr, int length, int width, int height);
+    OutputData2D onProcessRData(const char* dataPtr, int length, int width, int height);
 
     void timeDomainSmooth(const ushort* dataPtr, int length, int width, int height, float* output);
 

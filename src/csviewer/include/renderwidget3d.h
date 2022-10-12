@@ -74,7 +74,6 @@ private:
     osg::ref_ptr<osg::MatrixTransform> makeCoordinate();
 signals:
     void show3DTextureChanged(bool texture);
-    void exportPointCloud();
 private:
     osgQOpenGLWidget* osgQOpenGLWidgetPtr;
     osg::ref_ptr<osg::Group> rootNode;
@@ -84,7 +83,6 @@ private:
 
     QPushButton* homeButton;
     QPushButton* textureButton;
-    QPushButton* exportButton;
     QWidget* buttonArea;
 };
 

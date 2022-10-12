@@ -112,9 +112,13 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(app,  &cs::CSApplication::cameraStateChanged,   this, &ViewerWindow::onCameraStateChanged);
     suc &= (bool)connect(app,  &cs::CSApplication::output3DUpdated,      this, &ViewerWindow::onOutput3DUpdated);
     suc &= (bool)connect(app,  &cs::CSApplication::removedCurrentCamera, this, &ViewerWindow::onRemovedCurrentCamera);
-    suc &= (bool)connect(app,  &cs::CSApplication::exportFinished,       this, &ViewerWindow::onExportFinished); 
+    suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged,   this, &ViewerWindow::onCaptureStateChanged);
+
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
- 
+    suc &= (bool)connect(this, &ViewerWindow::show3DUpdated,             app,  &cs::CSApplication::onShow3DUpdated);
+
+    suc &= (bool)connect(ui->renderWidget3D,    &RenderWidget3D::show3DTextureChanged,   app,  &cs::CSApplication::onShow3DTextureChanged);
+
     suc &= (bool)connect(ui->modeSwitchButton,  &QPushButton::clicked,                   this, &ViewerWindow::onClickedModeSwitchButton);
     suc &= (bool)connect(ui->cameraListWidget,  &CameraListWidget::clickedCloseButton,   this, &ViewerWindow::onClickedModeSwitchButton);
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::clickedCloseButton, this, &ViewerWindow::onClickedModeSwitchButton);
@@ -123,8 +127,6 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->stackedWidget,     &QStackedWidget::currentChanged,         this, &ViewerWindow::onPageChanged);
     suc &= (bool)connect(ui->tabWidget,         &QTabWidget::currentChanged,             this, &ViewerWindow::onRenderPageChanged);
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::roiStateChanged,    this, &ViewerWindow::onRoiEditStateChanged);
-    suc &= (bool)connect(ui->renderWidget3D,    &RenderWidget3D::show3DTextureChanged,   this, &ViewerWindow::onShow3DTextureChanged);
-    suc &= (bool)connect(ui->renderWidget3D,    &RenderWidget3D::exportPointCloud,       this, &ViewerWindow::onExportPointCloud);
 
     suc &= (bool)connect(this, &ViewerWindow::translateSignal,   this,                   &ViewerWindow::onTranslate,            Qt::QueuedConnection);
     suc &= (bool)connect(this, &ViewerWindow::renderInitialized, this,                   &ViewerWindow::onRenderInitialized,    Qt::QueuedConnection);
@@ -195,20 +197,9 @@ void ViewerWindow::onPageChanged(int idx)
 void ViewerWindow::onRenderPageChanged(int idx)
 {
     RENDER_PAGE_ID pageId = (RENDER_PAGE_ID)idx;
-    switch (pageId)
-    {
-    case RENDER_PAGE_2D:
-        cs::CSApplication::getInstance()->getCamera()->setProperty("showRender3D", false);
-        break;
-    case RENDER_PAGE_3D:
-        cs::CSApplication::getInstance()->getCamera()->setProperty("showRender3D", true);
-        break;
-    default:
-        qWarning() << "invalid page index.";
-        break;
-    }
-
     ui->paraSettingWidget->onShow3DUpdate(pageId == RENDER_PAGE_3D);
+
+    emit show3DUpdated(pageId == RENDER_PAGE_3D);
 }
 
 void ViewerWindow::onCameraStateChanged(int state)
@@ -229,11 +220,14 @@ void ViewerWindow::onCameraStateChanged(int state)
     {
         ui->stackedWidget->setCurrentIndex(PARASETTING_PAGE);
         ui->menuCamera->setEnabled(true);
-        auto camera = cs::CSApplication::getInstance()->getCamera();
-        CSCameraInfo info = camera->getCameraInfo();
+
+        // update camera info dialog
+        CSCameraInfo info = cs::CSApplication::getInstance()->getCamera()->getCameraInfo();
         cameraInfoDialog->updateCameraInfo(info);
+
         circleProgressBar->close();
         destoryRender2dWidgets();
+
         break;
     }
     case CAMERA_DISCONNECTED:
@@ -348,11 +342,10 @@ void ViewerWindow::initRenderConnections()
         auto renderWidget = render2dWidgets[key];
         if (renderWidget)
         {
-            suc &= (bool)connect(renderWidget, &RenderWidget2D::clickedExport, this, &ViewerWindow::onClickedExport);
             if (key == CAMERA_DATA_DEPTH)
             {        
                 suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(renderWidget), &DepthRenderWidget2D::roiRectFUpdated,  this, &ViewerWindow::onRoiRectFUpdated);
-                suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(renderWidget), &DepthRenderWidget2D::showCoordChanged, this, &ViewerWindow::onShowCoordChanged);
+                suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(renderWidget), &DepthRenderWidget2D::showCoordChanged, cs::CSApplication::getInstance(), &cs::CSApplication::onShowCoordChanged);
             }
         }
     }
@@ -460,19 +453,6 @@ void ViewerWindow::onRoiRectFUpdated(QRectF rect)
     ui->paraSettingWidget->onRoiRectFUpdated(rect);
 }
 
-void ViewerWindow::onShowCoordChanged(bool show, QPointF pos)
-{
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    camera->setProperty("showDepthCoord", show);
-    camera->setProperty("showDepthCoordPos", pos);
-}
-
-void ViewerWindow::onShow3DTextureChanged(bool texture)
-{
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    camera->setProperty("show3DWithTexture", texture);
-}
-
 void ViewerWindow::onUpdateLanguage(QAction* action)
 {
     if (action == ui->actionChinese)
@@ -505,29 +485,6 @@ void ViewerWindow::onTriggeredAbout(QAction* action)
 void ViewerWindow::onTriggeredRestartCamera()
 {
     emit cs::CSApplication::getInstance()->restartCamera();
-}
-
-void ViewerWindow::onExportPointCloud()
-{
-    QString suffix = ".ply";
-    QString filter = QString("Point Cloud(*%1)").arg(suffix);
-    QUrl url =  QFileDialog::getSaveFileUrl(this, tr("Save Point Cloud"), QDir::currentPath(), filter);
-
-    if (url.isValid())
-    {
-        QString localFile = url.toLocalFile();
-        if (!localFile.endsWith(suffix))
-        {
-            localFile += suffix;
-        }
-        cs::CSApplication::getInstance()->onExportPointCloud(localFile);
-        //show progress bar
-        circleProgressBar->open();
-    }
-    else 
-    {
-        qInfo() << "Cancel saving the model";
-    }
 }
 
 void ViewerWindow::onTriggeredInformation()
@@ -618,37 +575,7 @@ void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
     }
 }
 
-void ViewerWindow::onClickedExport(int cameraType)
+void ViewerWindow::onCaptureStateChanged(int state, QString message)
 {
-    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Export stream data"), QDir::currentPath(), "");
-    if (url.isValid())
-    {
-        QString localFile = url.toLocalFile();
-        if (cameraType == CAMERA_DATA_RGB)
-        {
-            cs::CSApplication::getInstance()->onExportRgbData(localFile);
-        }
-        else 
-        {
-            cs::CSApplication::getInstance()->onExportDepthData(localFile);
-        }
-        circleProgressBar->open();
-    }
-    else
-    {
-        qInfo() << "Cancel exporting stream data";
-    }
-}
-
-void ViewerWindow::onExportFinished(bool success)
-{
-    circleProgressBar->close();
-    if (success)
-    {
-        onShowStatusBarMessage(tr("Export successfully"), 5000);
-    }
-    else
-    {
-        onShowStatusBarMessage(tr("Export failed"), 5000);
-    }
+    onShowStatusBarMessage(message, 5000);
 }
