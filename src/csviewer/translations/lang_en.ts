@@ -61,7 +61,7 @@
     <name>ViewerWindow</name>
     <message>
         <location filename="../viewerwindow.ui"/>
-        <location filename="../viewerwindow.cpp" line="187"/>
+        <location filename="../viewerwindow.cpp" line="190"/>
         <source>Parameter Settings</source>
         <translation type="unfinished"></translation>
     </message>
@@ -111,77 +111,82 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="184"/>
+        <location filename="../viewerwindow.cpp" line="163"/>
+        <source>Set default save path (</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.cpp" line="187"/>
         <source>Camera List</source>
         <translation type="unfinished">Camera List</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="262"/>
+        <location filename="../viewerwindow.cpp" line="265"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="265"/>
+        <location filename="../viewerwindow.cpp" line="268"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="268"/>
+        <location filename="../viewerwindow.cpp" line="271"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="271"/>
+        <location filename="../viewerwindow.cpp" line="274"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="274"/>
+        <location filename="../viewerwindow.cpp" line="277"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="277"/>
+        <location filename="../viewerwindow.cpp" line="280"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="280"/>
+        <location filename="../viewerwindow.cpp" line="283"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="283"/>
+        <location filename="../viewerwindow.cpp" line="286"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="286"/>
+        <location filename="../viewerwindow.cpp" line="289"/>
         <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="289"/>
+        <location filename="../viewerwindow.cpp" line="292"/>
         <source>Preview has been paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="292"/>
+        <location filename="../viewerwindow.cpp" line="295"/>
         <source>Restarting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="295"/>
+        <location filename="../viewerwindow.cpp" line="298"/>
         <source>Stopping preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="298"/>
+        <location filename="../viewerwindow.cpp" line="301"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="554"/>
+        <location filename="../viewerwindow.cpp" line="557"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -521,17 +526,9 @@
     </message>
 </context>
 <context>
-    <name>cs::CameraCaptureTool</name>
-    <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="40"/>
-        <source>captruing, please wait...</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="96"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="116"/>
         <source>Start capturing</source>
         <translation type="unfinished"></translation>
     </message>
@@ -544,7 +541,7 @@
 <context>
     <name>cs::CameraCaptureMutiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="366"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="335"/>
         <source>a frame dropped</source>
         <translation type="unfinished"></translation>
     </message>
@@ -605,8 +602,16 @@
 <context>
     <name>CaptureSettingDialog</name>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="78"/>
+        <location filename="../capturesettingdialog.cpp" line="101"/>
         <source>Capture frame data</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>cs::CameraCaptureTool</name>
+    <message>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="51"/>
+        <source>captruing, please wait...</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

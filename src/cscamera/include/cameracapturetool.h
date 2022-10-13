@@ -55,6 +55,7 @@
 
 namespace cs 
 {
+class ICSCamera;
 class CameraCaptureBase : public QThread
 {
     Q_OBJECT
@@ -84,9 +85,15 @@ public:
 
     void run() override;
     void saveFinished();
+
+    void setCamera(std::shared_ptr<ICSCamera>& camera);
 signals:
     void captureStateChanged(int state, QString message);
     void captureNumberUpdated(int, int);
+protected:
+    virtual void onCaptureDataDone();
+    void saveIntrinsics();
+
 protected:
     CameraCaptureConfig captureConfig;
     CAPTURE_TYPE captureType;
@@ -107,6 +114,8 @@ protected:
     bool captureFinished = false;
 
     QThreadPool threadPool;
+
+    std::shared_ptr<ICSCamera> camera;
 };
 
 // save a frame of data
@@ -117,6 +126,7 @@ public:
     CameraCaptureSingle(const CameraCaptureConfig& config);
     void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 protected:
+
 };
 
 // save multi-frame data
@@ -127,10 +137,19 @@ public:
     CameraCaptureMutiple(const CameraCaptureConfig& config);
     void addOutputData(const OutputDataPort& outputDataPort) override;
     void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
+
+protected:
+    void onCaptureDataDone() override;
+    void saveTimeStamps();
 private:
     int capturedRgbCount = 0;
     int capturedDepthCount = 0;
     int capturePointCloudCount = 0;
+    
+    // RGB frame time stamps
+    QVector<double> rgbTimeStamps;
+    // depth frame time stamps
+    QVector<double> depthTimeStamps;
 };
 
 class CS_CAMERA_EXPORT CameraCaptureTool : public Processor::ProcessEndListener
@@ -142,6 +161,7 @@ public:
     void process(const OutputDataPort& outputDataPort) override;
     
     void startCapture(CameraCaptureConfig config);
+    void setCamera(std::shared_ptr<ICSCamera>& camera);
 public slots:
     void stopCapture();
 signals:
@@ -152,6 +172,7 @@ private:
     // for saving data
     OutputDataPort cachedOutputData;
     CameraCaptureBase* cameraCapture = nullptr;
+    std::shared_ptr<ICSCamera> camera;
 };
 }
 

@@ -192,8 +192,7 @@ static void depthCallback(cs::IFramePtr frame, void* usrData)
     CSCamera* camera = (CSCamera*)usrData;
 
     FrameData frameData;
-    frameData.frameDataType = TYPE_DEPTH;
-    camera->onProcessFrame(frame, frameData);
+    camera->onProcessFrame(TYPE_DEPTH, frame, frameData);
    
     emit camera->framedDataUpdated(frameData);
 }
@@ -203,8 +202,7 @@ static void rgbCallback(cs::IFramePtr frame, void* usrData)
     CSCamera* camera = (CSCamera*)usrData;
 
     FrameData frameData;
-    frameData.frameDataType = TYPE_RGB;
-    camera->onProcessFrame(frame, frameData);
+    camera->onProcessFrame(TYPE_RGB, frame, frameData);
     emit camera->framedDataUpdated(frameData);
 }
 
@@ -792,25 +790,14 @@ void CSCamera::onGetFrame(int timeout)
         //cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
         //cameraPtr->getFrame(STREAM_TYPE_RGB, rgbFrame, timeout);
 
-        frameData.frameDataType = TYPE_UNKNOW;
-
-        if (onProcessFrame(depthFrame, frameData))
-        {
-            frameData.frameDataType = (FRAME_DATA_TYPE)(frameData.frameDataType | TYPE_DEPTH);
-        }
-
-        if (onProcessFrame(rgbFrame, frameData))
-        {
-            frameData.frameDataType = (FRAME_DATA_TYPE)(frameData.frameDataType | TYPE_RGB);
-        }
+        onProcessFrame(TYPE_DEPTH, depthFrame, frameData);
+        onProcessFrame(TYPE_RGB, rgbFrame, frameData);
     }
     else
     {
         IFramePtr depthFrame;
         cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
-
-        frameData.frameDataType = TYPE_DEPTH;
-        onProcessFrame(depthFrame, frameData);
+        onProcessFrame(TYPE_DEPTH, depthFrame, frameData);
     }
 
     if (frameData.data.size() > 0)
@@ -819,14 +806,14 @@ void CSCamera::onGetFrame(int timeout)
     }
 }
 
-bool CSCamera::onProcessFrame(const IFramePtr& frame, FrameData& frameData)
+bool CSCamera::onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, FrameData& frameData)
 {
     if (!frame || frame->empty())
     {
         return false;
     }
 
-    StreamDataInfo streamDataInfo = { frame->getFormat(),frame->getWidth(), frame->getHeight(), frame->getTimeStamp()};
+    StreamDataInfo streamDataInfo = { streamDataType, frame->getFormat(),frame->getWidth(), frame->getHeight(), frame->getTimeStamp()};
     const int dataSize = frame->getSize();
 
     //copy data

@@ -90,7 +90,7 @@ public:
     bool softTrigger() override;
 
     void onGetFrame(int timeout = GET_FRAME_TIME_OUT);
-    bool onProcessFrame(const IFramePtr& frame, FrameData& frameData);
+    bool onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, FrameData& frameData);
     void setCameraThread(QThread*  thread);
 
     CSCameraInfo getCameraInfo() const override;

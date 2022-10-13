@@ -58,6 +58,7 @@ public:
     CaptureSettingDialog(QWidget* parent = nullptr);
     ~CaptureSettingDialog();
 
+    void showEvent(QShowEvent* event) override;
 public slots:
     void onCaptureNumberUpdated(int number, int dropped);
     void onCaptureStateChanged(int state, QString message);

@@ -96,7 +96,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="IRCheckBox">
+       <widget class="QCheckBox" name="irCheckBox">
         <property name="focusPolicy">
          <enum>Qt::NoFocus</enum>
         </property>
@@ -226,7 +226,7 @@
   <tabstop>frameNumberSlider</tabstop>
   <tabstop>depthCheckBox</tabstop>
   <tabstop>rgbCheckBox</tabstop>
-  <tabstop>IRCheckBox</tabstop>
+  <tabstop>irCheckBox</tabstop>
   <tabstop>pointCloudCheckBox</tabstop>
   <tabstop>saveFormatComboBox</tabstop>
   <tabstop>startCaptureButton</tabstop>

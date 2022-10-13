@@ -61,6 +61,11 @@ set(OSG_LIB ${THIRDPARTY_DIR}/osg3.6.5/${PLATFORM}/lib)
 set(OSG_INC ${THIRDPARTY_DIR}/osg3.6.5/${PLATFORM}/include)
 set(OSG_BIN ${THIRDPARTY_DIR}/osg3.6.5/${PLATFORM}/bin)
 
+## yaml-cpp
+set(YAML_CPP_INC ${THIRDPARTY_DIR}/yaml-cpp0.6.0/include)
+set(YAML_CPP_LIB ${THIRDPARTY_DIR}/yaml-cpp0.6.0/${PLATFORM}/lib)
+set(YAML_CPP_BIN ${THIRDPARTY_DIR}/yaml-cpp0.6.0/${PLATFORM}/bin)
+
 add_definitions(-D_UNICODE -DUNICODE)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 

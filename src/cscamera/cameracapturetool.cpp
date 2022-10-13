@@ -2,6 +2,14 @@
 #include <QMutexLocker>
 #include <QDebug>
 #include <QTime>
+#include <QDir>
+#include <QFile>
+#include <QTextStream>
+#include <QVariant>
+
+#include <icscamera.h>
+#include <fstream>
+#include <yaml-cpp/yaml.h>
 
 #include "outputsaver.h"
 
@@ -53,6 +61,7 @@ void CameraCaptureTool::startCapture(CameraCaptureConfig config)
         cameraCapture = new CameraCaptureSingle(config);
     }
 
+    cameraCapture->setCamera(camera);
     cameraCapture->setOutputData(cachedOutputData);
 
     bool suc = true;
@@ -63,7 +72,7 @@ void CameraCaptureTool::startCapture(CameraCaptureConfig config)
 
     Q_ASSERT(suc);
 
-    // start capture
+    //start capture
     cameraCapture->start();
 }
 
@@ -79,6 +88,11 @@ void CameraCaptureTool::stopCapture()
     cameraCapture->requestInterruption();
     cameraCapture->wait();
     cameraCapture = nullptr;
+}
+
+void CameraCaptureTool::setCamera(std::shared_ptr<ICSCamera>& camera)
+{
+    this->camera = camera;
 }
 
 CameraCaptureBase::CameraCaptureBase(const CameraCaptureConfig& config, CAPTURE_TYPE captureType)
@@ -160,11 +174,12 @@ void CameraCaptureBase::run()
     threadPool.waitForDone();
 
     int timeMs = time.elapsed();
-    qInfo() << "capture " << capturedDataCount <<  " spend time : " << timeMs;
+
+    onCaptureDataDone();
+
+    qInfo("captured %d frames (%d dropped), spend time : %d ms", capturedDataCount, skipDataCount, timeMs);
 
     QString msg = QString("End capture, captured %1 frames (%2 dropped)").arg(capturedDataCount).arg(skipDataCount);
-
-    qInfo() << msg;
     emit captureStateChanged(CAPTURE_FINISHED, msg);
 }
 
@@ -176,6 +191,10 @@ void CameraCaptureBase::saveFinished()
     emit captureNumberUpdated(capturedDataCount, skipDataCount);
 }
 
+void CameraCaptureBase::setCamera(std::shared_ptr<ICSCamera>& camera)
+{
+    this->camera = camera;
+}
 
 void CameraCaptureBase::setOutputData(const OutputDataPort& outputDataPort)
 {
@@ -184,6 +203,97 @@ void CameraCaptureBase::setOutputData(const OutputDataPort& outputDataPort)
     outputDatas.enqueue(outputDataPort);
 
     cachedDataCount++;
+}
+
+YAML::Node genYamlNodeFromIntrinsics(const Intrinsics& intrinsics)
+{
+    YAML::Node node;
+    node["width"] = intrinsics.width;
+    node["height"] = intrinsics.height;
+
+    YAML::Node nodeMatrix;
+    node["matrix"] = nodeMatrix;
+
+    nodeMatrix.SetTag("opencv-matrix");
+    nodeMatrix["rows"] = 3;
+    nodeMatrix["cols"] = 3;
+    nodeMatrix["dt"] = "f";
+
+    YAML::Node matrixData;
+    matrixData.SetStyle(YAML::EmitterStyle::Flow);
+    matrixData[0] = intrinsics.fx;
+    matrixData[1] = intrinsics.zero01;
+    matrixData[2] = intrinsics.cx;
+    matrixData[3] = intrinsics.zeor10;
+    matrixData[4] = intrinsics.fy;
+    matrixData[5] = intrinsics.cy;
+    matrixData[6] = intrinsics.zeor20;
+    matrixData[7] = intrinsics.zero21;
+    matrixData[8] = intrinsics.one22;
+
+    nodeMatrix["data"] = matrixData;
+
+    return node;
+}
+
+void CameraCaptureBase::saveIntrinsics()
+{
+    qInfo() << "save camera intrinsics";
+
+    QVariant hasRgbV;
+    camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+
+    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-intrinsics.yaml";
+
+    std::ofstream fout(savePath.toStdString());
+    if (!fout.is_open())
+    {
+        qWarning() << "open file failed, file:" << savePath;
+        return;
+    }
+
+    fout << "%YAML:1.0\n";
+    fout << "---\n";
+
+    YAML::Node rootNode;
+    if (hasRgbV.isValid() && hasRgbV.toBool())
+    {
+        Intrinsics rgbIntrinsics;
+        QVariant intrinsics;
+        camera->getCameraPara(cs::parameter::PARA_DEPTH_INTRINSICS, intrinsics);
+
+        if (intrinsics.isValid())
+        {
+            rgbIntrinsics = intrinsics.value<Intrinsics>();
+            YAML::Node node = genYamlNodeFromIntrinsics(rgbIntrinsics);
+
+            rootNode["RGB intrinsics"] = node;
+        }
+        else
+        {
+            qWarning() << "get rgb intrinsics failed";
+        }
+    }
+
+    Intrinsics depthIntrinsics;
+    QVariant intrinsics;
+    camera->getCameraPara(cs::parameter::PARA_RGB_INTRINSICS, intrinsics);
+    if (intrinsics.isValid())
+    {
+        depthIntrinsics = intrinsics.value<Intrinsics>();
+        YAML::Node node = genYamlNodeFromIntrinsics(depthIntrinsics);
+
+        rootNode["Depth intrinsics"] = node;
+    }
+
+    fout << rootNode;
+    fout.close();
+}
+
+void CameraCaptureBase::onCaptureDataDone()
+{
+    // save camera intrinsics to file
+    saveIntrinsics();
 }
 
 CameraCaptureSingle::CameraCaptureSingle(const CameraCaptureConfig& config)
@@ -238,19 +348,78 @@ void CameraCaptureMutiple::getCaptureIndex(OutputDataPort& output, int& rgbFrame
     pointCloudIdx = capturePointCloudCount;
 
     auto& frameData = output.getFrameData();
-    if (frameData.frameDataType == TYPE_DEPTH_RGB)
+    
+    for (auto& streamData : frameData.data)
     {
-        capturedRgbCount++;
-        capturedDepthCount++;
-        capturePointCloudCount++;
+        if (streamData.dataInfo.streamDataType == TYPE_RGB)
+        {
+            capturedDepthCount++;
+            capturePointCloudCount++;
+
+            depthTimeStamps.push_back(streamData.dataInfo.timeStamp);
+        }
+        else if (streamData.dataInfo.streamDataType == TYPE_DEPTH)
+        {
+            capturedRgbCount++;
+            rgbTimeStamps.push_back(streamData.dataInfo.timeStamp);
+        }
     }
-    else if (frameData.frameDataType == TYPE_RGB)
+}
+
+void CameraCaptureMutiple::onCaptureDataDone()
+{
+    // save time stamps to file
+    saveTimeStamps();
+
+    CameraCaptureBase::onCaptureDataDone();
+}
+
+void CameraCaptureMutiple::saveTimeStamps()
+{
+    qInfo() << "save time stamps";
+
+    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-TimeStamps.txt";
+
+    if (depthTimeStamps.isEmpty() && rgbTimeStamps.isEmpty())
     {
-        capturedRgbCount++;
+        return;
     }
-    else if (frameData.frameDataType == TYPE_DEPTH)
+
+    QFile file(savePath);
+    file.open(QFile::WriteOnly);
+    if (!file.isOpen())
     {
-        capturedDepthCount++;
-        capturePointCloudCount++;
+        qWarning() << "open file failed, file:" << file;
+        return;
+    }
+
+    QTextStream ts(&file);
+
+    // save depth time stamps
+    if (!depthTimeStamps.isEmpty())
+    {
+        ts << "[Depth Time Stamps]\n";
+        const int size = depthTimeStamps.size();
+        for(int i = 0; i < size; i++)
+        {
+            QString time = QString().setNum(qRound64(depthTimeStamps.at(i)));
+            QString s = QString("%1 = %2\n").arg(i, 4, 10,QChar('0')).arg(time);
+            ts << s;
+        }
+
+        ts << "\n";
+    }
+
+    // save RGB time stamps
+    if (!rgbTimeStamps.isEmpty())
+    {
+        ts << "[RGB Time Stamps]\n";
+        const int size = rgbTimeStamps.size();
+        for (int i = 0; i < size; i++)
+        {
+            QString time = QString().setNum(qRound64(rgbTimeStamps.at(i)));
+            QString s = QString("%1 = %2\n").arg(i, 4, 10, QChar('0')).arg(time);
+            ts << s;
+        }
     }
 }

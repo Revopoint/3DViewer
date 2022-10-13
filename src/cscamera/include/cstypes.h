@@ -68,16 +68,16 @@ enum CAMERA_STATE
     CAMERA_RESTARTING_CAMERA
 };
 
-enum FRAME_DATA_TYPE
+enum STREAM_DATA_TYPE
 {
     TYPE_UNKNOW            = 0,
     TYPE_DEPTH             = (1 << 0),
     TYPE_RGB               = (1 << 1),
-    TYPE_DEPTH_RGB         = (TYPE_DEPTH | TYPE_RGB)
 };
 
 struct StreamDataInfo 
 { 
+    STREAM_DATA_TYPE streamDataType;
     STREAM_FORMAT format;
     int width;
     int height;
@@ -92,7 +92,6 @@ struct StreamData
  
 struct FrameData
 { 
-    FRAME_DATA_TYPE frameDataType;
     QVector<StreamData> data; 
 };
 

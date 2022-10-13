@@ -380,10 +380,10 @@ void ParaSettingsWidget::updateControlButtonState(int cameraState)
         || cameraState == CAMERA_STOPPED_STREAM);
 
     ui->previewButton->setEnabled(enable);
-    ui->captureSingleButton->setEnabled(enable);
-    ui->captureMultipleButton->setEnabled(enable);
 
     enable = (cameraState == CAMERA_STARTED_STREAM);
+    ui->captureSingleButton->setEnabled(enable);
+    ui->captureMultipleButton->setEnabled(enable);
 
     if (cameraState == CAMERA_CONNECTED)
     {

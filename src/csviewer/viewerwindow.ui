@@ -190,6 +190,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionsetDefaultSaveDir"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuLanguage">
@@ -284,6 +285,7 @@
     <string>Ctrl+L</string>
    </property>
   </action>
+  <action name="actionsetDefaultSaveDir"/>
  </widget>
  <customwidgets>
   <customwidget>

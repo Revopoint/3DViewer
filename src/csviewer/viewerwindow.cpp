@@ -159,6 +159,9 @@ void ViewerWindow::initWindow()
 
     //disable 3d tab
     ui->tabWidget->setTabEnabled(RENDER_PAGE_3D, false);
+
+    QString defaultSavePath = tr("Set default save path (") + QDir::homePath() + ")";
+    ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 }
 
 void ViewerWindow::onClickedModeSwitchButton()

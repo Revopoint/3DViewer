@@ -46,16 +46,19 @@
 #include <QDir>
 #include <QDebug>
 
+#include <icscamera.h>
+
 #include "csapplication.h"
 #include "ui_capturesetting.h"
 
 static QStringList captureSaveFormats = { "images", "raw" };
 
 CaptureSettingDialog::CaptureSettingDialog(QWidget* parent)
-    : ui(new Ui::CaptureSettingWidget)
+    : QDialog(parent)
+    , ui(new Ui::CaptureSettingWidget)
 {
     ui->setupUi(this);
-    dataTypeCheckBoxs = { ui->rgbCheckBox, ui->IRCheckBox, ui->depthCheckBox, ui->pointCloudCheckBox, };
+    dataTypeCheckBoxs = { ui->rgbCheckBox, ui->irCheckBox, ui->depthCheckBox, ui->pointCloudCheckBox, };
 
     // init default capture setting
     initDefaultCaptureConfig();
@@ -70,6 +73,26 @@ CaptureSettingDialog::CaptureSettingDialog(QWidget* parent)
 CaptureSettingDialog::~CaptureSettingDialog()
 {
     delete ui;
+}
+
+void CaptureSettingDialog::showEvent(QShowEvent* event)
+{
+    auto camera = cs::CSApplication::getInstance()->getCamera();
+    QVariant hasRgbV, hasIrV, hasDepthV;
+    camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+    camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_LR, hasIrV);
+    camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
+
+    const bool hasRgb = hasRgbV.toBool();
+    const bool hasIr = hasIrV.toBool();
+    const bool hasDepth = hasDepthV.toBool();
+
+    ui->rgbCheckBox->setEnabled(hasRgb);
+    ui->depthCheckBox->setEnabled(hasDepth);
+    ui->irCheckBox->setEnabled(hasIr);
+    ui->pointCloudCheckBox->setEnabled(hasDepth);
+
+    QDialog::showEvent(event);
 }
 
 void CaptureSettingDialog::onStartCapture()
@@ -114,7 +137,7 @@ void CaptureSettingDialog::onDataTypeChanged()
         captureConfig.captureDataTypes.push_back(CAMERA_DATA_RGB);
     }
 
-    if (ui->IRCheckBox->isChecked())
+    if (ui->irCheckBox->isChecked())
     {
         captureConfig.captureDataTypes.push_back(CAMERA_DATA_L);
         captureConfig.captureDataTypes.push_back(CAMERA_DATA_R);
@@ -174,7 +197,7 @@ void CaptureSettingDialog::initDialog()
             break;
         case CAMERA_DATA_L:
         case CAMERA_DATA_R:
-            ui->IRCheckBox->setChecked(true);
+            ui->irCheckBox->setChecked(true);
             break;
         case CAMERA_DATA_DEPTH:
             ui->depthCheckBox->setChecked(true);

@@ -13,10 +13,16 @@ source_group("Process\\include" FILES ${PROCESS_INC} )
 
 include_directories(include)
 include_directories(${CAMERA_SDK_INC}) 
+include_directories(${YAML_CPP_INC}) 
 
 link_directories(${CAMERA_SDK_LIB})
+link_directories(${YAML_CPP_LIB})
 
 add_definitions(-DCS_CAMERA_API)
+
+if(WIN32)
+    add_definitions(-DYAML_CPP_DLL)
+endif()
 
 #qt5_wrap_cpp(MOC_HDS ${HEADERS})
 #source_group("Generated Files\\moc" FILES ${MOC_HDS})
@@ -31,12 +37,15 @@ add_library(${TARGET_NAME} SHARED
 
 if(MSVC)
     set(3DCAMERA_LIBRARY optimized 3DCamera debug 3DCamerad)
+    set(YAMLCPP_LIBRARY optimized yaml-cpp debug yaml-cppd)
 else()
     set(3DCAMERA_LIBRARY 3DCamera)
+    set(YAMLCPP_LIBRARY yaml-cpp)
 endif()
 
 target_link_libraries(${TARGET_NAME}  PRIVATE
     ${3DCAMERA_LIBRARY}
+    ${YAMLCPP_LIBRARY}
     Qt5::Core
     Qt5::Gui)
 

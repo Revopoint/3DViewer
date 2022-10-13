@@ -152,7 +152,7 @@ endif()
 
 if (MSVC)
     set_target_properties(${TARGET_NAME} PROPERTIES VS_GLOBAL_LocalDebuggerEnvironment
-        "PATH=${_qt5Core_install_prefix}/bin;${CAMERA_SDK_LIB};${OSG_BIN};$(PATH)")
+        "PATH=${_qt5Core_install_prefix}/bin;${CAMERA_SDK_LIB};${YAML_CPP_BIN};${OSG_BIN};$(PATH)")
 
     set_target_properties(${TARGET_NAME} PROPERTIES
     LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")

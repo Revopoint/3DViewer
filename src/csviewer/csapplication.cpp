@@ -110,6 +110,7 @@ void CSApplication::start()
     initConnections();
     cameraThread->start();
 
+    cameraCaptureTool->setCamera(cameraThread->getCamera());
     processor->addProcessEndLisener(cameraCaptureTool.get());
 }
 
