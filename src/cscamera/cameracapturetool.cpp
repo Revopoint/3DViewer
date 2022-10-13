@@ -1,6 +1,9 @@
 #include "cameracapturetool.h"
 #include <QMutexLocker>
 #include <QDebug>
+#include <QTime>
+
+#include "outputsaver.h"
 
 using namespace cs;
 
@@ -82,6 +85,7 @@ CameraCaptureBase::CameraCaptureBase(const CameraCaptureConfig& config, CAPTURE_
     : captureConfig(config)
     , captureType(captureType)
 {
+    //threadPool.setMaxThreadCount(1);
 }
 
 CameraCaptureBase::CAPTURE_TYPE CameraCaptureBase::getCaptureType() const
@@ -92,10 +96,18 @@ CameraCaptureBase::CAPTURE_TYPE CameraCaptureBase::getCaptureType() const
 void CameraCaptureBase::run()
 {
     qInfo() << "start capturing";
+    QTime time;
+    time.start();
 
     emit captureStateChanged(CAPTURING, tr("Start capturing"));
 
-    while (!isInterruptionRequested() && (skipDataCount + capturedDataCount) < captureConfig.captureNumber)
+    int captured = 0;
+    {
+        QMutexLocker locker(&saverMutex);
+        captured = capturedDataCount;
+    }
+
+    while (!isInterruptionRequested() && (skipDataCount + captured) < captureConfig.captureNumber)
     {
         mutex.lock();
         if (outputDatas.isEmpty())
@@ -109,20 +121,61 @@ void CameraCaptureBase::run()
             outputData = outputDatas.dequeue();
             mutex.unlock();
 
-            // save the data 
-            saveOutputData(outputData);
-            capturedDataCount++;
+            if (outputData.isEmpty())
+            {
+                emit captureStateChanged(CAPTURE_ERROR, tr("save frame data is empty"));
+                continue;
+            }
 
-            emit captureNumberUpdated(capturedDataCount, skipDataCount);
+            int rgbFrameIndex = -1, depthFrameIndex = -1, pointCloudIndex = -1;
+            getCaptureIndex(outputData, rgbFrameIndex, depthFrameIndex, pointCloudIndex);
+
+            // save a frame in separate thread
+            OutputSaver* outputSaver = nullptr;
+            if (captureConfig.saveFormat == "raw")
+            {
+                outputSaver = new RawOutputSaver(this, captureConfig, outputData);
+            }
+            else 
+            {
+                outputSaver = new ImageOutputSaver(this, captureConfig, outputData);
+            }
+
+            outputSaver->setSaveIndex(rgbFrameIndex, depthFrameIndex, pointCloudIndex);
+
+            threadPool.start(outputSaver, QThread::LowPriority);
+        }
+
+        {
+            QMutexLocker locker(&saverMutex);
+            captured = capturedDataCount;
         }
     }
+    
+    captureFinished = true;
 
-    captureFinished = true;   
+    qInfo() << "wait all thread finished";
+
+    //wait all thread finished
+    threadPool.waitForDone();
+
+    int timeMs = time.elapsed();
+    qInfo() << "capture " << capturedDataCount <<  " spend time : " << timeMs;
+
     QString msg = QString("End capture, captured %1 frames (%2 dropped)").arg(capturedDataCount).arg(skipDataCount);
 
     qInfo() << msg;
     emit captureStateChanged(CAPTURE_FINISHED, msg);
 }
+
+void CameraCaptureBase::saveFinished()
+{
+    QMutexLocker locker(&saverMutex);
+    capturedDataCount++;
+
+    emit captureNumberUpdated(capturedDataCount, skipDataCount);
+}
+
 
 void CameraCaptureBase::setOutputData(const OutputDataPort& outputDataPort)
 {
@@ -133,209 +186,15 @@ void CameraCaptureBase::setOutputData(const OutputDataPort& outputDataPort)
     cachedDataCount++;
 }
 
-void CameraCaptureBase::saveOutputData(OutputDataPort& output)
-{
-    if (output.isEmpty())
-    {
-        emit captureStateChanged(CAPTURE_ERROR, tr("save frame data is empty"));
-        return;
-    }
-
-    //qInfo() << "save frame data to disk";
-  
-    auto captureTypes = captureConfig.captureDataTypes;
-
-    // save point cloud
-    if (captureTypes.contains(CAMERA_DTA_POINT_CLOUD))
-    {
-        if (output.hasData(CAMERA_DTA_POINT_CLOUD))
-        {
-            savePointCloud(output.getPointCloud());
-        }
-        else
-        {
-            //TODO: save from frameData
-        }
-    }
-
-    // save images
-    saveOutput2D(output);
-}
-
-void CameraCaptureBase::saveOutput2D(OutputDataPort& output)
-{
-    auto& frameData = output.getFrameData();
-    
-    for (auto& streamData : frameData.data)
-    {
-        saveOutput2D(streamData, output);
-    }
-}
-
-void CameraCaptureBase::saveOutput2D(StreamData& streamData, OutputDataPort& output)
-{
-    auto captureTypes = captureConfig.captureDataTypes;
-    if (captureTypes.contains(CAMERA_DATA_RGB))
-    {
-        saveOutputRGB(streamData, output);
-    }
-
-    if (captureTypes.contains(CAMERA_DATA_DEPTH))
-    {
-        saveOutputDepth(streamData, output);
-    }
-
-    if (captureTypes.contains(CAMERA_DATA_L) || captureTypes.contains(CAMERA_DATA_R))
-    {
-        saveOutputIr(streamData, output);
-    }
-}
-
-void CameraCaptureBase::saveOutputRGB(StreamData& streamData, OutputDataPort& output)
-{
-    switch (streamData.dataInfo.format)
-    {
-    case STREAM_FORMAT_RGB8:
-    case STREAM_FORMAT_MJPG: 
-        {
-            CS_CAMERA_DATA_TYPE dataType = CAMERA_DATA_RGB;
-            QString savePath = QString("%1/%2%3.png").arg(captureConfig.saveDir).arg(captureConfig.saveName).arg(getSaveFileSuffix(dataType));
-            QImage image;
-            if (output.hasData(dataType))
-            {
-                image = output.getOutputData2D(dataType).image;
-            }
-            else
-            {
-                // save from streamData
-                if (streamData.dataInfo.format == STREAM_FORMAT_RGB8)
-                {
-                    image = QImage((uchar*)streamData.data.data(), streamData.dataInfo.width, streamData.dataInfo.height, QImage::Format_RGB888);
-                }
-                else 
-                {
-                    image.loadFromData(streamData.data, "JPG");
-                }
-            }
-            if (!image.save(savePath, "PNG"))
-            {
-                qWarning() << "save image failed:" << savePath;
-            }
-            break;
-        }
-    default:
-        break;
-    }
-}
-
-void CameraCaptureBase::saveOutputDepth(StreamData& streamData, OutputDataPort& output)
-{
-    switch (streamData.dataInfo.format)
-    {
-    case STREAM_FORMAT_Z16:
-    case STREAM_FORMAT_Z16Y8Y8:
-    {
-        CS_CAMERA_DATA_TYPE dataType = CAMERA_DATA_DEPTH;
-        QString savePath = QString("%1/%2%3.png").arg(captureConfig.saveDir).arg(captureConfig.saveName).arg(getSaveFileSuffix(dataType));
-
-        QImage image((uchar*)streamData.data.data(), streamData.dataInfo.width, streamData.dataInfo.height, QImage::Format_RGB16);
-        if (!image.save(savePath, "PNG"))
-        {
-            qWarning() << "save image failed:" << savePath;
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void CameraCaptureBase::saveOutputIr(StreamData& streamData, OutputDataPort& output)
-{
-    switch (streamData.dataInfo.format)
-    {
-    case STREAM_FORMAT_Z16Y8Y8:
-    case STREAM_FORMAT_PAIR: 
-    {
-        QVector<QPair<CS_CAMERA_DATA_TYPE, int>> saveInfos =
-        {
-            { CAMERA_DATA_L, 0},
-            { CAMERA_DATA_R, 1}
-        };
-
-        const int offset = (streamData.dataInfo.format == STREAM_FORMAT_Z16Y8Y8) ? (streamData.data.size() / 2) : 0;
-
-        for (auto pair : saveInfos)
-        {
-            CS_CAMERA_DATA_TYPE dataType = pair.first;
-            QString savePath = QString("%1/%2%3.png").arg(captureConfig.saveDir).arg(captureConfig.saveName).arg(getSaveFileSuffix(dataType));
-
-            const int width = streamData.dataInfo.width;
-            const int height = streamData.dataInfo.height;
-
-            const int offset2 = pair.second * width * height + offset;
-
-            QImage image;
-            if (output.hasData(dataType))
-            {
-                image = output.getOutputData2D(dataType).image;
-            }
-            else
-            {
-                image = QImage((uchar*)streamData.data.data() + offset2, width, height, QImage::Format_Grayscale8);
-            }
-
-            if (!image.save(savePath, "PNG"))
-            {
-                qWarning() << "save image failed:" << savePath;
-            }
-        }
-        break;
-    }
-    default:
-        break;
-    }
-}
-
-void CameraCaptureBase::savePointCloud(cs::Pointcloud& pointCloud)
-{
-    QString savePath = QString("%1/%2%3.ply").arg(captureConfig.saveDir).arg(captureConfig.saveName).arg(getSaveFileSuffix(CAMERA_DTA_POINT_CLOUD));
-    pointCloud.exportToFile(savePath.toStdString(), nullptr, 0, 0);
-}
-
-QString CameraCaptureBase::getSaveFileSuffix(CS_CAMERA_DATA_TYPE dataType)
-{
-    QString suffix = "";
-    switch (dataType)
-    {
-    case CAMERA_DATA_L:
-        suffix = "-ir-L";
-        break;
-    case CAMERA_DATA_R:
-        suffix = "-ir-R";
-        break;
-    case CAMERA_DATA_DEPTH:
-        suffix = "-depth";
-        break;
-    case CAMERA_DATA_RGB:
-        suffix = "-RGB";
-        break;
-    case CAMERA_DTA_POINT_CLOUD:
-        suffix = "";
-        break;
-    default:
-        break;
-    }
-
-    suffix = QString("%1").arg(suffix);
-
-    return suffix;
-}
-
 CameraCaptureSingle::CameraCaptureSingle(const CameraCaptureConfig& config)
     : CameraCaptureBase(config, CAPTURE_TYPE_SINGLE)
 {
 
+}
+
+void CameraCaptureSingle::getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex)
+{
+    rgbFrameIndex = depthFrameIndex = pointCloudIndex = -1;
 }
 
 CameraCaptureMutiple::CameraCaptureMutiple(const CameraCaptureConfig& config)
@@ -372,66 +231,26 @@ void CameraCaptureMutiple::addOutputData(const OutputDataPort& outputDataPort)
     }
 }
 
-QString CameraCaptureMutiple::getSaveFileSuffix(CS_CAMERA_DATA_TYPE dataType)
+void CameraCaptureMutiple::getCaptureIndex(OutputDataPort& output, int& rgbFrameIdx, int& depthFrameIdx, int& pointCloudIdx)
 {
-    QString suffix = "";
-    int count = 0;
+    rgbFrameIdx = capturedRgbCount;
+    depthFrameIdx = capturedDepthCount;
+    pointCloudIdx = capturePointCloudCount;
 
-    switch (dataType)
+    auto& frameData = output.getFrameData();
+    if (frameData.frameDataType == TYPE_DEPTH_RGB)
     {
-    case CAMERA_DATA_L:
-        suffix = "-ir-L";
-        count = capturedDepthCount;
-        break;
-    case CAMERA_DATA_R:
-        suffix = "-ir-R";
-        count = capturedDepthCount;
-        break;
-    case CAMERA_DATA_DEPTH:
-        suffix = "-depth";
-        count = capturedDepthCount;
-        break;
-    case CAMERA_DATA_RGB:
-        suffix = "-RGB";
-        count = capturedRgbCount;
-        break;
-    case CAMERA_DTA_POINT_CLOUD:
-        suffix = "-";
-        count = capturePointCloudCount;
-        break;
-    default:
-        break;
+        capturedRgbCount++;
+        capturedDepthCount++;
+        capturePointCloudCount++;
     }
-
-    suffix = QString("%1-%2").arg(suffix).arg(count, 4, 10, QLatin1Char('0'));
-
-    return suffix;
-}
-
-void CameraCaptureMutiple::savePointCloud(cs::Pointcloud& pointCloud)
-{
-    CameraCaptureBase::savePointCloud(pointCloud);
-    capturePointCloudCount++;
-}
-
-void CameraCaptureMutiple::saveOutput2D(OutputDataPort& output)
-{
-    CameraCaptureBase::saveOutput2D(output);
-
-    switch (output.getFrameData().frameDataType)
+    else if (frameData.frameDataType == TYPE_RGB)
     {
-    case TYPE_DEPTH:
-        capturedDepthCount++;
-        break;
-    case TYPE_RGB:
         capturedRgbCount++;
-        break;
-    case TYPE_DEPTH_RGB:
+    }
+    else if (frameData.frameDataType == TYPE_DEPTH)
+    {
         capturedDepthCount++;
-        capturedRgbCount++;
-        break;
-    default:
-        Q_ASSERT(false);
-        break;
+        capturePointCloudCount++;
     }
 }

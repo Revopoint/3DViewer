@@ -49,8 +49,6 @@
 
 #include <hpp/Processing.hpp>
 
-class DataExporter;
-
 namespace cs {
     
 class CameraThread;
@@ -107,7 +105,6 @@ private:
     std::shared_ptr<CameraThread> cameraThread;
     std::shared_ptr<Processor> processor;
     std::shared_ptr<ProcessThread> processThread;
-    std::shared_ptr<DataExporter> dataExporter;
     
     bool show3D = false;
     QMap<int, cs::ProcessStrategy*> processStrategys;

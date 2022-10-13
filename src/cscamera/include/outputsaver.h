@@ -40,34 +40,70 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_DATAEXPORTER_H
-#define _CS_DATAEXPORTER_H
-#include <QObject>
-#include <QThread>
+#ifndef _CS_OUTPUT_SAVER_H
+#define _CS_OUTPUT_SAVER_H
 
-#include <cstypes.h>
-#include <hpp/Processing.hpp>
+#include <QRunnable>
 
-class DataExporter : public QObject
+#include "cstypes.h"
+#include "process/outputdataport.h"
+
+namespace cs {
+
+class CameraCaptureBase;
+class OutputSaver : public QRunnable
 {
-    Q_OBJECT
 public:
-    DataExporter();
-    ~DataExporter();
-public slots:
-    void onExportStreamData(StreamData streamData, QImage image, QString filePath);
-    void onExportPointCloud(cs::Pointcloud pointCloud, QImage image, QString filePath);
-private:
-    bool exportRgbData(const StreamData& streamData, const QImage& image, const QString& filePath);
-    bool exportDepthData(const StreamData& streamData, const QImage& image, const QString& filePath);
-    bool exportPairData(const StreamData& streamData, const QString& filePath);
+    OutputSaver(CameraCaptureBase* cameraCapture, const CameraCaptureConfig& config, const OutputDataPort& output);
+    virtual ~OutputSaver();
+    void run() override;
 
-    bool exportBinData(const char* data, int dataLength,  QString fileName);
-    bool exportImage(const QImage& image, QString fileName);
-signals:
-    void exportFinished(bool success);
-private:
-    QThread thread;
+    void setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex);
+protected:
+    void savePointCloud();
+
+    void saveOutput2D();
+    void saveOutput2D(StreamData& streamData);
+
+    virtual void saveOutputRGB(StreamData& streamData) {}
+    virtual void saveOutputDepth(StreamData& streamData) {}
+    virtual void saveOutputIr(StreamData& streamData) {}
+
+    void savePointCloud(cs::Pointcloud& pointCloud);
+
+    QString getSavePath(CS_CAMERA_DATA_TYPE dataType);
+
+protected:
+    CameraCaptureBase* cameraCapture = nullptr;
+    CameraCaptureConfig captureConfig;
+    OutputDataPort outputDataPort;
+    QString suffix2D;
+
+    int rgbFrameIndex = -1;
+    int depthFrameIndex = -1;
+    int pointCloudIndex = -1;
 };
 
-#endif // _CS_DATAEXPORTER_H
+class ImageOutputSaver : public OutputSaver
+{
+public:
+    ImageOutputSaver(CameraCaptureBase* cameraCapture, const CameraCaptureConfig& config, const OutputDataPort& output);
+    void saveOutputRGB(StreamData& streamData) override;
+    void saveOutputDepth(StreamData& streamData) override;
+    void saveOutputIr(StreamData& streamData) override;
+};
+
+class RawOutputSaver : public OutputSaver
+{
+public:
+    RawOutputSaver(CameraCaptureBase* cameraCapture, const CameraCaptureConfig& config, const OutputDataPort& output);
+    void saveOutputRGB(StreamData& streamData) override;
+    void saveOutputDepth(StreamData& streamData) override;
+    void saveOutputIr(StreamData& streamData) override;
+private:
+    void saveDataToFile(QString filePath, QByteArray data);
+};
+
+}
+
+#endif // _CS_OUTPUT_SAVER_H

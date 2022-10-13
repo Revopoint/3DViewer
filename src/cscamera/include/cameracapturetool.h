@@ -47,6 +47,7 @@
 #include <QQueue>
 #include <QMutex>
 #include <QString>
+#include <QThreadPool>
 
 #include "cstypes.h"
 #include "cscameraapi.h"
@@ -78,22 +79,14 @@ public:
     CAPTURE_TYPE getCaptureType() const;
     virtual void addOutputData(const OutputDataPort& outputDataPort) {}
     virtual void setOutputData(const OutputDataPort& outputDataPort);
+    
+    virtual void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) {}
 
     void run() override;
+    void saveFinished();
 signals:
     void captureStateChanged(int state, QString message);
     void captureNumberUpdated(int, int);
-protected:
-    void saveOutputData(OutputDataPort& output);
-    virtual void saveOutput2D(OutputDataPort& output);
-    virtual void savePointCloud(cs::Pointcloud& pointCloud);
-
-    virtual QString getSaveFileSuffix(CS_CAMERA_DATA_TYPE dataType);
-
-    void saveOutput2D(StreamData& streamData, OutputDataPort& output);
-    void saveOutputRGB(StreamData& streamData, OutputDataPort& output);
-    void saveOutputDepth(StreamData& streamData, OutputDataPort& output);
-    void saveOutputIr(StreamData& streamData, OutputDataPort& output);
 protected:
     CameraCaptureConfig captureConfig;
     CAPTURE_TYPE captureType;
@@ -108,9 +101,12 @@ protected:
     // cached data
     QQueue<OutputDataPort> outputDatas;
     QMutex mutex;
+    QMutex saverMutex;
 
     const int maxCachedCount = 10;
     bool captureFinished = false;
+
+    QThreadPool threadPool;
 };
 
 // save a frame of data
@@ -119,7 +115,7 @@ class CameraCaptureSingle : public CameraCaptureBase
     Q_OBJECT
 public:
     CameraCaptureSingle(const CameraCaptureConfig& config);
-
+    void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 protected:
 };
 
@@ -130,10 +126,7 @@ class CameraCaptureMutiple : public CameraCaptureBase
 public:
     CameraCaptureMutiple(const CameraCaptureConfig& config);
     void addOutputData(const OutputDataPort& outputDataPort) override;
-protected:
-    QString getSaveFileSuffix(CS_CAMERA_DATA_TYPE dataType) override;
-    void savePointCloud(cs::Pointcloud& pointCloud) override;
-    void saveOutput2D(OutputDataPort& output) override;
+    void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 private:
     int capturedRgbCount = 0;
     int capturedDepthCount = 0;

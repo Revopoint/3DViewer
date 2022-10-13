@@ -51,7 +51,6 @@
 #include "process/processthread.h" 
 #include "process/processor.h"
 #include "app_version.h"
-#include "dataexporter.h"
 #include "cameracapturetool.h"
 
 #include "process/pointcloudprocessstrategy.h"
@@ -71,7 +70,6 @@ CSApplication* CSApplication::getInstance()
 CSApplication::CSApplication()
     : processor(std::make_shared<Processor>())
     , processThread(std::make_shared<ProcessThread>(processor)) 
-    , dataExporter(std::make_shared<DataExporter>())
     , cameraCaptureTool(std::make_shared<CameraCaptureTool>())
 {
     CameraThread::setSdkLogPath(LOG_ROOT_DIR + "/sdk.log");
