@@ -60,6 +60,7 @@
 #include "camerainfodialog.h"
 #include "csprogressbar.h"
 #include "csmessagebox.h"
+#include "appconfig.h"
 
 #define GITHUB_URL "https://github.com/Revopoint/3DViewer"
 #define WEBSITE_URL "https://www.revopoint3d.com/"
@@ -67,7 +68,6 @@
 ViewerWindow::ViewerWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::ViewerWindow)
-    , language(LANGUAGE_EN)
     , translator(new QTranslator(this))
     , cameraInfoDialog(new CameraInfoDialog())
     , circleProgressBar(new CSProgressBar(this))
@@ -75,12 +75,6 @@ ViewerWindow::ViewerWindow(QWidget *parent)
 {
     // init translator
     qApp->installTranslator(translator);
-    QString qmFile = ( language == LANGUAGE_ZH ) ? "lang_zh.qm" : "lang_en.qm";
-    qmFile = QString("%1/translations/%2").arg(QApplication::applicationDirPath()).arg(qmFile);
-    if (!translator->load(QDir::cleanPath(qmFile)))
-    {
-        qDebug() << "load qm failed : " << qmFile;
-    }
 
     // set ui
     ui->setupUi(this);
@@ -94,7 +88,13 @@ ViewerWindow::ViewerWindow(QWidget *parent)
     render2dWidgets[CAMERA_DATA_DEPTH] = nullptr;
     render2dWidgets[CAMERA_DATA_RGB] = nullptr;
 
-    emit translateSignal();
+    // set language
+    language = (cs::CSApplication::getInstance()->getAppConfig()->getLanguage() == "zh") ? LANGUAGE_ZH : LANGUAGE_EN;
+
+    ui->actionEnglish->setChecked(language == LANGUAGE_EN);
+    ui->actionChinese->setChecked(language == LANGUAGE_ZH);
+
+    onLanguageChanged();
 }
 
 ViewerWindow::~ViewerWindow()
@@ -140,7 +140,8 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionExit,              &QAction::triggered,   this, &ViewerWindow::onAppExit);
     suc &= (bool)connect(ui->actionInfomation,        &QAction::triggered,   this, &ViewerWindow::onTriggeredInformation);
     suc &= (bool)connect(ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
-  
+    suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
+
     Q_ASSERT(suc);      
 }
 
@@ -160,7 +161,8 @@ void ViewerWindow::initWindow()
     //disable 3d tab
     ui->tabWidget->setTabEnabled(RENDER_PAGE_3D, false);
 
-    QString defaultSavePath = tr("Set default save path (") + QDir::homePath() + ")";
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    QString defaultSavePath = tr("Set default save path (") + config->getDefaultSavePath() + ")";
     ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 }
 
@@ -458,15 +460,19 @@ void ViewerWindow::onRoiRectFUpdated(QRectF rect)
 
 void ViewerWindow::onUpdateLanguage(QAction* action)
 {
+    auto app = cs::CSApplication::getInstance();
+
     if (action == ui->actionChinese)
     {
         ui->actionEnglish->setChecked(false);
         language = LANGUAGE_ZH;
+        app->getAppConfig()->setLanguage("zh");
     }
     else
     {
         ui->actionChinese->setChecked(false);
         language = LANGUAGE_EN;
+        app->getAppConfig()->setLanguage("en");
     }
 
     onLanguageChanged();
@@ -498,6 +504,28 @@ void ViewerWindow::onTriggeredInformation()
 void ViewerWindow::onTriggeredLogDir()
 {
     QDesktopServices::openUrl(QUrl::fromLocalFile(LOG_ROOT_DIR));
+}
+
+void ViewerWindow::onTriggeredDefaultSavePath()
+{
+    qInfo() << "trigger default save path";
+
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    QString dirPath = QFileDialog::getExistingDirectory(this, tr("Set default save path"), config->getDefaultSavePath());
+
+    if (!dirPath.isEmpty())
+    {
+        config->setDefaultSavePath(dirPath);
+
+        QString defaultSavePath = tr("Set default save path (") + dirPath + ")";
+        ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+        
+        onShowStatusBarMessage(defaultSavePath, 3000);
+    }
+    else
+    {
+        qInfo() << "Cancel set default save path";
+    }
 }
 
 void ViewerWindow::onAppExit()

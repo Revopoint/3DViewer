@@ -52,6 +52,7 @@
 #include "process/processor.h"
 #include "app_version.h"
 #include "cameracapturetool.h"
+#include "appconfig.h"
 
 #include "process/pointcloudprocessstrategy.h"
 #include "process/depthprocessstrategy.h"
@@ -69,8 +70,9 @@ CSApplication* CSApplication::getInstance()
 
 CSApplication::CSApplication()
     : processor(std::make_shared<Processor>())
-    , processThread(std::make_shared<ProcessThread>(processor)) 
+    , processThread(std::make_shared<ProcessThread>(processor))
     , cameraCaptureTool(std::make_shared<CameraCaptureTool>())
+    , appConfig(std::make_shared<AppConfig>())
 {
     CameraThread::setSdkLogPath(LOG_ROOT_DIR + "/sdk.log");
     cameraThread = std::make_shared<CameraThread>();
@@ -259,4 +261,9 @@ void CSApplication::startCapture(CameraCaptureConfig config)
 void CSApplication::stopCapture()
 {
     cameraCaptureTool->stopCapture();
+}
+
+std::shared_ptr<AppConfig> CSApplication::getAppConfig()
+{
+    return appConfig;
 }

@@ -40,81 +40,32 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_CSAPPLICATION_H
-#define _CS_CSAPPLICATION_H
-#include <QObject>
-#include <QImage>
-#include <memory>
-#include <cstypes.h>
+#ifndef _CS_APP_CONFIG_H
+#define _CS_APP_CONFIG_H
 
-#include <hpp/Processing.hpp>
+#include <QSettings>
 
-class AppConfig;
-
-namespace cs {
-    
-class CameraThread;
-class ProcessThread;
-class Processor;
-class ICSCamera;
-class ProcessStrategy;
-class CameraCaptureTool;
-
-class CSApplication : public QObject
+class AppConfig : public QObject
 {
-    Q_OBJECT
 public:
-    static CSApplication* getInstance();
-    ~CSApplication();
-    void start();
-    std::shared_ptr<ICSCamera> getCamera() const;
+    AppConfig();
+    ~AppConfig();
 
-    void startCapture(CameraCaptureConfig config);
-    void stopCapture();
+    void setLanguage(QString lan);
+    void setDefaultSavePath(QString path);
 
-    std::shared_ptr<AppConfig> getAppConfig();
-public slots:
-    void onShow3DUpdated(bool show);
-    void onShow3DTextureChanged(bool texture);
-    void onShowCoordChanged(bool show, QPointF pos);
-signals:
-    void cameraListUpdated(const QStringList infoList);
-    void connectCamera(QString serial);
-    void disconnectCamera();
-    void restartCamera();
-    void startStream();
-    void pausedStream();
-    void resumeStream();
-    void queryCameras();
-
-    void cameraStateChanged(int state);
-    void output2DUpdated(OutputData2D outputData);
-    void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-    void removedCurrentCamera(QString serial);
-
-    // save frame data
-    void captureNumberUpdated(int captured, int dropped);
-    void captureStateChanged(int state, QString message);
-
-private slots:
-    void onCameraStateChanged(int state);
-    void onCameraParaUpdated(int paraId, QVariant value);
+    QString getLanguage() const;
+    QString getDefaultSavePath() const;
 private:
-    CSApplication();    
-    void initConnections();
-    void disconnections();
-    void updateProcessStrategys();
+    void save();
 private:
-    std::shared_ptr<CameraThread> cameraThread;
-    std::shared_ptr<Processor> processor;
-    std::shared_ptr<ProcessThread> processThread;
+    QSettings* settings;
     
-    bool show3D = false;
-    QMap<int, cs::ProcessStrategy*> processStrategys;
-    std::shared_ptr<CameraCaptureTool> cameraCaptureTool;
-
-    std::shared_ptr<AppConfig> appConfig;
+    //settings
+    // frame save path
+    QString defaultSavePath;
+    // current language
+    QString language;
 };
-}
 
-#endif // _CS_CSAPPLICATION_H
+#endif //_CS_APP_CONFIG_H

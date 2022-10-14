@@ -113,6 +113,8 @@ private slots:
     void onTriggeredRestartCamera();
     void onTriggeredInformation();
     void onTriggeredLogDir();
+    void onTriggeredDefaultSavePath();
+
     void onAppExit();
 private slots:
     void onTranslate();

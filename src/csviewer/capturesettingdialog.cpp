@@ -49,6 +49,7 @@
 #include <icscamera.h>
 
 #include "csapplication.h"
+#include "appconfig.h"
 #include "ui_capturesetting.h"
 
 static QStringList captureSaveFormats = { "images", "raw" };
@@ -98,7 +99,9 @@ void CaptureSettingDialog::showEvent(QShowEvent* event)
 void CaptureSettingDialog::onStartCapture()
 {
     qInfo() << "onStartCapture";
-    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), QDir::currentPath());
+
+    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir);
 
     if (url.isValid())
     {

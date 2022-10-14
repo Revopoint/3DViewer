@@ -70,6 +70,7 @@
 
 #include "hdrsettingsdialog.h"
 #include "capturesettingdialog.h"
+#include "appconfig.h"
 
 #define HDR_TABLE_COLS 3
 using namespace cs::parameter;
@@ -753,8 +754,10 @@ void ParaSettingsWidget::onClickedDisconnCamera()
 
 void ParaSettingsWidget::onClickCaptureSingle()
 {
+    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+
     qInfo() << "click capture single";
-    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), QDir::currentPath());
+    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir);
 
     if (url.isValid())
     {
