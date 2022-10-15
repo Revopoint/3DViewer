@@ -120,8 +120,8 @@ void CSAxis::traverse(osg::NodeVisitor& nv)
     osg::Camera::traverse(nv);
 }
 
-RenderWidget3D::RenderWidget3D(QWidget* parent)
-    : QWidget(parent)
+RenderWidget3D::RenderWidget3D(int renderId, QWidget* parent)
+    : RenderWidget(renderId, parent)
     , osgQOpenGLWidgetPtr(new osgQOpenGLWidget(this))
     , homeButton(new QPushButton(this))
     , textureButton(new QPushButton(this))

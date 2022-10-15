@@ -4,11 +4,8 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QTabWidget>
-
 #include <icscamera.h>
-
-#include "renderwidget2d.h"
-#include "renderwidget3d.h"
+#include "renderwidget.h"
 #include "csapplication.h"
 
 RenderWindow::RenderWindow(QWidget* parent)
@@ -32,28 +29,25 @@ void RenderWindow::initConnections()
     bool suc = true;
     suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated, this, &RenderWindow::onOutput3DUpdated);
     suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated, this, &RenderWindow::onOutput2DUpdated);
+    suc &= (bool)connect(this, &RenderWindow::fullScreenUpdated,   this, &RenderWindow::onFullScreenUpdated, Qt::QueuedConnection);
+
+    void onFullScreenUpdated(int renderID, bool value);
 
     Q_ASSERT(suc);
 }
 
 void RenderWindow::onWindowLayoutUpdated()
 {
-    if (renderWidget3D)
+    for (auto key : renderWidgets.keys())
     {
-        delete renderWidget3D;
-        renderWidget3D = nullptr;
-    }
-
-    for (auto key : render2dWidgets.keys())
-    {
-        if (render2dWidgets[key])
+        if (renderWidgets[key])
         {
-            delete render2dWidgets[key];
-            render2dWidgets[key] = nullptr;
+            delete renderWidgets[key];
+            renderWidgets[key] = nullptr;
         }
     }
 
-    render2dWidgets.clear();
+    renderWidgets.clear();
 
     if (renderMainWidget)
     {
@@ -83,24 +77,46 @@ void RenderWindow::onWindowLayoutUpdated()
     auto depthRatio = depthRes.toSize().width() * 1.0f / depthRes.toSize().height();
 
     // set (width/height) ratio
-    if (render2dWidgets[CAMERA_DATA_L])
+    if (renderWidgets[CAMERA_DATA_L])
     {
-        render2dWidgets[CAMERA_DATA_L]->setWHRatio(depthRatio);
-        render2dWidgets[CAMERA_DATA_R]->setWHRatio(depthRatio);
+        RenderWidget2D* render = qobject_cast<RenderWidget2D*>(renderWidgets[CAMERA_DATA_L]);
+        render->setWHRatio(depthRatio);
+        render->setWHRatio(depthRatio);
     }
 
-    if (render2dWidgets[CAMERA_DATA_DEPTH])
+    if (renderWidgets[CAMERA_DATA_DEPTH])
     {
-        render2dWidgets[CAMERA_DATA_DEPTH]->setWHRatio(depthRatio);
+        RenderWidget2D* render = qobject_cast<RenderWidget2D*>(renderWidgets[CAMERA_DATA_DEPTH]);
+        render->setWHRatio(depthRatio);
     }
 
-    if (render2dWidgets[CAMERA_DATA_RGB])
+    if (renderWidgets[CAMERA_DATA_RGB])
     {
         // set (width/height) ratio
         QVariant rgbRes;
         camera->getCameraPara(cs::parameter::PARA_RGB_RESOLUTION, rgbRes);
         auto res = rgbRes.toSize();
-        render2dWidgets[CAMERA_DATA_RGB]->setWHRatio(res.width() * 1.0 / res.height());
+
+        RenderWidget2D* render = qobject_cast<RenderWidget2D*>(renderWidgets[CAMERA_DATA_RGB]);
+        render->setWHRatio(res.width() * 1.0 / res.height());
+    }
+
+    if (layoutMode == LAYOUT_TITLE)
+    {
+        for (auto widget : renderWidgets.values())
+        {
+            RenderWidget2D* renderWidget = qobject_cast<RenderWidget2D*>(widget);
+            if (renderWidget)
+            {
+                bool suc = true;
+                suc &= (bool)connect(renderWidget, &RenderWidget2D::renderExit, this, &RenderWindow::renderExit);
+                suc &= (bool)connect(renderWidget, &RenderWidget2D::fullScreenUpdated, this, &RenderWindow::fullScreenUpdated);
+                Q_ASSERT(suc);
+
+                renderWidget->setEnableScale(false);
+                renderWidget->setShowFullScreen(true);
+            }
+        }
     }
 
     rootLayout->addWidget(renderMainWidget);
@@ -131,12 +147,32 @@ void RenderWindow::initRenderWidgetsTitle()
         qWarning() << "root render widget is nullptr";
         return;
     }
-
     QGridLayout* layout = new QGridLayout(renderMainWidget);
+    
+    initGridLayout();
+}
+
+void RenderWindow::initGridLayout()
+{
+    auto layout = qobject_cast<QGridLayout*>(renderMainWidget->layout());
+    if (!layout)
+    {
+        qWarning() << "grid layout is null";
+        return;
+    }
+
+    for (int i = 0; i < layout->rowCount(); ++i)
+    {
+        layout->setRowStretch(i, 0);
+    }
+    for (int i = 0; i < layout->columnCount(); ++i)
+    {
+        layout->setColumnStretch(i, 0);
+    }
 
     int idx = 0;
     int row = 0;
-    for(auto widget : render2dWidgets.values())
+    for (auto widget : renderWidgets.values())
     {
         if (widget)
         {
@@ -150,14 +186,6 @@ void RenderWindow::initRenderWidgetsTitle()
             }
         }
     }
-
-    if (renderWidget3D)
-    {
-        int col = (idx & 1) > 0 ? 1 : 0;
-        layout->addWidget(renderWidget3D, row, col);
-        idx++;
-    }
-
     // set stretch
     const int rowCount = idx / 2 + ((idx & 1) > 0 ? 1 : 0);
     const int colCount = (idx > 1) ? 2 : 1;
@@ -183,7 +211,7 @@ void RenderWindow::initRenderWidgetsTab()
     }
 
     tabWidget->clear();
-    for (auto widget : render2dWidgets.values())
+    for (auto widget : renderWidgets.values())
     {
         if (widget) 
         {
@@ -204,16 +232,16 @@ void RenderWindow::initRenderWidgetsTab()
             case CAMERA_DATA_DEPTH:
             {
                 tabWidget->addTab(widget, "Depth");
-                bool suc = true;
-                suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(widget), &DepthRenderWidget2D::roiRectFUpdated, this, &RenderWindow::roiRectFUpdated);
-                suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(widget), &DepthRenderWidget2D::showCoordChanged, cs::CSApplication::getInstance(), &cs::CSApplication::onShowCoordChanged);
-                Q_ASSERT(suc);
-
                 break;
             }
             case CAMERA_DATA_RGB:
             {
                 tabWidget->addTab(widget, "RGB");
+                break;
+            } 
+            case CAMERA_DTA_POINT_CLOUD:
+            {
+                tabWidget->addTab(widget, "Point Cloud");
                 break;
             }
             default:
@@ -221,17 +249,11 @@ void RenderWindow::initRenderWidgetsTab()
             }
         }
     }
-
-    if (renderWidget3D)
-    {
-        tabWidget->addTab(renderWidget3D, "Point Cloud");
-        connect(renderWidget3D, &RenderWidget3D::show3DTextureChanged, cs::CSApplication::getInstance(), &cs::CSApplication::onShow3DTextureChanged);
-    }
 }
 
 void RenderWindow::onOutput2DUpdated(OutputData2D outputData)
 {
-    RenderWidget2D* widget = render2dWidgets[outputData.info.cameraDataType];
+    RenderWidget2D* widget = qobject_cast<RenderWidget2D*>(renderWidgets[outputData.info.cameraDataType]);
     if (widget)
     {
         widget->onRenderDataUpdated(outputData);
@@ -240,15 +262,16 @@ void RenderWindow::onOutput2DUpdated(OutputData2D outputData)
 
 void RenderWindow::onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image)
 {
-    if (renderWidget3D)
+    RenderWidget3D* widget = qobject_cast<RenderWidget3D*>(renderWidgets[CAMERA_DTA_POINT_CLOUD]);
+    if (widget)
     {
-        renderWidget3D->onRenderDataUpdated(pointCloud, image);
+        widget->onRenderDataUpdated(pointCloud, image);
     }
 }
 
 void RenderWindow::onRoiEditStateChanged(bool edit)
 {
-    DepthRenderWidget2D* widget = qobject_cast<DepthRenderWidget2D*>(render2dWidgets[CAMERA_DATA_DEPTH]);;
+    DepthRenderWidget2D* widget = qobject_cast<DepthRenderWidget2D*>(renderWidgets[CAMERA_DATA_DEPTH]);;
     if (widget)
     {
         widget->onRoiEditStateChanged(edit);
@@ -264,21 +287,17 @@ void RenderWindow::initRenderWidgets()
         switch (dataType)
         {
         case CAMERA_DATA_L:
-        {
-            auto renderWidget = new RenderWidget2D((int)dataType);
-            render2dWidgets[dataType] = renderWidget;
-            break;
-        }
         case CAMERA_DATA_R:
+        case CAMERA_DATA_RGB:
         {
             auto renderWidget = new RenderWidget2D((int)dataType);
-            render2dWidgets[dataType] = renderWidget;
+            renderWidgets[dataType] = renderWidget;
             break;
         }
         case CAMERA_DATA_DEPTH:
         {
             auto renderWidget = new DepthRenderWidget2D((int)dataType);
-            render2dWidgets[dataType] = renderWidget;
+            renderWidgets[dataType] = renderWidget;
 
             bool suc = true;
             suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(renderWidget), &DepthRenderWidget2D::roiRectFUpdated, this, &RenderWindow::roiRectFUpdated);
@@ -287,20 +306,77 @@ void RenderWindow::initRenderWidgets()
 
             break;
         }
-        case CAMERA_DATA_RGB:
-        {
-            auto renderWidget = new RenderWidget2D((int)dataType);
-            render2dWidgets[dataType] = renderWidget;
-            break;
-        }
         case CAMERA_DTA_POINT_CLOUD:
         {
-            auto renderWidget = new RenderWidget3D(this);
-            renderWidget3D = renderWidget;
+            auto renderWidget = new RenderWidget3D((int)dataType, this);
+            renderWidgets[dataType] = renderWidget;
+
+            connect(qobject_cast<RenderWidget3D*>(renderWidget), &RenderWidget3D::show3DTextureChanged, cs::CSApplication::getInstance(), &cs::CSApplication::onShow3DTextureChanged);
             break;
         }
         default:
             break;
+        }
+    }
+}
+
+void RenderWindow::onFullScreenUpdated(int renderId, bool value)
+{
+    if (!renderMainWidget)
+    {
+        qWarning() << "the render root widget is null.";
+        return;
+    }
+
+    auto layout = qobject_cast<QGridLayout*>(renderMainWidget->layout());
+    if (layout)
+    {
+        RenderWidget* renderWidget = nullptr;
+        for (auto key : renderWidgets.keys())
+        {
+            if (renderWidgets[key])
+            {
+                layout->removeWidget(renderWidgets[key]);
+
+                if (renderId == key)
+                {
+                    renderWidget = renderWidgets[key];
+                }
+                else 
+                {
+                    renderWidgets[key]->setVisible(false);
+                }
+            }
+        }
+
+        if (value)
+        {
+            for (int i = 0; i < layout->rowCount(); ++i)
+            {
+                layout->setRowStretch(i, 0);
+            }
+            for (int i = 0; i < layout->columnCount(); ++i)
+            {
+                layout->setColumnStretch(i, 0);
+            }
+
+            if (renderWidget)
+            {
+                layout->addWidget(renderWidget, 0, 0);
+            }
+        }
+        else 
+        {
+            for (auto key : renderWidgets.keys())
+            {
+                if (renderWidgets[key])
+                {
+                    layout->removeWidget(renderWidgets[key]);
+                    renderWidgets[key]->setVisible(true);
+                }
+            }
+
+            initGridLayout();
         }
     }
 }

@@ -64,7 +64,6 @@ public:
     QMap<CS_CAMERA_DATA_TYPE, OutputData2D> getOutputData2Ds();
     FrameData getFrameData();
 
-
     void setFrameData(const FrameData& frameData);
     void setPointCloud(const cs::Pointcloud& pointCloud);
     void addOutputData2D(const OutputData2D& outputData2D);

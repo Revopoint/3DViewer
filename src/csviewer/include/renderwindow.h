@@ -49,8 +49,7 @@
 #include <cstypes.h>
 #include <hpp/Processing.hpp>
 
-class RenderWidget2D;
-class RenderWidget3D;
+class RenderWidget;
 class RenderWindow : public QWidget
 {
     Q_OBJECT
@@ -61,23 +60,27 @@ public:
     void onWindowLayoutUpdated();
 signals:
     void roiRectFUpdated(QRectF rect);
+    void renderExit(int renderId);
+    void fullScreenUpdated(int renderID, bool value);
 public slots:
     void onRenderWindowsUpdated(QVector<int> windows);
     void onWindowLayoutModeUpdated(int mode);
     void onOutput2DUpdated(OutputData2D outputData);
     void onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
     void onRoiEditStateChanged(bool edit);
+private slots:
+    void onFullScreenUpdated(int renderId, bool value);
 private:
     void initRenderWidgetsTitle();
     void initRenderWidgetsTab();
     void initConnections();
     void initRenderWidgets();
+    void initGridLayout();
 private:
     WINDOWLAYOUT_MODE layoutMode = LAYOUT_TAB;// LAYOUT_TITLE;
     QVector<int> displayWindows;
 
-    QMap<int, RenderWidget2D*> render2dWidgets;
-    RenderWidget3D* renderWidget3D = nullptr;
+    QMap<int, RenderWidget*> renderWidgets;
     // the parent widget of render
     QWidget* renderMainWidget = nullptr;
     QLayout* rootLayout;

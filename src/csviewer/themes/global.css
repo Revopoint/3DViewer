@@ -67,6 +67,18 @@ QWidget#topControlArea {
 
 }
 
+RenderWindow RenderWidget {
+    background: rgb(229, 229, 229);
+}
+
+RenderWidget{
+    border: 1px solid rgb(200, 200, 200);
+}
+
+QTabWidget RenderWidget {
+    border: none;
+}
+
 /* QMenuBar */
 QMenuBar {
     background: rgb(229, 229, 229);
@@ -206,6 +218,10 @@ QPushButton#modeSwitchButton {
 
 QPushButton#roiEditBtn {
     min-width: 90px;
+}
+
+QPushButton#ExitButton, QPushButton#FullScreenButton {
+    background: transparent;
 }
 
 QWidget#cameraBtnCtlArea QPushButton {
@@ -460,6 +476,11 @@ QScrollBar:vertical {
     width: 6px;
 }
 
+QScrollBar:horizontal {
+    background: transparent;
+    height: 6px;
+}
+
 QScrollBar::handle:vertical {
     background: rgb(200, 200, 200);
     min-height: 20px;
@@ -467,23 +488,30 @@ QScrollBar::handle:vertical {
     border-radius: 3px;
 }
 
-QScrollBar::handle::vertical:hover {
+QScrollBar::handle:horizontal {
+    background: rgb(200, 200, 200);
+    min-width: 20px;
+    border: 1px solid rgb(190, 190, 190);
+    border-radius: 3px;
+}
+
+QScrollBar::handle:hover {
     background: rgb(90, 112, 169);
 }
 
-QScrollBar::add-line:vertical {
+QScrollBar::add-line {
     background: none;
 }
 
-QScrollBar::sub-line:vertical {
+QScrollBar::sub-line {
     background: none;
 }
 
-QScrollBar::up-arrow:vertical, QScrollBar::down-arrow:vertical {
+QScrollBar::up-arrow, QScrollBar::down-arrow {
     background: none;
 }
 
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+QScrollBar::add-page, QScrollBar::sub-page {
     background: none;
 }
     
@@ -538,3 +566,11 @@ QWidget#CWSwitchButton QPushButton:checked {
     background: url(:/resources/switch_button_on.png);
 }
 
+QScrollArea {
+    /*border: 1px solid red;*/
+}
+
+QWidget#RenderCenterWidget {
+    /*border: 1px solid blue;
+    background: red;*/
+}

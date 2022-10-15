@@ -124,9 +124,10 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(this, &ViewerWindow::translateSignal,     ui->cameraListWidget,   &CameraListWidget::translateSignal,    Qt::QueuedConnection);
     suc &= (bool)connect(this, &ViewerWindow::translateSignal,     ui->paraSettingWidget,  &ParaSettingsWidget::translateSignal,  Qt::QueuedConnection);
 
-    suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,         ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
-    suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,     ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
-    suc &= (bool)connect(ui->renderWindow, &RenderWindow::roiRectFUpdated, this,               &ViewerWindow::onRoiRectFUpdated);
+    suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,           ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
+    suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,       ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
+    suc &= (bool)connect(ui->renderWindow, &RenderWindow::roiRectFUpdated,   this,               &ViewerWindow::onRoiRectFUpdated);
+    suc &= (bool)connect(ui->renderWindow, &RenderWindow::renderExit,        this,               &ViewerWindow::onRenderExit, Qt::QueuedConnection);
 
     // menu
     suc &= (bool)connect(ui->menuLanguage,            &QMenu::triggered,     this, &ViewerWindow::onUpdateLanguage);
@@ -535,8 +536,6 @@ void ViewerWindow::onTriggeredWindowsTab()
 
 void ViewerWindow::updateWindowActions()
 {
-    CSMenu* menu = (renderLayoutMode == LAYOUT_TITLE) ? ui->menuTitle : ui->menuTabs;
-
     for (auto action : windowActions)
     {
         ui->menuTitle->addAction(action);
@@ -544,5 +543,18 @@ void ViewerWindow::updateWindowActions()
 
         action->setCheckable(true);
         action->setChecked(true);
+    }
+}
+
+void ViewerWindow::onRenderExit(int renderId)
+{
+    for (auto action : windowActions) 
+    {
+        if (action->getType() == renderId)
+        {
+            action->setChecked(false);
+            onRenderWindowUpdated();
+            break;
+        }
     }
 }

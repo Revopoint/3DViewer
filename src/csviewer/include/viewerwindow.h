@@ -128,6 +128,8 @@ private slots:
     void onWindowsMenuTriggered(QAction* action);
     void onTriggeredWindowsTitle();
     void onTriggeredWindowsTab();
+
+    void onRenderExit(int renderId);
 signals:
     void translateSignal(); 
     void show3DUpdated(bool show);

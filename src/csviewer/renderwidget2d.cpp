@@ -52,16 +52,17 @@
 #include <QTime>
 
 RenderWidget2D::RenderWidget2D(int renderId, QWidget* parent)
-    : QFrame(parent)
+    : RenderWidget(renderId, parent)
+    , scrollArea(new QScrollArea(this))
     , centerWidget(new QWidget(this))
     , topControlArea(new QWidget(centerWidget))
-    , imageLabel(new QLabel(centerWidget))
-    , fpsLabel(new  QLabel(centerWidget))
-    , renderId(renderId)
+    , imageArea(new QWidget(centerWidget))
+    , imageLabel(new QLabel(imageArea))
+    , fpsLabel(new  QLabel(imageArea))
     , frameCount(0)
     , fps(0)
 {
-    initFrame();
+    initWidget();
 }
 
 RenderWidget2D::~RenderWidget2D()
@@ -69,31 +70,45 @@ RenderWidget2D::~RenderWidget2D()
 
 }
 
-void RenderWidget2D::initFrame()
+void RenderWidget2D::initWidget()
 {
     setProperty("isRender", true);
     imageLabel->setProperty("isImage", true);
+    centerWidget->setObjectName("RenderCenterWidget");
+
+    QVBoxLayout* rootLayout = new QVBoxLayout(this);
+    rootLayout->addWidget(topControlArea);
+    rootLayout->addWidget(scrollArea);
+    rootLayout->setContentsMargins(0, 0, 0, 10);
+    rootLayout->setSpacing(0);
+
+    scrollArea->setWidget(centerWidget);
+    scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    centerWidget->setGeometry(0, 0, scrollArea->width()* imageAreaScale, scrollArea->height() * imageAreaScale);
     setMinimumSize(QSize(300, 180));
 
-    QVBoxLayout* layout = new QVBoxLayout(centerWidget);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
-    layout->addWidget(topControlArea);
-    layout->addWidget(imageLabel);
+    // image area
+    QVBoxLayout* vLayout = new QVBoxLayout(imageArea);
+    vLayout->setContentsMargins(0, 0, 0, 0);
+    vLayout->setSpacing(0);
+    vLayout->addWidget(imageLabel);
 
-    centerWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    ////top
+    topControlArea->setProperty("TopControlArea", true);
     topControlArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
     topControlArea->setFixedHeight(32);
 
-    //top
     QHBoxLayout* hLayout = new QHBoxLayout(topControlArea);
     hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout->setContentsMargins(0, 0, 5, 0);
+    hLayout->setContentsMargins(0, 0, 10, 0);
     hLayout->setSpacing(10);
+
+    hLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLayout->addWidget(fpsLabel);
+
     fpsLabel->setObjectName("fpsLabel");
-    
+
     updateFps();
 }
 
@@ -120,6 +135,8 @@ void RenderWidget2D::onFrameIncrease()
 
 void RenderWidget2D::onRenderDataUpdated(OutputData2D outputData)
 {
+    cachedImage = outputData.image;
+
     QPixmap pixmap = QPixmap::fromImage(outputData.image);
     pixmap = pixmap.scaled(imageLabel->size());
     painter.begin(&pixmap);
@@ -157,16 +174,157 @@ void RenderWidget2D::setWHRatio(float ratio)
     updateImageSize();
 }
 
+void RenderWidget2D::setEnableScale(bool enable)
+{
+    enableImageScale = enable;
+}
+
+void RenderWidget2D::setShowFullScreen(bool value)
+{
+    showFullScreen = value;
+    if (showFullScreen)
+    {
+        initButtons();
+    }
+}
+
+void RenderWidget2D::initButtons()
+{
+    if (!exitButton)
+    {
+        exitButton = new QPushButton(this);
+        exitButton->setObjectName("ExitButton");
+        exitButton->setIconSize(QSize(24, 24));
+        exitButton->setIcon(QIcon(":/resources/exit.png"));
+
+        connect(exitButton, &QPushButton::clicked, this, &RenderWidget2D::onClickExitButton);
+    }
+
+    if (!fullScreenBtn)
+    {
+        fullScreenBtn = new QPushButton(this);
+        fullScreenBtn->setObjectName("FullScreenButton");
+        fullScreenBtn->setCheckable(true);
+
+        connect(fullScreenBtn, &QPushButton::toggled, this, &RenderWidget2D::onClickFullScreen);
+
+        QIcon icon1;
+        icon1.addFile(QStringLiteral(":/resources/fullscreen.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral(":/resources/fullscreen_exit.png"), QSize(), QIcon::Active, QIcon::On);
+        icon1.addFile(QStringLiteral(":/resources/fullscreen_exit.png"), QSize(), QIcon::Selected, QIcon::On);
+
+        fullScreenBtn->setIconSize(QSize(24, 24));
+        fullScreenBtn->setIcon(icon1);
+    }
+
+    auto layout = topControlArea->layout();
+    if (layout)
+    {
+        layout->addWidget(exitButton);
+    }
+
+    if (!bottomControlArea)
+    {
+        bottomControlArea = new QWidget(this);
+
+        QHBoxLayout* hLayout = new QHBoxLayout(bottomControlArea);
+        hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+        hLayout->setContentsMargins(0, 0, 10, 0);
+        hLayout->setSpacing(10);
+
+        hLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
+        hLayout->addWidget(fullScreenBtn);
+
+        auto rootLayout = this->layout();
+        if (rootLayout)
+        {
+            rootLayout->addWidget(bottomControlArea);
+        }
+    }
+}
+
+void RenderWidget2D::onClickExitButton()
+{
+    emit renderExit(getRenderId());
+}
+
+void RenderWidget2D::onClickFullScreen(bool checked)
+{
+    enableImageScale = checked;
+    emit fullScreenUpdated(getRenderId(), checked);
+}
+
 void RenderWidget2D::resizeEvent(QResizeEvent* event)
 {
     updateImageSize();
 }
 
+void RenderWidget2D::wheelEvent(QWheelEvent* event)
+{
+    if (enableImageScale && holdCtrl)
+    {
+        QPoint numDegrees = event->angleDelta() / 8;
+
+        //qDebug() << "angleDelta, x= " << numDegrees.x() << ", y = " << numDegrees.y();
+        if (!numDegrees.isNull())
+        {
+            QPoint numSteps = numDegrees / 15;
+            float v = imageScaleStep * numSteps.y();
+
+            float lastScale = imageAreaScale;
+            imageAreaScale += v;
+            imageAreaScale = (imageAreaScale < imageAreaScaleMin) ? imageAreaScaleMin : imageAreaScale;
+            imageAreaScale = (imageAreaScale > imageAreaScaleMax) ? imageAreaScaleMax : imageAreaScale;
+
+            if (qAbs(imageAreaScale - lastScale) > 0.0000001)
+            {
+                updateImageSize();
+            }
+        }
+    }
+    RenderWidget::wheelEvent(event);
+}
+
+void RenderWidget2D::keyPressEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Control)
+    {
+        holdCtrl = true;
+    }
+
+    RenderWidget::keyPressEvent(event);
+}
+
+void RenderWidget2D::keyReleaseEvent(QKeyEvent* event)
+{
+    if (event->key() == Qt::Key_Control)
+    {
+        holdCtrl = false;
+    }
+
+    RenderWidget::keyPressEvent(event);
+}
+
 void RenderWidget2D::updateImageSize()
 {
-    const int w1 = width();
-    const int topH = topControlArea->height();
-    const int h1 = height() - topH;
+    int width = scrollArea->width();
+    int height = scrollArea->height();
+
+    if (imageAreaScale < 1)
+    {
+        int scaleW = width * imageAreaScale;
+        int scaleH = width * imageAreaScale;
+        int x = (width - scaleW) / 2;
+        int y = (height - scaleH) / 2;
+
+        centerWidget->setGeometry(x, y, scaleW, scaleH);
+    }
+    else 
+    {
+        centerWidget->setGeometry(0, 0, width * imageAreaScale, height * imageAreaScale);
+    }
+    const int w1 = centerWidget->width();
+    const int h1 = centerWidget->height();
     
     int imgW, imgH;
     if (w1 / ratioWH < h1)
@@ -181,20 +339,22 @@ void RenderWidget2D::updateImageSize()
     }
 
     int x = (w1 - imgW) / 2;
-    int y = (height() - imgH - topH) / 2;
+    int y = (centerWidget->height() - imgH) / 2;
 
-    imageLabel->setGeometry(0, topH, imgW, imgH);
-    centerWidget->setGeometry(x, y, imgW, topH + imgH);
+    imageLabel->setGeometry(0, 0, imgW, imgH);
+    imageArea->setGeometry(x, y, imgW, imgH);
+
+    if (!cachedImage.isNull())
+    {
+        QPixmap pixmap = QPixmap::fromImage(cachedImage);
+        pixmap = pixmap.scaled(imageLabel->size());
+        imageLabel->setPixmap(pixmap);
+    }
 }
 
 void RenderWidget2D::onTranslate()
 {
 
-}
-
-int RenderWidget2D::getRenderId()
-{
-    return renderId;
 }
 
 DepthRenderWidget2D::DepthRenderWidget2D(int renderId, QWidget* parent)

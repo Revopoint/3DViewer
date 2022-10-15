@@ -50,6 +50,7 @@
 #include <QTime>
 #include <QPainter>
 #include <QPushButton>
+#include <QScrollArea>
 
 #include <osgQOpenGL/osgQOpenGLWidget>
 #include <osgViewer/Viewer>
@@ -59,40 +60,88 @@
 #include <cstypes.h>
 #include <hpp/Processing.hpp>
 
-class RenderWidget2D : public QFrame
+class RenderWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    RenderWidget(int renderId, QWidget* parent = nullptr)
+        : QWidget(parent)
+        , renderId(renderId)
+    {
+        setAttribute(Qt::WA_StyledBackground);
+    }
+    int getRenderId() const 
+    { 
+        return renderId; 
+    }
+protected:
+    int renderId;
+};
+
+
+class RenderWidget2D : public RenderWidget
 {
     Q_OBJECT
 public:
     RenderWidget2D(int renderId, QWidget* parent = nullptr);
     ~RenderWidget2D();
     void setWHRatio(float ratio);
-    void resizeEvent(QResizeEvent* event) override;
-    void onTranslate();
+   
+    void setShowFullScreen(bool value);
+    void setEnableScale(bool enable);
 
-    int getRenderId();
+    void resizeEvent(QResizeEvent* event) override;
+    void wheelEvent(QWheelEvent* event);
+    void keyPressEvent(QKeyEvent* event);
+    void keyReleaseEvent(QKeyEvent* event);
+
+    void onTranslate();
 public slots:
     void onRenderDataUpdated(OutputData2D outputData);
 protected:
-    void initFrame();
+    void initWidget();
     void onFrameIncrease();
     void updateImageSize();
     virtual void onPainterInfos(OutputData2D outputData);
     void updateFps();
+    void initButtons();
+private:
+    void onClickExitButton();
+    void onClickFullScreen(bool checked);
 signals:
-    void clickedExport(int renderId);
+    void renderExit(int renderId);
+    void fullScreenUpdated(int renderID, bool value);
 protected:
+    QScrollArea* scrollArea;
     QWidget* centerWidget;
     QWidget* topControlArea;
+    QWidget* bottomControlArea = nullptr;
+
+    QWidget* imageArea;
     QLabel* imageLabel;
     QLabel* fpsLabel;
 
+    QPushButton* exitButton = nullptr;
+    QPushButton* fullScreenBtn = nullptr;
+
     float ratioWH = 1.6f;
-    int renderId;
     QPainter painter;
 
+    // fps
     QTime frameTime;
     int frameCount;
     float fps;
+
+    bool enableImageScale = true;
+    float imageAreaScale = 1.0f;
+    float imageAreaScaleMin = 1;
+    float imageAreaScaleMax = 10;
+    float imageScaleStep = 0.1;
+
+    bool showFullScreen = false;
+    bool holdCtrl = false;
+
+    QImage cachedImage;
 };
 
 class DepthRenderWidget2D : public RenderWidget2D
@@ -121,11 +170,11 @@ private:
     bool isShowCoord;
 };
 
-class RenderWidget3D : public QWidget
+class RenderWidget3D : public RenderWidget
 {
     Q_OBJECT
 public:
-    RenderWidget3D(QWidget* parent = nullptr);
+    RenderWidget3D(int renderId, QWidget* parent = nullptr);
     ~RenderWidget3D();
 
     void onTranslate();
