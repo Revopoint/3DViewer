@@ -174,4 +174,10 @@ struct CameraCaptureConfig
     QString saveName;
 };
 
+enum WINDOWLAYOUT_MODE
+{
+    LAYOUT_TITLE,
+    LAYOUT_TAB
+};
+
 #endif // _CS_TYPES_H

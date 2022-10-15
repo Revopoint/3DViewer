@@ -78,7 +78,7 @@
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="ParaSettingsWidget" name="paraSettingWidget">
           <property name="enabled">
@@ -130,50 +130,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="renderWidget" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QTabWidget" name="tabWidget">
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="display2d">
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <attribute name="title">
-           <string>2D</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <layout class="QHBoxLayout" name="render2dTopLayout"/>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="render2dBottomLayout"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="RenderWidget3D" name="renderWidget3D">
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <attribute name="title">
-           <string>3D</string>
-          </attribute>
-         </widget>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+     <widget class="RenderWindow" name="renderWindow" native="true"/>
     </item>
    </layout>
   </widget>
@@ -218,9 +175,30 @@
     <addaction name="actionRestartCamera"/>
     <addaction name="actionInfomation"/>
    </widget>
+   <widget class="QMenu" name="menuWindows">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Windows</string>
+    </property>
+    <widget class="CSMenu" name="menuTitle">
+     <property name="title">
+      <string>Title</string>
+     </property>
+    </widget>
+    <widget class="CSMenu" name="menuTabs">
+     <property name="title">
+      <string>Tabs</string>
+     </property>
+    </widget>
+    <addaction name="menuTitle"/>
+    <addaction name="menuTabs"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCamera"/>
    <addaction name="menuLanguage"/>
+   <addaction name="menuWindows"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -251,14 +229,6 @@
     <string>English</string>
    </property>
   </action>
-  <action name="actionGithub">
-   <property name="text">
-    <string>Github</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+I</string>
-   </property>
-  </action>
   <action name="actionWebSite">
    <property name="text">
     <string>Web Site</string>
@@ -286,6 +256,11 @@
    </property>
   </action>
   <action name="actionsetDefaultSaveDir"/>
+  <action name="actionGithub">
+   <property name="text">
+    <string>Github</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -301,10 +276,15 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>RenderWidget3D</class>
+   <class>RenderWindow</class>
    <extends>QWidget</extends>
-   <header>renderwidget3d.h</header>
+   <header>renderwindow.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CSMenu</class>
+   <extends>QMenu</extends>
+   <header>csmenu.h</header>
   </customwidget>
  </customwidgets>
  <resources>

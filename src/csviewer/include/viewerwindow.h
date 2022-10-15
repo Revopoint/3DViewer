@@ -45,6 +45,7 @@
 
 #include <QMainWindow>
 #include <QMap>
+#include <QVector>
 #include <cstypes.h>
 #include <hpp/Processing.hpp>
 
@@ -64,6 +65,8 @@ class QTranslator;
 class CameraInfoDialog;
 class CSProgressBar;
 class CSMessageBox;
+class CSAction;
+
 class ViewerWindow : public QMainWindow
 {
     Q_OBJECT
@@ -97,15 +100,15 @@ private slots:
     void onRenderPageChanged(int idx);
     void onCameraStateChanged(int state);
 
-    void onOutput2DUpdated(OutputData2D outputData);
-    void onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-
     void onRoiEditStateChanged(bool edit);
     void onRoiRectFUpdated(QRectF rect);
     void onShowStatusBarMessage(QString msg, int timeout);
 
-    //capture frame data
+    // capture frame data
     void onCaptureStateChanged(int state, QString message);
+
+    // start the stream
+    void onCameraStreamStarted();
 private slots:
     // menu
     void onUpdateLanguage(QAction* action);
@@ -120,28 +123,32 @@ private slots:
     void onTranslate();
     void onRemovedCurrentCamera(QString serial);
     void onConfirmCameraRemoved();
-    void onRenderInitialized();
     void onAboutToQuit();
+    void onRenderWindowUpdated();
+    void onWindowsMenuTriggered(QAction* action);
+    void onTriggeredWindowsTitle();
+    void onTriggeredWindowsTab();
 signals:
     void translateSignal(); 
-    void renderInitialized();
     void show3DUpdated(bool show);
+    void renderWindowUpdated(QVector<int> windows);
+    void windowLayoutModeUpdated(int mode);
 private:
     void initWindow();
     void initConnections();
-    void initRenderWidgets();
-    void destoryRender2dWidgets();
-    void initRenderConnections();
     void onLanguageChanged();
     void updateStatusBar(int state);
+    void updateWindowActions();
 private:
     Ui::ViewerWindow* ui;
-    QMap<int, RenderWidget2D*> render2dWidgets;
     CS_LANGUAGE language;
     QTranslator* translator;
 
     CameraInfoDialog* cameraInfoDialog;
     CSProgressBar* circleProgressBar;
     CSMessageBox* globalMessageBox;
+
+    QVector<CSAction*> windowActions;
+    WINDOWLAYOUT_MODE renderLayoutMode = LAYOUT_TAB;
 };
 #endif // _CS_VIEWERWINDOW_H

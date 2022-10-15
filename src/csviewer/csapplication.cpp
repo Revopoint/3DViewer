@@ -193,20 +193,14 @@ void CSApplication::updateProcessStrategys()
         }
     }
 
-    if (show3D)
-    {
-        processStrategys[cs::STRATEGY_CLOUD_POINT] = new PointCloudProcessStrategy();
-    }
-    else
-    {
-        processStrategys[cs::STRATEGY_DEPTH] = new DepthProcessStrategy();
+    processStrategys[cs::STRATEGY_CLOUD_POINT] = new PointCloudProcessStrategy();
+    processStrategys[cs::STRATEGY_DEPTH] = new DepthProcessStrategy();
 
-        QVariant hasRgbV;
-        cameraThread->getCamera()->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
-        if (hasRgbV.toBool())
-        {
-            processStrategys[cs::STRATEGY_RGB] = new RgbProcessStrategy();
-        }
+    QVariant hasRgbV;
+    cameraThread->getCamera()->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+    if (hasRgbV.toBool())
+    {
+        processStrategys[cs::STRATEGY_RGB] = new RgbProcessStrategy();
     }
 
     // add process strategys

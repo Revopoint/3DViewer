@@ -40,7 +40,7 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#include "renderwidget3d.h"
+#include "renderwidget.h"
 
 #include <QApplication>
 #include <QHBoxLayout>
@@ -131,6 +131,7 @@ RenderWidget3D::RenderWidget3D(QWidget* parent)
     pLayout->setMargin(0);
     pLayout->addWidget(osgQOpenGLWidgetPtr);
     osgQOpenGLWidgetPtr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setMinimumSize(QSize(300, 180));
 
     initButtons();
     updateButtonArea();
@@ -225,6 +226,12 @@ void RenderWidget3D::initWindow()
     //coordAxis->setMatrix(matrix);
 
     rootNode->addChild(csAxes);
+
+    pViewer->home();
+
+    osgQOpenGLWidgetPtr->mutex()->writeLock();
+    isReady = true;
+    osgQOpenGLWidgetPtr->mutex()->writeUnlock();
 }
 
 void RenderWidget3D::updateNodeVertexs(cs::Pointcloud& pointCloud)
@@ -296,6 +303,11 @@ void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage&
 void RenderWidget3D::onRenderDataUpdated(cs::Pointcloud& pointCloud, const QImage& image)
 {
     osgQOpenGLWidgetPtr->mutex()->writeLock();
+    if (!isReady)
+    {
+        osgQOpenGLWidgetPtr->mutex()->writeUnlock();
+        return;
+    }
 
     // update vertexs
     updateNodeVertexs(pointCloud);

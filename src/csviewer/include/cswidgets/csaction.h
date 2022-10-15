@@ -40,51 +40,24 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_RENDERWIDGET3D_H
-#define _CS_RENDERWIDGET3D_H
-#include <QWidget>
-#include <osgQOpenGL/osgQOpenGLWidget>
-#include <osgViewer/Viewer>
-#include <osg/Camera>
-#include <osg/MatrixTransform>
-#include <osg/Material>
-#include <cstypes.h>
-#include <hpp/Processing.hpp>
+#ifndef _CS_ACTION_H
+#define _CS_ACTION_H
 
-class QPushButton;
-class RenderWidget3D : public QWidget
+#include <QAction>
+
+class CSAction : public QAction
 {
     Q_OBJECT
 public:
-    RenderWidget3D(QWidget* parent = nullptr);
-    ~RenderWidget3D();
-    void onRenderDataUpdated(cs::Pointcloud& pointCloud, const QImage& image);
-    void onTranslate();
-    void setTextureEnable(bool enable);
-protected slots:
-    void initWindow();
-    void resizeEvent(QResizeEvent* event) override;
-private:  
-    void initNode();
-    void updateNodeVertexs(cs::Pointcloud& pointCloud);
-    void updateNodeTexture(cs::Pointcloud& pointCloud, const QImage& image);
-    void refresh();
-    void updateButtonArea();
-    void initButtons();
-    osg::ref_ptr<osg::MatrixTransform> makeCoordinate();
-signals:
-    void show3DTextureChanged(bool texture);
-private:
-    osgQOpenGLWidget* osgQOpenGLWidgetPtr;
-    osg::ref_ptr<osg::Group> rootNode;
-    osg::ref_ptr<osg::MatrixTransform> sceneNode;
-    osg::ref_ptr<osg::Material> material;
-    osg::ref_ptr<osg::Geometry> geom;
+    CSAction(int type, QObject* parent = nullptr);
+    CSAction(int type, const QString& text, QObject* parent = nullptr);
+    CSAction(int type, const QIcon& icon, const QString& text, QObject* parent = nullptr);
 
-    QPushButton* homeButton;
-    QPushButton* textureButton;
-    QWidget* buttonArea;
+    ~CSAction();
+    void setType(int t);
+    int getType() const;
+private:
+    int type;
 };
 
-#endif // _CS_RENDERWIDGET3D_H
-
+#endif

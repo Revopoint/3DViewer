@@ -39,78 +39,38 @@
 *
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
+#include "csaction.h"
 
-#ifndef _CS_RENDERWIDGET2D_H
-#define _CS_RENDERWIDGET2D_H
-#include <QFrame>
-#include <QLabel>
-#include <QImage>
-#include <QPoint>
-#include <QRectF>
-#include <QTime>
-#include <QPainter>
-
-#include <cstypes.h>
-
-class QPushButton;
-class RenderWidget2D : public QFrame
+CSAction::CSAction(int type, QObject* parent)
+    : QAction(parent)
+    , type(type)
 {
-    Q_OBJECT
-public:
-    RenderWidget2D(int renderId, QWidget* parent = nullptr);
-    ~RenderWidget2D();
-    void setWHRatio(float ratio);
-    void resizeEvent(QResizeEvent* event) override;
-    void onTranslate();
-public slots:
-    void onRenderDataUpdated(OutputData2D outputData);
-protected:
-    void initFrame();
-    void onFrameIncrease();
-    void updateImageSize();
-    virtual void onPainterInfos(OutputData2D outputData);
-    void updateFps();
-signals:
-    void clickedExport(int renderId);
-protected:
-    QWidget* centerWidget;
-    QWidget* topControlArea;
-    QLabel* imageLabel;
-    QLabel* fpsLabel;
+}
 
-    float ratioWH = 1.6f;
-    int renderId;
-    QPainter painter;
-
-    QTime frameTime;
-    int frameCount;
-    float fps;
-};
-
-class DepthRenderWidget2D : public RenderWidget2D
+CSAction::CSAction(int type, const QString& text, QObject* parent)
+    : QAction(text, parent)
+    , type(type)
 {
-    Q_OBJECT
-public:
-     DepthRenderWidget2D(int renderId, QWidget* parent = nullptr);
-    ~DepthRenderWidget2D();
+}
 
-    void setShowCoord(bool show);
-    void mouseMoveEvent(QMouseEvent* event) override;
-    void mousePressEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
-public slots:
-    void onRoiEditStateChanged(bool edit);
-    void onShowCoordChanged(bool show);
-signals:
-    void roiRectFUpdated(QRectF rect);
-    void showCoordChanged(bool show, QPointF position = QPointF(-1.0f, -1.0f));
-private:
-    void onPainterInfos(OutputData2D outputData) override;
-private:
-    QPointF mousePressPoint;
-    QPointF mouseReleasePoint;
-    bool isRoiEdit;
-    bool isShowCoord;
-};
+CSAction::CSAction(int type, const QIcon& icon, const QString& text, QObject* parent)
+    : QAction(icon, text, parent)
+    , type(type)
+{
 
-#endif // _CS_RENDERWIDGET2D_H
+}
+
+CSAction::~CSAction()
+{
+
+}
+
+void CSAction::setType(int t)
+{
+    type = t;
+}
+
+int CSAction::getType() const
+{
+    return type;
+}

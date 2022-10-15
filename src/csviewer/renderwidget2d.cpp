@@ -40,7 +40,7 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#include "renderwidget2d.h"
+#include "renderwidget.h"
 
 #include <QtCore/QVariant>
 #include <QPushButton>
@@ -190,6 +190,11 @@ void RenderWidget2D::updateImageSize()
 void RenderWidget2D::onTranslate()
 {
 
+}
+
+int RenderWidget2D::getRenderId()
+{
+    return renderId;
 }
 
 DepthRenderWidget2D::DepthRenderWidget2D(int renderId, QWidget* parent)
