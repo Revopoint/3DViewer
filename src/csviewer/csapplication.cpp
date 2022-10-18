@@ -112,7 +112,8 @@ void CSApplication::start()
     initConnections();
     cameraThread->start();
 
-    cameraCaptureTool->setCamera(cameraThread->getCamera());
+    auto camera = cameraThread->getCamera();
+    cameraCaptureTool->setCamera(camera);
     processor->addProcessEndLisener(cameraCaptureTool.get());
 }
 

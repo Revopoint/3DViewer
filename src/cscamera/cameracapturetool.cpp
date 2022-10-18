@@ -347,7 +347,7 @@ void CameraCaptureMutiple::getCaptureIndex(OutputDataPort& output, int& rgbFrame
     depthFrameIdx = capturedDepthCount;
     pointCloudIdx = capturePointCloudCount;
 
-    auto& frameData = output.getFrameData();
+    FrameData frameData = output.getFrameData();
     
     for (auto& streamData : frameData.data)
     {

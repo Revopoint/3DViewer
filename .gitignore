@@ -4,3 +4,5 @@ build
 package
 vs2015*
 *.aps
+build*
+*.user

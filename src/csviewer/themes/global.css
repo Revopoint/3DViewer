@@ -253,3 +253,68 @@ QSlider::handle:Horizontal {
     margin-top: -5px;
     margin-bottom: -5px;
 }
+
+/*QScrollBar*/
+QScrollBar:vertical {
+    background: rgb(179, 179, 179);
+    width: 10px;
+}
+
+QScrollBar:horizontal {
+    background: rgb(179, 179, 179);
+    height: 10px;
+}
+
+QScrollBar::handle:vertical {
+    background: rgb(230, 230, 230);
+    min-height: 20px;
+    border: none;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal {
+    background: rgb(230, 230, 230);
+    min-width: 20px;
+    border: none;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:hover {
+    background: rgb(230, 230, 230);
+}
+
+QScrollBar::add-line {
+    background: none;
+}
+
+QScrollBar::sub-line {
+    background: none;
+}
+
+QScrollBar::up-arrow:vertical {
+    background-image: url(:/resources/arrow_up_small.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QScrollBar::down-arrow:vertical {
+    background-image: url(:/resources/arrow_down_small.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QScrollBar::left-arrow:horizontal {
+    background-image: url(:/resources/arrow_up_small.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QScrollBar::right-arrow:horizontal {
+    background-image: url(:/resources/arrow_down_small.png);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: none;
+}

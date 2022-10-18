@@ -46,7 +46,8 @@ void OutputSaver::savePointCloud()
 
     if (outputDataPort.hasData(CAMERA_DTA_POINT_CLOUD))
     {
-        savePointCloud(outputDataPort.getPointCloud());
+        cs::Pointcloud pointCloud = outputDataPort.getPointCloud();
+        savePointCloud(pointCloud);
     }
     else
     {
@@ -56,8 +57,7 @@ void OutputSaver::savePointCloud()
 
 void OutputSaver::saveOutput2D()
 {
-    auto& frameData = outputDataPort.getFrameData();
-
+    FrameData frameData = outputDataPort.getFrameData();
     for (auto& streamData : frameData.data)
     {
         saveOutput2D(streamData);

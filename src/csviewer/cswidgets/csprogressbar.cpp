@@ -45,6 +45,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QtMath>
+#include <QPainterPath>
 
 CSProgressBar::CSProgressBar(QWidget* parent)
     : QDialog(parent)
