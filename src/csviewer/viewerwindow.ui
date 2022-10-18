@@ -28,7 +28,7 @@
      <widget class="QFrame" name="CameraControlWidget">
       <property name="minimumSize">
        <size>
-        <width>360</width>
+        <width>420</width>
         <height>0</height>
        </size>
       </property>
@@ -87,7 +87,7 @@
      <x>0</x>
      <y>0</y>
      <width>1077</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -124,7 +124,7 @@
    </widget>
    <widget class="QMenu" name="menuWindows">
     <property name="enabled">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
     <property name="title">
      <string>Windows</string>
@@ -234,8 +234,6 @@
    <header>csmenu.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="3dviewer.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

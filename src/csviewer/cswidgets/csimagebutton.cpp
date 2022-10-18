@@ -45,7 +45,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 
-CSImageButton::CSImageButton(const QIcon& icon, const QString& text, Qt::LayoutDirection layoutDirection, QWidget* parent)
+CSTextImageButton::CSTextImageButton(const QIcon& icon, const QString& text, Qt::LayoutDirection layoutDirection, QWidget* parent)
     : QPushButton(parent)
     , layoutDirection(layoutDirection)
     , icon(icon)
@@ -54,7 +54,7 @@ CSImageButton::CSImageButton(const QIcon& icon, const QString& text, Qt::LayoutD
     initButton(text);
 }
 
-void CSImageButton::initButton(const QString& text)
+void CSTextImageButton::initButton(const QString& text)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setSpacing(0);

@@ -128,7 +128,7 @@ RenderWidget3D::RenderWidget3D(int renderId, QWidget* parent)
     , buttonArea(new QWidget(this))
 {
     QHBoxLayout* pLayout = new QHBoxLayout(this);
-    pLayout->setMargin(0);
+    pLayout->setMargin(2);
     pLayout->addWidget(osgQOpenGLWidgetPtr);
     osgQOpenGLWidgetPtr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(QSize(300, 180));
@@ -155,7 +155,7 @@ void RenderWidget3D::initWindow()
     osgViewer::Viewer* pViewer = osgQOpenGLWidgetPtr->getOsgViewer();
 
     osg::ref_ptr<osg::Camera> camera = pViewer->getCamera();
-    camera->setClearColor(osg::Vec4(229.0 / 255, 229.0 / 255, 229.0 / 255, 1.0));
+    camera->setClearColor(osg::Vec4(242.0 / 255.0, 242.0 / 255, 242.0 / 255, 1.0));
     camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     camera->setComputeNearFarMode(osg::Camera::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
     camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(width()) / static_cast<double>(height()), 1.0f, 10000.0f);
@@ -395,9 +395,9 @@ void RenderWidget3D::initButtons()
     textureButton->setToolTip(tr("Texture on"));
 
     QIcon icon1;
-    icon1.addFile(QStringLiteral(":/resources/pointCloud_blue.png"), QSize(), QIcon::Normal, QIcon::Off);
-    icon1.addFile(QStringLiteral(":/resources/pointCloud_color.png"), QSize(), QIcon::Active, QIcon::On);
-    icon1.addFile(QStringLiteral(":/resources/pointCloud_color.png"), QSize(), QIcon::Selected, QIcon::On);
+    icon1.addFile(QStringLiteral(":/resources/texture_off.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon1.addFile(QStringLiteral(":/resources/texture_on.png"), QSize(), QIcon::Active, QIcon::On);
+    icon1.addFile(QStringLiteral(":/resources/texture_on.png"), QSize(), QIcon::Selected, QIcon::On);
     textureButton->setIcon(icon1);
 
     QHBoxLayout* layout = new QHBoxLayout(buttonArea);

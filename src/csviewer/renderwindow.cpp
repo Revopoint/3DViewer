@@ -12,9 +12,9 @@ RenderWindow::RenderWindow(QWidget* parent)
     : QWidget(parent)
 {
     setObjectName("RenderWindow");
-    setAttribute(Qt::WA_StyledBackground);
+    setAttribute(Qt::WA_StyledBackground, true);
     rootLayout = new QVBoxLayout(this);
-
+    rootLayout->setContentsMargins(0, 0, 0, 0);
     initConnections();
 }
 
@@ -67,7 +67,10 @@ void RenderWindow::onWindowLayoutUpdated()
     else
     {
         // tabs
-        renderMainWidget = new QTabWidget(this);
+        QTabWidget* tabWidget = new QTabWidget(this);
+        tabWidget->setTabBarAutoHide(true);
+        tabWidget->setAttribute(Qt::WA_StyledBackground, true);
+        renderMainWidget = tabWidget;
         initRenderWidgetsTab();
     }
 

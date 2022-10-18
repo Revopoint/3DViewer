@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>427</width>
-    <height>307</height>
+    <height>333</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,7 +55,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>320</height>
+       <height>180</height>
       </size>
      </property>
      <property name="widgetResizable">
@@ -117,8 +117,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="3dviewer.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

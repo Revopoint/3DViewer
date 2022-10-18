@@ -47,10 +47,10 @@
 #include <QIcon>
 #include <QLabel>
 
-class CSImageButton : public QPushButton
+class CSTextImageButton : public QPushButton
 {
 public:
-    CSImageButton(const QIcon& icon, const QString& text, Qt::LayoutDirection layoutDirection = Qt::LeftToRight, QWidget* parent = Q_NULLPTR);
+    CSTextImageButton(const QIcon& icon, const QString& text, Qt::LayoutDirection layoutDirection = Qt::LeftToRight, QWidget* parent = Q_NULLPTR);
 private:
     void initButton(const QString& text);
 private:

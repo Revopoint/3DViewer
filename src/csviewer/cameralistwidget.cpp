@@ -229,7 +229,7 @@ void CameraListWidget::initTopButton()
 
     icon.addFile(QStringLiteral(":/resources/double_arrow_down.png"), size, QIcon::Normal, QIcon::Off);
     icon.addFile(QStringLiteral(":/resources/double_arrow_left.png"), size, QIcon::Selected, QIcon::On);
-    CSImageButton* topButton = new CSImageButton(icon, "Camera List", Qt::LeftToRight, ui->topItem);
+    CSTextImageButton* topButton = new CSTextImageButton(icon, "Camera List", Qt::LeftToRight, ui->topItem);
 
     auto* layout = ui->topItem->layout();
     if (layout)
@@ -237,7 +237,7 @@ void CameraListWidget::initTopButton()
         layout->addWidget(topButton);
     }
 
-    connect(topButton, &CSImageButton::toggled, [=](bool checked)
+    connect(topButton, &CSTextImageButton::toggled, [=](bool checked)
         {
             if (checked)
             {

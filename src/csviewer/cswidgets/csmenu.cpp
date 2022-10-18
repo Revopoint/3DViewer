@@ -51,6 +51,13 @@ CSMenu::CSMenu(const QString& title, QWidget* parent)
 {
 
 }
+
+void CSMenu::mousePressEvent(QMouseEvent* e)
+{
+  emit clicked();
+
+}
+
 void CSMenu::mouseReleaseEvent(QMouseEvent* e)
 {
     emit clicked();

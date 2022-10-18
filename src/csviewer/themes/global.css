@@ -43,11 +43,15 @@
 /* QWidget */
 QWidget {
     /*border: none;*/
-    border-style: outset;
+    border-style:outset;
     color: rgb(77,77,77);
     font: 13px;
     background: transparent;
     /*border: 1px solid red;*/
+}
+
+QWidget:focus{
+    outline: none;
 }
 
 QWidget:disabled {
@@ -101,19 +105,94 @@ QPushButton[isCameraButton] {
     height: 52px;
     background: rgb(179, 179, 179);
     border: 1px solid rgb(102, 102, 102);
-    border-top: none;
+    border-top:none;
 }
 
 QPushButton[isCameraButton]:checked {
     background: rgb(204, 204, 204);
     border: none;
+    outline:none;
 }
 
 QWidget#cameraBtnCtlArea QPushButton {
     width: 52px;
     height: 52px;
     border-radius: 4px;
-    background: rgb(179, 179, 179);
+    background-color: rgb(179, 179, 179);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QPushButton#previewButton{
+    background-image: url(:/resources/start_stream.png);
+}
+
+QPushButton#previewButton:disabled{
+    background-image: url(:/resources/start_stream_disable.png);
+}
+
+QPushButton#previewButton:hover{
+    background-image: url(:/resources/start_stream_active.png);
+}
+
+QPushButton#previewButton:checked{
+    background-image: url(:/resources/pause_stream.png);
+}
+
+QPushButton#previewButton:checked:disabled{
+    background-image: url(:/resources/pause_stream_disable.png);
+}
+
+QPushButton#previewButton:checked:hover{
+    background-image: url(:/resources/pause_stream_active.png);
+}
+
+QPushButton#stopPreviewButton{
+    background-image: url(:/resources/stop_stream.png);
+}
+
+QPushButton#stopPreviewButton:disbale{
+    background-image: url(:/resources/stop_stream_disable.png);
+}
+
+QPushButton#stopPreviewButton:hover{
+    background-image: url(:/resources/stop_stream_active.png);
+}
+
+QPushButton#singleShotButton{
+    background-image: url(:/resources/single_shot.png);
+}
+
+QPushButton#singleShotButton:disable{
+    background-image: url(:/resources/single_shot_disbale.png);
+}
+
+QPushButton#singleShotButton:hover{
+    background-image: url(:/resources/single_shot_active.png);
+}
+
+QPushButton#captureSingleButton{
+    background-image: url(:/resources/save.png);
+}
+
+QPushButton#captureSingleButton:disbale{
+    background-image: url(:/resources/save_disable.png);
+}
+
+QPushButton#captureSingleButton:hover{
+    background-image: url(:/resources/save_active.png);
+}
+
+QPushButton#captureMultipleButton{
+    background-image: url(:/resources/vedio.png);
+}
+
+QPushButton#captureMultipleButton:disable{
+    background-image: url(:/resources/vedio_disable.png);
+}
+
+QPushButton#captureMultipleButton:hover{
+    background-image: url(:/resources/vedio_active.png);
 }
 
 /*QLabel*/
@@ -206,7 +285,7 @@ QComboBox:on {
 
 /* CSComboBox*/
 QLabel#TitleLabel {
-    min-width: 160px;
+    min-width: 140px;
 }
 
 /*QLineEdit*/
@@ -318,3 +397,52 @@ QScrollBar::right-arrow:horizontal {
 QScrollBar::add-page, QScrollBar::sub-page {
     background: none;
 }
+
+QWidget#ParameterSettingsWidget{
+    background: red;
+}
+
+/*QTabWidget*/
+QTabWidget{
+    background:rgb(179, 179, 179);
+}
+
+QTabWidget::pane {
+    position: absolute;
+    border-top: 1px solid rgb(102,102,102);
+    background: rgb(242, 242, 242);
+    top:-1px;
+}
+
+QTabWidget::tab-bar {
+    top: 1px;
+    left: 0;
+}
+
+QTabBar::tab {
+    width: 140px;
+    height: 40px;
+    border: 1px solid rgb(102, 102, 102);
+    border-left: none;
+    border-top:none;
+    background: rgb(179, 179, 179);
+
+}
+
+QTabBar::tab:selected, QTabBar::tab:hover {
+    background: rgb(242, 242, 242);
+    border-bottom: none;
+}
+
+RenderWindow RenderWidget {
+    background: transparent;
+}
+
+RenderWidget{
+    border: 1px solid rgb(200, 200, 200);
+}
+
+QTabWidget RenderWidget {
+    border: none;
+}
+

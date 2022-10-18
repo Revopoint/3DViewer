@@ -101,7 +101,7 @@ void RenderWidget2D::initWidget()
 
     QHBoxLayout* hLayout = new QHBoxLayout(topControlArea);
     hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout->setContentsMargins(0, 0, 10, 0);
+    hLayout->setContentsMargins(0, 10, 10, 0);
     hLayout->setSpacing(10);
 
     hLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -194,8 +194,8 @@ void RenderWidget2D::initButtons()
     {
         exitButton = new QPushButton(this);
         exitButton->setObjectName("ExitButton");
-        exitButton->setIconSize(QSize(24, 24));
-        exitButton->setIcon(QIcon(":/resources/exit.png"));
+        exitButton->setIconSize(QSize(20, 20));
+        exitButton->setIcon(QIcon(":/resources/fork_large.png"));
 
         connect(exitButton, &QPushButton::clicked, this, &RenderWidget2D::onClickExitButton);
     }
@@ -209,11 +209,11 @@ void RenderWidget2D::initButtons()
         connect(fullScreenBtn, &QPushButton::toggled, this, &RenderWidget2D::onClickFullScreen);
 
         QIcon icon1;
-        icon1.addFile(QStringLiteral(":/resources/fullscreen.png"), QSize(), QIcon::Normal, QIcon::Off);
-        icon1.addFile(QStringLiteral(":/resources/fullscreen_exit.png"), QSize(), QIcon::Active, QIcon::On);
-        icon1.addFile(QStringLiteral(":/resources/fullscreen_exit.png"), QSize(), QIcon::Selected, QIcon::On);
+        icon1.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Active, QIcon::On);
+        icon1.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Selected, QIcon::On);
 
-        fullScreenBtn->setIconSize(QSize(24, 24));
+        fullScreenBtn->setIconSize(QSize(22, 22));
         fullScreenBtn->setIcon(icon1);
     }
 

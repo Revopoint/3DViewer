@@ -83,7 +83,7 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
     , roiRectF(0,0,0,0)
     , captureSettingDialog(new CaptureSettingDialog)
 {
-    setAttribute(Qt::WA_StyledBackground);
+    setAttribute(Qt::WA_StyledBackground, true);
     ui->setupUi(this);
     initWidget();
     initConnections();
@@ -207,20 +207,13 @@ void ParaSettingsWidget::initParaConnections()
 void ParaSettingsWidget::initWidget()
 {
     ui->depthCameraButton->setProperty("isCameraButton", true);
-    ui->rgbCameraButton->setProperty("isCameraButton", true);
-
-    ui->rgbCameraButton->setCheckable(true);
-    ui->depthCameraButton->setCheckable(true);
-
-    ui->depthCameraButton->setChecked(true);
-
+    ui->rgbCameraButton->setProperty("isCameraButton", true);  
     ui->stackedWidget->setCurrentIndex(PAGE_DEPTH_CAMERA);
 
     ui->hdrSettingBtn->setProperty("isCSStyle", true);
     ui->roiEditBtn->setProperty("isCSStyle", true);
 
     // control button
-    ui->previewButton->setCheckable(true);
     ui->previewButton->setEnabled(false);
     ui->captureSingleButton->setEnabled(false);
     ui->captureMultipleButton->setEnabled(false);
@@ -230,6 +223,8 @@ void ParaSettingsWidget::initWidget()
     //parameter widget
     initDepthPara();
     initRgbPara();
+
+    ui->depthCameraButton->animateClick();
 }
 
 void ParaSettingsWidget::initConnections()
@@ -268,7 +263,7 @@ void ParaSettingsWidget::initTopButton()
 
     icon.addFile(QStringLiteral(":/resources/double_arrow_down.png"), size, QIcon::Normal, QIcon::Off);
     icon.addFile(QStringLiteral(":/resources/double_arrow_left.png"), size, QIcon::Selected, QIcon::On);
-    CSImageButton* topButton = new CSImageButton(icon, "Parameter Settings", Qt::LeftToRight, ui->cameraTopItem);
+    CSTextImageButton* topButton = new CSTextImageButton(icon, "Parameter Settings", Qt::LeftToRight, ui->cameraTopItem);
 
     auto* layout = ui->cameraTopItem->layout();
     if (layout)
@@ -276,11 +271,12 @@ void ParaSettingsWidget::initTopButton()
         layout->addWidget(topButton);
     }
 
-    connect(topButton, &CSImageButton::toggled, [=](bool checked)
+    connect(topButton, &CSTextImageButton::toggled, [=](bool checked)
         {
             if (checked)
             {
                 ui->scrollArea->hide();
+                ui->cameraButtonArea->hide();
                 verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
                 int idx = ui->verticalLayout->indexOf(ui->bottomControlArea);
@@ -291,6 +287,7 @@ void ParaSettingsWidget::initTopButton()
                 ui->verticalLayout->removeItem(verticalSpacer);
                 verticalSpacer = nullptr;
                 ui->scrollArea->show();
+                ui->cameraButtonArea->show();
             }
         });
 }

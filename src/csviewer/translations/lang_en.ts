@@ -90,8 +90,8 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="156"/>
-        <location filename="../viewerwindow.cpp" line="337"/>
+        <location filename="../viewerwindow.cpp" line="158"/>
+        <location filename="../viewerwindow.cpp" line="339"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -100,77 +100,77 @@
         <translation type="obsolete">Camera List</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="225"/>
+        <location filename="../viewerwindow.cpp" line="227"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="228"/>
+        <location filename="../viewerwindow.cpp" line="230"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="231"/>
+        <location filename="../viewerwindow.cpp" line="233"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="234"/>
+        <location filename="../viewerwindow.cpp" line="236"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="237"/>
+        <location filename="../viewerwindow.cpp" line="239"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="240"/>
+        <location filename="../viewerwindow.cpp" line="242"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="243"/>
+        <location filename="../viewerwindow.cpp" line="245"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="246"/>
+        <location filename="../viewerwindow.cpp" line="248"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="249"/>
+        <location filename="../viewerwindow.cpp" line="251"/>
         <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="252"/>
+        <location filename="../viewerwindow.cpp" line="254"/>
         <source>Preview has been paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="255"/>
+        <location filename="../viewerwindow.cpp" line="257"/>
         <source>Restarting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="258"/>
+        <location filename="../viewerwindow.cpp" line="260"/>
         <source>Stopping preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="261"/>
+        <location filename="../viewerwindow.cpp" line="263"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="331"/>
+        <location filename="../viewerwindow.cpp" line="333"/>
         <source>Set default save path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="393"/>
+        <location filename="../viewerwindow.cpp" line="395"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -279,18 +279,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="739"/>
-        <location filename="../parasettingswidget.cpp" line="747"/>
+        <location filename="../parasettingswidget.cpp" line="736"/>
+        <location filename="../parasettingswidget.cpp" line="744"/>
         <source>Start preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="787"/>
+        <location filename="../parasettingswidget.cpp" line="784"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="349"/>
+        <location filename="../parasettingswidget.cpp" line="346"/>
         <source>Confirm</source>
         <translation type="unfinished"></translation>
     </message>
@@ -359,32 +359,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="350"/>
+        <location filename="../parasettingswidget.cpp" line="347"/>
         <source>Use the mouse to select the ROI area in the depth image, and then click the &quot;Confirm&quot; button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="354"/>
+        <location filename="../parasettingswidget.cpp" line="351"/>
         <source>Edit ROI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="740"/>
+        <location filename="../parasettingswidget.cpp" line="737"/>
         <source>Capture single frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="741"/>
+        <location filename="../parasettingswidget.cpp" line="738"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="742"/>
+        <location filename="../parasettingswidget.cpp" line="739"/>
         <source>Single Shot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="747"/>
+        <location filename="../parasettingswidget.cpp" line="744"/>
         <source>Pause preview</source>
         <translation type="unfinished"></translation>
     </message>

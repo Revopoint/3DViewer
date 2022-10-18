@@ -428,6 +428,8 @@ void ViewerWindow::onCameraStreamStarted()
     camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_LR, hasIrV);
     camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
 
+    hasRgbV = true;
+    hasDepthV = true;
     for (auto action : windowActions)
     {
         ui->menuWindows->removeAction(action);

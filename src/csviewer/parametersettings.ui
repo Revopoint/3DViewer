@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>1</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>0</number>
@@ -51,6 +51,53 @@
     </widget>
    </item>
    <item>
+    <widget class="QWidget" name="cameraButtonArea" native="true">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>1</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QPushButton" name="depthCameraButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>Depth Camera</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="rgbCameraButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
+        <property name="text">
+         <string>RGB Camera</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
       <bool>true</bool>
@@ -61,7 +108,7 @@
         <x>0</x>
         <y>0</y>
         <width>460</width>
-        <height>570</height>
+        <height>554</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -71,6 +118,9 @@
        </sizepolicy>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
+       <property name="spacing">
+        <number>0</number>
+       </property>
        <property name="leftMargin">
         <number>0</number>
        </property>
@@ -84,63 +134,10 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QWidget" name="widget" native="true">
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QPushButton" name="depthCameraButton">
-            <property name="text">
-             <string>Depth Camera</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>25</width>
-              <height>19</height>
-             </size>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-            <property name="checked">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="rgbCameraButton">
-            <property name="text">
-             <string>RGB Camera</string>
-            </property>
-            <property name="iconSize">
-             <size>
-              <width>25</width>
-              <height>19</height>
-             </size>
-            </property>
-            <property name="checkable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-       </item>
-       <item>
         <widget class="QStackedWidget" name="stackedWidget">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
          <widget class="QWidget" name="depthParaPage">
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
@@ -366,32 +363,15 @@
            <property name="text">
             <string/>
            </property>
-           <property name="icon">
-            <iconset resource="3dviewer.qrc">
-             <normaloff>:/resources/start_stream.png</normaloff>:/resources/start_stream.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
+           <property name="checkable">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="stopPreviewButton">
            <property name="text">
             <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="3dviewer.qrc">
-             <normaloff>:/resources/stop_stream.png</normaloff>:/resources/stop_stream.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
            </property>
           </widget>
          </item>
@@ -400,16 +380,6 @@
            <property name="text">
             <string/>
            </property>
-           <property name="icon">
-            <iconset resource="3dviewer.qrc">
-             <normaloff>:/resources/single_shot.png</normaloff>:/resources/single_shot.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
           </widget>
          </item>
          <item>
@@ -417,32 +387,12 @@
            <property name="text">
             <string/>
            </property>
-           <property name="icon">
-            <iconset resource="3dviewer.qrc">
-             <normaloff>:/resources/save.png</normaloff>:/resources/save.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
-           </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="captureMultipleButton">
            <property name="text">
             <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="3dviewer.qrc">
-             <normaloff>:/resources/vedio.png</normaloff>:/resources/vedio.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>32</width>
-             <height>32</height>
-            </size>
            </property>
           </widget>
          </item>
@@ -467,8 +417,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="3dviewer.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

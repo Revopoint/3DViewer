@@ -53,6 +53,7 @@ public:
     CSMenu(const QString& title, QWidget* parent = Q_NULLPTR);
 
     void mouseReleaseEvent(QMouseEvent* e) override;
+    void mousePressEvent(QMouseEvent* e) override;
 signals:
     void clicked();
 };
