@@ -59,6 +59,7 @@ QT_END_NAMESPACE
 
 class HDRSettingsDialog;
 class CaptureSettingDialog;
+class QSpacerItem;
 class ParaSettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -121,6 +122,7 @@ private:
     void initHDRParaWidgets();
     void initParaConnections();
     void initRgbPara();
+    void initTopButton();
 
     void initConnections();
     void addDepthParaWidget(CSParaWidget* widget);
@@ -145,6 +147,7 @@ private:
     CaptureSettingDialog* captureSettingDialog;
 
     QRectF roiRectF;
+    QSpacerItem* verticalSpacer = nullptr;
 };
 
 

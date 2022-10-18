@@ -77,35 +77,38 @@ CSSlider::CSSlider(int paraId, const char* title, QWidget* parent)
     , intValidator(new QIntValidator(-10000000, 10000000, this))
     , step(1)
 {
+    setObjectName("CSSlider");
     lineEdit->setValidator(intValidator);
 
-    QVBoxLayout* vLayout = new QVBoxLayout(this);
-    QHBoxLayout* hLayout = new QHBoxLayout();
+    QHBoxLayout* hLayout = new QHBoxLayout(this);
+    hLayout->setContentsMargins(0, 0, 0, 0);
+    hLayout->setSpacing(0);
 
-    vLayout->setContentsMargins(15, 0, 15, 0);
+    titleLabel = new QLabel(this);
+    hLayout->addWidget(titleLabel);
 
-    if (strlen(paraName) > 0)
-    {
-        titleLabel = new QLabel(this);
-        vLayout->addWidget(titleLabel);
-    }
-
-    vLayout->addItem(hLayout);
+    titleLabel->setObjectName("TitleLabel");
 
     QVBoxLayout* vLayout2 = new QVBoxLayout();
-
     hLayout->addWidget(lineEdit);
     hLayout->addItem(vLayout2);
-    hLayout->setSpacing(10);
+    hLayout->setSpacing(0);
+    vLayout2->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* hLayout2 = new QHBoxLayout();
+    hLayout2->setContentsMargins(0, 0, 0, 0);
 
     hLayout2->addWidget(minLabel);
     hLayout2->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLayout2->addWidget(maxLabel);
+
+    minLabel->setProperty("fontSize10", true);
+    maxLabel->setProperty("fontSize10", true);
     
-    vLayout2->addItem(hLayout2);
     vLayout2->addWidget(slider);
+    vLayout2->addItem(hLayout2);
+    vLayout2->setSpacing(0);
+    vLayout2->setContentsMargins(20, 0, 20, 0);
 
     minLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     maxLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);

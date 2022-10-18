@@ -61,19 +61,21 @@ public:
 public slots:
     void onCameraListUpdated(const QStringList infoList);
     void onCameraStateChanged(int state);
+    void onCameraListClicked(int rowIndex);
+
 private slots:
-    void onClickedConnectButton(); 
-    void onDoubleClickedCameraListView(QListWidgetItem* item);
-    void onCameraListIndexChanged(int index);
+    void onClickedCameraListItem(bool selected, QString text, QListWidgetItem* listItem);
 signals:
     void connectCamera(QString serial);
+    void disconnectCamera();
     void translateSignal();
-    void clickedCloseButton();
 private:
     void iniWidget();
+    void initTopButton();
     void initConnections();
     void onTranslate();
-    bool isNetConnect(QString uuid);
+    bool isNetConnect(QString info);
+    void addListWidgetItem(const QString& text);
 private:
     Ui::CameraListWidget* ui;
 };

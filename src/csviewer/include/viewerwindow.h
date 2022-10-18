@@ -71,13 +71,6 @@ class ViewerWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    enum STACK_WIDGET_PAGE_ID
-    {
-        PARASETTING_PAGE = 0,
-        CAMERALIST_PAGE = 1,
-        PAGE_COUNT
-    };
-
     enum RENDER_PAGE_ID
     {
         RENDER_PAGE_2D = 0,
@@ -95,8 +88,6 @@ public:
     ViewerWindow(QWidget* parent = nullptr);
     ~ViewerWindow();
 private slots:
-    void onClickedModeSwitchButton();
-    void onPageChanged(int idx);
     void onRenderPageChanged(int idx);
     void onCameraStateChanged(int state);
 

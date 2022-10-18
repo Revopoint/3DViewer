@@ -112,12 +112,8 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
     suc &= (bool)connect(this, &ViewerWindow::show3DUpdated,             app,  &cs::CSApplication::onShow3DUpdated);
 
-    suc &= (bool)connect(ui->modeSwitchButton,  &QPushButton::clicked,                   this, &ViewerWindow::onClickedModeSwitchButton);
-    suc &= (bool)connect(ui->cameraListWidget,  &CameraListWidget::clickedCloseButton,   this, &ViewerWindow::onClickedModeSwitchButton);
-    suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::clickedCloseButton, this, &ViewerWindow::onClickedModeSwitchButton);
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::showMessage,        this, &ViewerWindow::onShowStatusBarMessage);
 
-    suc &= (bool)connect(ui->stackedWidget,     &QStackedWidget::currentChanged,         this, &ViewerWindow::onPageChanged);
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::roiStateChanged,    this, &ViewerWindow::onRoiEditStateChanged);
 
     suc &= (bool)connect(this, &ViewerWindow::translateSignal,     this,                   &ViewerWindow::onTranslate,            Qt::QueuedConnection);
@@ -156,44 +152,9 @@ void ViewerWindow::initWindow()
     ui->actionEnglish->setChecked(language == LANGUAGE_EN);
     ui->actionChinese->setChecked(language == LANGUAGE_ZH);
 
-    //set page
-    ui->stackedWidget->setCurrentIndex(CAMERALIST_PAGE);
-
     auto config = cs::CSApplication::getInstance()->getAppConfig();
     QString defaultSavePath = tr("Set default save path (") + config->getDefaultSavePath() + ")";
     ui->actionsetDefaultSaveDir->setText(defaultSavePath);
-}
-
-void ViewerWindow::onClickedModeSwitchButton()
-{
-    const int curIdx = ui->stackedWidget->currentIndex();
-    
-    int idx = curIdx + 1;
-    if (idx >= PAGE_COUNT)
-    {
-        idx = 0;
-    }
-
-    ui->stackedWidget->setCurrentIndex(idx);
-}
-
-void ViewerWindow::onPageChanged(int idx)
-{
-    STACK_WIDGET_PAGE_ID curPage = (STACK_WIDGET_PAGE_ID)idx;
-
-    switch (curPage)
-    {
-    case PARASETTING_PAGE:
-        ui->modeSwitchButton->setText(tr("Camera List"));
-        break;
-    case CAMERALIST_PAGE:
-        ui->modeSwitchButton->setText(tr("Parameter Settings"));
-        emit cs::CSApplication::getInstance()->queryCameras();
-        break;
-    default:
-        qWarning() << "invalid page index.";
-        break;
-    }
 }
 
 // switch 2D/3D
@@ -221,7 +182,6 @@ void ViewerWindow::onCameraStateChanged(int state)
     
     case CAMERA_CONNECTED:
     {
-        ui->stackedWidget->setCurrentIndex(PARASETTING_PAGE);
         ui->menuCamera->setEnabled(true);
 
         // update camera info dialog
@@ -439,7 +399,6 @@ void ViewerWindow::onRemovedCurrentCamera(QString serial)
 void ViewerWindow::onConfirmCameraRemoved()
 {
     disconnect(globalMessageBox, &CSMessageBox::accepted, this, &ViewerWindow::onConfirmCameraRemoved);
-    ui->stackedWidget->setCurrentIndex(CAMERALIST_PAGE);
 }
 
 void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)

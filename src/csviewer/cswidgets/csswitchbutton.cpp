@@ -51,8 +51,10 @@ CSSwitchButton::CSSwitchButton(int paraId, const char* title , QWidget* parent)
     , button(new QPushButton(this))
 {
     setObjectName("CWSwitchButton");
+    titleLabel->setObjectName("TitleLabel");
+
     QHBoxLayout* hLayout = new QHBoxLayout(this);
-    hLayout->setContentsMargins(15,0,15,0);
+    hLayout->setContentsMargins(0,0,0, 0);
     hLayout->addWidget(titleLabel);
     hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLayout->addWidget(button);

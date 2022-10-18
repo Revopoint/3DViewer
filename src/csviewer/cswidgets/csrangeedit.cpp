@@ -50,6 +50,7 @@
 #include <QDebug>
 
 #include "cswidgets/cslineedit.h"
+#include "cswidgets/csline.h"
 
 CSRangeEdit::CSRangeEdit(int paraId, const char* title, QWidget* parent)
     : CSParaWidget(paraId, title, parent)
@@ -60,27 +61,37 @@ CSRangeEdit::CSRangeEdit(int paraId, const char* title, QWidget* parent)
     , rangeBottom(0)
     , rangeTop(0)
 {
-    QVBoxLayout* vLayout = new QVBoxLayout(this);
-    QHBoxLayout* hLayout = new QHBoxLayout();
+    setObjectName("CSRangeEdit");
+    titleLabel->setObjectName("TitleLabel");
 
-    vLayout->setContentsMargins(15, 0, 15, 0);
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     titleLabel->setText(title);
     titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    vLayout->addWidget(titleLabel);
-    vLayout->addItem(hLayout);
+    layout->addWidget(titleLabel);
+    CSHLine* line = new CSHLine(this);
 
-    QLabel* label = new QLabel("-", this);
-    label->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QHBoxLayout* hLayout = new QHBoxLayout(this);
+    layout->addItem(hLayout);
+
+    line->setFixedWidth(10);
+    line->setProperty("isDark", true);
 
     hLayout->addWidget(rangeMinEdit);
-    hLayout->addWidget(label);
+    hLayout->addWidget(line);
     hLayout->addWidget(rangeMaxEdit);
+    hLayout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLayout->setSpacing(10);
+    hLayout->setContentsMargins(0, 0, 0, 0);
 
     rangeMinEdit->setValidator(intValidator);
     rangeMaxEdit->setValidator(intValidator);
+
+    rangeMinEdit->setFixedWidth(86);
+    rangeMaxEdit->setFixedWidth(86);
 
     bool suc = true;
 

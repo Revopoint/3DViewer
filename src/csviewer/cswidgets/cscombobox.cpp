@@ -43,42 +43,32 @@
 #include "cswidgets/cscombobox.h"
 #include <QFormLayout>
 #include <QListView>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QDebug>
 
-CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent, Qt::Orientation orientation)
+CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent)
     : CSParaWidget(paraId, title, parent)
     , comboBox(new CustomComboBox(this))
     , titleLabel(new QLabel(this))
     , lastIndex(-1)
 {
-    if (orientation == Qt::Horizontal)
-    {
-        setObjectName("CSHComboBox");
+    //setAttribute(Qt::WA_StyledBackground);
+    setObjectName("CSComboBox");
+    titleLabel->setObjectName("TitleLabel");
 
-        QFormLayout* formLayout = new QFormLayout(this);
-        formLayout->setSpacing(0);
-        formLayout->setContentsMargins(15, 0, 15, 0);
-        formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
+    QHBoxLayout* layout = new QHBoxLayout(this);
 
-        titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        formLayout->setWidget(0, QFormLayout::LabelRole, titleLabel);
-        formLayout->setWidget(0, QFormLayout::FieldRole, comboBox);
-
-    }
-    else 
-    {
-        setObjectName("CSVComboBox");
-        titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        QVBoxLayout* layout = new QVBoxLayout(this);
-        layout->addWidget(titleLabel);
-        layout->addWidget(comboBox);
-        layout->setContentsMargins(15, 0, 15, 0);
-    }
+    titleLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    layout->addWidget(titleLabel);
+    layout->addWidget(comboBox);
+    layout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     QListView* listView = new QListView(this);
+    comboBox->setFocusPolicy(Qt::NoFocus);
+    listView->setFocusPolicy(Qt::NoFocus);
+
     comboBox->setView(listView);
 
     bool suc = true;

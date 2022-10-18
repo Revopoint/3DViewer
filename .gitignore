@@ -3,3 +3,4 @@ build
 /publish
 package
 vs2015*
+*.aps

@@ -52,6 +52,7 @@ CSSpinBox::CSSpinBox(int paraId, const char* title, QWidget* parent)
     , spinBox(new CustomSpinBox(this))
 {
     setObjectName("CSSpinBox");
+    titleLabel->setObjectName("TitleLabel");
 
     QFormLayout* layout = new QFormLayout(this);
     titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);

@@ -11,6 +11,7 @@
 RenderWindow::RenderWindow(QWidget* parent)
     : QWidget(parent)
 {
+    setObjectName("RenderWindow");
     setAttribute(Qt::WA_StyledBackground);
     rootLayout = new QVBoxLayout(this);
 

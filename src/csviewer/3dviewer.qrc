@@ -1,51 +1,65 @@
 <RCC>
     <qresource prefix="/">
         <file>themes/global.css</file>
+        <file>resources/3DViewer.icns</file>
+        <file>resources/3DViewer.ico</file>
+        <file>resources/arrow_down.png</file>
+        <file>resources/arrow_down_active.png</file>
+        <file>resources/arrow_down_gray.png</file>
+        <file>resources/arrow_down_mid.png</file>
+        <file>resources/arrow_down_mid_active.png</file>
+        <file>resources/arrow_down_small.png</file>
+        <file>resources/arrow_up.png</file>
+        <file>resources/arrow_up_active.png</file>
+        <file>resources/arrow_up_gray.png</file>
+        <file>resources/arrow_up_small.png</file>
         <file>resources/camera_active.png</file>
         <file>resources/camera_list.png</file>
         <file>resources/camera_normal.png</file>
-        <file>resources/slider.png</file>
-        <file>resources/arrow_down.png</file>
-        <file>resources/arrow_down_active.png</file>
-        <file>resources/arrow_up.png</file>
-        <file>resources/arrow_up_active.png</file>
+        <file>resources/checked.png</file>
         <file>resources/double_arrow_down.png</file>
         <file>resources/double_arrow_down_active.png</file>
+        <file>resources/double_arrow_left.png</file>
+        <file>resources/double_arrow_right.png</file>
         <file>resources/double_arrow_up.png</file>
         <file>resources/double_arrow_up_active.png</file>
+        <file>resources/export.png</file>
+        <file>resources/export_active.png</file>
+        <file>resources/export_mid.png</file>
+        <file>resources/fork.png</file>
+        <file>resources/fork_large.png</file>
+        <file>resources/full_screen.png</file>
+        <file>resources/full_screen_exit.png</file>
+        <file>resources/home.png</file>
+        <file>resources/pause_stream.png</file>
+        <file>resources/pause_stream_active.png</file>
+        <file>resources/pause_stream_disable.png</file>
+        <file>resources/save.png</file>
+        <file>resources/save_active.png</file>
+        <file>resources/save_disable.png</file>
+        <file>resources/settings.png</file>
+        <file>resources/single_shot.png</file>
+        <file>resources/single_shot_active.png</file>
+        <file>resources/single_shot_disbale.png</file>
+        <file>resources/start_stream.png</file>
+        <file>resources/start_stream_active.png</file>
+        <file>resources/start_stream_disable.png</file>
+        <file>resources/stop_stream.png</file>
+        <file>resources/stop_stream_active.png</file>
+        <file>resources/stop_stream_disable.png</file>
+        <file>resources/switch_button_off.png</file>
+        <file>resources/switch_button_on.png</file>
+        <file>resources/texture_off.png</file>
+        <file>resources/texture_on.png</file>
+        <file>resources/tick.png</file>
         <file>resources/triangle_arrow_down.png</file>
         <file>resources/triangle_arrow_down_active.png</file>
         <file>resources/triangle_arrow_up.png</file>
         <file>resources/triangle_arrow_up_active.png</file>
-        <file>resources/switch_button_off.png</file>
-        <file>resources/switch_button_on.png</file>
-        <file>resources/arrow_down_mid.png</file>
-        <file>resources/arrow_down_mid_active.png</file>
-        <file>resources/3DViewer.ico</file>
-        <file>resources/usb.png</file>
-        <file>resources/internet.png</file>
-        <file>resources/settings.png</file>
-        <file>resources/pointCloud_blue.png</file>
-        <file>resources/pointCloud_color.png</file>
-        <file>resources/home.png</file>
-        <file>resources/disconnect.png</file>
-        <file>resources/pause_stream.png</file>
-        <file>resources/restart_camera.png</file>
-        <file>resources/resume_stream.png</file>
-        <file>resources/export.png</file>
-        <file>resources/camera.png</file>
-        <file>resources/checked.png</file>
         <file>resources/unchecked.png</file>
-        <file>resources/export_active.png</file>
-        <file>resources/export_mid.png</file>
-        <file>resources/save.png</file>
-        <file>resources/save_active.png</file>
-        <file>resources/save_mid.png</file>
-        <file>resources/save_large.png</file>
-        <file>resources/video.png</file>
-        <file>resources/exit.png</file>
-        <file>resources/fullscreen.png</file>
-        <file>resources/fullscreen_exit.png</file>
+        <file>resources/vedio.png</file>
+        <file>resources/vedio_active.png</file>
+        <file>resources/vedio_disable.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>cameralist.ui</file>

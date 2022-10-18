@@ -44,6 +44,7 @@
 #define _CS_CSLINE_H
 
 #include <QFrame>
+#include <QWidget>
 
 class CSLine : public QFrame 
 {
@@ -52,15 +53,19 @@ public:
     void paintEvent(QPaintEvent* event) override;
 };
 
-class CSHLine : public CSLine
+class CSHLine : public QWidget
 {
 public:
     CSHLine(QWidget* parent = nullptr);
+private:
+    CSLine* line;
 };
 
-class CSVLine : public CSLine
+class CSVLine : public QWidget
 {
 public:
     CSVLine(QWidget* parent = nullptr);
+private:
+    CSLine* line;
 };
 #endif //_CS_CSLINE_H
