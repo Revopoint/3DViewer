@@ -53,6 +53,7 @@
 #include <QThread>
 #include <QDialog>
 #include <QFileDialog>
+#include <QSpacerItem>
 #include <QDir>
 
 #include <cameraproxy.h>
@@ -67,6 +68,7 @@
 #include "cswidgets/csspinbox.h"
 #include "cswidgets/csswitchbutton.h"
 #include "cswidgets/cstablewidget.h"
+#include "cswidgets/csroieditwidget.h"
 
 #include "hdrsettingsdialog.h"
 #include "capturesettingdialog.h"
@@ -92,7 +94,6 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
 ParaSettingsWidget::~ParaSettingsWidget()
 {
     delete ui;
-    delete hdrSettingsDialog;
     delete captureSettingDialog;
 }
 
@@ -110,12 +111,12 @@ void ParaSettingsWidget::initDepthPara()
     // line
     addDepthDividLine();
 
+    // auto exposure
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure"), this));
     // exposure
     addDepthParaWidget(new CSSlider(PARA_DEPTH_EXPOSURE, QT_TR_NOOP("Exposure Time(us)"), this));
     // gain
     addDepthParaWidget(new CSComboBox(PARA_DEPTH_GAIN, QT_TR_NOOP("Gain"), this));
-    // auto exposure
-    addDepthParaWidget(new CSComboBox(PARA_DEPTH_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure"), this));
     // line
     addDepthDividLine();
 
@@ -136,8 +137,35 @@ void ParaSettingsWidget::initDepthPara()
     // line
     addDepthDividLine();
 
+    // ROI
+    addDepthParaWidget(new CSRoiEditWidget(PARA_DEPTH_ROI, QT_TR_NOOP("ROI"), this));
+    // line
+    addDepthDividLine();
+
     // HDR settings
-    initHDRParaWidgets();
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_HDR_MODE, QT_TR_NOOP("HDR Mode"), this));
+    addDepthParaWidget(new CSSlider(PARA_DEPTH_HDR_LEVEL, QT_TR_NOOP("HDR Level"), this));
+    addDepthParaWidget(new CSTableWidget(PARA_DEPTH_HDR_SETTINGS, HDR_TABLE_COLS, { QT_TR_NOOP("Number"), QT_TR_NOOP("Exposure"), QT_TR_NOOP("Gain")}));
+    addHdrButtons();
+}
+
+void ParaSettingsWidget::addHdrButtons()
+{
+    QWidget* buttonArea = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout(buttonArea);
+    layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    layout->setContentsMargins(0, 0, 20, 0);
+    layout->setSpacing(10);
+
+    hdrRefreshButton = new QPushButton(tr("Refresh"), buttonArea);
+    hdrConfirmButton = new QPushButton("OK", buttonArea);
+    hdrRefreshButton->setProperty("isCSStyle", true);
+    hdrConfirmButton->setProperty("isCSStyle", true);
+
+    layout->addWidget(hdrRefreshButton);
+    layout->addWidget(hdrConfirmButton);
+
+    ui->depthParaLayout->addWidget(buttonArea);
 }
 
 void ParaSettingsWidget::initHDRParaWidgets()
@@ -154,8 +182,6 @@ void ParaSettingsWidget::initHDRParaWidgets()
         Q_ASSERT(!paraWidgets.contains(paraId));
         paraWidgets[paraId] = widget;
     }
-
-    hdrSettingsDialog = new HDRSettingsDialog(paraWidgets[PARA_DEPTH_HDR_MODE], paraWidgets[PARA_DEPTH_HDR_LEVEL], paraWidgets[PARA_DEPTH_HDR_SETTINGS]);
 }
 
 void ParaSettingsWidget::initRgbPara()
@@ -197,9 +223,9 @@ void ParaSettingsWidget::initParaConnections()
         Q_ASSERT(suc);
     }
 
-    suc &= (bool)connect(hdrSettingsDialog, &HDRSettingsDialog::refreshHdrSetting, this, &ParaSettingsWidget::onRefreshHdrSetting);
-    suc &= (bool)connect(hdrSettingsDialog, &HDRSettingsDialog::updateHdrSetting, this, &ParaSettingsWidget::onUpdateHdrSetting);
-    suc &= (bool)connect(this, &ParaSettingsWidget::hdrModeChanged, hdrSettingsDialog, &HDRSettingsDialog::onHdrModeChanged);
+    //suc &= (bool)connect(hdrSettingsDialog, &HDRSettingsDialog::refreshHdrSetting, this, &ParaSettingsWidget::onRefreshHdrSetting);
+    //suc &= (bool)connect(hdrSettingsDialog, &HDRSettingsDialog::updateHdrSetting, this, &ParaSettingsWidget::onUpdateHdrSetting);
+    //suc &= (bool)connect(this, &ParaSettingsWidget::hdrModeChanged, hdrSettingsDialog, &HDRSettingsDialog::onHdrModeChanged);
 
     Q_ASSERT(suc);
 }
@@ -210,13 +236,12 @@ void ParaSettingsWidget::initWidget()
     ui->rgbCameraButton->setProperty("isCameraButton", true);  
     ui->stackedWidget->setCurrentIndex(PAGE_DEPTH_CAMERA);
 
-    ui->hdrSettingBtn->setProperty("isCSStyle", true);
-    ui->roiEditBtn->setProperty("isCSStyle", true);
-
     // control button
     ui->previewButton->setEnabled(false);
     ui->captureSingleButton->setEnabled(false);
-    ui->captureMultipleButton->setEnabled(false);
+    //ui->captureMultipleButton->setEnabled(false);
+    ui->singleShotButton->setEnabled(false);
+    ui->stopPreviewButton->setEnabled(false);
 
     initTopButton();
 
@@ -234,8 +259,6 @@ void ParaSettingsWidget::initConnections()
     suc &= (bool)connect(ui->depthCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickDepthButton);
     suc &= (bool)connect(ui->rgbCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickRgbButton);
     suc &= (bool)connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &ParaSettingsWidget::onPageChanged);
-    suc &= (bool)connect(ui->hdrSettingBtn, &QPushButton::clicked, this, &ParaSettingsWidget::onClickHdrButton);
-    suc &= (bool)connect(ui->roiEditBtn, &QPushButton::toggled, this, &ParaSettingsWidget::onClickRoiEditButton);
 
     suc &= (bool)connect(ui->previewButton, &QPushButton::clicked, this, &ParaSettingsWidget::onPreviewStateChanged);
     suc &= (bool)connect(ui->previewButton, &QPushButton::toggled, this, &ParaSettingsWidget::onPreviewButtonToggled);
@@ -248,7 +271,8 @@ void ParaSettingsWidget::initConnections()
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app, &cs::CSApplication::cameraStateChanged, this, &ParaSettingsWidget::onCameraStateChanged);
     suc &= (bool)connect(this, &ParaSettingsWidget::translateSignal, this, &ParaSettingsWidget::onTranslate);
-    suc &= (bool)connect(this, &ParaSettingsWidget::translateSignal, hdrSettingsDialog, &HDRSettingsDialog::onTranslate);
+
+    //suc &= (bool)connect(this, &ParaSettingsWidget::translateSignal, hdrSettingsDialog, &HDRSettingsDialog::onTranslate);
 
     Q_ASSERT(suc);
 
@@ -317,10 +341,6 @@ void ParaSettingsWidget::onClickRgbButton()
     }
 }
 
-void ParaSettingsWidget::onClickHdrButton()
-{
-    hdrSettingsDialog->show();
-}
 
 void ParaSettingsWidget::onSingleShotChanged(bool checked)
 {
@@ -329,8 +349,6 @@ void ParaSettingsWidget::onSingleShotChanged(bool checked)
     
     const int  triggerMode = checked ? TRIGGER_MODE_SOFTWAER : TRIGGER_MODE_OFF;
     camera->setCameraPara(PARA_TRIGGER_MODE, triggerMode);
-    
-    ui->roiEditWidget->setEnabled(!checked);
 }
 
 void ParaSettingsWidget::onClickSingleShot()
@@ -339,23 +357,24 @@ void ParaSettingsWidget::onClickSingleShot()
     camera->softTrigger();
 }
 
-void ParaSettingsWidget::onClickRoiEditButton(bool checked)
+void ParaSettingsWidget::onClickRoiEditButton()
 {
-    if (checked)
-    {
-        ui->roiEditBtn->setText(tr("Confirm"));
-        emit showMessage(tr("Use the mouse to select the ROI area in the depth image, and then click the \"Confirm\" button"), 10000);
-    }
-    else 
-    {
-        ui->roiEditBtn->setText(tr("Edit ROI")); 
-        emit showMessage("");
+    emit showMessage(tr("Use the mouse to select the ROI area in the depth image, and then click the \"Confirm\" button"), 10000);
 
-        //set parameter
-        cameraPtr->setCameraPara(PARA_DEPTH_ROI, roiRectF);
-    }
-    roiRectF = QRectF(0, 0, 0, 0);
-    emit roiStateChanged(checked);
+    // TODO:
+    emit roiStateChanged(true);
+}
+
+void ParaSettingsWidget::onClickFullScreenButton()
+{
+    emit roiStateChanged(true);
+}
+
+void ParaSettingsWidget::onConfirmRoi()
+{
+
+    //set parameter
+    cameraPtr->setCameraPara(PARA_DEPTH_ROI, roiRectF);
 }
 
 void ParaSettingsWidget::onPageChanged(int idx)
@@ -446,13 +465,6 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
 
         widget->setEnabled(enable);
     }
-
-    // ROI
-    ui->roiEditBtn->setEnabled(cameraState == CAMERA_STARTED_STREAM);
-    ui->roiLabel->setEnabled(ui->roiEditBtn->isEnabled());
-
-    // HDR
-    ui->hdrSettingBtn->setEnabled(cameraState == CAMERA_STARTED_STREAM);
 }
 
 void ParaSettingsWidget::onUpdatedCameraParas()
@@ -507,17 +519,6 @@ void ParaSettingsWidget::updateParaValues()
         widget->setValue(value);
 
         onParaLinkResponse((CAMERA_PARA_ID)widget->getParaId(), value);
-    }
-
-    //ROI
-    if (ui->roiLabel->isEnabled())
-    {
-        QVariant value;
-        cameraPtr->getCameraPara(PARA_DEPTH_ROI, value);
-        if (value != QVariant::Invalid)
-        {
-            onCameraParaUpdated(PARA_DEPTH_ROI, value);
-        }
     }
 }
 
@@ -576,7 +577,7 @@ void ParaSettingsWidget::onParaValueChanged(int paraId, QVariant value)
     cameraPtr->setCameraPara((CAMERA_PARA_ID)paraId, value);
     if (paraId == PARA_DEPTH_HDR_MODE || paraId == PARA_DEPTH_HDR_LEVEL)
     {
-        emit hdrSettingsDialog->progressStateChanged(true);
+
     }
 }
 
@@ -590,7 +591,7 @@ void ParaSettingsWidget::onCameraParaUpdated(int paraId, QVariant value)
 
         if (paraId == PARA_DEPTH_HDR_SETTINGS)
         {
-            emit hdrSettingsDialog->progressStateChanged(false);
+
         }
     }
     else if (paraId == PARA_DEPTH_ROI)
@@ -601,7 +602,6 @@ void ParaSettingsWidget::onCameraParaUpdated(int paraId, QVariant value)
                                                  .arg(QString::number(rect.top(),    'f', 2))
                                                  .arg(QString::number(rect.right(),  'f', 2))
                                                  .arg(QString::number(rect.bottom(), 'f', 2));
-        ui->roiLabel->setText(str);
     }
     else if (paraId == PARA_DEPTH_FRAMETIME || paraId == PARA_TRIGGER_MODE)
     {
@@ -649,8 +649,6 @@ void ParaSettingsWidget::onCameraParaItemsUpdated(int paraId)
 
 void ParaSettingsWidget::onParaLinkResponse(int paraId, QVariant value)
 {
-    CAMERA_PARA_ID cameraParaId = (CAMERA_PARA_ID)paraId;
-
     switch (paraId)
     {
     case PARA_DEPTH_AUTO_EXPOSURE:
@@ -680,8 +678,6 @@ void ParaSettingsWidget::onParaLinkResponse(int paraId, QVariant value)
 
 void ParaSettingsWidget::onRefreshHdrSetting()
 {
-    emit hdrSettingsDialog->progressStateChanged(true);
-
     CAMERA_PARA_ID paraId = PARA_DEPTH_HDR_MODE;
 
     QVariant value;
@@ -692,8 +688,6 @@ void ParaSettingsWidget::onRefreshHdrSetting()
 
 void ParaSettingsWidget::onUpdateHdrSetting()
 {
-    emit hdrSettingsDialog->progressStateChanged(true);
-
     CAMERA_PARA_ID paraId = PARA_DEPTH_HDR_SETTINGS;
     QVariant value;
     paraWidgets[paraId]->getValue(value);
@@ -707,8 +701,7 @@ void ParaSettingsWidget::onRoiRectFUpdated(QRectF rect)
 
 void ParaSettingsWidget::onShow3DUpdate(bool show)
 {
-    ui->roiEditBtn->setEnabled(!show);
-    ui->roiLabel->setEnabled(!show);
+
 }
 
 void ParaSettingsWidget::onTranslate()

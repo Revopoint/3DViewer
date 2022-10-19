@@ -420,7 +420,7 @@ void ViewerWindow::onCaptureStateChanged(int state, QString message)
 
 void ViewerWindow::onCameraStreamStarted()
 {
-    //// get camera parameter
+    // get camera parameter
     auto camera = cs::CSApplication::getInstance()->getCamera();
 
     QVariant hasRgbV, hasIrV, hasDepthV;
@@ -428,8 +428,6 @@ void ViewerWindow::onCameraStreamStarted()
     camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_LR, hasIrV);
     camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
 
-    hasRgbV = true;
-    hasDepthV = true;
     for (auto action : windowActions)
     {
         ui->menuWindows->removeAction(action);

@@ -45,6 +45,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QDebug>
+#include <QListView>
 
 #include <icscamera.h>
 
@@ -169,18 +170,9 @@ void CaptureSettingDialog::onSaveFormatChanged(int index)
     }
 }
 
-void CaptureSettingDialog::onCaptureFrameNumberChanged()
+ void CaptureSettingDialog::onCaptureFrameNumberChanged(int para, QVariant value)
 {
-    captureConfig.captureNumber = ui->frameNumberSlider->value();
-    ui->frameNumberLineEdit->setText(QString::number(captureConfig.captureNumber));
-}
-
-void CaptureSettingDialog::onFrameNumberLineEditChanged()
-{
-    QString text = ui->frameNumberLineEdit->text();
-    ui->frameNumberSlider->setValue(text.toInt());
-
-    captureConfig.captureNumber = text.toInt();
+    captureConfig.captureNumber = value.toInt();
 }
 
 void CaptureSettingDialog::initDialog()
@@ -188,7 +180,7 @@ void CaptureSettingDialog::initDialog()
     ui->startCaptureButton->setProperty("isCSStyle", true);
     ui->stopCaptureButton->setProperty("isCSStyle", true);
 
-    ui->frameNumberSlider->setRange(minCaptureCount, maxCaptureCount);
+    ui->frameNumberSlider->setParaRange(minCaptureCount, maxCaptureCount, 10);
 
     // default data types
     for (auto type : captureConfig.captureDataTypes)
@@ -216,9 +208,8 @@ void CaptureSettingDialog::initDialog()
 
     // save format combobox
     ui->saveFormatComboBox->addItems(captureSaveFormats);
-    
-    ui->frameNumberLineEdit->setText(QString::number(captureConfig.captureNumber));
     ui->frameNumberSlider->setValue(captureConfig.captureNumber);
+    ui->saveFormatComboBox->setView(new QListView(ui->saveFormatComboBox));
 }
 
 void CaptureSettingDialog::initConnections()
@@ -233,12 +224,11 @@ void CaptureSettingDialog::initConnections()
     }
 
     suc &= (bool)connect(ui->saveFormatComboBox,  QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CaptureSettingDialog::onSaveFormatChanged);
-    suc &= (bool)connect(ui->frameNumberSlider,   &QSlider::sliderReleased,    this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
-    suc &= (bool)connect(ui->frameNumberLineEdit, &QLineEdit::editingFinished, this, &CaptureSettingDialog::onFrameNumberLineEditChanged);
-
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app, &cs::CSApplication::captureNumberUpdated, this, &CaptureSettingDialog::onCaptureNumberUpdated);
     suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged,  this, &CaptureSettingDialog::onCaptureStateChanged);
+
+    suc &= (bool)connect(ui->frameNumberSlider,  &CSSlider::valueChanged, this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
 
     Q_ASSERT(suc);
 }

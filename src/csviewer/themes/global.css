@@ -82,6 +82,10 @@ QWidget#bottomControlArea {
     background: rgb(204, 204, 204);
 }
 
+QWidget#CaptureSettingWidget, QWidget#CameraInfoWidget{
+    background:rgb(204, 204, 204);
+}
+
 /* QMenuBar */
 QMenuBar {
     background: rgb(179, 179, 179);
@@ -151,7 +155,7 @@ QPushButton#stopPreviewButton{
     background-image: url(:/resources/stop_stream.png);
 }
 
-QPushButton#stopPreviewButton:disbale{
+QPushButton#stopPreviewButton:disabled{
     background-image: url(:/resources/stop_stream_disable.png);
 }
 
@@ -163,7 +167,7 @@ QPushButton#singleShotButton{
     background-image: url(:/resources/single_shot.png);
 }
 
-QPushButton#singleShotButton:disable{
+QPushButton#singleShotButton:disabled{
     background-image: url(:/resources/single_shot_disbale.png);
 }
 
@@ -175,7 +179,7 @@ QPushButton#captureSingleButton{
     background-image: url(:/resources/save.png);
 }
 
-QPushButton#captureSingleButton:disbale{
+QPushButton#captureSingleButton:disabled{
     background-image: url(:/resources/save_disable.png);
 }
 
@@ -187,13 +191,26 @@ QPushButton#captureMultipleButton{
     background-image: url(:/resources/vedio.png);
 }
 
-QPushButton#captureMultipleButton:disable{
+QPushButton#captureMultipleButton:disabled{
     background-image: url(:/resources/vedio_disable.png);
 }
 
 QPushButton#captureMultipleButton:hover{
     background-image: url(:/resources/vedio_active.png);
 }
+
+QPushButton[isCSStyle]{
+    border: 1px solid rgb(140, 140, 140);
+    width: 92px;
+    height: 26px;
+    border-radius: 3px;
+}
+
+QPushButton[isCSStyle]:hover{
+    border: 1px solid rgb(0, 169, 255);
+    color: rgb(0, 169, 255);
+}
+
 
 /*QLabel*/
 QLabel {
@@ -261,14 +278,12 @@ QComboBox QAbstractItemView::item {
 
 QComboBox QListView::item:hover {
     background-color: rgb(0, 169, 255, 100);
-    border: none;
-    
+    border: none; 
 }
 
 QComboBox QListView::item::selected {
     background-color: rgb(0, 169, 255);
 }
-
 
 QComboBox::drop-down {
     width: 26px;
@@ -446,3 +461,56 @@ QTabWidget RenderWidget {
     border: none;
 }
 
+/* QTableWidget*/
+QTableWidget {
+    border: 1px solid rgb(153, 153, 153);
+}
+
+QHeaderView::section {
+    background-color: transparent;
+    border: 1px solid rgb(153, 153, 153);
+    border-left: none;
+    border-top: none;
+    height: 30px;
+}
+
+QHeaderView::section:last{
+    border-right: none;
+}
+
+QTableWidget::item {
+    background:rgb(179, 179, 179);
+    height: 30px;
+    border: 1px solid rgb(153, 153, 153);
+    border-left: none;
+    border-top: none;
+}
+
+QHeaderView::item:last{
+    border-right: none;
+}
+
+QTableWidget::item::selected {
+    color: white;
+    background: rgb(0, 169, 255);
+}
+
+/* QCheckBox*/
+QCheckBox {
+    height: 24px;
+}
+
+QCheckBox::indicator {
+    width:24px;
+    height: 24px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QCheckBox::indicator:unchecked {
+    image: url(:/resources/unchecked.png);
+}
+
+QCheckBox::indicator:checked {
+    image: url(:/resources/checked.png);
+}

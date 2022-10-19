@@ -68,8 +68,7 @@ private slots:
     
     void onDataTypeChanged();
     void onSaveFormatChanged(int index);
-    void onCaptureFrameNumberChanged();
-    void onFrameNumberLineEditChanged();
+    void onCaptureFrameNumberChanged(int para, QVariant value);
 private:
     void initDefaultCaptureConfig();
     void initDialog();

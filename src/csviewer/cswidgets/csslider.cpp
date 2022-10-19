@@ -68,6 +68,13 @@ void CustomSlider::mouseReleaseEvent(QMouseEvent* event)
     }
 }
 
+CSSlider::CSSlider(QWidget* parent)
+    : CSSlider(-1, "", parent)
+{
+
+
+}
+
 CSSlider::CSSlider(int paraId, const char* title, QWidget* parent)
     : CSParaWidget(paraId, title, parent)
     , lineEdit(new CSLineEdit(this))
@@ -122,6 +129,11 @@ CSSlider::CSSlider(int paraId, const char* title, QWidget* parent)
     suc &= (bool)connect(lineEdit, &CSLineEdit::focusOutSignal,  this, &CSSlider::onLinEditFocusOut);
 
     Q_ASSERT(suc);
+
+    if(QString(title).isEmpty())
+    {
+        titleLabel->setVisible(false);
+    }
 }
 
 CSSlider::~CSSlider()
@@ -174,6 +186,7 @@ void CSSlider::onSliderClicked(int value)
     value = value / step * step;
 
     slider->setValue(value);
+    lineEdit->setText(QString::number(value));
     emit valueChanged(getParaId(), value);
 }
 

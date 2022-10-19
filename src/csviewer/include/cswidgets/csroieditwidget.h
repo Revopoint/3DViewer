@@ -40,51 +40,26 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#include "cswidgets/csswitchbutton.h"
-#include <QLabel>
+#ifndef _CS_CSROIEDITWIDGET_H
+#define _CS_CSROIEDITWIDGET_H
+
+#include <QWidget>
+#include <QVariant>
 #include <QPushButton>
-#include <QHBoxLayout>
 
-CSSwitchButton::CSSwitchButton(int paraId, const char* title , QWidget* parent)
-    : CSParaWidget(paraId, title, parent)
-    , titleLabel(new QLabel(this))
-    , button(new QPushButton(this))
+#include "csparawidget.h"
+
+class CSRoiEditWidget : public CSParaWidget
 {
-    setObjectName("CWSwitchButton");
-    titleLabel->setObjectName("TitleLabel");
+    Q_OBJECT
+public:
+    CSRoiEditWidget(int paraId, const char* name = "", QWidget * parent = nullptr);
+    ~CSRoiEditWidget();
+    void setValue(const QVariant&) override {}
+    void getValue(QVariant&) override {}
+private:
+    QPushButton* fullScreenButton;
+    QPushButton* roiEditButton;
+};
 
-    QHBoxLayout* hLayout = new QHBoxLayout(this);
-    hLayout->setContentsMargins(0,0,20, 0);
-    hLayout->addWidget(titleLabel);
-    hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout->addWidget(button);
-
-    button->setCheckable(true);
-
-    bool suc = true;
-    suc &= (bool)connect(button, &QPushButton::clicked, this, &CSSwitchButton::onButtonToggled);
-
-    Q_ASSERT(suc);
-}
-
-CSSwitchButton::~CSSwitchButton()
-{
-}
-
-void CSSwitchButton::setValue(const QVariant& value)
-{
-    button->setChecked(value.toBool());
-}
-
-void CSSwitchButton::onButtonToggled(bool checked)
-{
-    emit valueChanged(getParaId(), checked);
-}
-
-void CSSwitchButton::retranslate(const char* context)
-{
-    if (strlen(paraName) > 0)
-    {
-        titleLabel->setText(QApplication::translate(context, paraName));
-    }
-}
+#endif //_CS_CSPARATWIDGET_H

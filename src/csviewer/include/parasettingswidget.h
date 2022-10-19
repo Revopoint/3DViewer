@@ -47,6 +47,7 @@
 #include <QMap>
 #include <QList>
 #include <QPair>
+#include <QPushButton>
 #include <memory>
 #include <QVariant>
 
@@ -91,8 +92,10 @@ public slots:
 private slots:
     void onClickDepthButton();
     void onClickRgbButton();
-    void onClickHdrButton();
-    void onClickRoiEditButton(bool checked);
+    void onClickRoiEditButton();
+    void onClickFullScreenButton();
+    void onConfirmRoi();
+
     void onPageChanged(int idx);
     void onSingleShotChanged(bool checked);
     void onClickSingleShot();
@@ -129,6 +132,7 @@ private:
     void addRgbParaWidget(CSParaWidget* widget);
     void addDepthDividLine();
     void addRgbDividLine();
+    void addHdrButtons();
 
     void updateParaRanges();
     void updateParaValues();
@@ -143,11 +147,13 @@ private:
     std::shared_ptr<cs::ICSCamera> cameraPtr;
 
     QMap<int, CSParaWidget*> paraWidgets;
-    HDRSettingsDialog* hdrSettingsDialog;
     CaptureSettingDialog* captureSettingDialog;
 
     QRectF roiRectF;
     QSpacerItem* verticalSpacer = nullptr;
+
+    QPushButton* hdrRefreshButton;
+    QPushButton* hdrConfirmButton;
 };
 
 

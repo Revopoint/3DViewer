@@ -124,7 +124,7 @@
    </widget>
    <widget class="QMenu" name="menuWindows">
     <property name="enabled">
-     <bool>true</bool>
+     <bool>false</bool>
     </property>
     <property name="title">
      <string>Windows</string>

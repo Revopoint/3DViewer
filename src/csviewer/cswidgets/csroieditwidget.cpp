@@ -39,52 +39,32 @@
 *
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
+#include "cswidgets/csroieditwidget.h"
 
-#include "cswidgets/csswitchbutton.h"
-#include <QLabel>
-#include <QPushButton>
 #include <QHBoxLayout>
+#include <QLabel>
+#include <QSpacerItem>
 
-CSSwitchButton::CSSwitchButton(int paraId, const char* title , QWidget* parent)
-    : CSParaWidget(paraId, title, parent)
-    , titleLabel(new QLabel(this))
-    , button(new QPushButton(this))
+CSRoiEditWidget::CSRoiEditWidget(int paraId, const char* name, QWidget * parent)
+    : CSParaWidget(paraId, name, parent)
+    , fullScreenButton(new QPushButton(tr("Full Screen"), this))
+    , roiEditButton(new QPushButton(tr("Edit ROI"), this))
 {
-    setObjectName("CWSwitchButton");
-    titleLabel->setObjectName("TitleLabel");
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 20, 0);
+    layout->setSpacing(10);
 
-    QHBoxLayout* hLayout = new QHBoxLayout(this);
-    hLayout->setContentsMargins(0,0,20, 0);
-    hLayout->addWidget(titleLabel);
-    hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout->addWidget(button);
+    layout->addWidget(new QLabel(name, this));
+    layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
+    layout->addWidget(fullScreenButton);
+    layout->addWidget(roiEditButton);
 
-    button->setCheckable(true);
-
-    bool suc = true;
-    suc &= (bool)connect(button, &QPushButton::clicked, this, &CSSwitchButton::onButtonToggled);
-
-    Q_ASSERT(suc);
+    fullScreenButton->setProperty("isCSStyle", true);
+    roiEditButton->setProperty("isCSStyle", true);
 }
 
-CSSwitchButton::~CSSwitchButton()
+CSRoiEditWidget::~CSRoiEditWidget()
 {
-}
 
-void CSSwitchButton::setValue(const QVariant& value)
-{
-    button->setChecked(value.toBool());
-}
 
-void CSSwitchButton::onButtonToggled(bool checked)
-{
-    emit valueChanged(getParaId(), checked);
-}
-
-void CSSwitchButton::retranslate(const char* context)
-{
-    if (strlen(paraName) > 0)
-    {
-        titleLabel->setText(QApplication::translate(context, paraName));
-    }
 }

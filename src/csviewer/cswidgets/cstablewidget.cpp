@@ -44,6 +44,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QHBoxLayout>
+#include <QScrollBar>
 #include <QTableWidgetItem>
 #include <hpp/Types.hpp>
 
@@ -56,10 +57,10 @@ CSTableWidget::CSTableWidget(int paraId, int cols, QStringList titleLabels, QWid
     , headers(titleLabels)
 {
     setObjectName("CSTableWidget");
-    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 20, 20, 0);
     layout->addWidget(tableWidget);
 
     tableWidget->setColumnCount(cols);
@@ -69,6 +70,13 @@ CSTableWidget::CSTableWidget(int paraId, int cols, QStringList titleLabels, QWid
     tableWidget->setHorizontalHeaderLabels(titleLabels); 
     tableWidget->setFocusPolicy(Qt::NoFocus);
     tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    tableWidget->verticalScrollBar()->setDisabled(true);
+    tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    tableWidget->setVerticalScrollMode(QTableWidget::ScrollPerPixel);
+
+    tableWidget->setFixedHeight(30+20);
 }
 
 CSTableWidget::~CSTableWidget()
@@ -83,6 +91,7 @@ void CSTableWidget::setValue(const QVariant& settings)
 
     tableWidget->clearContents();
     tableWidget->setRowCount(count);
+    tableWidget->setFixedHeight(30 * count + 30);
 
     for (int i = 0; i < count; i++)
     {
