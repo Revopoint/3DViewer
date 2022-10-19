@@ -91,14 +91,23 @@ QMenuBar {
     background: rgb(179, 179, 179);
 }
 
+QMenuBar::item:selected{
+    background: rgb(153, 153, 153);
+}
+
+QMenu::item{
+    background: rgb(179, 179, 179);
+}
+
+QMenu::item:selected{
+    background: rgb(153, 153, 153);
+}
+
 QMenuBar:disabled {
     color: rgb(120, 120, 120);
 }
 
 /* QFrame */
-QFrame {
-    background: transparent;
-}
 
 /* QPushButton */
 QPushButton {
@@ -464,6 +473,7 @@ QTabWidget RenderWidget {
 /* QTableWidget*/
 QTableWidget {
     border: 1px solid rgb(153, 153, 153);
+    background: rgb(204, 204, 204);
 }
 
 QHeaderView::section {
@@ -482,8 +492,8 @@ QTableWidget::item {
     background:rgb(179, 179, 179);
     height: 30px;
     border: 1px solid rgb(153, 153, 153);
-    border-left: none;
-    border-top: none;
+    border-top:none;
+    border-left:none;
 }
 
 QHeaderView::item:last{
@@ -513,4 +523,12 @@ QCheckBox::indicator:unchecked {
 
 QCheckBox::indicator:checked {
     image: url(:/resources/checked.png);
+}
+
+QLabel#captureInfo {
+    color: rgb(0, 169, 255);
+}
+
+QStatusBar {
+    background: rgb(179, 179, 179);
 }

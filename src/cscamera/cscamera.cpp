@@ -1154,6 +1154,10 @@ void CSCamera::getCameraParaItems(CAMERA_PARA_ID paraId, QList<QPair<QString, QV
     case PARA_DEPTH_HDR_LEVEL:
         getHdrLevels(list);
         break;
+    case PARA_DEPTH_GAIN:
+    case PARA_RGB_GAIN:
+        getGains(paraId, list);
+        break;
     default:
         break;
     }
@@ -1391,6 +1395,11 @@ void CSCamera::getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant&
         max = DEPTH_RANGE_LIMIT.max;
         step = 1;
         break;
+    case PROPERTY_EXT_HDR_SCALE_SETTING:
+        min = CAMERA_HDR_LEVEL_RANGE.min;
+        max = CAMERA_HDR_LEVEL_RANGE.max;
+        step = 1;
+        break;
     default:
         break;
     }
@@ -1481,6 +1490,20 @@ void CSCamera::getHdrModes(QList<QPair<QString, QVariant>>& list) const
 void CSCamera::getHdrLevels(QList<QPair<QString, QVariant>>& list) const
 {
     for (int i = CAMERA_HDR_LEVEL_RANGE.min; i <= CAMERA_HDR_LEVEL_RANGE.max; i++)
+    {
+        list.push_back({ QString::number(i), i });
+    }
+}
+
+void CSCamera::getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& list)
+{
+    QVariant min, max, step;
+    getCameraParaRange(paraId, min, max, step);
+
+    int minV = min.toInt();
+    int maxV = max.toInt();
+
+    for (int i = minV; i <= maxV; i++)
     {
         list.push_back({ QString::number(i), i });
     }

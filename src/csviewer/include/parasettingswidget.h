@@ -86,6 +86,7 @@ public slots:
     void onPreviewButtonToggled(bool toggled);
     void onClickedRestartCamera();
     void onClickedDisconnCamera();
+    void onClickedStopStream();
 
     void onClickCaptureSingle();
     void onClickCaptureMultiple();
@@ -154,6 +155,10 @@ private:
 
     QPushButton* hdrRefreshButton;
     QPushButton* hdrConfirmButton;
+    QWidget* hdrButtonArea;
+
+    //TODO
+    bool softTrigger = false;
 };
 
 

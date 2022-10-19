@@ -68,7 +68,7 @@ void RenderWindow::onWindowLayoutUpdated()
     {
         // tabs
         QTabWidget* tabWidget = new QTabWidget(this);
-        tabWidget->setTabBarAutoHide(true);
+        //tabWidget->setTabBarAutoHide(true);
         tabWidget->setAttribute(Qt::WA_StyledBackground, true);
         renderMainWidget = tabWidget;
         initRenderWidgetsTab();
@@ -109,16 +109,20 @@ void RenderWindow::onWindowLayoutUpdated()
     {
         for (auto widget : renderWidgets.values())
         {
-            RenderWidget2D* renderWidget = qobject_cast<RenderWidget2D*>(widget);
-            if (renderWidget)
+
+            if (widget)
             {
                 bool suc = true;
-                suc &= (bool)connect(renderWidget, &RenderWidget2D::renderExit, this, &RenderWindow::renderExit);
-                suc &= (bool)connect(renderWidget, &RenderWidget2D::fullScreenUpdated, this, &RenderWindow::fullScreenUpdated);
+                suc &= (bool)connect(widget, &RenderWidget::renderExit, this, &RenderWindow::renderExit);
+                suc &= (bool)connect(widget, &RenderWidget::fullScreenUpdated, this, &RenderWindow::fullScreenUpdated);
                 Q_ASSERT(suc);
 
-                renderWidget->setEnableScale(false);
-                renderWidget->setShowFullScreen(true);
+                widget->setShowFullScreen(true);
+                RenderWidget2D* renderWidget = qobject_cast<RenderWidget2D*>(widget);
+                if (renderWidget)
+                {
+                    renderWidget->setEnableScale(false);
+                }
             }
         }
     }

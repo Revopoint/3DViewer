@@ -180,7 +180,7 @@ void CaptureSettingDialog::initDialog()
     ui->startCaptureButton->setProperty("isCSStyle", true);
     ui->stopCaptureButton->setProperty("isCSStyle", true);
 
-    ui->frameNumberSlider->setParaRange(minCaptureCount, maxCaptureCount, 10);
+    ui->frameNumberSlider->setParaRange(minCaptureCount, maxCaptureCount, 1);
 
     // default data types
     for (auto type : captureConfig.captureDataTypes)
@@ -235,7 +235,7 @@ void CaptureSettingDialog::initConnections()
 
 void CaptureSettingDialog::onCaptureNumberUpdated(int captured, int dropped)
 {
-    QString msg = QString("captured %1 frames (%2 dropped)").arg(captured).arg(dropped);
+    QString msg = QString("Captured %1 frames (%2 dropped)").arg(captured).arg(dropped);
     ui->captureInfo->setText(msg);
 }
 

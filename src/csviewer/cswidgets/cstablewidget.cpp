@@ -91,7 +91,7 @@ void CSTableWidget::setValue(const QVariant& settings)
 
     tableWidget->clearContents();
     tableWidget->setRowCount(count);
-    tableWidget->setFixedHeight(30 * count + 30);
+    tableWidget->setFixedHeight((30+2 )* (count+1)-1);
 
     for (int i = 0; i < count; i++)
     {

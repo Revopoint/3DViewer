@@ -77,6 +77,7 @@ public slots:
     void onStartStream();
     void onPausedStream();
     void onResumeStream();
+    void onStopStream();
 
     void onCameraStateChanged(int state);
     void onRestartCameraTimeout();

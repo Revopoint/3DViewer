@@ -51,6 +51,15 @@
 #include <QPainter>
 #include <QTime>
 
+static QMap<int, QString> renderTitleMap =
+{
+    {(int)CAMERA_DATA_L, "IR(L)"},
+    {(int)CAMERA_DATA_R, "IR(R)"},
+    {(int)CAMERA_DATA_DEPTH, "Depth"},
+    {(int)CAMERA_DATA_RGB, "RGB"},
+    {(int)CAMERA_DTA_POINT_CLOUD, "Point Cloud"},
+};
+
 RenderWidget2D::RenderWidget2D(int renderId, QWidget* parent)
     : RenderWidget(renderId, parent)
     , scrollArea(new QScrollArea(this))
@@ -96,18 +105,21 @@ void RenderWidget2D::initWidget()
 
     ////top
     topControlArea->setProperty("TopControlArea", true);
-    topControlArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    topControlArea->setFixedHeight(32);
+    topControlArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
     QHBoxLayout* hLayout = new QHBoxLayout(topControlArea);
+
+    titleLabel = new QLabel(renderTitleMap[renderId], topControlArea);
+    hLayout->addWidget(titleLabel);
     hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout->setContentsMargins(0, 10, 10, 0);
+    hLayout->setContentsMargins(15, 10, 15, 10);
     hLayout->setSpacing(10);
 
     hLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLayout->addWidget(fpsLabel);
 
     fpsLabel->setObjectName("fpsLabel");
+    titleLabel->setVisible(false);
 
     updateFps();
 }
@@ -186,6 +198,8 @@ void RenderWidget2D::setShowFullScreen(bool value)
     {
         initButtons();
     }
+
+    titleLabel->setVisible(value);
 }
 
 void RenderWidget2D::initButtons()
@@ -229,7 +243,7 @@ void RenderWidget2D::initButtons()
 
         QHBoxLayout* hLayout = new QHBoxLayout(bottomControlArea);
         hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-        hLayout->setContentsMargins(0, 0, 10, 0);
+        hLayout->setContentsMargins(0, 0, 15, 10);
         hLayout->setSpacing(10);
 
         hLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));

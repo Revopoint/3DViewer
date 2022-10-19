@@ -74,8 +74,13 @@ public:
     { 
         return renderId; 
     }
+    virtual void setShowFullScreen(bool value) {}
+signals:
+    void renderExit(int renderId);
+    void fullScreenUpdated(int renderID, bool value);
 protected:
     int renderId;
+    bool showFullScreen = false;
 };
 
 
@@ -87,7 +92,6 @@ public:
     ~RenderWidget2D();
     void setWHRatio(float ratio);
    
-    void setShowFullScreen(bool value);
     void setEnableScale(bool enable);
 
     void resizeEvent(QResizeEvent* event) override;
@@ -95,6 +99,7 @@ public:
     void keyPressEvent(QKeyEvent* event);
     void keyReleaseEvent(QKeyEvent* event);
 
+    void setShowFullScreen(bool value) override;
     void onTranslate();
 public slots:
     void onRenderDataUpdated(OutputData2D outputData);
@@ -108,9 +113,6 @@ protected:
 private:
     void onClickExitButton();
     void onClickFullScreen(bool checked);
-signals:
-    void renderExit(int renderId);
-    void fullScreenUpdated(int renderID, bool value);
 protected:
     QScrollArea* scrollArea;
     QWidget* centerWidget;
@@ -123,6 +125,7 @@ protected:
 
     QPushButton* exitButton = nullptr;
     QPushButton* fullScreenBtn = nullptr;
+    QLabel* titleLabel = nullptr;
 
     float ratioWH = 1.6f;
     QPainter painter;
@@ -138,7 +141,6 @@ protected:
     float imageAreaScaleMax = 10;
     float imageScaleStep = 0.1;
 
-    bool showFullScreen = false;
     bool holdCtrl = false;
 
     QImage cachedImage;
@@ -155,6 +157,7 @@ public:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
+
 public slots:
     void onRoiEditStateChanged(bool edit);
     void onShowCoordChanged(bool show);
@@ -179,6 +182,7 @@ public:
 
     void onTranslate();
     void setTextureEnable(bool enable);
+    void setShowFullScreen(bool value) override;
 public slots:
     void onRenderDataUpdated(cs::Pointcloud& pointCloud, const QImage& image);
 protected slots:
@@ -204,7 +208,12 @@ private:
 
     QPushButton* homeButton;
     QPushButton* textureButton;
-    QWidget* buttonArea;
+    QPushButton* exitButton;
+    QPushButton* fullScreenBtn;
+
+    QLabel* titlLabel;
+    QWidget* topItem;
+    QWidget* bottomItem;
 
     bool isReady = false;
 };

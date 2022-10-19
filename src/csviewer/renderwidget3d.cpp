@@ -125,7 +125,9 @@ RenderWidget3D::RenderWidget3D(int renderId, QWidget* parent)
     , osgQOpenGLWidgetPtr(new osgQOpenGLWidget(this))
     , homeButton(new QPushButton(this))
     , textureButton(new QPushButton(this))
-    , buttonArea(new QWidget(this))
+    , topItem(new QWidget(this))
+    , bottomItem(new QWidget(this))
+    , exitButton(new QPushButton(this))
 {
     QHBoxLayout* pLayout = new QHBoxLayout(this);
     pLayout->setMargin(2);
@@ -372,26 +374,25 @@ void RenderWidget3D::initNode()
 
 void RenderWidget3D::updateButtonArea()
 {
-    const int offset = 12;
-    const int x = width() - offset - buttonArea->width();
-    const int y = offset;
-
-    buttonArea->setGeometry(x, y, buttonArea->width(), buttonArea->height());
+    topItem->setGeometry(0, 0, width(), topItem->height());
+    bottomItem->setGeometry(0, height()- bottomItem->height(), width(), bottomItem->height());
 }
 
 void RenderWidget3D::initButtons()
 {
-    buttonArea->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
-    buttonArea->resize(80, 40);
+    topItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    bottomItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    topItem->setFixedHeight(48);
+    bottomItem->setFixedHeight(48);
 
     homeButton->setObjectName("homeButton");
-    homeButton->setIconSize(QSize(36, 36));
+    homeButton->setIconSize(QSize(28, 28));
     homeButton->setIcon(QIcon(":/resources/home.png"));
     homeButton->setToolTip(tr("Home"));
 
     textureButton->setCheckable(true);
     textureButton->setObjectName("textureButton");
-    textureButton->setIconSize(QSize(32, 32));
+    textureButton->setIconSize(QSize(28, 28));
     textureButton->setToolTip(tr("Texture on"));
 
     QIcon icon1;
@@ -400,10 +401,23 @@ void RenderWidget3D::initButtons()
     icon1.addFile(QStringLiteral(":/resources/texture_on.png"), QSize(), QIcon::Selected, QIcon::On);
     textureButton->setIcon(icon1);
 
-    QHBoxLayout* layout = new QHBoxLayout(buttonArea);
+    exitButton->setIconSize(QSize(22, 22));
+    exitButton->setIcon(QIcon(":/resources/fork_large.png"));
+
+    connect(exitButton, &QPushButton::clicked, this, [=]() {
+            emit renderExit(renderId);
+        });
+
+    QHBoxLayout* layout = new QHBoxLayout(topItem);
+
+    titlLabel = new QLabel("Point Cloud", topItem);
+    layout->addWidget(titlLabel);
+    layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
     layout->addWidget(textureButton);
     layout->addWidget(homeButton);
-    layout->setMargin(0);
+    layout->addWidget(exitButton);
+
+    layout->setContentsMargins(15, 10, 15, 10);
 
     connect(textureButton, &QPushButton::toggled, [=](bool toggled)
         {
@@ -418,6 +432,32 @@ void RenderWidget3D::initButtons()
 
             emit show3DTextureChanged(toggled);
         });
+
+    layout = new QHBoxLayout(bottomItem);
+    layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
+    layout->setContentsMargins(0, 0, 15, 10);
+
+    fullScreenBtn = new QPushButton(bottomItem);
+    fullScreenBtn->setObjectName("FullScreenButton");
+    fullScreenBtn->setCheckable(true);
+
+    connect(fullScreenBtn, &QPushButton::toggled, this, [=](bool checked) {
+            emit fullScreenUpdated(renderId, checked);
+        });
+
+    QIcon icon2;
+    icon2.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon2.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Active, QIcon::On);
+    icon2.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Selected, QIcon::On);
+
+    fullScreenBtn->setIconSize(QSize(22, 22));
+    fullScreenBtn->setIcon(icon2);
+
+    layout->addWidget(fullScreenBtn);
+
+    fullScreenBtn->setVisible(false);
+    titlLabel->setVisible(false);
+    exitButton->setVisible(false);
 }
 
 void RenderWidget3D::onTranslate()
@@ -437,6 +477,13 @@ void RenderWidget3D::onTranslate()
 void RenderWidget3D::setTextureEnable(bool enable)
 {
     textureButton->setEnabled(enable);
+}
+
+void RenderWidget3D::setShowFullScreen(bool value)
+{
+    fullScreenBtn->setVisible(value);
+    titlLabel->setVisible(value);
+    exitButton->setVisible(value);
 }
 
 osg::ref_ptr<osg::MatrixTransform> RenderWidget3D::makeCoordinate()

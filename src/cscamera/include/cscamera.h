@@ -114,6 +114,7 @@ private:
     void getFilterTypes(QList<QPair<QString, QVariant>>&) const;
     void getHdrModes(QList<QPair<QString, QVariant>>&) const;
     void getHdrLevels(QList<QPair<QString, QVariant>>&) const;
+    void getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>&);
 
     void setDepthFormat(STREAM_FORMAT format);
     void setDepthResolution(QSize res);

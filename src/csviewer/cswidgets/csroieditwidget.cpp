@@ -61,6 +61,11 @@ CSRoiEditWidget::CSRoiEditWidget(int paraId, const char* name, QWidget * parent)
 
     fullScreenButton->setProperty("isCSStyle", true);
     roiEditButton->setProperty("isCSStyle", true);
+
+    bool suc = true;
+    suc = (bool)connect(fullScreenButton, &QPushButton::clicked, this, &CSRoiEditWidget::clickedFullScreen);
+    suc = (bool)connect(roiEditButton,    &QPushButton::clicked, this, &CSRoiEditWidget::clickedEditRoi);
+    Q_ASSERT(suc);
 }
 
 CSRoiEditWidget::~CSRoiEditWidget()

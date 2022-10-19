@@ -135,7 +135,7 @@ void CSListItem::setSelected(bool select)
 {
     isSelected = select;
     iconLabel->setVisible(isSelected);
-    if (listWidgetItem->isSelected())
+    if (isSelected)
     {
         actionLabel->setText(actionOnText);
     }

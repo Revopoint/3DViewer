@@ -57,6 +57,9 @@ public:
     ~CSRoiEditWidget();
     void setValue(const QVariant&) override {}
     void getValue(QVariant&) override {}
+signals:
+    void clickedFullScreen();
+    void clickedEditRoi();
 private:
     QPushButton* fullScreenButton;
     QPushButton* roiEditButton;

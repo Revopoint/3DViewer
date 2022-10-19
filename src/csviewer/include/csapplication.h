@@ -85,6 +85,7 @@ signals:
     void startStream();
     void pausedStream();
     void resumeStream();
+    void stopStream();
     void queryCameras();
 
     void cameraStateChanged(int state);

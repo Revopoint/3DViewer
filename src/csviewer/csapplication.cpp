@@ -140,6 +140,7 @@ void CSApplication::initConnections()
     suc &= (bool)connect(this,  &CSApplication::disconnectCamera,   cameraThread.get(),  &CameraThread::onDisconnectCamera);
     suc &= (bool)connect(this,  &CSApplication::restartCamera,      cameraThread.get(),  &CameraThread::onRestartCamera);
     suc &= (bool)connect(this,  &CSApplication::startStream,        cameraThread.get(),  &CameraThread::onStartStream);
+    suc &= (bool)connect(this,  &CSApplication::stopStream,         cameraThread.get(),  &CameraThread::onStopStream);
     suc &= (bool)connect(this,  &CSApplication::pausedStream,       cameraThread.get(),  &CameraThread::onPausedStream);
     suc &= (bool)connect(this,  &CSApplication::resumeStream,       cameraThread.get(),  &CameraThread::onResumeStream);
     suc &= (bool)connect(this,  &CSApplication::queryCameras,       cameraThread.get(),  &CameraThread::onQueryCameras);
