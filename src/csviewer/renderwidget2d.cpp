@@ -223,9 +223,9 @@ void RenderWidget2D::initButtons()
         connect(fullScreenBtn, &QPushButton::toggled, this, &RenderWidget2D::onClickFullScreen);
 
         QIcon icon1;
-        icon1.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Normal, QIcon::Off);
-        icon1.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Active, QIcon::On);
-        icon1.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Selected, QIcon::On);
+        icon1.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Normal, QIcon::Off);
+        icon1.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Active, QIcon::On);
+        icon1.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Selected, QIcon::On);
 
         fullScreenBtn->setIconSize(QSize(22, 22));
         fullScreenBtn->setIcon(icon1);

@@ -248,44 +248,44 @@
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="148"/>
-        <location filename="../parasettingswidget.cpp" line="176"/>
+        <location filename="../parasettingswidget.cpp" line="181"/>
         <source>Number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="148"/>
-        <location filename="../parasettingswidget.cpp" line="176"/>
+        <location filename="../parasettingswidget.cpp" line="181"/>
         <source>Exposure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="119"/>
         <location filename="../parasettingswidget.cpp" line="148"/>
-        <location filename="../parasettingswidget.cpp" line="176"/>
-        <location filename="../parasettingswidget.cpp" line="201"/>
+        <location filename="../parasettingswidget.cpp" line="181"/>
+        <location filename="../parasettingswidget.cpp" line="206"/>
         <source>Gain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="737"/>
-        <location filename="../parasettingswidget.cpp" line="745"/>
+        <location filename="../parasettingswidget.cpp" line="772"/>
+        <location filename="../parasettingswidget.cpp" line="780"/>
         <source>Start preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="785"/>
+        <location filename="../parasettingswidget.cpp" line="830"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="103"/>
-        <location filename="../parasettingswidget.cpp" line="190"/>
+        <location filename="../parasettingswidget.cpp" line="195"/>
         <source>Stream Format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="105"/>
-        <location filename="../parasettingswidget.cpp" line="192"/>
+        <location filename="../parasettingswidget.cpp" line="197"/>
         <source>Resolution</source>
         <translation type="unfinished"></translation>
     </message>
@@ -296,13 +296,13 @@
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="117"/>
-        <location filename="../parasettingswidget.cpp" line="199"/>
+        <location filename="../parasettingswidget.cpp" line="204"/>
         <source>Exposure Time(us)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="115"/>
-        <location filename="../parasettingswidget.cpp" line="197"/>
+        <location filename="../parasettingswidget.cpp" line="202"/>
         <source>Auto Exposure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -328,53 +328,58 @@
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="146"/>
-        <location filename="../parasettingswidget.cpp" line="174"/>
+        <location filename="../parasettingswidget.cpp" line="179"/>
         <source>HDR Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="147"/>
-        <location filename="../parasettingswidget.cpp" line="175"/>
+        <location filename="../parasettingswidget.cpp" line="180"/>
         <source>HDR Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="160"/>
+        <location filename="../parasettingswidget.cpp" line="163"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="206"/>
+        <location filename="../parasettingswidget.cpp" line="211"/>
         <source>Auto White Balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="208"/>
+        <location filename="../parasettingswidget.cpp" line="213"/>
         <source>White Balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="370"/>
+        <location filename="../parasettingswidget.cpp" line="376"/>
+        <source>Entered single shot mode! You can click the button to get the next frame.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="386"/>
         <source>Use the mouse to select the ROI area in the depth image, and then click the &quot;Confirm&quot; button</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="738"/>
+        <location filename="../parasettingswidget.cpp" line="773"/>
         <source>Capture single frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="739"/>
+        <location filename="../parasettingswidget.cpp" line="774"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="740"/>
+        <location filename="../parasettingswidget.cpp" line="775"/>
         <source>Single Shot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="745"/>
+        <location filename="../parasettingswidget.cpp" line="780"/>
         <source>Pause preview</source>
         <translation type="unfinished"></translation>
     </message>
@@ -494,21 +499,21 @@
 <context>
     <name>RenderWidget3D</name>
     <message>
-        <location filename="../renderwidget3d.cpp" line="390"/>
-        <location filename="../renderwidget3d.cpp" line="434"/>
+        <location filename="../renderwidget3d.cpp" line="391"/>
+        <location filename="../renderwidget3d.cpp" line="474"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="395"/>
-        <location filename="../renderwidget3d.cpp" line="416"/>
-        <location filename="../renderwidget3d.cpp" line="431"/>
+        <location filename="../renderwidget3d.cpp" line="396"/>
+        <location filename="../renderwidget3d.cpp" line="430"/>
+        <location filename="../renderwidget3d.cpp" line="471"/>
         <source>Texture on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="412"/>
-        <location filename="../renderwidget3d.cpp" line="427"/>
+        <location filename="../renderwidget3d.cpp" line="426"/>
+        <location filename="../renderwidget3d.cpp" line="467"/>
         <source>Texture off</source>
         <translation type="unfinished"></translation>
     </message>

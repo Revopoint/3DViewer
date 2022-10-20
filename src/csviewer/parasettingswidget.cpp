@@ -372,6 +372,8 @@ void ParaSettingsWidget::onClickSingleShot()
 
         softTrigger = true;
         ui->previewButton->setChecked(false);
+
+        emit showMessage(tr("Entered single shot mode! You can click the button to get the next frame."), 5000);
     }
     else
     {

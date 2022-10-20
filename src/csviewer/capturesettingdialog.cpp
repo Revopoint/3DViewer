@@ -220,7 +220,7 @@ void CaptureSettingDialog::initConnections()
 
     for (auto checkBox : dataTypeCheckBoxs)
     {
-        suc &= (bool)connect(ui->rgbCheckBox, &QCheckBox::toggled, this, &CaptureSettingDialog::onDataTypeChanged);
+        suc &= (bool)connect(checkBox, &QCheckBox::toggled, this, &CaptureSettingDialog::onDataTypeChanged);
     }
 
     suc &= (bool)connect(ui->saveFormatComboBox,  QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CaptureSettingDialog::onSaveFormatChanged);

@@ -113,7 +113,7 @@ QString OutputSaver::getSavePath(CS_CAMERA_DATA_TYPE dataType)
         fileName += suffix2D;
         break;
     case CAMERA_DTA_POINT_CLOUD:
-        fileName = (pointCloudIndex < 0) ? QString("%1.ply").arg(fileName) : QString("%1-%2").arg(fileName).arg(pointCloudIndex, 4, 10, QChar('0'));
+        fileName = (pointCloudIndex < 0) ? QString("%1.ply").arg(fileName) : QString("%1-%2.ply").arg(fileName).arg(pointCloudIndex, 4, 10, QChar('0'));
         break;
     default:
         break;

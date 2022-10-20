@@ -446,9 +446,9 @@ void RenderWidget3D::initButtons()
         });
 
     QIcon icon2;
-    icon2.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Normal, QIcon::Off);
-    icon2.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Active, QIcon::On);
-    icon2.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Selected, QIcon::On);
+    icon2.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon2.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Active, QIcon::On);
+    icon2.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Selected, QIcon::On);
 
     fullScreenBtn->setIconSize(QSize(22, 22));
     fullScreenBtn->setIcon(icon2);
