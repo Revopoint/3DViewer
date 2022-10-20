@@ -52,6 +52,12 @@
    </item>
    <item>
     <widget class="QWidget" name="cameraButtonArea" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
        <number>0</number>
@@ -108,7 +114,7 @@
         <x>0</x>
         <y>0</y>
         <width>460</width>
-        <height>554</height>
+        <height>565</height>
        </rect>
       </property>
       <property name="sizePolicy">

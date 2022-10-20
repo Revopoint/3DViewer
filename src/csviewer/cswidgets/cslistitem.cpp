@@ -43,10 +43,14 @@
 #include "cslistitem.h"
 
 #include <QHBoxLayout>
+#include <QApplication> 
 
-CSListItem::CSListItem(const QIcon& icon, const QString& text, QListWidget* view)
+CSListItem::CSListItem(const QIcon& icon, const QString& text, const char* onText, const char* offText, const char* context,QListWidget* view)
     : QWidget(view)
     , listWidgetItem(new QListWidgetItem)
+    , actionOnText(onText)
+    , actionOffText(offText)
+    , context(context)
 {
     setAttribute(Qt::WA_StyledBackground);
     setObjectName("CSListItem");
@@ -87,23 +91,17 @@ QListWidgetItem* CSListItem::getListWidgetItem() const
     return listWidgetItem;
 }
 
-void CSListItem::setActionText(const QString& text, bool on)
-{
-    if (on)
-    {
-        actionOnText = text;
-    }
-    else 
-    {
-        actionOffText = text;
-    }
-
-    setSelected(isSelected);
-}
-
 void CSListItem::enterEvent(QEvent* event)
 {
     actionLabel->setVisible(true);
+    if (isSelected)
+    {
+        actionLabel->setText(getTranslate(actionOnText));
+    }
+    else
+    {
+        actionLabel->setText(getTranslate(actionOffText));
+    }
 
     textLabel->setStyleSheet("color:rgb(0, 164, 255)");
     actionLabel->setStyleSheet("color:rgb(0, 164, 255)");
@@ -137,15 +135,20 @@ void CSListItem::setSelected(bool select)
     iconLabel->setVisible(isSelected);
     if (isSelected)
     {
-        actionLabel->setText(actionOnText);
+        actionLabel->setText(getTranslate(actionOnText));
     }
     else
     {
-        actionLabel->setText(actionOffText);
+        actionLabel->setText(getTranslate(actionOffText));
     }
 }
 
 QString CSListItem::getText() const
 {
     return textLabel->text();
+}
+
+QString CSListItem::getTranslate(const char* text)
+{
+    return QApplication::translate(context, text);
 }

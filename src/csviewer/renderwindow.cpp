@@ -59,7 +59,7 @@ void RenderWindow::onWindowLayoutUpdated()
 
     initRenderWidgets();
 
-    if (layoutMode == LAYOUT_TITLE)
+    if (layoutMode == LAYOUT_TILE)
     {
         renderMainWidget = new QWidget(this);
         initRenderWidgetsTitle();
@@ -105,7 +105,7 @@ void RenderWindow::onWindowLayoutUpdated()
         render->setWHRatio(res.width() * 1.0 / res.height());
     }
 
-    if (layoutMode == LAYOUT_TITLE)
+    if (layoutMode == LAYOUT_TILE)
     {
         for (auto widget : renderWidgets.values())
         {

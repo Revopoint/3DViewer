@@ -179,7 +179,7 @@ void CameraCaptureBase::run()
 
     qInfo("captured %d frames (%d dropped), spend time : %d ms", capturedDataCount, skipDataCount, timeMs);
 
-    QString msg = QString("End capture, captured %1 frames (%2 dropped)").arg(capturedDataCount).arg(skipDataCount);
+    QString msg = QString(tr("End capture, captured %1 frames (%2 dropped)")).arg(capturedDataCount).arg(skipDataCount);
     emit captureStateChanged(CAPTURE_FINISHED, msg);
 }
 

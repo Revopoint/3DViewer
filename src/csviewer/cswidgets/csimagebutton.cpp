@@ -44,23 +44,33 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QApplication>
 
-CSTextImageButton::CSTextImageButton(const QIcon& icon, const QString& text, Qt::LayoutDirection layoutDirection, QWidget* parent)
+CSTextImageButton::CSTextImageButton(const QIcon& icon, const char* text, Qt::LayoutDirection layoutDirection, QWidget* parent)
     : QPushButton(parent)
     , layoutDirection(layoutDirection)
     , icon(icon)
+    , buttonTitle(text)
 {
     setCheckable(true);
-    initButton(text);
+    initButton();
 }
 
-void CSTextImageButton::initButton(const QString& text)
+void CSTextImageButton::retranslate(const char* context)
+{
+    if (strlen(buttonTitle) > 0)
+    {
+        buttonText->setText(QApplication::translate(context, buttonTitle));
+    }
+}
+
+void CSTextImageButton::initButton()
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    buttonText = new QLabel(text, this);
+    buttonText = new QLabel(tr(buttonTitle), this);
     buttonIcon = new QLabel(this);
 
     auto size = icon.availableSizes().first();

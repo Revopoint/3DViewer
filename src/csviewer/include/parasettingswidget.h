@@ -61,6 +61,7 @@ QT_END_NAMESPACE
 class HDRSettingsDialog;
 class CaptureSettingDialog;
 class QSpacerItem;
+class CSTextImageButton;
 class ParaSettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -156,6 +157,8 @@ private:
     QPushButton* hdrRefreshButton;
     QPushButton* hdrConfirmButton;
     QWidget* hdrButtonArea;
+
+    CSTextImageButton* topItemButton;
 
     //TODO
     bool softTrigger = false;

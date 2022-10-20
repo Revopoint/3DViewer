@@ -77,7 +77,7 @@ private:
     void initRenderWidgets();
     void initGridLayout();
 private:
-    WINDOWLAYOUT_MODE layoutMode = LAYOUT_TITLE;// LAYOUT_TITLE;
+    WINDOWLAYOUT_MODE layoutMode = LAYOUT_TILE;// LAYOUT_TITLE;
     QVector<int> displayWindows;
 
     QMap<int, RenderWidget*> renderWidgets;

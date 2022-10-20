@@ -5,11 +5,12 @@
     <name>CameraListWidget</name>
     <message>
         <location filename="../cameralist.ui"/>
+        <location filename="../cameralistwidget.cpp" line="232"/>
         <source>Camera List</source>
         <translation type="unfinished">Camera List</translation>
     </message>
     <message>
-        <location filename="../cameralistwidget.cpp" line="144"/>
+        <location filename="../cameralistwidget.cpp" line="145"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
@@ -75,7 +76,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="156"/>
         <location filename="../viewerwindow.cpp" line="337"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
@@ -83,6 +83,12 @@
     <message>
         <source>Camera List</source>
         <translation type="obsolete">Camera List</translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.cpp" line="156"/>
+        <location filename="../viewerwindow.cpp" line="391"/>
+        <source>Set default save path </source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../viewerwindow.cpp" line="225"/>
@@ -155,7 +161,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="393"/>
+        <location filename="../viewerwindow.cpp" line="397"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -211,7 +217,7 @@
     </message>
     <message>
         <location filename="../viewerwindow.ui"/>
-        <source>Title</source>
+        <source>Tile</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -267,13 +273,13 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="772"/>
-        <location filename="../parasettingswidget.cpp" line="780"/>
+        <location filename="../parasettingswidget.cpp" line="773"/>
+        <location filename="../parasettingswidget.cpp" line="784"/>
         <source>Start preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="830"/>
+        <location filename="../parasettingswidget.cpp" line="834"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -317,6 +323,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../parasettingswidget.cpp" line="131"/>
+        <source>Filter Level</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../parasettingswidget.cpp" line="136"/>
         <source>Fill Hole</source>
         <translation type="unfinished"></translation>
@@ -354,6 +365,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../parasettingswidget.cpp" line="296"/>
+        <source>Parameter Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../parasettingswidget.cpp" line="376"/>
         <source>Entered single shot mode! You can click the button to get the next frame.</source>
         <translation type="unfinished"></translation>
@@ -364,22 +380,27 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="773"/>
+        <location filename="../parasettingswidget.cpp" line="774"/>
         <source>Capture single frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="774"/>
+        <location filename="../parasettingswidget.cpp" line="775"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="775"/>
+        <location filename="../parasettingswidget.cpp" line="776"/>
         <source>Single Shot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="780"/>
+        <location filename="../parasettingswidget.cpp" line="777"/>
+        <source>Stop preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="784"/>
         <source>Pause preview</source>
         <translation type="unfinished"></translation>
     </message>
@@ -530,6 +551,11 @@
         <source>save frame data is empty</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="182"/>
+        <source>End capture, captured %1 frames (%2 dropped)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>cs::CameraCaptureMutiple</name>
@@ -597,6 +623,11 @@
     <message>
         <location filename="../capturesettingdialog.cpp" line="105"/>
         <source>Capture frame data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../capturesettingdialog.cpp" line="238"/>
+        <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

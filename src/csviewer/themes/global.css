@@ -82,8 +82,13 @@ QWidget#bottomControlArea {
     background: rgb(204, 204, 204);
 }
 
-QWidget#CaptureSettingWidget, QWidget#CameraInfoWidget{
-    background:rgb(204, 204, 204);
+QWidget#cameraButtonArea {
+    background: rgb(204, 204, 204);
+    border-top: 1px solid rgb(102,102,102);
+}
+
+QWidget#CaptureSettingWidget, QWidget#CameraInfoWidget {
+    background: rgb(204, 204, 204);
 }
 
 /* QMenuBar */
@@ -118,7 +123,8 @@ QPushButton[isCameraButton] {
     height: 52px;
     background: rgb(179, 179, 179);
     border: 1px solid rgb(102, 102, 102);
-    border-top:none;
+    border-top: none;
+    font-size: 16px;
 }
 
 QPushButton[isCameraButton]:checked {

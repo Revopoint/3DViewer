@@ -38,7 +38,7 @@
         <height>0</height>
        </size>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,3">
        <property name="spacing">
         <number>6</number>
        </property>
@@ -123,9 +123,9 @@
     <property name="title">
      <string>Windows</string>
     </property>
-    <widget class="CSMenu" name="menuTitle">
+    <widget class="CSMenu" name="menuTile">
      <property name="title">
-      <string>Title</string>
+      <string>Tile</string>
      </property>
     </widget>
     <widget class="CSMenu" name="menuTabs">
@@ -133,7 +133,7 @@
       <string>Tabs</string>
      </property>
     </widget>
-    <addaction name="menuTitle"/>
+    <addaction name="menuTile"/>
     <addaction name="menuTabs"/>
    </widget>
    <addaction name="menuFile"/>

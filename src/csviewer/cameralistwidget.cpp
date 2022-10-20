@@ -65,6 +65,8 @@ CameraListWidget::CameraListWidget(QWidget* parent)
     ui->setupUi(this);
     iniWidget();
     initConnections();
+
+    setObjectName("CameraListWidget");
 }
 
 CameraListWidget::~CameraListWidget()
@@ -140,10 +142,7 @@ void CameraListWidget::onCameraListUpdated(const QStringList infoList)
 void  CameraListWidget::addListWidgetItem(const QString& text)
 {
     QIcon icon = QIcon(":/resources/tick.png");
-    CSListItem* item = new CSListItem(icon, text, ui->cameraListWidget);
-    item->setActionText(tr("Disconnect"), true);
-    item->setActionText(tr("Connect"), false);
-
+    CSListItem* item = new CSListItem(icon, text, QT_TR_NOOP("Disconnect"), QT_TR_NOOP("Connect"),  "CameraListWidget", ui->cameraListWidget);
     ui->cameraListWidget->addItem(item->getListWidgetItem());
     ui->cameraListWidget->setItemWidget(item->getListWidgetItem(), item);
 
@@ -220,6 +219,7 @@ void CameraListWidget::iniWidget()
 void CameraListWidget::onTranslate()
 {
     ui->retranslateUi(this);
+    topItemButton->retranslate("CameraListWidget");
 }
 
 void CameraListWidget::initTopButton()
@@ -229,15 +229,15 @@ void CameraListWidget::initTopButton()
 
     icon.addFile(QStringLiteral(":/resources/double_arrow_down.png"), size, QIcon::Normal, QIcon::Off);
     icon.addFile(QStringLiteral(":/resources/double_arrow_left.png"), size, QIcon::Selected, QIcon::On);
-    CSTextImageButton* topButton = new CSTextImageButton(icon, "Camera List", Qt::LeftToRight, ui->topItem);
+    topItemButton = new CSTextImageButton(icon, QT_TR_NOOP("Camera List"), Qt::LeftToRight, ui->topItem);
 
     auto* layout = ui->topItem->layout();
     if (layout)
     {
-        layout->addWidget(topButton);
+        layout->addWidget(topItemButton);
     }
 
-    connect(topButton, &CSTextImageButton::toggled, [=](bool checked)
+    connect(topItemButton, &CSTextImageButton::toggled, [=](bool checked)
         {
             if (checked)
             {

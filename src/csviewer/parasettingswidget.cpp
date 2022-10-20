@@ -128,7 +128,7 @@ void ParaSettingsWidget::initDepthPara()
     // filter type
     addDepthParaWidget(new CSComboBox(PARA_DEPTH_FILTER_TYPE, QT_TR_NOOP("Filter Type")));
     // filter
-    addDepthParaWidget(new CSSlider(PARA_DEPTH_FILTER, "Filter Level", this));
+    addDepthParaWidget(new CSSlider(PARA_DEPTH_FILTER, QT_TR_NOOP("Filter Level"), this));
     // line
     addDepthDividLine();
 
@@ -257,7 +257,7 @@ void ParaSettingsWidget::initWidget()
     initDepthPara();
     initRgbPara();
 
-    ui->depthCameraButton->animateClick();
+    ui->depthCameraButton->setChecked(true);
 }
 
 void ParaSettingsWidget::initConnections()
@@ -293,15 +293,15 @@ void ParaSettingsWidget::initTopButton()
 
     icon.addFile(QStringLiteral(":/resources/double_arrow_down.png"), size, QIcon::Normal, QIcon::Off);
     icon.addFile(QStringLiteral(":/resources/double_arrow_left.png"), size, QIcon::Selected, QIcon::On);
-    CSTextImageButton* topButton = new CSTextImageButton(icon, "Parameter Settings", Qt::LeftToRight, ui->cameraTopItem);
+    topItemButton = new CSTextImageButton(icon, QT_TR_NOOP("Parameter Settings"), Qt::LeftToRight, ui->cameraTopItem);
 
     auto* layout = ui->cameraTopItem->layout();
     if (layout)
     {
-        layout->addWidget(topButton);
+        layout->addWidget(topItemButton);
     }
 
-    connect(topButton, &CSTextImageButton::toggled, [=](bool checked)
+    connect(topItemButton, &CSTextImageButton::toggled, [=](bool checked)
         {
             if (checked)
             {
@@ -768,11 +768,15 @@ void ParaSettingsWidget::onTranslate()
         }
     }
 
+    topItemButton->retranslate("ParaSettingsWidget");
     // control button
     ui->previewButton->setToolTip(tr("Start preview"));
     ui->captureSingleButton->setToolTip(tr("Capture single frame"));
     ui->captureMultipleButton->setToolTip(tr("Capture multiple frames"));
     ui->singleShotButton->setToolTip(tr("Single Shot"));
+    ui->stopPreviewButton->setToolTip(tr("Stop preview"));
+
+    captureSettingDialog->onTranslate();
 }
 
 void ParaSettingsWidget::onPreviewButtonToggled(bool toggled)

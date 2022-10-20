@@ -5,6 +5,7 @@
     <name>CameraListWidget</name>
     <message>
         <location filename="../cameralist.ui"/>
+        <location filename="../cameralistwidget.cpp" line="232"/>
         <source>Camera List</source>
         <translation type="unfinished">相机列表</translation>
     </message>
@@ -13,9 +14,9 @@
         <translation type="obsolete">关闭</translation>
     </message>
     <message>
-        <location filename="../cameralistwidget.cpp" line="144"/>
+        <location filename="../cameralistwidget.cpp" line="145"/>
         <source>Disconnect</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">断开相机</translation>
     </message>
     <message>
         <location filename="../cameralistwidget.cpp" line="145"/>
@@ -111,14 +112,19 @@
         <translation type="obsolete">重启相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="156"/>
         <location filename="../viewerwindow.cpp" line="337"/>
         <source>Set default save path (</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
         <source>Camera List</source>
         <translation type="obsolete">相机列表</translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.cpp" line="156"/>
+        <location filename="../viewerwindow.cpp" line="391"/>
+        <source>Set default save path </source>
+        <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
         <location filename="../viewerwindow.cpp" line="225"/>
@@ -188,14 +194,14 @@
     <message>
         <location filename="../viewerwindow.cpp" line="331"/>
         <source>Set default save path</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
         <source>Save Point Cloud</source>
         <translation type="obsolete">保存点云</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="393"/>
+        <location filename="../viewerwindow.cpp" line="397"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished">当前相机已经断开</translation>
     </message>
@@ -254,17 +260,21 @@
     <message>
         <location filename="../viewerwindow.ui"/>
         <source>Windows</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">窗口</translation>
     </message>
     <message>
         <location filename="../viewerwindow.ui"/>
         <source>Tabs</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">选项卡</translation>
+    </message>
+    <message>
+        <source>Title</source>
+        <translation type="obsolete">平铺</translation>
     </message>
     <message>
         <location filename="../viewerwindow.ui"/>
-        <source>Title</source>
-        <translation type="unfinished"></translation>
+        <source>Tile</source>
+        <translation type="unfinished">平铺</translation>
     </message>
 </context>
 <context>
@@ -358,45 +368,50 @@
         <location filename="../parasettingswidget.cpp" line="103"/>
         <location filename="../parasettingswidget.cpp" line="195"/>
         <source>Stream Format</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">格式</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="105"/>
         <location filename="../parasettingswidget.cpp" line="197"/>
         <source>Resolution</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">分辨率</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="110"/>
         <source>Depth Range(mm)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">深度范围</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="117"/>
         <location filename="../parasettingswidget.cpp" line="204"/>
         <source>Exposure Time(us)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">曝光时间(us)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="115"/>
         <location filename="../parasettingswidget.cpp" line="202"/>
         <source>Auto Exposure</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">自动曝光</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="124"/>
         <source>Threshold(Gray Level)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">阈值(Gray Level)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="129"/>
         <source>Filter Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">过滤器类型</translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="131"/>
+        <source>Filter Level</source>
+        <translation type="unfinished">过滤器等级</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="136"/>
         <source>Fill Hole</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">补洞</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="141"/>
@@ -407,13 +422,13 @@
         <location filename="../parasettingswidget.cpp" line="146"/>
         <location filename="../parasettingswidget.cpp" line="179"/>
         <source>HDR Mode</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HDR模式</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="147"/>
         <location filename="../parasettingswidget.cpp" line="180"/>
         <source>HDR Level</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">HDR等级</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="163"/>
@@ -423,17 +438,22 @@
     <message>
         <location filename="../parasettingswidget.cpp" line="211"/>
         <source>Auto White Balance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">自动白平衡</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="213"/>
         <source>White Balance</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">白平衡</translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="296"/>
+        <source>Parameter Settings</source>
+        <translation type="unfinished">参数设置</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="376"/>
         <source>Entered single shot mode! You can click the button to get the next frame.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">已经进入单次触发模式！点击该按钮获取下一帧数据。</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="386"/>
@@ -441,29 +461,34 @@
         <translation type="unfinished">使用鼠标在深度图中框选ROI区域，然后点击“确定”按钮</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="773"/>
-        <source>Capture single frame</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../parasettingswidget.cpp" line="774"/>
-        <source>Capture multiple frames</source>
-        <translation type="unfinished"></translation>
+        <source>Capture single frame</source>
+        <translation type="unfinished">保存单帧</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="775"/>
+        <source>Capture multiple frames</source>
+        <translation type="unfinished">保存多帧</translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="776"/>
         <source>Single Shot</source>
         <translation type="unfinished">单次触发</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="780"/>
+        <location filename="../parasettingswidget.cpp" line="777"/>
+        <source>Stop preview</source>
+        <translation type="unfinished">停止预览</translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="784"/>
         <source>Pause preview</source>
         <translation type="unfinished">暂停预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="830"/>
+        <location filename="../parasettingswidget.cpp" line="834"/>
         <source>Capture frame data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存帧数据</translation>
     </message>
     <message>
         <source>Stream Format:</source>
@@ -478,8 +503,8 @@
         <translation type="obsolete">白平衡：</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="772"/>
-        <location filename="../parasettingswidget.cpp" line="780"/>
+        <location filename="../parasettingswidget.cpp" line="773"/>
+        <location filename="../parasettingswidget.cpp" line="784"/>
         <source>Start preview</source>
         <translation type="unfinished">启动预览</translation>
     </message>
@@ -662,12 +687,17 @@
     <message>
         <location filename="../../cscamera/cameracapturetool.cpp" line="116"/>
         <source>Start capturing</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始保存</translation>
     </message>
     <message>
         <location filename="../../cscamera/cameracapturetool.cpp" line="140"/>
         <source>save frame data is empty</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存数据为空</translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="182"/>
+        <source>End capture, captured %1 frames (%2 dropped)</source>
+        <translation type="unfinished">保存完毕，已保存%1帧（丢失%2帧）</translation>
     </message>
 </context>
 <context>
@@ -675,7 +705,7 @@
     <message>
         <location filename="../../cscamera/cameracapturetool.cpp" line="335"/>
         <source>a frame dropped</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">丢失一帧数据</translation>
     </message>
 </context>
 <context>
@@ -683,17 +713,17 @@
     <message>
         <location filename="../capturesetting.ui"/>
         <source>Capture</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">数据保存</translation>
     </message>
     <message>
         <location filename="../capturesetting.ui"/>
         <source>Frame Number</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">帧数</translation>
     </message>
     <message>
         <location filename="../capturesetting.ui"/>
         <source>Data Type</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">数据类型</translation>
     </message>
     <message>
         <location filename="../capturesetting.ui"/>
@@ -718,17 +748,17 @@
     <message>
         <location filename="../capturesetting.ui"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">开始</translation>
     </message>
     <message>
         <location filename="../capturesetting.ui"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">停止</translation>
     </message>
     <message>
         <location filename="../capturesetting.ui"/>
         <source>Save Format</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存格式</translation>
     </message>
 </context>
 <context>
@@ -736,7 +766,12 @@
     <message>
         <location filename="../capturesettingdialog.cpp" line="105"/>
         <source>Capture frame data</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">保存帧数据</translation>
+    </message>
+    <message>
+        <location filename="../capturesettingdialog.cpp" line="238"/>
+        <source>Captured %1 frames (%2 dropped)</source>
+        <translation type="unfinished">已保存%1帧（丢失%2帧）</translation>
     </message>
 </context>
 <context>
@@ -744,7 +779,7 @@
     <message>
         <location filename="../../cscamera/cameracapturetool.cpp" line="51"/>
         <source>captruing, please wait...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">正在保存，请稍等</translation>
     </message>
 </context>
 <context>
@@ -752,7 +787,7 @@
     <message>
         <location filename="../cswidgets/csroieditwidget.cpp" line="50"/>
         <source>Full Screen</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">全屏</translation>
     </message>
     <message>
         <location filename="../cswidgets/csroieditwidget.cpp" line="51"/>

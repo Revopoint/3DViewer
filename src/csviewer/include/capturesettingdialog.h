@@ -62,6 +62,7 @@ public:
 public slots:
     void onCaptureNumberUpdated(int number, int dropped);
     void onCaptureStateChanged(int state, QString message);
+    void onTranslate();
 private slots:
     void onStartCapture();
     void onStopCapture();

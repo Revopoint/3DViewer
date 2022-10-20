@@ -71,5 +71,10 @@ CSRoiEditWidget::CSRoiEditWidget(int paraId, const char* name, QWidget * parent)
 CSRoiEditWidget::~CSRoiEditWidget()
 {
 
+}
 
+void CSRoiEditWidget::retranslate(const char* context)
+{
+    fullScreenButton->setText(tr("Full Screen"));
+    roiEditButton->setText(tr("Edit ROI"));
 }

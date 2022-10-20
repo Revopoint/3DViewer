@@ -134,9 +134,9 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
     suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
 
-    suc &= (bool)connect(ui->menuTitle, &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
+    suc &= (bool)connect(ui->menuTile, &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuTabs,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
-    suc &= (bool)connect(ui->menuTitle, &CSMenu::clicked,    this, &ViewerWindow::onTriggeredWindowsTitle);
+    suc &= (bool)connect(ui->menuTile, &CSMenu::clicked,    this, &ViewerWindow::onTriggeredWindowsTitle);
     suc &= (bool)connect(ui->menuTabs,  &CSMenu::clicked,    this, &ViewerWindow::onTriggeredWindowsTab);
 
     Q_ASSERT(suc);      
@@ -153,7 +153,7 @@ void ViewerWindow::initWindow()
     ui->actionChinese->setChecked(language == LANGUAGE_ZH);
 
     auto config = cs::CSApplication::getInstance()->getAppConfig();
-    QString defaultSavePath = tr("Set default save path (") + config->getDefaultSavePath() + ")";
+    QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
     ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 }
 
@@ -386,6 +386,10 @@ void ViewerWindow::onTranslate()
     ui->retranslateUi(this);
     cameraInfoDialog->onTranslate();
     globalMessageBox->retranslate();
+
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
+    ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
@@ -481,9 +485,9 @@ void ViewerWindow::onRenderWindowUpdated()
 
 void ViewerWindow::onTriggeredWindowsTitle()
 {
-    renderLayoutMode = LAYOUT_TITLE;
+    renderLayoutMode = LAYOUT_TILE;
 
-    emit windowLayoutModeUpdated(LAYOUT_TITLE);
+    emit windowLayoutModeUpdated(LAYOUT_TILE);
 }
 
 void ViewerWindow::onTriggeredWindowsTab()
@@ -497,7 +501,7 @@ void ViewerWindow::updateWindowActions()
 {
     for (auto action : windowActions)
     {
-        ui->menuTitle->addAction(action);
+        ui->menuTile->addAction(action);
         ui->menuTabs->addAction(action);
 
         action->setCheckable(true);

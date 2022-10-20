@@ -142,6 +142,6 @@ private:
     CSMessageBox* globalMessageBox;
 
     QVector<CSAction*> windowActions;
-    WINDOWLAYOUT_MODE renderLayoutMode = LAYOUT_TITLE;
+    WINDOWLAYOUT_MODE renderLayoutMode = LAYOUT_TILE;
 };
 #endif // _CS_VIEWERWINDOW_H

@@ -176,7 +176,7 @@ struct CameraCaptureConfig
 
 enum WINDOWLAYOUT_MODE
 {
-    LAYOUT_TITLE,
+    LAYOUT_TILE,
     LAYOUT_TAB
 };
 

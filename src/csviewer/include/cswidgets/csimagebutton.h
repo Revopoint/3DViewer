@@ -50,15 +50,17 @@
 class CSTextImageButton : public QPushButton
 {
 public:
-    CSTextImageButton(const QIcon& icon, const QString& text, Qt::LayoutDirection layoutDirection = Qt::LeftToRight, QWidget* parent = Q_NULLPTR);
+    CSTextImageButton(const QIcon& icon, const char* text, Qt::LayoutDirection layoutDirection = Qt::LeftToRight, QWidget* parent = Q_NULLPTR);
+    void retranslate(const char* context);
 private:
-    void initButton(const QString& text);
+    void initButton();
 private:
     Qt::LayoutDirection layoutDirection;
     
     QIcon icon;
     QLabel* buttonIcon;
     QLabel* buttonText;
+    const char* buttonTitle;
 };
 
 

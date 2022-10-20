@@ -52,10 +52,9 @@ class CSListItem : public QWidget
 {
     Q_OBJECT
 public:
-    explicit CSListItem(const QIcon& icon, const QString& text, QListWidget* view = Q_NULLPTR);
+    explicit CSListItem(const QIcon& icon, const QString& text, const char* onText, const char* offText, const char* context, QListWidget* view = Q_NULLPTR);
     ~CSListItem();
     QListWidgetItem* getListWidgetItem() const;
-    void setActionText(const QString& text, bool on);
     void setSelected(bool select);
 
     QString getText() const;
@@ -66,14 +65,17 @@ public:
 signals:
     void toggled(bool selected, QString text, QListWidgetItem* listItem);
 private:
+    QString getTranslate(const char* text);
+private:
     QLabel* iconLabel;
     QLabel* actionLabel;
     QLabel* textLabel;
     
     int itemIndex = 0;
     bool isSelected = false;
-    QString actionOnText;
-    QString actionOffText;
+    const char* actionOnText;
+    const char* actionOffText;
+    const char* context;
     QListWidgetItem* listWidgetItem;
 };
 

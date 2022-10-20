@@ -52,6 +52,7 @@ QT_END_NAMESPACE
 
 class QStandardItemModel;
 class QListWidgetItem;
+class CSTextImageButton;
 class CameraListWidget : public QWidget
 {
     Q_OBJECT
@@ -78,5 +79,6 @@ private:
     void addListWidgetItem(const QString& text);
 private:
     Ui::CameraListWidget* ui;
+    CSTextImageButton* topItemButton;
 };
 #endif // _CS_CAMERALISTWIDGET_H

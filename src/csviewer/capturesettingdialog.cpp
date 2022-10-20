@@ -235,11 +235,16 @@ void CaptureSettingDialog::initConnections()
 
 void CaptureSettingDialog::onCaptureNumberUpdated(int captured, int dropped)
 {
-    QString msg = QString("Captured %1 frames (%2 dropped)").arg(captured).arg(dropped);
+    QString msg = QString(tr("Captured %1 frames (%2 dropped)")).arg(captured).arg(dropped);
     ui->captureInfo->setText(msg);
 }
 
 void CaptureSettingDialog::onCaptureStateChanged(int state, QString message)
 {
 
+}
+
+void CaptureSettingDialog::onTranslate()
+{
+    ui->retranslateUi(this);
 }
