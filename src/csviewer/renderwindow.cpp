@@ -277,12 +277,12 @@ void RenderWindow::onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& im
     }
 }
 
-void RenderWindow::onRoiEditStateChanged(bool edit)
+void RenderWindow::onRoiEditStateChanged(bool edit,  QRectF rect)
 {
     DepthRenderWidget2D* widget = qobject_cast<DepthRenderWidget2D*>(renderWidgets[CAMERA_DATA_DEPTH]);;
     if (widget)
     {
-        widget->onRoiEditStateChanged(edit);
+        widget->onRoiEditStateChanged(edit, rect);
     }
 }
 

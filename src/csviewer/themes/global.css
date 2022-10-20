@@ -91,6 +91,11 @@ QWidget#CaptureSettingWidget, QWidget#CameraInfoWidget {
     background: rgb(204, 204, 204);
 }
 
+QWidget#Line
+{
+    background: rgb(179, 179, 179);
+}
+
 /* QMenuBar */
 QMenuBar {
     background: rgb(179, 179, 179);
@@ -226,6 +231,29 @@ QPushButton[isCSStyle]:hover{
     color: rgb(0, 169, 255);
 }
 
+QPushButton#CancelButton, QPushButton#OkButton
+{
+    background-position: center;
+    background-repeat: no-repeat;
+    width: 30px;
+    height: 30px;
+}
+
+QPushButton#CancelButton
+{
+    background-image: url(:/resources/fork.png);
+}
+
+QPushButton#OkButton
+{
+    background-image: url(:/resources/tick.png);
+}
+
+QWidget#RoiButtonArea
+{
+    border-radius: 3px;
+    background-color: #666666;
+}
 
 /*QLabel*/
 QLabel {
@@ -538,3 +566,10 @@ QLabel#captureInfo {
 QStatusBar {
     background: rgb(179, 179, 179);
 }
+
+CSROIWidget{
+    background: transparent;
+    border: 1px solid red;
+}
+
+

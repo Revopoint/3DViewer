@@ -40,50 +40,49 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_RENDER_WINDOWS_H
-#define _CS_RENDER_WINDOWS_H
+#ifndef _CS_CSROI_H
+#define _CS_CSROI_H
 
 #include <QWidget>
-#include <QVBoxLayout>
-#include <QImage>
-#include <cstypes.h>
-#include <hpp/Processing.hpp>
+#include <QVariant>
+#include <QPushButton>
+#include <QRectF>
+#include <QPoint>
 
-class RenderWidget;
-class RenderWindow : public QWidget
+class CSROIWidget : public QWidget
 {
     Q_OBJECT
 public:
-    RenderWindow(QWidget* parent = nullptr);
-    ~RenderWindow();
+    CSROIWidget(QWidget * parent = nullptr);
+    ~CSROIWidget();
 
-    void onWindowLayoutUpdated();
+    void setOffset(QMargins offset);
+    int getButtonAreaHeight() const { return buttonAreaHeight; }
+    void updateRoiRectF(QRectF rect);
+    void paintEvent(QPaintEvent* event) override;
+
+    void mouseReleaseEvent(QMouseEvent* event) override;
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+private:
+    void drawRoi();
+    void updateButtonsPos();
 signals:
-    void roiRectFUpdated(QRectF rect);
-    void renderExit(int renderId);
-    void fullScreenUpdated(int renderID, bool value);
-public slots:
-    void onRenderWindowsUpdated(QVector<int> windows);
-    void onWindowLayoutModeUpdated(int mode);
-    void onOutput2DUpdated(OutputData2D outputData);
-    void onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-    void onRoiEditStateChanged(bool edit,  QRectF rect);
-private slots:
-    void onFullScreenUpdated(int renderId, bool value);
+    void roiValueUpdated(QRectF rect);
+    void roiVisialeChanged(bool visible);
 private:
-    void initRenderWidgetsTitle();
-    void initRenderWidgetsTab();
-    void initConnections();
-    void initRenderWidgets();
-    void initGridLayout();
-private:
-    WINDOWLAYOUT_MODE layoutMode = LAYOUT_TILE;// LAYOUT_TITLE;
-    QVector<int> displayWindows;
+    QRectF roiRect;
+    QRectF roiRectLast;
 
-    QMap<int, RenderWidget*> renderWidgets;
-    // the parent widget of render
-    QWidget* renderMainWidget = nullptr;
-    QLayout* rootLayout;
+    QMargins roiOffset;
+    int buttonAreaHeight = 30;
+
+    QPushButton* cancelButton;
+    QPushButton* okButton;
+    QWidget* buttonArea;
+
+    int pressPositon = -1;
+    QPoint lastPosition;
 };
 
-#endif //_CS_RENDER_WINDOWS_H
+#endif //_CS_CSROI_H

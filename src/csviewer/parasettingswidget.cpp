@@ -82,7 +82,6 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
     : QWidget(parent)
     , ui(new Ui::ParameterSettingsWidget)
     , cameraPtr(cs::CSApplication::getInstance()->getCamera())
-    , roiRectF(0,0,0,0)
     , captureSettingDialog(new CaptureSettingDialog)
 {
     setAttribute(Qt::WA_StyledBackground, true);
@@ -232,7 +231,7 @@ void ParaSettingsWidget::initParaConnections()
     if (roiWidget)
     {
         suc &= (bool)connect(roiWidget, &CSRoiEditWidget::clickedFullScreen, this, &ParaSettingsWidget::onClickFullScreenButton);
-        suc &= (bool)connect(roiWidget, &CSRoiEditWidget::clickedEditRoi,    this, &ParaSettingsWidget::onClickSingleShot);
+        suc &= (bool)connect(roiWidget, &CSRoiEditWidget::clickedEditRoi,    this, &ParaSettingsWidget::onClickRoiEditButton);
     }
 
     Q_ASSERT(suc);
@@ -383,21 +382,21 @@ void ParaSettingsWidget::onClickSingleShot()
 
 void ParaSettingsWidget::onClickRoiEditButton()
 {
-    emit showMessage(tr("Use the mouse to select the ROI area in the depth image, and then click the \"Confirm\" button"), 10000);
+    QVariant value;
+    cameraPtr->getCameraPara(PARA_DEPTH_ROI, value);
+    QRectF rect = value.toRectF();
 
-    // TODO:
-    emit roiStateChanged(true);
+    emit roiStateChanged(true, rect);
 }
 
 void ParaSettingsWidget::onClickFullScreenButton()
 {
-    emit roiStateChanged(true);
-}
+    QRectF rect(0.0, 0.0, 1.0,1.0);
+    QVariant value = QVariant::fromValue<QRectF>(rect);
 
-void ParaSettingsWidget::onConfirmRoi()
-{
-    //set parameter
-    cameraPtr->setCameraPara(PARA_DEPTH_ROI, roiRectF);
+    cameraPtr->setCameraPara(PARA_DEPTH_ROI, value);
+
+    emit roiStateChanged(true, rect);
 }
 
 void ParaSettingsWidget::onPageChanged(int idx)
@@ -621,10 +620,12 @@ void ParaSettingsWidget::onCameraParaUpdated(int paraId, QVariant value)
     {
         QRectF rect = value.toRectF();
 
-        QString str = QString("[%1, %2, %3, %4]").arg(QString::number(rect.left(),   'f', 2))
-                                                 .arg(QString::number(rect.top(),    'f', 2))
-                                                 .arg(QString::number(rect.right(),  'f', 2))
-                                                 .arg(QString::number(rect.bottom(), 'f', 2));
+        QString str = QString("[%1, %2, %3, %4]").arg(QString::number(rect.left(),   'f', 3))
+                                                 .arg(QString::number(rect.top(),    'f', 3))
+                                                 .arg(QString::number(rect.right(),  'f', 3))
+                                                 .arg(QString::number(rect.bottom(), 'f', 3));
+
+        emit showMessage(QString(tr("Set ROI ")) + str);
     }
     else if (paraId == PARA_DEPTH_FRAMETIME)
     {
@@ -739,12 +740,7 @@ void ParaSettingsWidget::onUpdateHdrSetting()
 
 void ParaSettingsWidget::onRoiRectFUpdated(QRectF rect)
 {
-    roiRectF = rect;
-}
-
-void ParaSettingsWidget::onShow3DUpdate(bool show)
-{
-
+    cameraPtr->setCameraPara(PARA_DEPTH_ROI, rect);
 }
 
 void ParaSettingsWidget::onTranslate()

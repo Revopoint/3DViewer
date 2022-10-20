@@ -91,7 +91,7 @@ private slots:
     void onRenderPageChanged(int idx);
     void onCameraStateChanged(int state);
 
-    void onRoiEditStateChanged(bool edit);
+    void onRoiEditStateChanged(bool edit, QRectF rect);
     void onRoiRectFUpdated(QRectF rect);
     void onShowStatusBarMessage(QString msg, int timeout);
 

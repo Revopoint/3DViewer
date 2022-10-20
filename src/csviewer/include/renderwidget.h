@@ -146,6 +146,7 @@ protected:
     QImage cachedImage;
 };
 
+class CSROIWidget;
 class DepthRenderWidget2D : public RenderWidget2D
 {
     Q_OBJECT
@@ -154,12 +155,11 @@ public:
     ~DepthRenderWidget2D();
 
     void setShowCoord(bool show);
-    void mouseMoveEvent(QMouseEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
-    void mouseReleaseEvent(QMouseEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 public slots:
-    void onRoiEditStateChanged(bool edit);
+    void onRoiEditStateChanged(bool edit, QRectF rect);
     void onShowCoordChanged(bool show);
 signals:
     void roiRectFUpdated(QRectF rect);
@@ -168,9 +168,10 @@ private:
     void onPainterInfos(OutputData2D outputData) override;
 private:
     QPointF mousePressPoint;
-    QPointF mouseReleasePoint;
     bool isRoiEdit;
     bool isShowCoord;
+
+    CSROIWidget* roiWidget;
 };
 
 class RenderWidget3D : public RenderWidget

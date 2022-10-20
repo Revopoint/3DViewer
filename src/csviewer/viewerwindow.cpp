@@ -91,6 +91,8 @@ ViewerWindow::ViewerWindow(QWidget *parent)
     ui->actionChinese->setChecked(language == LANGUAGE_ZH);
 
     onLanguageChanged();
+
+    onCameraStreamStarted();
 }
 
 ViewerWindow::~ViewerWindow()
@@ -157,13 +159,9 @@ void ViewerWindow::initWindow()
     ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 }
 
-// switch 2D/3D
 void ViewerWindow::onRenderPageChanged(int idx)
 {
-    RENDER_PAGE_ID pageId = (RENDER_PAGE_ID)idx;
-    ui->paraSettingWidget->onShow3DUpdate(pageId == RENDER_PAGE_3D);
-
-    emit show3DUpdated(pageId == RENDER_PAGE_3D);
+    emit show3DUpdated(idx == RENDER_PAGE_3D);
 }
 
 void ViewerWindow::onCameraStateChanged(int state)
@@ -265,9 +263,9 @@ void ViewerWindow::updateStatusBar(int state)
     }
 }
 
-void ViewerWindow::onRoiEditStateChanged(bool edit)
+void ViewerWindow::onRoiEditStateChanged(bool edit, QRectF rect)
 {
-    ui->renderWindow->onRoiEditStateChanged(edit);
+    ui->renderWindow->onRoiEditStateChanged(edit, rect);
 }
 
 void ViewerWindow::onRoiRectFUpdated(QRectF rect)

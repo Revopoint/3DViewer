@@ -50,7 +50,7 @@ set(APP_VERSION_H ${PROJECT_BINARY_DIR}/app_version.h)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/app_version.h.in ${APP_VERSION_H})
 
 # theme file
-set(THEMES_FILE ${CMAKE_CURRENT_SOURCE_DIR}/themes/global.css ${CMAKE_CURRENT_SOURCE_DIR}/themes/global2.css)
+set(THEMES_FILE ${CMAKE_CURRENT_SOURCE_DIR}/themes/global.css)
 
 if(WIN32)
     file(GLOB RC_FILE "${CMAKE_CURRENT_SOURCE_DIR}/*.rc")

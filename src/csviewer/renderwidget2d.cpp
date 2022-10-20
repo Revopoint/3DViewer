@@ -51,6 +51,8 @@
 #include <QPainter>
 #include <QTime>
 
+#include "cswidgets/csroi.h"
+
 static QMap<int, QString> renderTitleMap =
 {
     {(int)CAMERA_DATA_L, "IR(L)"},
@@ -99,7 +101,7 @@ void RenderWidget2D::initWidget()
 
     // image area
     QVBoxLayout* vLayout = new QVBoxLayout(imageArea);
-    vLayout->setContentsMargins(0, 0, 0, 0);
+    vLayout->setContentsMargins(10, 10, 10, 10);
     vLayout->setSpacing(0);
     vLayout->addWidget(imageLabel);
 
@@ -265,6 +267,11 @@ void RenderWidget2D::onClickExitButton()
 void RenderWidget2D::onClickFullScreen(bool checked)
 {
     enableImageScale = checked;
+    if(!enableImageScale)
+    {
+        this->imageAreaScale = 1;
+        updateImageSize();
+    }
     emit fullScreenUpdated(getRenderId(), checked);
 }
 
@@ -355,7 +362,7 @@ void RenderWidget2D::updateImageSize()
     int x = (w1 - imgW) / 2;
     int y = (centerWidget->height() - imgH) / 2;
 
-    imageLabel->setGeometry(0, 0, imgW, imgH);
+    //imageLabel->setGeometry(0, 0, imgW, imgH);
     imageArea->setGeometry(x, y, imgW, imgH);
 
     if (!cachedImage.isNull())
@@ -374,26 +381,23 @@ void RenderWidget2D::onTranslate()
 DepthRenderWidget2D::DepthRenderWidget2D(int renderId, QWidget* parent)
     : RenderWidget2D(renderId, parent)
     , mousePressPoint(0,0)
-    , mouseReleasePoint(0, 0)
     , isRoiEdit(false)
     , isShowCoord(false)
+    , roiWidget(new CSROIWidget(centerWidget))
 {
+    roiWidget->setObjectName("ROIWidget");
 
+    QMargins margins = imageArea->layout()->contentsMargins();
+    margins.setBottom(margins.bottom() + roiWidget->getButtonAreaHeight());
+
+    roiWidget->setOffset(margins);
+    roiWidget->setVisible(false);
+    connect(roiWidget, &CSROIWidget::roiValueUpdated, this, &DepthRenderWidget2D::roiRectFUpdated);
 }
 
 DepthRenderWidget2D::~DepthRenderWidget2D()
 {
 
-}
-
-void DepthRenderWidget2D::mouseMoveEvent(QMouseEvent* event)
-{
-    if (isRoiEdit)
-    {
-        QPoint pt = imageLabel->mapFromGlobal(event->globalPos());
-        mouseReleasePoint.rx() = (pt.x() * 1.0f) / imageLabel->width();
-        mouseReleasePoint.ry() = (pt.y() * 1.0f) / imageLabel->height();
-    }
 }
 
 void DepthRenderWidget2D::mousePressEvent(QMouseEvent* event)
@@ -404,7 +408,7 @@ void DepthRenderWidget2D::mousePressEvent(QMouseEvent* event)
     mousePressPoint.rx() = (pt.x() * 1.0f) / imageLabel->width();
     mousePressPoint.ry() = (pt.y() * 1.0f) / imageLabel->height();
 
-    setShowCoord(!isRoiEdit && rect.contains(pt));
+    setShowCoord(rect.contains(pt));
 }
 
 template<class T>
@@ -414,44 +418,22 @@ static void valueCorrect(T& v, T min, T max)
     v = (v > max) ? max : v;
 }
 
-void DepthRenderWidget2D::mouseReleaseEvent(QMouseEvent* event)
+void DepthRenderWidget2D::resizeEvent(QResizeEvent* event)
 {
-    if (isRoiEdit && (mousePressPoint != mouseReleasePoint))
-    {
-        auto x1 = mousePressPoint.x();
-        auto y1 = mousePressPoint.y();
+    RenderWidget2D::resizeEvent(event);
 
-        auto x2 = mouseReleasePoint.x();
-        auto y2 = mouseReleasePoint.y();
-        
-        valueCorrect<qreal>(x1, 0, 1);
-        valueCorrect<qreal>(x2, 0, 1);
-        valueCorrect<qreal>(y1, 0, 1);
-        valueCorrect<qreal>(y2, 0, 1);
-        
-        qreal minx = (x1 < x2) ? x1 : x2;
-        qreal miny = (y1 < y2) ? y1 : y2;
-        qreal w = qAbs((x1 - x2));
-        qreal h = qAbs((y1 - y2));
+    QRect imageAreaRect = imageArea->geometry();
+    imageAreaRect.setHeight(imageAreaRect.height() + roiWidget->getButtonAreaHeight());
 
-        QRectF rect(minx, miny, w, h);
-        
-        emit roiRectFUpdated(rect);
-    }
+    roiWidget->setGeometry(imageAreaRect);
 }
 
 void DepthRenderWidget2D::onPainterInfos(OutputData2D outputData)
 {
     RenderWidget2D::onPainterInfos(outputData);
-
-    // draw ROI rect
-    if (isRoiEdit && mousePressPoint != mouseReleasePoint)
+    if(isRoiEdit)
     {
-        painter.setPen(QPen(Qt::red, 2));
-
-        QPoint p1 = QPoint(mousePressPoint.x() * imageLabel->width(), mousePressPoint.y() * imageLabel->height());
-        QPoint p2 = QPoint(mouseReleasePoint.x() * imageLabel->width(), mouseReleasePoint.y() * imageLabel->height());;
-        painter.drawRect(QRect(p1, p2));
+        roiWidget->update();
     }
 
     // draw point information
@@ -484,15 +466,12 @@ void DepthRenderWidget2D::onPainterInfos(OutputData2D outputData)
         painter.drawText(rect, Qt::AlignLeft | Qt::AlignBottom, text);
     }
 }
-void DepthRenderWidget2D::onRoiEditStateChanged(bool edit)
+void DepthRenderWidget2D::onRoiEditStateChanged(bool edit, QRectF rect)
 {
     isRoiEdit = edit;
-    if (isRoiEdit)
-    {
-        setShowCoord(false);
-    }
 
-    mousePressPoint = mouseReleasePoint = QPoint(0, 0);
+    roiWidget->updateRoiRectF(rect);
+    roiWidget->setVisible(isRoiEdit);
 }
 
 void DepthRenderWidget2D::onShowCoordChanged(bool show)

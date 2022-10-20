@@ -79,7 +79,6 @@ public slots:
     void onCameraStateChanged(int state);
     void onUpdatedCameraParas();
     //roi
-    void onShow3DUpdate(bool show);
     void onRoiRectFUpdated(QRectF rect);
 
     // control
@@ -96,7 +95,6 @@ private slots:
     void onClickRgbButton();
     void onClickRoiEditButton();
     void onClickFullScreenButton();
-    void onConfirmRoi();
 
     void onPageChanged(int idx);
     void onSingleShotChanged(bool checked);
@@ -116,7 +114,7 @@ private slots:
 
     void onTranslate();
 signals:
-    void roiStateChanged(bool edit);
+    void roiStateChanged(bool edit, QRectF rect);
     void translateSignal();
     void hdrModeChanged(int mode);
     void clickedCloseButton();
@@ -151,7 +149,6 @@ private:
     QMap<int, CSParaWidget*> paraWidgets;
     CaptureSettingDialog* captureSettingDialog;
 
-    QRectF roiRectF;
     QSpacerItem* verticalSpacer = nullptr;
 
     QPushButton* hdrRefreshButton;
