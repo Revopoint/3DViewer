@@ -236,6 +236,52 @@ YAML::Node genYamlNodeFromIntrinsics(const Intrinsics& intrinsics)
     return node;
 }
 
+YAML::Node genYamlNodeFromExtrinsics(const Extrinsics& extrinsics)
+{
+    YAML::Node node;
+    
+    {
+        YAML::Node nodeMatrix;
+        node["rotation"] = nodeMatrix;
+
+        nodeMatrix.SetTag("opencv-matrix");
+        nodeMatrix["rows"] = 3;
+        nodeMatrix["cols"] = 3;
+        nodeMatrix["dt"] = "f";
+
+        YAML::Node matrixData;
+        matrixData.SetStyle(YAML::EmitterStyle::Flow);
+        matrixData[0] = extrinsics.rotation[0];
+        matrixData[1] = extrinsics.rotation[1];
+        matrixData[2] = extrinsics.rotation[2];
+        matrixData[3] = extrinsics.rotation[3];
+        matrixData[4] = extrinsics.rotation[4];
+        matrixData[5] = extrinsics.rotation[5];
+        matrixData[6] = extrinsics.rotation[6];
+        matrixData[7] = extrinsics.rotation[7];
+        matrixData[8] = extrinsics.rotation[8];
+
+        nodeMatrix["data"] = matrixData;
+    }
+
+    YAML::Node nodeMatrix2;
+    node["translation"] = nodeMatrix2;
+    nodeMatrix2.SetTag("opencv-matrix");
+    nodeMatrix2["rows"] = 1;
+    nodeMatrix2["cols"] = 3;
+    nodeMatrix2["dt"] = "f";
+
+    YAML::Node matrixData;
+    matrixData.SetStyle(YAML::EmitterStyle::Flow);
+    matrixData[0] = extrinsics.translation[0];
+    matrixData[1] = extrinsics.translation[1];
+    matrixData[2] = extrinsics.translation[2];
+
+    nodeMatrix2["data"] = matrixData;
+
+    return node;
+}
+
 void CameraCaptureBase::saveIntrinsics()
 {
     qInfo() << "save camera intrinsics";
@@ -256,6 +302,7 @@ void CameraCaptureBase::saveIntrinsics()
     fout << "---\n";
 
     YAML::Node rootNode;
+    // RGB intrinsics
     if (hasRgbV.isValid() && hasRgbV.toBool())
     {
         Intrinsics rgbIntrinsics;
@@ -275,15 +322,42 @@ void CameraCaptureBase::saveIntrinsics()
         }
     }
 
-    Intrinsics depthIntrinsics;
-    QVariant intrinsics;
-    camera->getCameraPara(cs::parameter::PARA_RGB_INTRINSICS, intrinsics);
-    if (intrinsics.isValid())
     {
-        depthIntrinsics = intrinsics.value<Intrinsics>();
-        YAML::Node node = genYamlNodeFromIntrinsics(depthIntrinsics);
+        // Depth intrinsics
+        Intrinsics depthIntrinsics;
+        QVariant intrinsics;
+        camera->getCameraPara(cs::parameter::PARA_RGB_INTRINSICS, intrinsics);
+        if (intrinsics.isValid())
+        {
+            depthIntrinsics = intrinsics.value<Intrinsics>();
+            YAML::Node node = genYamlNodeFromIntrinsics(depthIntrinsics);
 
-        rootNode["Depth intrinsics"] = node;
+            rootNode["Depth intrinsics"] = node;
+        }
+    }
+    
+    {
+        // depth scale
+        QVariant value;
+        float depthScale;
+        camera->getCameraPara(cs::parameter::PARA_DEPTH_SCALE, value);
+        if (value.isValid())
+        {
+            depthScale = value.toFloat();
+            rootNode["Depth Scale"] = depthScale;
+        }
+    }
+
+    {
+        // extrinsics
+        QVariant value;
+        Extrinsics extrinsics;
+        camera->getCameraPara(cs::parameter::PARA_EXTRINSICS, value);
+        if (value.isValid())
+        {
+            extrinsics = value.value<Extrinsics>();
+            rootNode["Extrinsics"] = genYamlNodeFromExtrinsics(extrinsics);
+        }
     }
 
     fout << rootNode;

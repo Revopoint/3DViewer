@@ -39,7 +39,7 @@ void OutputSaver::setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int point
 
 void OutputSaver::savePointCloud()
 {
-    if (!captureConfig.captureDataTypes.contains(CAMERA_DTA_POINT_CLOUD) || !outputDataPort.hasData(CAMERA_DATA_DEPTH))
+    if (!captureConfig.captureDataTypes.contains(CAMERA_DTA_POINT_CLOUD))
     {
         return;
     }
@@ -51,7 +51,29 @@ void OutputSaver::savePointCloud()
     }
     else
     {
-        //TODO: save from frameData
+        cs::Pointcloud pc;
+        auto frameData = outputDataPort.getFrameData();
+        for (auto& streamData : frameData.data)
+        {
+            switch (streamData.dataInfo.format)
+            {
+            case STREAM_FORMAT_Z16:
+            case STREAM_FORMAT_Z16Y8Y8: 
+            {
+                int width = streamData.dataInfo.width;
+                int height = streamData.dataInfo.height;
+                float depthScale = frameData.depthScale;
+
+                Intrinsics depthIntrinsics = frameData.depthIntrinsics;
+
+                pc.generatePoints<ushort>((ushort*)streamData.data.data(), width, height, depthScale, &depthIntrinsics, nullptr, nullptr, true);
+                savePointCloud(pc);
+                break;
+            }
+            default:
+                break;
+            }
+        }
     }
 }
 

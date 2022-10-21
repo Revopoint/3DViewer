@@ -205,6 +205,7 @@ private:
     Intrinsics depthIntrinsics;
     Intrinsics rgbIntrinsics;
     Extrinsics extrinsics;
+    float depthScale;
 
     StreamThread* streamThread;
     friend StreamThread;

@@ -45,6 +45,7 @@
 #include <QObject>
 #include <QVector>
 #include <QMutex>
+#include <memory>
 
 #include "cscameraapi.h"
 #include "cstypes.h"

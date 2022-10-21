@@ -92,7 +92,12 @@ struct StreamData
  
 struct FrameData
 { 
-    QVector<StreamData> data; 
+    Intrinsics rgbIntrinsics;
+    Intrinsics depthIntrinsics;
+    Extrinsics extrinsics;
+    float depthScale;
+
+    QVector<StreamData> data;
 };
 
 Q_DECLARE_METATYPE(FrameData);

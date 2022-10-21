@@ -133,7 +133,6 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
     }
     
     emit output3DUpdated(pc, texImage, depthData);
-
     outputDataPort.setPointCloud(pc);
 }
 

@@ -111,6 +111,7 @@ void CaptureSettingDialog::onStartCapture()
         captureConfig.saveDir = fileInfo.absolutePath();
         captureConfig.saveName = fileInfo.fileName();
         cs::CSApplication::getInstance()->startCapture(captureConfig);
+        ui->captureInfo->setText("");
     }
     else
     {
