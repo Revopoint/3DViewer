@@ -87,3 +87,13 @@ PROCESS_STRA_TYPE ProcessStrategy::getProcessStraType()
 {
     return strategyType;
 }
+
+void ProcessStrategy::setStrategyEnable(bool enable)
+{
+    strategyEnable = enable;
+}
+
+int ProcessStrategy::isStrategyEnable()
+{
+    return strategyEnable;
+}

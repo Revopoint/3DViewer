@@ -143,6 +143,11 @@ void CSListItem::setSelected(bool select)
     }
 }
 
+bool CSListItem::isSelect()
+{
+    return isSelected;
+}
+
 QString CSListItem::getText() const
 {
     return textLabel->text();

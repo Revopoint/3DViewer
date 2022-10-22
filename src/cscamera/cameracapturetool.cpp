@@ -425,14 +425,14 @@ void CameraCaptureMutiple::getCaptureIndex(OutputDataPort& output, int& rgbFrame
     
     for (auto& streamData : frameData.data)
     {
-        if (streamData.dataInfo.streamDataType == TYPE_RGB)
+        if (streamData.dataInfo.streamDataType == TYPE_DEPTH)
         {
             capturedDepthCount++;
             capturePointCloudCount++;
 
             depthTimeStamps.push_back(streamData.dataInfo.timeStamp);
         }
-        else if (streamData.dataInfo.streamDataType == TYPE_DEPTH)
+        else if (streamData.dataInfo.streamDataType == TYPE_RGB)
         {
             capturedRgbCount++;
             rgbTimeStamps.push_back(streamData.dataInfo.timeStamp);

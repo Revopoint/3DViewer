@@ -56,6 +56,7 @@ public:
     ~CSListItem();
     QListWidgetItem* getListWidgetItem() const;
     void setSelected(bool select);
+    bool isSelect();
 
     QString getText() const;
     void enterEvent(QEvent* event) override;

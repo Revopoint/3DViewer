@@ -84,10 +84,11 @@ void CameraListWidget::onClickedCameraListItem(bool selected, QString serial, QL
     else 
     {
         // connect to camera
-        int row = ui->cameraListWidget->currentRow();
-        if (row >= 0)
+
+        // clear last
+        for (int i = 0; i < ui->cameraListWidget->count(); i++)
         {
-            QListWidgetItem* item = ui->cameraListWidget->item(row);
+            QListWidgetItem* item = ui->cameraListWidget->item(i);
             QWidget* itemWidget = ui->cameraListWidget->itemWidget(item);
             CSListItem* csItem = qobject_cast<CSListItem*>(itemWidget);
             if (csItem)
@@ -95,8 +96,6 @@ void CameraListWidget::onClickedCameraListItem(bool selected, QString serial, QL
                 csItem->setSelected(false);
             }
         }
-        int idx = ui->cameraListWidget->row(listItem);
-        ui->cameraListWidget->setCurrentRow(idx);
 
         emit connectCamera(serial);
     }
@@ -133,7 +132,6 @@ void CameraListWidget::onCameraListUpdated(const QStringList infoList)
         CSListItem* csItem = qobject_cast<CSListItem*>(itemWidget);
         if (csItem)
         {
-            ui->cameraListWidget->setCurrentRow(curSelect);
             csItem->setSelected(true);
         }
     }
@@ -168,22 +166,23 @@ void CameraListWidget::onCameraStateChanged(int state)
         return;
     }
 
-    // update current list widget item
-    int curRow = ui->cameraListWidget->currentRow();
-    if (curRow >= 0)
+    // update current list widget 
+    auto curCameraSerial = QString(cs::CSApplication::getInstance()->getCamera()->getCameraInfo().cameraInfo.serial);
+    for (int i = 0; i < ui->cameraListWidget->count(); i++)
     {
-        QListWidgetItem* item = ui->cameraListWidget->item(curRow);
+        QListWidgetItem* item = ui->cameraListWidget->item(i);
         QWidget* itemWidget = ui->cameraListWidget->itemWidget(item);
         CSListItem* csItem = qobject_cast<CSListItem*>(itemWidget);
         if (csItem)
         {
-            csItem->setSelected(selected);
-        }
-
-        if (!selected)
-        {
-            // unselect all items
-            ui->cameraListWidget->setCurrentRow(-1);
+            if (!curCameraSerial.isEmpty() && csItem->getText().contains(curCameraSerial))
+            {
+                csItem->setSelected(true);
+            }
+            else 
+            {
+                csItem->setSelected(false);
+            }     
         }
     }
 }

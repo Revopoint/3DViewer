@@ -75,6 +75,8 @@ public:
     PROCESS_STRA_TYPE getProcessStraType();
     void process(const FrameData& frameData, OutputDataPort& outputDataPort);
     virtual void onLoadCameraPara() {}
+    void setStrategyEnable(bool enable);
+    int isStrategyEnable();
 signals:
     void output2DUpdated(OutputData2D outputData, StreamData streamData = StreamData());
     void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image, StreamData streamData = StreamData());
@@ -96,6 +98,7 @@ protected:
     bool isCameraParaDirty;
     QMutex mutex;
     PROCESS_STRA_TYPE strategyType;
+    bool strategyEnable = true;
 };
 
 }

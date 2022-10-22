@@ -74,7 +74,7 @@ public:
 
     std::shared_ptr<AppConfig> getAppConfig();
 public slots:
-    void onShow3DUpdated(bool show);
+    void onWindowLayoutChanged(QVector<int> windows);
     void onShow3DTextureChanged(bool texture);
     void onShowCoordChanged(bool show, QPointF pos);
 signals:

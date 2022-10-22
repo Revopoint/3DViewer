@@ -707,7 +707,7 @@
 <context>
     <name>cs::CameraCaptureMutiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="335"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="409"/>
         <source>a frame dropped</source>
         <translation type="unfinished">丢失一帧数据</translation>
     </message>
@@ -773,7 +773,7 @@
         <translation type="unfinished">保存帧数据</translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="238"/>
+        <location filename="../capturesettingdialog.cpp" line="239"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished">已保存%1帧（丢失%2帧）</translation>
     </message>

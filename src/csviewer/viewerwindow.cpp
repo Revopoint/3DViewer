@@ -112,7 +112,7 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged,   this, &ViewerWindow::onCaptureStateChanged);
 
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
-    suc &= (bool)connect(this, &ViewerWindow::show3DUpdated,             app,  &cs::CSApplication::onShow3DUpdated);
+    suc &= (bool)connect(this, &ViewerWindow::windowLayoutChanged,       app,  &cs::CSApplication::onWindowLayoutChanged, Qt::QueuedConnection);
 
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::showMessage,        this, &ViewerWindow::onShowStatusBarMessage);
 
@@ -479,20 +479,36 @@ void ViewerWindow::onRenderWindowUpdated()
 
     // notify to render window
     emit renderWindowUpdated(windows);
+    onWindowLayoutChanged();
+
 }
 
 void ViewerWindow::onTriggeredWindowsTitle()
 {
     renderLayoutMode = LAYOUT_TILE;
-
     emit windowLayoutModeUpdated(LAYOUT_TILE);
+    onWindowLayoutChanged();
 }
 
 void ViewerWindow::onTriggeredWindowsTab()
 {
     renderLayoutMode = LAYOUT_TAB;
-
     emit windowLayoutModeUpdated(LAYOUT_TAB);
+    onWindowLayoutChanged();
+}
+
+void ViewerWindow::onWindowLayoutChanged()
+{
+    QVector<int> windows;
+    for (auto action : windowActions)
+    {
+        if (action->isChecked())
+        {
+            windows.push_back(action->getType());
+        }
+    }
+
+    emit windowLayoutChanged(windows);
 }
 
 void ViewerWindow::updateWindowActions()

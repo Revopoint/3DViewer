@@ -91,6 +91,8 @@ public:
     void saveOutputRGB(StreamData& streamData) override;
     void saveOutputDepth(StreamData& streamData) override;
     void saveOutputIr(StreamData& streamData) override;
+private:
+    void saveGrayScale16(StreamData& streamData, QString path);
 };
 
 class RawOutputSaver : public OutputSaver

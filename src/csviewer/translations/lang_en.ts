@@ -560,7 +560,7 @@
 <context>
     <name>cs::CameraCaptureMutiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="335"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="409"/>
         <source>a frame dropped</source>
         <translation type="unfinished"></translation>
     </message>
@@ -626,7 +626,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="238"/>
+        <location filename="../capturesettingdialog.cpp" line="239"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>

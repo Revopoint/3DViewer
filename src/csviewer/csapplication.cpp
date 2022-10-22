@@ -225,10 +225,29 @@ void CSApplication::updateProcessStrategys()
     }
 }
 
-void CSApplication::onShow3DUpdated(bool show)
+void CSApplication::onWindowLayoutChanged(QVector<int> windows)
 {
-    show3D = show;
-    updateProcessStrategys();
+    for (auto straType : processStrategys.keys())
+    {
+        auto stra = processStrategys[straType];
+        if (stra)
+        {
+            if (straType == STRATEGY_DEPTH)
+            {
+                bool enable = windows.contains(CAMERA_DATA_L) || windows.contains(CAMERA_DATA_R) || windows.contains(CAMERA_DATA_DEPTH);
+                stra->setStrategyEnable(enable);
+            }
+            else if (straType == STRATEGY_CLOUD_POINT)
+            {
+                bool enable = windows.contains(CAMERA_DTA_POINT_CLOUD);
+                stra->setStrategyEnable(enable);
+            }
+            else if (straType == STRATEGY_RGB)
+            {
+                stra->setStrategyEnable(windows.contains(CAMERA_DATA_RGB));
+            }
+        }
+    }
 }
 
 void CSApplication::onShow3DTextureChanged(bool texture)

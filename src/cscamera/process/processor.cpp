@@ -140,7 +140,10 @@ void Processor::process(const FrameData& frameData)
     OutputDataPort outputDataPort(frameData);
     for (auto stra : processStrategys)
     {
-        stra->process(frameData, outputDataPort);
+        if (stra->isStrategyEnable())
+        {
+            stra->process(frameData, outputDataPort);
+        }
     }
 
     // to do some thing after process, for example save data

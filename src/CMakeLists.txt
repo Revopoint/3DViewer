@@ -66,6 +66,11 @@ set(YAML_CPP_INC ${THIRDPARTY_DIR}/yaml-cpp0.6.0/include)
 set(YAML_CPP_LIB ${THIRDPARTY_DIR}/yaml-cpp0.6.0/${PLATFORM}/lib)
 set(YAML_CPP_BIN ${THIRDPARTY_DIR}/yaml-cpp0.6.0/${PLATFORM}/bin)
 
+## libpng
+set(LIBPNG_CPP_INC ${THIRDPARTY_DIR}/libpng/include)
+set(LIBPNG_CPP_LIB ${THIRDPARTY_DIR}/libpng/${PLATFORM}/lib)
+set(LIBPNG_CPP_BIN ${THIRDPARTY_DIR}/libpng/${PLATFORM}/bin)
+
 add_definitions(-D_UNICODE -DUNICODE)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 

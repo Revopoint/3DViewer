@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QFile>
 
+#include <png.h>
 #include "cameracapturetool.h"
 
 using namespace cs;
@@ -199,18 +200,77 @@ void ImageOutputSaver::saveOutputDepth(StreamData& streamData)
     case STREAM_FORMAT_Z16Y8Y8:
     {
         CS_CAMERA_DATA_TYPE dataType = CAMERA_DATA_DEPTH;
-        QString savePath = getSavePath(dataType);
 
-        QImage image((uchar*)streamData.data.data(), streamData.dataInfo.width, streamData.dataInfo.height, QImage::Format_RGB16);
-        if (!image.save(savePath, "PNG"))
-        {
-            qWarning() << "save image failed:" << savePath;
-        }
+        QString savePath = getSavePath(dataType);
+        saveGrayScale16(streamData, savePath);
         break;
     }
     default:
         break;
     }
+}
+
+void ImageOutputSaver::saveGrayScale16(StreamData& streamData, QString path)
+{
+    png_structp png_ptr = NULL;
+    png_infop info_ptr = NULL;
+    FILE* fp = NULL;
+
+    int bitDepth = 16;
+    int width = streamData.dataInfo.width;
+    int height = streamData.dataInfo.height;
+
+    uchar* pngData = (uchar*)streamData.data.data();
+    do 
+    {
+        fp = fopen(path.toStdString().c_str(), "wb");
+        if (fp == NULL) {
+            qWarning() << "Open file failed, file : " << path;
+            break;
+        }
+
+        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+        if (png_ptr == NULL) {
+            qWarning() << ("Could not allocate write struct");
+            break;
+        }
+
+        // Initialize info structure
+        info_ptr = png_create_info_struct(png_ptr);
+        if (info_ptr == NULL) {
+            qWarning() << "Could not allocate info struct";
+            break;
+        }
+
+        if (setjmp(png_jmpbuf(png_ptr))) {
+            qWarning() << "DisplayTool::writeImgToFile, Error during png creation";
+            break;
+        }
+
+        png_init_io(png_ptr, fp);
+
+        png_set_IHDR(png_ptr, info_ptr, width, height, bitDepth, PNG_FORMAT_GRAY, PNG_INTERLACE_NONE,
+            PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
+
+        png_write_info(png_ptr, info_ptr);
+
+        int rowSize = width * (bitDepth / 8);
+
+        for (int i = 0; i < height; i++) {
+            int offset = i * rowSize;
+            png_write_row(png_ptr, pngData + offset);
+        }
+
+        png_write_end(png_ptr, NULL);
+    
+    } while (false);
+
+
+    if (fp != NULL)
+        fclose(fp);
+
+    if (png_ptr != NULL || info_ptr != NULL)
+        png_destroy_write_struct(&png_ptr, &info_ptr);
 }
 
 void ImageOutputSaver::saveOutputIr(StreamData& streamData)

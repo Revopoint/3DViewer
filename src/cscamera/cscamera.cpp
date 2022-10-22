@@ -329,6 +329,15 @@ void CSCamera::onStreamStarted()
 
     DEPTH_RANGE_LIMIT.min = 20;
     DEPTH_RANGE_LIMIT.max = 65535 * propExt.depthScale;
+    depthScale = propExt.depthScale;
+
+    PropertyExtension scanMode;
+    scanMode.bFastScanMode = false;
+    ret = cameraPtr->setPropertyExtension(PROPERTY_EXT_FAST_SCAN_MODE, scanMode);
+    if (ret != SUCCESS)
+    {
+        qDebug() << "set scan mode failed";
+    }
 }
 
 bool CSCamera::stopStream()
@@ -802,6 +811,11 @@ void CSCamera::onGetFrame(int timeout)
 
     if (frameData.data.size() > 0)
     {
+        frameData.rgbIntrinsics = rgbIntrinsics;
+        frameData.depthIntrinsics = depthIntrinsics;
+        frameData.extrinsics = extrinsics;
+        frameData.depthScale = depthScale;
+
         emit framedDataUpdated(frameData);
     }
 }

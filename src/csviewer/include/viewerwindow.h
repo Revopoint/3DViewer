@@ -121,11 +121,13 @@ private slots:
     void onTriggeredWindowsTab();
 
     void onRenderExit(int renderId);
+    void onWindowLayoutChanged();
 signals:
     void translateSignal(); 
     void show3DUpdated(bool show);
     void renderWindowUpdated(QVector<int> windows);
     void windowLayoutModeUpdated(int mode);
+    void windowLayoutChanged(QVector<int> windows);
 private:
     void initWindow();
     void initConnections();
