@@ -67,6 +67,7 @@ public:
 private:
     void drawRoi();
     void updateButtonsPos();
+    void translateRoi(float x, float y);
 signals:
     void roiValueUpdated(QRectF rect);
     void roiVisialeChanged(bool visible);
@@ -75,7 +76,7 @@ private:
     QRectF roiRectLast;
 
     QMargins roiOffset;
-    int buttonAreaHeight = 30;
+    int buttonAreaHeight = 40;
 
     QPushButton* cancelButton;
     QPushButton* okButton;

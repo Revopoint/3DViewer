@@ -615,17 +615,18 @@ void ParaSettingsWidget::onCameraParaUpdated(int paraId, QVariant value)
     {
         paraWidgets[paraId]->setValue(value);
         onParaLinkResponse(paraId, value);
-    }
-    else if (paraId == PARA_DEPTH_ROI)
-    {
-        QRectF rect = value.toRectF();
 
-        QString str = QString("[%1, %2, %3, %4]").arg(QString::number(rect.left(),   'f', 3))
-                                                 .arg(QString::number(rect.top(),    'f', 3))
-                                                 .arg(QString::number(rect.right(),  'f', 3))
-                                                 .arg(QString::number(rect.bottom(), 'f', 3));
+        if (paraId == PARA_DEPTH_ROI)
+        {
+            QRectF rect = value.toRectF();
 
-        emit showMessage(QString(tr("Set ROI ")) + str);
+            QString str = QString("[%1, %2, %3, %4]").arg(QString::number(rect.left(), 'f', 3))
+                .arg(QString::number(rect.top(), 'f', 3))
+                .arg(QString::number(rect.right(), 'f', 3))
+                .arg(QString::number(rect.bottom(), 'f', 3));
+
+            emit showMessage(QString(tr("Set ROI ")) + str);
+        }
     }
     else if (paraId == PARA_DEPTH_FRAMETIME)
     {

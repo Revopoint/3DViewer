@@ -244,6 +244,7 @@ CSCamera::CSCamera()
     , cachedDepthExposure(0)
     , cachedDepthGain(0)
     , triggerMode(TRIGGER_MODE_OFF)
+    , roiRectF(QRectF(0.0, 0.0, 1.0, 1.0))
 {
     manualHdrSetting.count = 0;
 }

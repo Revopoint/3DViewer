@@ -184,11 +184,11 @@ QPushButton#stopPreviewButton:disabled{
     background-image: url(:/resources/stop_stream_disable.png);
 }
 
-QPushButton#stopPreviewButton:hover{
+QPushButton#stopPreviewButton:hover {
     background-image: url(:/resources/stop_stream_active.png);
 }
 
-QPushButton#singleShotButton{
+QPushButton#singleShotButton {
     background-image: url(:/resources/single_shot.png);
 }
 
@@ -589,7 +589,7 @@ QStatusBar {
 
 CSROIWidget{
     background: transparent;
-    border: 1px solid red;
+    /*border: 1px solid red;*/
 }
 
 

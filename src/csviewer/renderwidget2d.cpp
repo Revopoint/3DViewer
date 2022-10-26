@@ -101,7 +101,7 @@ void RenderWidget2D::initWidget()
 
     // image area
     QVBoxLayout* vLayout = new QVBoxLayout(imageArea);
-    vLayout->setContentsMargins(10, 10, 10, 10);
+    vLayout->setContentsMargins(5, 5, 5, 5 + bottomOffset);
     vLayout->setSpacing(0);
     vLayout->addWidget(imageLabel);
 
@@ -345,7 +345,7 @@ void RenderWidget2D::updateImageSize()
         centerWidget->setGeometry(0, 0, width * imageAreaScale, height * imageAreaScale);
     }
     const int w1 = centerWidget->width();
-    const int h1 = centerWidget->height();
+    const int h1 = centerWidget->height() - bottomOffset;
     
     int imgW, imgH;
     if (w1 / ratioWH < h1)
@@ -360,10 +360,12 @@ void RenderWidget2D::updateImageSize()
     }
 
     int x = (w1 - imgW) / 2;
-    int y = (centerWidget->height() - imgH) / 2;
+    int y = (h1 - imgH) / 2;
 
     //imageLabel->setGeometry(0, 0, imgW, imgH);
-    imageArea->setGeometry(x, y, imgW, imgH);
+    imageArea->setGeometry(x, y, imgW, imgH + bottomOffset);
+    auto layout = imageArea->layout();
+    layout->setContentsMargins(5, 5, 5, 5 + bottomOffset);
 
     if (!cachedImage.isNull())
     {
@@ -392,7 +394,12 @@ DepthRenderWidget2D::DepthRenderWidget2D(int renderId, QWidget* parent)
 
     roiWidget->setOffset(margins);
     roiWidget->setVisible(false);
-    connect(roiWidget, &CSROIWidget::roiValueUpdated, this, &DepthRenderWidget2D::roiRectFUpdated);
+    connect(roiWidget, &CSROIWidget::roiValueUpdated, this, &DepthRenderWidget2D::roiRectFUpdated); 
+    connect(roiWidget, &CSROIWidget::roiVisialeChanged, this, [=](bool visible)
+        {
+            bottomOffset = visible ? roiWidget->getButtonAreaHeight() : 0;
+            updateImageSize();
+        });
 }
 
 DepthRenderWidget2D::~DepthRenderWidget2D()
@@ -416,16 +423,6 @@ static void valueCorrect(T& v, T min, T max)
 {
     v = (v < min) ? min : v;
     v = (v > max) ? max : v;
-}
-
-void DepthRenderWidget2D::resizeEvent(QResizeEvent* event)
-{
-    RenderWidget2D::resizeEvent(event);
-
-    QRect imageAreaRect = imageArea->geometry();
-    imageAreaRect.setHeight(imageAreaRect.height() + roiWidget->getButtonAreaHeight());
-
-    roiWidget->setGeometry(imageAreaRect);
 }
 
 void DepthRenderWidget2D::onPainterInfos(OutputData2D outputData)
@@ -472,6 +469,9 @@ void DepthRenderWidget2D::onRoiEditStateChanged(bool edit, QRectF rect)
 
     roiWidget->updateRoiRectF(rect);
     roiWidget->setVisible(isRoiEdit);
+
+    bottomOffset = isRoiEdit ? roiWidget->getButtonAreaHeight() : 0;
+    updateImageSize();
 }
 
 void DepthRenderWidget2D::onShowCoordChanged(bool show)
@@ -490,4 +490,12 @@ void DepthRenderWidget2D::setShowCoord(bool show)
     {
         emit showCoordChanged(isShowCoord);
     }  
+}
+
+void DepthRenderWidget2D::updateImageSize()
+{
+    RenderWidget2D::updateImageSize();
+
+    QRect imageAreaRect = imageArea->geometry();
+    roiWidget->setGeometry(imageAreaRect);
 }

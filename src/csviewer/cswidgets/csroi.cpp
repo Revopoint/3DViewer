@@ -69,6 +69,7 @@ CSROIWidget::CSROIWidget(QWidget* parent)
     , roiRect(QRectF(0.0, 0.0, 1.0, 1.0))
     , roiOffset(10, 10, 10, 10)
 {
+    setAttribute(Qt::WA_StyledBackground, true);
     //setVisible(false);
     roiRectLast = roiRect;
 
@@ -199,10 +200,13 @@ void CSROIWidget::mouseReleaseEvent(QMouseEvent* event)
 {
     pressPositon = -1;
     lastPosition = QPoint(0, 0);
+
+    //QWidget::mouseReleaseEvent(event);
 }
 
 void CSROIWidget::mousePressEvent(QMouseEvent* event)
 {
+    //QWidget::mousePressEvent(event);
     //QPoint pos = QCursor().pos();
     pressPositon = -1;
 
@@ -292,26 +296,25 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
         pressPositon =RIGHT_BOTTOM;
         return;
     }
-
 }
 
 void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
 {
      auto pos = event->pos();
-     qDebug() << "pos x = " << pos.x() << ", y = " << pos.y();
-     if(pressPositon < 0)
-     {
-         return;
-     }
-
-     //roiRect
      QPoint curPos = event->pos();
      QPoint dPos = curPos - lastPosition;
 
-     lastPosition = curPos;
-
+     //qDebug() << "pos x = " << pos.x() << ", y = " << pos.y();
      auto dx = (dPos.x()) * 1.0 / (width() - roiOffset.left() - roiOffset.right());
      auto dy = (dPos.y()) * 1.0 / (height() - roiOffset.top() - roiOffset.bottom());
+     
+     //roiRect
+     lastPosition = curPos;
+     if(pressPositon < 0)
+     {
+         translateRoi(dx, dy);
+         return;
+     }
 
      auto left = roiRect.left();
      auto top = roiRect.top();
@@ -417,4 +420,48 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
      }
 
      update();
+}
+
+void CSROIWidget::translateRoi(float x, float y)
+{
+    //qDebug() << "dx : " << x << ", dy : "<< y;
+    auto left = roiRect.left();
+    auto top = roiRect.top();
+    auto right = roiRect.right();
+    auto bottom = roiRect.bottom();
+
+    if (x > 0)
+    {
+        qreal r = right + x;
+        r = r > 1 ? 1 : r;
+        left += (r - right);
+        right = r;
+    }
+    else 
+    {
+        qreal l = left + x;
+        l = l < 0 ? 0 : l;
+        right += (l - left);
+        left = l;
+    }
+
+    if (y > 0)
+    {
+        qreal b = bottom + y;
+        b = b > 1 ? 1 : b;
+        top += (b - bottom);
+        bottom = b;
+    }
+    else 
+    {
+        qreal t = top + y;
+        t = t < 0 ? 0 : t;
+        bottom += (t - top);
+        top = t;
+    }
+
+    roiRect.setTopLeft(QPointF(left, top));
+    roiRect.setBottomRight(QPointF(right, bottom));
+
+    update();
 }

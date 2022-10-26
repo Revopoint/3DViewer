@@ -44,7 +44,6 @@
         <file>resources/start_stream.png</file>
         <file>resources/start_stream_active.png</file>
         <file>resources/start_stream_disable.png</file>
-        <file>resources/stop_stream.png</file>
         <file>resources/stop_stream_active.png</file>
         <file>resources/stop_stream_disable.png</file>
         <file>resources/switch_button_off.png</file>
@@ -60,6 +59,7 @@
         <file>resources/vedio.png</file>
         <file>resources/vedio_active.png</file>
         <file>resources/vedio_disable.png</file>
+        <file>resources/stop_stream.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>cameralist.ui</file>

@@ -83,7 +83,6 @@ protected:
     bool showFullScreen = false;
 };
 
-
 class RenderWidget2D : public RenderWidget
 {
     Q_OBJECT
@@ -106,7 +105,7 @@ public slots:
 protected:
     void initWidget();
     void onFrameIncrease();
-    void updateImageSize();
+    virtual void updateImageSize();
     virtual void onPainterInfos(OutputData2D outputData);
     void updateFps();
     void initButtons();
@@ -144,6 +143,8 @@ protected:
     bool holdCtrl = false;
 
     QImage cachedImage;
+
+    int bottomOffset = 0;
 };
 
 class CSROIWidget;
@@ -156,8 +157,8 @@ public:
 
     void setShowCoord(bool show);
     void mousePressEvent(QMouseEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
 
+    void updateImageSize() override;
 public slots:
     void onRoiEditStateChanged(bool edit, QRectF rect);
     void onShowCoordChanged(bool show);
