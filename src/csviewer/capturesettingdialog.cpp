@@ -46,6 +46,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QListView>
+#include <QFile>
 
 #include <icscamera.h>
 
@@ -82,7 +83,7 @@ void CaptureSettingDialog::showEvent(QShowEvent* event)
     auto camera = cs::CSApplication::getInstance()->getCamera();
     QVariant hasRgbV, hasIrV, hasDepthV;
     camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
-    camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_LR, hasIrV);
+    camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_IR, hasIrV);
     camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
 
     const bool hasRgb = hasRgbV.toBool();

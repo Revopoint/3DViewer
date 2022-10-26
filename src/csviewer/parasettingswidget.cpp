@@ -50,6 +50,7 @@
 #include <QListView>
 #include <QStringListModel>
 #include <QTime>
+#include <QTimer>
 #include <QThread>
 #include <QDialog>
 #include <QFileDialog>
@@ -160,7 +161,7 @@ void ParaSettingsWidget::addHdrButtons()
     layout->setSpacing(10);
 
     hdrRefreshButton = new QPushButton(tr("Refresh"), hdrButtonArea);
-    hdrConfirmButton = new QPushButton("OK", hdrButtonArea);
+    hdrConfirmButton = new QPushButton(tr("OK"), hdrButtonArea);
     hdrRefreshButton->setProperty("isCSStyle", true);
     hdrConfirmButton->setProperty("isCSStyle", true);
 
@@ -257,6 +258,7 @@ void ParaSettingsWidget::initWidget()
     initRgbPara();
 
     ui->depthCameraButton->setChecked(true);
+    ui->scrollArea->setEnabled(false);
 }
 
 void ParaSettingsWidget::initConnections()
@@ -346,32 +348,20 @@ void ParaSettingsWidget::onClickRgbButton()
     }
 }
 
-
-void ParaSettingsWidget::onSingleShotChanged(bool checked)
-{
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    ui->singleShotButton->setEnabled(checked);
-    
-    const int triggerMode = checked ? TRIGGER_MODE_SOFTWAER : TRIGGER_MODE_OFF;
-    camera->setCameraPara(PARA_TRIGGER_MODE, triggerMode);
-}
-
 void ParaSettingsWidget::onClickSingleShot()
 {
     auto camera = cs::CSApplication::getInstance()->getCamera();
 
-    QVariant value;
-    camera->getCameraPara(PARA_TRIGGER_MODE, value);
-
+    //QVariant value;
+    //camera->getCameraPara(PARA_TRIGGER_MODE, value);
     //if (value.toInt() == TRIGGER_MODE_OFF)
-    if(softTrigger == false)
+    if(!isSingleShotMode)
     {
         const int triggerMode = TRIGGER_MODE_SOFTWAER;
         camera->setCameraPara(PARA_TRIGGER_MODE, triggerMode);
 
-        softTrigger = true;
         ui->previewButton->setChecked(false);
-
+        isSingleShotMode = true;
         emit showMessage(tr("Entered single shot mode! You can click the button to get the next frame."), 5000);
     }
     else
@@ -428,6 +418,7 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
     case CAMERA_STARTED_STREAM:
         onUpdatedCameraParas();
         ui->previewButton->setChecked(true);
+        isSingleShotMode = false;
         break;
     case CAMERA_CONNECTED:
         {
@@ -459,10 +450,9 @@ void ParaSettingsWidget::updateControlButtonState(int cameraState)
     enable = (cameraState == CAMERA_STARTED_STREAM);
     ui->captureSingleButton->setEnabled(enable);
     ui->captureMultipleButton->setEnabled(enable);
-    ui->stopPreviewButton->setEnabled(enable);
     ui->singleShotButton->setEnabled(enable);
 
-    softTrigger = false;
+    ui->stopPreviewButton->setEnabled((cameraState == CAMERA_STARTED_STREAM) || (cameraState == CAMERA_PAUSED_STREAM));
 }
 
 void ParaSettingsWidget::updateWidgetsState(int cameraState)
@@ -479,6 +469,7 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
     QVariant hasRgbV;
     cameraPtr->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
     bool hasRgb = hasRgbV.toBool(); 
+
     ui->rgbCameraButton->setEnabled(hasRgb);
     ui->rgbParaWidget->setEnabled(hasRgb);
 
@@ -491,6 +482,15 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
             : (cameraState == CAMERA_STARTED_STREAM ? !isStreamTypePara : false);
 
         widget->setEnabled(enable);
+    }
+
+    if (cameraState == CAMERA_STARTED_STREAM)
+    {
+        QVariant hasDepthV;
+        cameraPtr->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
+        bool hasDepth = hasDepthV.toBool();
+
+        paraWidgets[PARA_DEPTH_RANGE]->setEnabled(hasDepth);
     }
 }
 
@@ -772,6 +772,9 @@ void ParaSettingsWidget::onTranslate()
     ui->singleShotButton->setToolTip(tr("Single Shot"));
     ui->stopPreviewButton->setToolTip(tr("Stop preview"));
 
+    hdrRefreshButton->setText(tr("Refresh"));
+    hdrConfirmButton->setText(tr("OK"));
+       
     captureSettingDialog->onTranslate();
 }
 
@@ -787,10 +790,10 @@ void ParaSettingsWidget::onPreviewStateChanged(bool toggled)
     const int value = camera->getCameraState();
     if (toggled)
     {
-        if (softTrigger)
+        if (isSingleShotMode)
         {
             camera->setCameraPara(PARA_TRIGGER_MODE, TRIGGER_MODE_OFF);
-            softTrigger = false;
+            isSingleShotMode = false;
         }
         else if (value == CAMERA_PAUSED_STREAM)
         {

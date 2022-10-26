@@ -210,11 +210,21 @@ void ImageOutputSaver::saveOutputDepth(StreamData& streamData)
     }
 }
 
+FILE* openFile(QString& path)
+{
+    FILE* fp = nullptr;
+    
+    QByteArray data = path.toLocal8Bit();
+    fp = fopen(data.data(), "wb");
+
+    return fp;
+}
+
 void ImageOutputSaver::saveGrayScale16(StreamData& streamData, QString path)
 {
-    png_structp png_ptr = NULL;
-    png_infop info_ptr = NULL;
-    FILE* fp = NULL;
+    png_structp png_ptr = nullptr;
+    png_infop info_ptr = nullptr;
+    FILE* fp = nullptr;
 
     int bitDepth = 16;
     int width = streamData.dataInfo.width;
@@ -223,21 +233,21 @@ void ImageOutputSaver::saveGrayScale16(StreamData& streamData, QString path)
     uchar* pngData = (uchar*)streamData.data.data();
     do 
     {
-        fp = fopen(path.toStdString().c_str(), "wb");
-        if (fp == NULL) {
+        fp = openFile(path);
+        if (fp == nullptr) {
             qWarning() << "Open file failed, file : " << path;
             break;
         }
 
-        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-        if (png_ptr == NULL) {
+        png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING, nullptr, nullptr, nullptr);
+        if (png_ptr == nullptr) {
             qWarning() << ("Could not allocate write struct");
             break;
         }
 
         // Initialize info structure
         info_ptr = png_create_info_struct(png_ptr);
-        if (info_ptr == NULL) {
+        if (info_ptr == nullptr) {
             qWarning() << "Could not allocate info struct";
             break;
         }
@@ -261,15 +271,15 @@ void ImageOutputSaver::saveGrayScale16(StreamData& streamData, QString path)
             png_write_row(png_ptr, pngData + offset);
         }
 
-        png_write_end(png_ptr, NULL);
+        png_write_end(png_ptr, nullptr);
     
     } while (false);
 
 
-    if (fp != NULL)
+    if (fp != nullptr)
         fclose(fp);
 
-    if (png_ptr != NULL || info_ptr != NULL)
+    if (png_ptr != nullptr || info_ptr != nullptr)
         png_destroy_write_struct(&png_ptr, &info_ptr);
 }
 

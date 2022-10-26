@@ -134,6 +134,7 @@ private:
     void onLanguageChanged();
     void updateStatusBar(int state);
     void updateWindowActions();
+    void destoryRenderWindows();
 private:
     Ui::ViewerWindow* ui;
     CS_LANGUAGE language;

@@ -54,6 +54,8 @@ CSTextImageButton::CSTextImageButton(const QIcon& icon, const char* text, Qt::La
 {
     setCheckable(true);
     initButton();
+
+    buttonText->setProperty("ButtonTitle", true);
 }
 
 void CSTextImageButton::retranslate(const char* context)

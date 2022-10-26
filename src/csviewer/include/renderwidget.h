@@ -217,5 +217,6 @@ private:
     QWidget* bottomItem;
 
     bool isReady = false;
+    bool isFirstFrame = true;
 };
 #endif // _CS_RENDERWIDGET2D_H

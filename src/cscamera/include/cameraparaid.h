@@ -56,7 +56,7 @@ namespace cs{
             PARA_HAS_DEPTH = 0,
             PARA_HAS_RGB,
             PARA_EXTRINSICS,
-            PARA_DEPTH_HAS_LR,
+            PARA_DEPTH_HAS_IR,
             PARA_TRIGGER_MODE,
 
             //depth

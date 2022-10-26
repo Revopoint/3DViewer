@@ -5,17 +5,17 @@
     <name>CameraListWidget</name>
     <message>
         <location filename="../cameralist.ui"/>
-        <location filename="../cameralistwidget.cpp" line="232"/>
+        <location filename="../cameralistwidget.cpp" line="231"/>
         <source>Camera List</source>
         <translation type="unfinished">Camera List</translation>
     </message>
     <message>
-        <location filename="../cameralistwidget.cpp" line="145"/>
+        <location filename="../cameralistwidget.cpp" line="143"/>
         <source>Disconnect</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cameralistwidget.cpp" line="145"/>
+        <location filename="../cameralistwidget.cpp" line="143"/>
         <source>Connect</source>
         <translation type="unfinished"></translation>
     </message>
@@ -76,7 +76,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="335"/>
+        <location filename="../viewerwindow.cpp" line="334"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,83 +85,83 @@
         <translation type="obsolete">Camera List</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="158"/>
-        <location filename="../viewerwindow.cpp" line="389"/>
+        <location filename="../viewerwindow.cpp" line="156"/>
+        <location filename="../viewerwindow.cpp" line="388"/>
         <source>Set default save path </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="223"/>
+        <location filename="../viewerwindow.cpp" line="222"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="226"/>
+        <location filename="../viewerwindow.cpp" line="225"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="229"/>
+        <location filename="../viewerwindow.cpp" line="228"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="232"/>
+        <location filename="../viewerwindow.cpp" line="231"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="235"/>
+        <location filename="../viewerwindow.cpp" line="234"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="238"/>
+        <location filename="../viewerwindow.cpp" line="237"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="241"/>
+        <location filename="../viewerwindow.cpp" line="240"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="244"/>
+        <location filename="../viewerwindow.cpp" line="243"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="247"/>
+        <location filename="../viewerwindow.cpp" line="246"/>
         <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="250"/>
+        <location filename="../viewerwindow.cpp" line="249"/>
         <source>Preview has been paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="253"/>
+        <location filename="../viewerwindow.cpp" line="252"/>
         <source>Restarting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="256"/>
+        <location filename="../viewerwindow.cpp" line="255"/>
         <source>Stopping preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="259"/>
+        <location filename="../viewerwindow.cpp" line="258"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="329"/>
+        <location filename="../viewerwindow.cpp" line="328"/>
         <source>Set default save path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="395"/>
+        <location filename="../viewerwindow.cpp" line="394"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -253,154 +253,161 @@
         <translation type="obsolete">Depth Range(mm):</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="147"/>
-        <location filename="../parasettingswidget.cpp" line="180"/>
+        <location filename="../parasettingswidget.cpp" line="166"/>
+        <location filename="../parasettingswidget.cpp" line="199"/>
         <source>Number</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="147"/>
-        <location filename="../parasettingswidget.cpp" line="180"/>
+        <location filename="../parasettingswidget.cpp" line="166"/>
+        <location filename="../parasettingswidget.cpp" line="199"/>
         <source>Exposure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="118"/>
-        <location filename="../parasettingswidget.cpp" line="147"/>
-        <location filename="../parasettingswidget.cpp" line="180"/>
-        <location filename="../parasettingswidget.cpp" line="205"/>
+        <location filename="../parasettingswidget.cpp" line="137"/>
+        <location filename="../parasettingswidget.cpp" line="166"/>
+        <location filename="../parasettingswidget.cpp" line="199"/>
+        <location filename="../parasettingswidget.cpp" line="224"/>
         <source>Gain</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="628"/>
+        <location filename="../parasettingswidget.cpp" line="646"/>
         <source>Set ROI </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="769"/>
-        <location filename="../parasettingswidget.cpp" line="780"/>
+        <location filename="../parasettingswidget.cpp" line="787"/>
+        <location filename="../parasettingswidget.cpp" line="801"/>
         <source>Start preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="830"/>
+        <location filename="../parasettingswidget.cpp" line="851"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="102"/>
-        <location filename="../parasettingswidget.cpp" line="194"/>
+        <location filename="../parasettingswidget.cpp" line="121"/>
+        <location filename="../parasettingswidget.cpp" line="213"/>
         <source>Stream Format</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="104"/>
-        <location filename="../parasettingswidget.cpp" line="196"/>
+        <location filename="../parasettingswidget.cpp" line="123"/>
+        <location filename="../parasettingswidget.cpp" line="215"/>
         <source>Resolution</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="109"/>
+        <location filename="../parasettingswidget.cpp" line="128"/>
         <source>Depth Range(mm)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="116"/>
-        <location filename="../parasettingswidget.cpp" line="203"/>
+        <location filename="../parasettingswidget.cpp" line="135"/>
+        <location filename="../parasettingswidget.cpp" line="222"/>
         <source>Exposure Time(us)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="114"/>
-        <location filename="../parasettingswidget.cpp" line="201"/>
+        <location filename="../parasettingswidget.cpp" line="133"/>
+        <location filename="../parasettingswidget.cpp" line="220"/>
         <source>Auto Exposure</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="123"/>
+        <location filename="../parasettingswidget.cpp" line="142"/>
         <source>Threshold(Gray Level)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="128"/>
+        <location filename="../parasettingswidget.cpp" line="147"/>
         <source>Filter Type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="130"/>
+        <location filename="../parasettingswidget.cpp" line="149"/>
         <source>Filter Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="135"/>
+        <location filename="../parasettingswidget.cpp" line="154"/>
         <source>Fill Hole</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="140"/>
+        <location filename="../parasettingswidget.cpp" line="159"/>
         <source>ROI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="145"/>
-        <location filename="../parasettingswidget.cpp" line="178"/>
+        <location filename="../parasettingswidget.cpp" line="164"/>
+        <location filename="../parasettingswidget.cpp" line="197"/>
         <source>HDR Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="146"/>
-        <location filename="../parasettingswidget.cpp" line="179"/>
+        <location filename="../parasettingswidget.cpp" line="165"/>
+        <location filename="../parasettingswidget.cpp" line="198"/>
         <source>HDR Level</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="162"/>
+        <location filename="../parasettingswidget.cpp" line="181"/>
+        <location filename="../parasettingswidget.cpp" line="793"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="210"/>
+        <location filename="../parasettingswidget.cpp" line="182"/>
+        <location filename="../parasettingswidget.cpp" line="794"/>
+        <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="229"/>
         <source>Auto White Balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="212"/>
+        <location filename="../parasettingswidget.cpp" line="231"/>
         <source>White Balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="295"/>
+        <location filename="../parasettingswidget.cpp" line="315"/>
         <source>Parameter Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="375"/>
+        <location filename="../parasettingswidget.cpp" line="383"/>
         <source>Entered single shot mode! You can click the button to get the next frame.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="770"/>
+        <location filename="../parasettingswidget.cpp" line="788"/>
         <source>Capture single frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="771"/>
+        <location filename="../parasettingswidget.cpp" line="789"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="772"/>
+        <location filename="../parasettingswidget.cpp" line="790"/>
         <source>Single Shot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="773"/>
+        <location filename="../parasettingswidget.cpp" line="791"/>
         <source>Stop preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="780"/>
+        <location filename="../parasettingswidget.cpp" line="801"/>
         <source>Pause preview</source>
         <translation type="unfinished"></translation>
     </message>
@@ -410,7 +417,7 @@
     <message>
         <location filename="../../cscamera/cscamera.cpp" line="80"/>
         <location filename="../../cscamera/cscamera.cpp" line="88"/>
-        <location filename="../../cscamera/cscamera.cpp" line="147"/>
+        <location filename="../../cscamera/cscamera.cpp" line="148"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
@@ -445,22 +452,22 @@
         <translation type="unfinished">Time Domain Smooth</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="148"/>
+        <location filename="../../cscamera/cscamera.cpp" line="149"/>
         <source>Shiny</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="149"/>
+        <location filename="../../cscamera/cscamera.cpp" line="150"/>
         <source>Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="150"/>
+        <location filename="../../cscamera/cscamera.cpp" line="151"/>
         <source>Both</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="151"/>
+        <location filename="../../cscamera/cscamera.cpp" line="152"/>
         <source>Manual</source>
         <translation type="unfinished"></translation>
     </message>
@@ -507,12 +514,12 @@
     <name>CSMessageBox</name>
     <message>
         <location filename="../cswidgets/csmessagebox.cpp" line="50"/>
-        <location filename="../cswidgets/csmessagebox.cpp" line="89"/>
+        <location filename="../cswidgets/csmessagebox.cpp" line="90"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../cswidgets/csmessagebox.cpp" line="90"/>
+        <location filename="../cswidgets/csmessagebox.cpp" line="91"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
@@ -520,21 +527,21 @@
 <context>
     <name>RenderWidget3D</name>
     <message>
-        <location filename="../renderwidget3d.cpp" line="391"/>
-        <location filename="../renderwidget3d.cpp" line="474"/>
+        <location filename="../renderwidget3d.cpp" line="400"/>
+        <location filename="../renderwidget3d.cpp" line="483"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="396"/>
-        <location filename="../renderwidget3d.cpp" line="430"/>
-        <location filename="../renderwidget3d.cpp" line="471"/>
+        <location filename="../renderwidget3d.cpp" line="405"/>
+        <location filename="../renderwidget3d.cpp" line="439"/>
+        <location filename="../renderwidget3d.cpp" line="480"/>
         <source>Texture on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="426"/>
-        <location filename="../renderwidget3d.cpp" line="467"/>
+        <location filename="../renderwidget3d.cpp" line="435"/>
+        <location filename="../renderwidget3d.cpp" line="476"/>
         <source>Texture off</source>
         <translation type="unfinished"></translation>
     </message>
@@ -621,12 +628,12 @@
 <context>
     <name>CaptureSettingDialog</name>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="105"/>
+        <location filename="../capturesettingdialog.cpp" line="106"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="239"/>
+        <location filename="../capturesettingdialog.cpp" line="240"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>

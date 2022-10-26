@@ -229,8 +229,6 @@ void RenderWidget3D::initWindow()
 
     rootNode->addChild(csAxes);
 
-    pViewer->home();
-
     osgQOpenGLWidgetPtr->mutex()->writeLock();
     isReady = true;
     osgQOpenGLWidgetPtr->mutex()->writeUnlock();
@@ -320,6 +318,17 @@ void RenderWidget3D::onRenderDataUpdated(cs::Pointcloud& pointCloud, const QImag
     //draw
     refresh();
 
+    if (isFirstFrame)
+    {
+        osgViewer::Viewer* pViewer = osgQOpenGLWidgetPtr->getOsgViewer();
+        if (pViewer)
+        {
+            pViewer->home();
+        }
+
+        isFirstFrame = false;
+    }
+    
     osgQOpenGLWidgetPtr->mutex()->writeUnlock();
 }
 

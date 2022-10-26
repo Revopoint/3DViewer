@@ -91,8 +91,6 @@ ViewerWindow::ViewerWindow(QWidget *parent)
     ui->actionChinese->setChecked(language == LANGUAGE_ZH);
 
     onLanguageChanged();
-
-    onCameraStreamStarted();
 }
 
 ViewerWindow::~ViewerWindow()
@@ -194,6 +192,7 @@ void ViewerWindow::onCameraStateChanged(int state)
     case CAMERA_CONNECTFAILED:
         circleProgressBar->close();
         ui->menuCamera->setEnabled(false);
+        destoryRenderWindows();
         break;
     case CAMERA_STARTED_STREAM:
         onCameraStreamStarted();
@@ -427,7 +426,7 @@ void ViewerWindow::onCameraStreamStarted()
 
     QVariant hasRgbV, hasIrV, hasDepthV;
     camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
-    camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_LR, hasIrV);
+    camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_IR, hasIrV);
     camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
 
     for (auto action : windowActions)
@@ -480,7 +479,6 @@ void ViewerWindow::onRenderWindowUpdated()
     // notify to render window
     emit renderWindowUpdated(windows);
     onWindowLayoutChanged();
-
 }
 
 void ViewerWindow::onTriggeredWindowsTitle()
@@ -534,4 +532,15 @@ void ViewerWindow::onRenderExit(int renderId)
             break;
         }
     }
+}
+
+void ViewerWindow::destoryRenderWindows()
+{
+    for (auto action : windowActions)
+    {
+        ui->menuWindows->removeAction(action);
+        delete action;
+    }
+    windowActions.clear();
+    onRenderWindowUpdated();
 }

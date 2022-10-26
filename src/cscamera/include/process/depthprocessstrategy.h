@@ -86,7 +86,7 @@ private:
 
     void timeDomainSmooth(const ushort* dataPtr, int length, int width, int height, float* output);
 
-private:
+protected:
     bool calcDepthCoord;
     QPointF depthCoordCalcPos;
     

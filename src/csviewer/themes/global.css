@@ -45,7 +45,7 @@ QWidget {
     /*border: none;*/
     border-style:outset;
     color: rgb(77,77,77);
-    font: 13px;
+    font-size: 14px;
     background: transparent;
     /*border: 1px solid red;*/
 }
@@ -72,6 +72,7 @@ QWidget#scrollAreaWidgetContents {
 
 QWidget#topItem {
     background: rgb(204, 204, 204);
+    font-size: 16px;
 }
 
 QWidget#cameraTopItem {
@@ -85,6 +86,7 @@ QWidget#bottomControlArea {
 QWidget#cameraButtonArea {
     background: rgb(204, 204, 204);
     border-top: 1px solid rgb(102,102,102);
+    
 }
 
 QWidget#CaptureSettingWidget, QWidget#CameraInfoWidget {
@@ -96,6 +98,9 @@ QWidget#Line
     background: rgb(179, 179, 179);
 }
 
+QWidget#CSMessageBox {
+    background: rgb(179, 179, 179);
+}
 /* QMenuBar */
 QMenuBar {
     background: rgb(179, 179, 179);
@@ -129,7 +134,7 @@ QPushButton[isCameraButton] {
     background: rgb(179, 179, 179);
     border: 1px solid rgb(102, 102, 102);
     border-top: none;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 QPushButton[isCameraButton]:checked {
@@ -263,6 +268,9 @@ QLabel:hover {
     
 }
 
+QLabel[ButtonTitle] {
+    font-size: 16px;
+}
 /*QListWidget*/
 QListWidget::item {
     background: transparent;
@@ -306,6 +314,10 @@ QComboBox {
     border-radius: 4px;
     border: 1px solid rgb(153,153,153);
     min-width: 120px;
+}
+
+QComboBox:disabled {
+    background-color: transparent;
 }
 
 QComboBox QAbstractItemView {
@@ -389,6 +401,14 @@ QSlider::handle:Horizontal {
     border-radius: 7px;
     margin-top: -5px;
     margin-bottom: -5px;
+}
+
+QSlider::handle:Horizontal:disabled {
+    background: rgb(180, 180, 180);
+}
+
+QSlider::sub-page:Horizontal:Horizontal:disabled {
+    background: rgb(153,153,153);
 }
 
 /*QScrollBar*/
@@ -484,7 +504,7 @@ QTabBar::tab {
     border-left: none;
     border-top:none;
     background: rgb(179, 179, 179);
-
+    font-size: 18px;
 }
 
 QTabBar::tab:selected, QTabBar::tab:hover {

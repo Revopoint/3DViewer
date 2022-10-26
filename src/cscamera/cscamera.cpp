@@ -129,7 +129,7 @@ static const QMap<CAMERA_PARA_ID, int> CAMERA_EXTENSION_PROPERTY_MAP =
     { PARA_DEPTH_SCALE,            PROPERTY_EXT_DEPTH_SCALE },  
     { PARA_DEPTH_ROI,              PROPERTY_EXT_DEPTH_ROI },
     { PARA_DEPTH_RANGE,            PROPERTY_EXT_DEPTH_RANGE },
-    { PARA_TRIGGER_MODE,           PROPERTY_EXT_TRIGGER_MODE }
+    { PARA_TRIGGER_MODE,           PROPERTY_EXT_TRIGGER_MODE },
 };
 
 static const QList<CAMERA_PARA_ID> CAMERA_OPTION_PARA_LIST =
@@ -330,14 +330,6 @@ void CSCamera::onStreamStarted()
     DEPTH_RANGE_LIMIT.min = 20;
     DEPTH_RANGE_LIMIT.max = 65535 * propExt.depthScale;
     depthScale = propExt.depthScale;
-
-    PropertyExtension scanMode;
-    scanMode.bFastScanMode = false;
-    ret = cameraPtr->setPropertyExtension(PROPERTY_EXT_FAST_SCAN_MODE, scanMode);
-    if (ret != SUCCESS)
-    {
-        qDebug() << "set scan mode failed";
-    }
 }
 
 bool CSCamera::stopStream()
@@ -928,7 +920,7 @@ void CSCamera::getUserParaPrivate(CAMERA_PARA_ID paraId, QVariant& value)
     case PARA_HAS_RGB:
         value = isRgbStreamSup;
         break;
-    case PARA_DEPTH_HAS_LR:
+    case PARA_DEPTH_HAS_IR:
         value = hasIrStream;
         break;
     case PARA_HAS_DEPTH:

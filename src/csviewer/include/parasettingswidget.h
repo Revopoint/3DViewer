@@ -87,6 +87,7 @@ public slots:
     void onClickedRestartCamera();
     void onClickedDisconnCamera();
     void onClickedStopStream();
+    void onClickSingleShot();
 
     void onClickCaptureSingle();
     void onClickCaptureMultiple();
@@ -97,8 +98,6 @@ private slots:
     void onClickFullScreenButton();
 
     void onPageChanged(int idx);
-    void onSingleShotChanged(bool checked);
-    void onClickSingleShot();
 
     // ui changed
     void onParaValueChanged(int paraId, QVariant value);
@@ -156,9 +155,7 @@ private:
     QWidget* hdrButtonArea;
 
     CSTextImageButton* topItemButton;
-
-    //TODO
-    bool softTrigger = false;
+    bool isSingleShotMode = false;
 };
 
 
