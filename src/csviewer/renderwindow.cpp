@@ -49,6 +49,7 @@ void RenderWindow::onWindowLayoutUpdated()
     }
 
     renderWidgets.clear();
+    onShow3DTextureChanged(false);
 
     if (renderMainWidget)
     {
@@ -319,7 +320,8 @@ void RenderWindow::initRenderWidgets()
             auto renderWidget = new RenderWidget3D((int)dataType, this);
             renderWidgets[dataType] = renderWidget;
 
-            connect(qobject_cast<RenderWidget3D*>(renderWidget), &RenderWidget3D::show3DTextureChanged, cs::CSApplication::getInstance(), &cs::CSApplication::onShow3DTextureChanged);
+            connect(renderWidget, &RenderWidget3D::show3DTextureChanged, this, &RenderWindow::onShow3DTextureChanged, Qt::QueuedConnection);
+            emit renderWidget->show3DTextureChanged(false);
             break;
         }
         default:
@@ -387,4 +389,10 @@ void RenderWindow::onFullScreenUpdated(int renderId, bool value)
             initGridLayout();
         }
     }
+}
+
+void RenderWindow::onShow3DTextureChanged(bool texture)
+{
+    show3DTexture = texture;
+    cs::CSApplication::getInstance()->onShow3DTextureChanged(show3DTexture);
 }

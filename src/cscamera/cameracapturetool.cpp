@@ -121,6 +121,8 @@ void CameraCaptureBase::run()
         captured = capturedDataCount;
     }
 
+    emit captureNumberUpdated(capturedDataCount, skipDataCount);
+
     while (!isInterruptionRequested() && (skipDataCount + captured) < captureConfig.captureNumber)
     {
         mutex.lock();

@@ -69,70 +69,29 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
         return;
     }
 
-    // Point Cloud
-    const StreamData& depthData = streamDatas.first();
-
-    const int width = depthData.dataInfo.width;
-    const int height = depthData.dataInfo.height;
-    const ushort* dataPtr = (const ushort*)depthData.data.data();
-
-    Q_ASSERT(depthData.data.size() >= width * height * sizeof(ushort));
-
-    // depth process
-    QByteArray floatData;
-    QImage depthImage, texImage;
-    onProcessDepthData(dataPtr, width * height, width, height, floatData, depthImage);
-
-    float* floatPtr = (float*)floatData.data();
-
-    bool hasTex = withTexture && streamDatas.size() > 1;
     Pointcloud pc;
-    switch (depthData.dataInfo.format)
+    QImage texImage;
+    for (const StreamData& streamData : streamDatas)
     {
-    case STREAM_FORMAT_Z16:
-    case STREAM_FORMAT_Z16Y8Y8:
-        if (hasTex) {
-            pc.generatePoints<float>(floatPtr, width, height, depthScale, &depthIntrinsics, &rgbIntrinsics, &extrinsics, true);
-        }
-        else 
+        switch (streamData.dataInfo.format)
         {
-            pc.generatePoints<float>(floatPtr, width, height, depthScale, &depthIntrinsics, nullptr, nullptr, true);
-        }  
-        break;
-    case STREAM_FORMAT_XZ32:
-        pc.generatePointsFromXZ(floatPtr, width);
-        break;
-    default:
-        qDebug() << "invalid stream format.";
-        Q_ASSERT(false);
-        return;
-    }
-
-    // rgb process
-    if (hasTex)
-    {
-        const StreamData& rgbData = streamDatas.at(1);
-        STREAM_FORMAT format = rgbData.dataInfo.format;
-
-        if (format == STREAM_FORMAT_RGB8)
-        {
-            QImage image =  QImage((uchar*)rgbData.data.data(), rgbData.dataInfo.width, rgbData.dataInfo.height, QImage::Format_RGB888);
-            texImage = image.copy(image.rect());
-        }
-        else if(format == STREAM_FORMAT_MJPG)
-        {
-            QImage image;
-            image.loadFromData(rgbData.data, "JPG");
-
-            texImage = image;
-        }
-        else {
+        case STREAM_FORMAT_Z16:
+        case STREAM_FORMAT_Z16Y8Y8:
+        case STREAM_FORMAT_XZ32:
+            generatePointCloud(streamData, pc);
+            break;
+        case STREAM_FORMAT_RGB8:
+        case STREAM_FORMAT_MJPG:
+            generateTexture(streamData, texImage);
+            break;
+        default:
             qDebug() << "invalid stream format.";
             Q_ASSERT(false);
+            return;
         }
     }
-    
-    emit output3DUpdated(pc, texImage, depthData);
+
+    emit output3DUpdated(pc, texImage);
     outputDataPort.setPointCloud(pc);
 }
 
@@ -160,7 +119,7 @@ void PointCloudProcessStrategy::onLoadCameraPara()
             extrinsics = value.value<Extrinsics>();
             break;
         case PARA_HAS_RGB:
-            withTexture = value.toBool() && withTexture;
+            withTexture = value.toBool();
             break;
         default:
             Q_ASSERT(false);
@@ -177,4 +136,69 @@ bool PointCloudProcessStrategy::getWithTexture() const
 void PointCloudProcessStrategy::setWithTexture(bool with)
 {
     withTexture = with;
+}
+
+void PointCloudProcessStrategy::generatePointCloud(const StreamData& depthData, Pointcloud& pc)
+{
+    // Point Cloud
+    const int width = depthData.dataInfo.width;
+    const int height = depthData.dataInfo.height;
+    const ushort* dataPtr = (const ushort*)depthData.data.data();
+
+    Q_ASSERT(depthData.data.size() >= width * height * sizeof(ushort));
+
+    // depth process
+    QByteArray floatData;
+    QImage depthImage, texImage;
+    onProcessDepthData(dataPtr, width * height, width, height, floatData, depthImage);
+
+    float* floatPtr = (float*)floatData.data();
+
+    bool hasTex = withTexture && depthData.data.size() > 1;
+    switch (depthData.dataInfo.format)
+    {
+    case STREAM_FORMAT_Z16:
+    case STREAM_FORMAT_Z16Y8Y8:
+        if (hasTex) {
+            pc.generatePoints<float>(floatPtr, width, height, depthScale, &depthIntrinsics, &rgbIntrinsics, &extrinsics, true);
+        }
+        else
+        {
+            pc.generatePoints<float>(floatPtr, width, height, depthScale, &depthIntrinsics, nullptr, nullptr, true);
+        }
+        break;
+    case STREAM_FORMAT_XZ32:
+        pc.generatePointsFromXZ(floatPtr, width);
+        break;
+    default:
+        qDebug() << "invalid stream format.";
+        Q_ASSERT(false);
+        return;
+    }
+}
+
+void PointCloudProcessStrategy::generateTexture(const StreamData& rgbData, QImage& texImage)
+{
+    // rgb process
+    if (withTexture)
+    {
+        STREAM_FORMAT format = rgbData.dataInfo.format;
+
+        if (format == STREAM_FORMAT_RGB8)
+        {
+            QImage image = QImage((uchar*)rgbData.data.data(), rgbData.dataInfo.width, rgbData.dataInfo.height, QImage::Format_RGB888);
+            texImage = image.copy(image.rect());
+        }
+        else if (format == STREAM_FORMAT_MJPG)
+        {
+            QImage image;
+            image.loadFromData(rgbData.data, "JPG");
+
+            texImage = image;
+        }
+        else {
+            qDebug() << "invalid stream format.";
+            Q_ASSERT(false);
+        }
+    }
 }

@@ -70,6 +70,7 @@ public slots:
     void onRoiEditStateChanged(bool edit,  QRectF rect);
 private slots:
     void onFullScreenUpdated(int renderId, bool value);
+    void onShow3DTextureChanged(bool texture);
 private:
     void initRenderWidgetsTitle();
     void initRenderWidgetsTab();
@@ -84,6 +85,7 @@ private:
     // the parent widget of render
     QWidget* renderMainWidget = nullptr;
     QLayout* rootLayout;
+    bool show3DTexture = false;
 };
 
 #endif //_CS_RENDER_WINDOWS_H

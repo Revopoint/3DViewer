@@ -261,7 +261,7 @@ void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage&
     const int height = image.height();
 
     bool bTexture = (!image.isNull() && tex_frame != nullptr && width > 0 && height > 0);
-    if (!bTexture)
+    if (!bTexture || !textureButton->isChecked())
     {
         osg::StateSet* ss = geom->getOrCreateStateSet();
         geom->setColorBinding(osg::Geometry::BIND_OFF);
@@ -302,6 +302,9 @@ void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage&
 
 void RenderWidget3D::onRenderDataUpdated(cs::Pointcloud& pointCloud, const QImage& image)
 {
+    lastPointCloud = pointCloud;
+    lastTextureImage = image;
+
     osgQOpenGLWidgetPtr->mutex()->writeLock();
     if (!isReady)
     {
@@ -439,6 +442,7 @@ void RenderWidget3D::initButtons()
                 textureButton->setToolTip(tr("Texture on"));
             }
 
+            onRenderDataUpdated(lastPointCloud, lastTextureImage);
             emit show3DTextureChanged(toggled);
         });
 

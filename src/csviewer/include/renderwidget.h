@@ -219,5 +219,8 @@ private:
 
     bool isReady = false;
     bool isFirstFrame = true;
+
+    cs::Pointcloud lastPointCloud;
+    QImage lastTextureImage;
 };
 #endif // _CS_RENDERWIDGET2D_H

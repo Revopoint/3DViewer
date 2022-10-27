@@ -90,7 +90,7 @@ OutputData2D RgbProcessStrategy::onProcessRGB8(const StreamData& streamData)
     OutputData2D outputData;
     outputData.info.cameraDataType = CAMERA_DATA_RGB;
     outputData.image = image.copy(image.rect());
-    emit output2DUpdated(outputData, streamData);
+    emit output2DUpdated(outputData);
 
     return outputData;
 }
@@ -104,7 +104,7 @@ OutputData2D RgbProcessStrategy::onProcessMJPG(const StreamData& streamData)
     OutputData2D outputData;
     outputData.image = image;
     outputData.info.cameraDataType = CAMERA_DATA_RGB;
-    emit output2DUpdated(outputData, streamData);
+    emit output2DUpdated(outputData);
 
     return outputData;
 }

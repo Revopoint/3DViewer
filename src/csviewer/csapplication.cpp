@@ -252,10 +252,7 @@ void CSApplication::onWindowLayoutChanged(QVector<int> windows)
 
 void CSApplication::onShow3DTextureChanged(bool texture)
 {
-    if (processStrategys[STRATEGY_CLOUD_POINT])
-    {
-        processStrategys[STRATEGY_CLOUD_POINT]->setProperty("withTexture", texture);
-    }   
+    show3DTexture = texture;
 }
 
 void CSApplication::onShowCoordChanged(bool show, QPointF pos)
@@ -282,4 +279,9 @@ void CSApplication::stopCapture()
 std::shared_ptr<AppConfig> CSApplication::getAppConfig()
 {
     return appConfig;
+}
+
+bool CSApplication::getShow3DTexture() const
+{
+    return show3DTexture;
 }

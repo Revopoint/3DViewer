@@ -345,125 +345,125 @@
         <translation type="obsolete">HDR级数：</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="148"/>
-        <location filename="../parasettingswidget.cpp" line="181"/>
+        <location filename="../parasettingswidget.cpp" line="157"/>
+        <location filename="../parasettingswidget.cpp" line="190"/>
         <source>Number</source>
         <translation type="unfinished">编号</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="148"/>
-        <location filename="../parasettingswidget.cpp" line="181"/>
+        <location filename="../parasettingswidget.cpp" line="157"/>
+        <location filename="../parasettingswidget.cpp" line="190"/>
         <source>Exposure</source>
-        <translation type="unfinished">曝光时间</translation>
+        <translation type="unfinished">曝光时间(US)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="119"/>
-        <location filename="../parasettingswidget.cpp" line="148"/>
-        <location filename="../parasettingswidget.cpp" line="181"/>
-        <location filename="../parasettingswidget.cpp" line="206"/>
+        <location filename="../parasettingswidget.cpp" line="128"/>
+        <location filename="../parasettingswidget.cpp" line="157"/>
+        <location filename="../parasettingswidget.cpp" line="190"/>
+        <location filename="../parasettingswidget.cpp" line="215"/>
         <source>Gain</source>
-        <translation type="unfinished">增益</translation>
+        <translation type="unfinished">增益(DB)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="103"/>
-        <location filename="../parasettingswidget.cpp" line="195"/>
+        <location filename="../parasettingswidget.cpp" line="112"/>
+        <location filename="../parasettingswidget.cpp" line="204"/>
         <source>Stream Format</source>
         <translation type="unfinished">格式</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="105"/>
-        <location filename="../parasettingswidget.cpp" line="197"/>
+        <location filename="../parasettingswidget.cpp" line="114"/>
+        <location filename="../parasettingswidget.cpp" line="206"/>
         <source>Resolution</source>
         <translation type="unfinished">分辨率</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="110"/>
+        <location filename="../parasettingswidget.cpp" line="119"/>
         <source>Depth Range(mm)</source>
-        <translation type="unfinished">深度范围</translation>
+        <translation type="unfinished">深度范围(MM)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="117"/>
-        <location filename="../parasettingswidget.cpp" line="204"/>
+        <location filename="../parasettingswidget.cpp" line="126"/>
+        <location filename="../parasettingswidget.cpp" line="213"/>
         <source>Exposure Time(us)</source>
-        <translation type="unfinished">曝光时间(us)</translation>
+        <translation type="unfinished">曝光时间(US)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="115"/>
-        <location filename="../parasettingswidget.cpp" line="202"/>
+        <location filename="../parasettingswidget.cpp" line="124"/>
+        <location filename="../parasettingswidget.cpp" line="211"/>
         <source>Auto Exposure</source>
         <translation type="unfinished">自动曝光</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="124"/>
+        <location filename="../parasettingswidget.cpp" line="133"/>
         <source>Threshold(Gray Level)</source>
         <translation type="unfinished">阈值(Gray Level)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="129"/>
+        <location filename="../parasettingswidget.cpp" line="138"/>
         <source>Filter Type</source>
         <translation type="unfinished">过滤器类型</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="131"/>
+        <location filename="../parasettingswidget.cpp" line="140"/>
         <source>Filter Level</source>
         <translation type="unfinished">过滤器等级</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="136"/>
+        <location filename="../parasettingswidget.cpp" line="145"/>
         <source>Fill Hole</source>
         <translation type="unfinished">补洞</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="141"/>
+        <location filename="../parasettingswidget.cpp" line="150"/>
         <source>ROI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="146"/>
-        <location filename="../parasettingswidget.cpp" line="179"/>
+        <location filename="../parasettingswidget.cpp" line="155"/>
+        <location filename="../parasettingswidget.cpp" line="188"/>
         <source>HDR Mode</source>
         <translation type="unfinished">HDR模式</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="147"/>
-        <location filename="../parasettingswidget.cpp" line="180"/>
+        <location filename="../parasettingswidget.cpp" line="156"/>
+        <location filename="../parasettingswidget.cpp" line="189"/>
         <source>HDR Level</source>
         <translation type="unfinished">HDR等级</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="163"/>
-        <location filename="../parasettingswidget.cpp" line="776"/>
+        <location filename="../parasettingswidget.cpp" line="172"/>
+        <location filename="../parasettingswidget.cpp" line="847"/>
         <source>Refresh</source>
         <translation type="unfinished">刷新</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="164"/>
-        <location filename="../parasettingswidget.cpp" line="777"/>
+        <location filename="../parasettingswidget.cpp" line="173"/>
+        <location filename="../parasettingswidget.cpp" line="848"/>
         <source>OK</source>
         <translation type="unfinished">确定</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="211"/>
+        <location filename="../parasettingswidget.cpp" line="220"/>
         <source>Auto White Balance</source>
         <translation type="unfinished">自动白平衡</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="213"/>
+        <location filename="../parasettingswidget.cpp" line="222"/>
         <source>White Balance</source>
-        <translation type="unfinished">白平衡</translation>
+        <translation type="unfinished">白平衡(K)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="297"/>
+        <location filename="../parasettingswidget.cpp" line="333"/>
         <source>Parameter Settings</source>
         <translation type="unfinished">参数设置</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="365"/>
+        <location filename="../parasettingswidget.cpp" line="402"/>
         <source>Entered single shot mode! You can click the button to get the next frame.</source>
         <translation type="unfinished">已经进入单次触发模式！点击该按钮获取下一帧数据。</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="628"/>
+        <location filename="../parasettingswidget.cpp" line="672"/>
         <source>Set ROI </source>
         <translation type="unfinished">设置ROI </translation>
     </message>
@@ -472,32 +472,32 @@
         <translation type="obsolete">使用鼠标在深度图中框选ROI区域，然后点击“确定”按钮</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="771"/>
+        <location filename="../parasettingswidget.cpp" line="842"/>
         <source>Capture single frame</source>
         <translation type="unfinished">保存单帧</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="772"/>
+        <location filename="../parasettingswidget.cpp" line="843"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished">保存多帧</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="773"/>
+        <location filename="../parasettingswidget.cpp" line="844"/>
         <source>Single Shot</source>
         <translation type="unfinished">单次触发</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="774"/>
+        <location filename="../parasettingswidget.cpp" line="845"/>
         <source>Stop preview</source>
         <translation type="unfinished">停止预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="784"/>
+        <location filename="../parasettingswidget.cpp" line="855"/>
         <source>Pause preview</source>
         <translation type="unfinished">暂停预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="834"/>
+        <location filename="../parasettingswidget.cpp" line="906"/>
         <source>Capture frame data</source>
         <translation type="unfinished">保存帧数据</translation>
     </message>
@@ -514,8 +514,8 @@
         <translation type="obsolete">白平衡：</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="770"/>
-        <location filename="../parasettingswidget.cpp" line="784"/>
+        <location filename="../parasettingswidget.cpp" line="841"/>
+        <location filename="../parasettingswidget.cpp" line="855"/>
         <source>Start preview</source>
         <translation type="unfinished">启动预览</translation>
     </message>
@@ -655,15 +655,15 @@
 <context>
     <name>RenderWidget3D</name>
     <message>
-        <location filename="../renderwidget3d.cpp" line="400"/>
-        <location filename="../renderwidget3d.cpp" line="483"/>
+        <location filename="../renderwidget3d.cpp" line="403"/>
+        <location filename="../renderwidget3d.cpp" line="487"/>
         <source>Home</source>
         <translation type="unfinished">归位</translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="405"/>
-        <location filename="../renderwidget3d.cpp" line="439"/>
-        <location filename="../renderwidget3d.cpp" line="480"/>
+        <location filename="../renderwidget3d.cpp" line="408"/>
+        <location filename="../renderwidget3d.cpp" line="442"/>
+        <location filename="../renderwidget3d.cpp" line="484"/>
         <source>Texture on</source>
         <translation type="unfinished">打开纹理</translation>
     </message>
@@ -676,8 +676,8 @@
         <translation type="obsolete">导出点云</translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="435"/>
-        <location filename="../renderwidget3d.cpp" line="476"/>
+        <location filename="../renderwidget3d.cpp" line="438"/>
+        <location filename="../renderwidget3d.cpp" line="480"/>
         <source>Texture off</source>
         <translation type="unfinished">关闭纹理</translation>
     </message>

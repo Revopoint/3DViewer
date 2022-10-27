@@ -53,7 +53,7 @@
 #include <algorithm>
 #include <3DCamera.hpp>
 
-static CSRange DEPTH_RANGE_LIMIT = { 0, 65535 };
+static CSRange DEPTH_RANGE_LIMIT = { 0, 10000 };
 static CSRange CAMERA_HDR_LEVEL_RANGE = { 2,8 };
 #define HDR_SCALE_DEFAULT  5
 
@@ -163,7 +163,8 @@ static const QMap<CAMERA_PARA_ID, QVariant> CAMERA_DEFAULT_PARA_VALUE =
 {
     { PARA_DEPTH_RANGE,          QVariant::fromValue(QPair<float, float>({ 50.0f, 2000.0f })) },
     { PARA_DEPTH_GAIN,           1.0f },
-    { PARA_DEPTH_EXPOSURE,       7000.0f }
+    { PARA_DEPTH_EXPOSURE,       7000.0f },
+    { PARA_TRIGGER_MODE,         (int)TRIGGER_MODE_OFF}
 };
 
 int CSCamera::setCameraChangeCallback(CameraChangeCallback callback, void* userData)
@@ -245,6 +246,7 @@ CSCamera::CSCamera()
     , cachedDepthGain(0)
     , triggerMode(TRIGGER_MODE_OFF)
     , roiRectF(QRectF(0.0, 0.0, 1.0, 1.0))
+    , depthScale(0.1)
 {
     manualHdrSetting.count = 0;
 }
@@ -327,9 +329,6 @@ void CSCamera::onStreamStarted()
     // get depth scale
     PropertyExtension propExt;
     ERROR_CODE ret = cameraPtr->getPropertyExtension(PROPERTY_EXT_DEPTH_SCALE, propExt);
-
-    DEPTH_RANGE_LIMIT.min = 20;
-    DEPTH_RANGE_LIMIT.max = 65535 * propExt.depthScale;
     depthScale = propExt.depthScale;
 }
 
@@ -1048,8 +1047,8 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
     switch (paraId)
     {
     case PARA_DEPTH_AUTO_EXPOSURE:
-        onParaUpdatedDelay(PARA_DEPTH_GAIN, 3000);
-        onParaUpdatedDelay(PARA_DEPTH_EXPOSURE, 3000);
+        //onParaUpdatedDelay(PARA_DEPTH_GAIN, 3000);
+        //onParaUpdatedDelay(PARA_DEPTH_EXPOSURE, 3000);
         break;
     case PARA_DEPTH_FILTER_TYPE:
         emit cameraParaRangeUpdated(PARA_DEPTH_FILTER);
@@ -1080,11 +1079,11 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
         } 
         break;
     case PARA_RGB_AUTO_EXPOSURE:
-        onParaUpdatedDelay(PARA_RGB_EXPOSURE, 3000);
-        onParaUpdatedDelay(PARA_RGB_GAIN, 3000);
+        //onParaUpdatedDelay(PARA_RGB_EXPOSURE, 3000);
+        //onParaUpdatedDelay(PARA_RGB_GAIN, 3000);
         break;
     case PARA_RGB_AUTO_WHITE_BALANCE:
-        onParaUpdatedDelay(PARA_RGB_WHITE_BALANCE, 3000);
+        //onParaUpdatedDelay(PARA_RGB_WHITE_BALANCE, 3000);
         break;
     case PARA_TRIGGER_MODE:
         onTriggerModeChanged(value.toInt() == TRIGGER_MODE_SOFTWAER);
@@ -1172,6 +1171,12 @@ void CSCamera::getCameraParaItems(CAMERA_PARA_ID paraId, QList<QPair<QString, QV
 
 void CSCamera::getPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& value)
 {
+    if (getCameraState() != CAMERA_STARTED_STREAM)
+    {
+        qWarning() << "get property failed, stream not started.";
+        return;
+    }
+
     float v = 0;
 
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
@@ -1299,7 +1304,7 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
         value = roiRectF;
         break;
     case PROPERTY_EXT_DEPTH_RANGE:
-        value = QVariant::fromValue(QPair<float, float>{ (float)propExt.depthRange.min, (float)propExt.depthRange.max });
+        value = QVariant::fromValue(QPair<float, float>{ (float)propExt.depthRange.min, (float)propExt.depthRange.max});
         break;
     case PROPERTY_EXT_TRIGGER_MODE:
         value = (int)propExt.triggerMode;

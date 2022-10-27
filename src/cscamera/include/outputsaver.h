@@ -69,7 +69,7 @@ protected:
     virtual void saveOutputDepth(StreamData& streamData) {}
     virtual void saveOutputIr(StreamData& streamData) {}
 
-    void savePointCloud(cs::Pointcloud& pointCloud);
+    void savePointCloud(cs::Pointcloud& pointCloud, QImage& texImage);
 
     QString getSavePath(CS_CAMERA_DATA_TYPE dataType);
 

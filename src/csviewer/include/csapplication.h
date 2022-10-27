@@ -73,10 +73,11 @@ public:
     void stopCapture();
 
     std::shared_ptr<AppConfig> getAppConfig();
+    bool getShow3DTexture() const;
 public slots:
     void onWindowLayoutChanged(QVector<int> windows);
-    void onShow3DTextureChanged(bool texture);
     void onShowCoordChanged(bool show, QPointF pos);
+    void onShow3DTextureChanged(bool texture);
 signals:
     void cameraListUpdated(const QStringList infoList);
     void connectCamera(QString serial);
@@ -110,11 +111,12 @@ private:
     std::shared_ptr<Processor> processor;
     std::shared_ptr<ProcessThread> processThread;
     
-    bool show3D = true;
     QMap<int, cs::ProcessStrategy*> processStrategys;
     std::shared_ptr<CameraCaptureTool> cameraCaptureTool;
 
     std::shared_ptr<AppConfig> appConfig;
+
+    bool show3DTexture = false;
 };
 }
 

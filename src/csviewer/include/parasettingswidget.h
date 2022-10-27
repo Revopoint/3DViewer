@@ -50,6 +50,7 @@
 #include <QPushButton>
 #include <memory>
 #include <QVariant>
+#include <QTimer>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ParameterSettingsWidget; }
@@ -141,6 +142,8 @@ private:
 
     void updateWidgetsState(int cameraState);
     void updateControlButtonState(int cameraState);
+
+    void stopTimers();
 private:
     Ui::ParameterSettingsWidget* ui;
     std::shared_ptr<cs::ICSCamera> cameraPtr;
@@ -156,6 +159,10 @@ private:
 
     CSTextImageButton* topItemButton;
     bool isSingleShotMode = false;
+
+    QTimer* depthAutoExposureTimer;
+    QTimer* rgbAutoExposureTimer;
+    QTimer* autoWhiteBalanceTimer;
 };
 
 

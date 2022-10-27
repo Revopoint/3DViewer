@@ -50,7 +50,6 @@
 #include <QListView>
 #include <QStringListModel>
 #include <QTime>
-#include <QTimer>
 #include <QThread>
 #include <QDialog>
 #include <QFileDialog>
@@ -85,6 +84,15 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
     , cameraPtr(cs::CSApplication::getInstance()->getCamera())
     , captureSettingDialog(new CaptureSettingDialog)
 {
+    // init timers
+    depthAutoExposureTimer = new QTimer(this);
+    rgbAutoExposureTimer = new QTimer(this);
+    autoWhiteBalanceTimer = new QTimer(this);
+
+    depthAutoExposureTimer->setInterval(3000);
+    rgbAutoExposureTimer->setInterval(3000);
+    autoWhiteBalanceTimer->setInterval(3000);
+
     setAttribute(Qt::WA_StyledBackground, true);
     ui->setupUi(this);
     initWidget();
@@ -93,6 +101,7 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
 
 ParaSettingsWidget::~ParaSettingsWidget()
 {
+    stopTimers();
     delete ui;
     delete captureSettingDialog;
 }
@@ -236,6 +245,33 @@ void ParaSettingsWidget::initParaConnections()
     }
 
     Q_ASSERT(suc);
+
+    suc &= (bool)connect(depthAutoExposureTimer, &QTimer::timeout, this, [=]() 
+        {
+            QVariant value;
+            cameraPtr->getCameraPara(PARA_DEPTH_EXPOSURE, value);
+            onCameraParaUpdated(PARA_DEPTH_EXPOSURE, value);
+
+            cameraPtr->getCameraPara(PARA_DEPTH_GAIN, value);
+            onCameraParaUpdated(PARA_DEPTH_GAIN, value);
+        });
+
+    suc &= (bool)connect(rgbAutoExposureTimer, &QTimer::timeout, this, [=]()
+        {
+            QVariant value;
+            cameraPtr->getCameraPara(PARA_RGB_GAIN, value);
+            onCameraParaUpdated(PARA_RGB_GAIN, value);
+
+            cameraPtr->getCameraPara(PARA_RGB_EXPOSURE, value);
+            onCameraParaUpdated(PARA_RGB_EXPOSURE, value);
+        });
+
+    suc &= (bool)connect(autoWhiteBalanceTimer, &QTimer::timeout, this, [=]()
+        {
+            QVariant value;
+            cameraPtr->getCameraPara(PARA_RGB_WHITE_BALANCE, value);
+            onCameraParaUpdated(PARA_RGB_WHITE_BALANCE, value);
+        });
 }
 
 void ParaSettingsWidget::initWidget()
@@ -361,6 +397,7 @@ void ParaSettingsWidget::onClickSingleShot()
         camera->setCameraPara(PARA_TRIGGER_MODE, triggerMode);
 
         ui->previewButton->setChecked(false);
+        ui->captureMultipleButton->setEnabled(false);
         isSingleShotMode = true;
         emit showMessage(tr("Entered single shot mode! You can click the button to get the next frame."), 5000);
     }
@@ -433,8 +470,10 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
     case CAMERA_CONNECTFAILED:
         ui->cameraButtonArea->setEnabled(false);
         ui->scrollArea->setEnabled(false);
+        stopTimers();
         break;
     default:    
+        stopTimers();
         ui->previewButton->setChecked(false);
         break;
     }
@@ -613,6 +652,11 @@ void ParaSettingsWidget::onCameraParaUpdated(int paraId, QVariant value)
 {
     if (paraWidgets.contains(paraId))
     {
+        if (!value.isValid())
+        {
+            return;
+        }
+
         paraWidgets[paraId]->setValue(value);
         onParaLinkResponse(paraId, value);
 
@@ -689,19 +733,46 @@ void ParaSettingsWidget::onParaLinkResponse(int paraId, QVariant value)
             bool enable = !(value.toInt() > 0);
             paraWidgets[PARA_DEPTH_GAIN]->setEnabled(enable);
             paraWidgets[PARA_DEPTH_EXPOSURE]->setEnabled(enable);
+
+            if (!enable)
+            {
+                depthAutoExposureTimer->start();
+            }
+            else 
+            {
+                depthAutoExposureTimer->stop();
+            }
         }
         break;
     case PARA_RGB_AUTO_EXPOSURE:
         paraWidgets[PARA_RGB_EXPOSURE]->setEnabled(!value.toBool());
         paraWidgets[PARA_RGB_GAIN]->setEnabled(!value.toBool());
+        if (value.toBool())
+        {
+            rgbAutoExposureTimer->start();
+        }
+        else
+        {
+            rgbAutoExposureTimer->stop();
+        }
         break;
     case PARA_RGB_AUTO_WHITE_BALANCE:
         paraWidgets[PARA_RGB_WHITE_BALANCE]->setEnabled(!value.toBool());
+        if (value.toBool())
+        {
+            autoWhiteBalanceTimer->start();
+        }
+        else
+        {
+            autoWhiteBalanceTimer->stop();
+        }
         break;
     case PARA_DEPTH_HDR_MODE: {
         bool isClosed = (value.toInt() == HDR_MODE_CLOSE);
         hdrButtonArea->setVisible(!isClosed);
+
         paraWidgets[PARA_DEPTH_HDR_SETTINGS]->setVisible(!isClosed); 
+        paraWidgets[PARA_DEPTH_HDR_LEVEL]->setEnabled(!isClosed);
 
         if (value.toInt() == HDR_MODE_MANUAL)
         {
@@ -795,6 +866,7 @@ void ParaSettingsWidget::onPreviewStateChanged(bool toggled)
         {
             camera->setCameraPara(PARA_TRIGGER_MODE, TRIGGER_MODE_OFF);
             isSingleShotMode = false;
+            ui->captureMultipleButton->setEnabled(true);
         }
         else if (value == CAMERA_PAUSED_STREAM)
         {
@@ -843,6 +915,7 @@ void ParaSettingsWidget::onClickCaptureSingle()
         config.saveFormat = QString("Images(*.)");
         config.saveDir = fileInfo.absolutePath();
         config.saveName = fileInfo.fileName();
+        config.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
 
         cs::CSApplication::getInstance()->startCapture(config);
     }
@@ -856,4 +929,11 @@ void ParaSettingsWidget::onClickCaptureMultiple()
 {
     qInfo() << "click capture multiple";
     captureSettingDialog->show();
+}
+
+void ParaSettingsWidget::stopTimers()
+{
+    depthAutoExposureTimer->stop();
+    rgbAutoExposureTimer->stop();
+    autoWhiteBalanceTimer->stop();
 }

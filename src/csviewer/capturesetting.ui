@@ -49,14 +49,17 @@
        <number>20</number>
       </property>
       <item>
-       <widget class="CSSlider" name="frameNumberSlider" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QLineEdit" name="frameNumberLineEdit">
+        <property name="maximumSize">
+         <size>
+          <width>100</width>
+          <height>100</height>
+         </size>
         </property>
        </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="frameNumberRange"/>
       </item>
       <item>
        <spacer name="horizontalSpacer_3">
@@ -272,14 +275,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>CSSlider</class>
-   <extends>QWidget</extends>
-   <header>csslider.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>depthCheckBox</tabstop>
   <tabstop>rgbCheckBox</tabstop>

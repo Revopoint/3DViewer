@@ -174,6 +174,7 @@ struct CameraCaptureConfig
 {
     int captureNumber = 1;
     QVector<CS_CAMERA_DATA_TYPE> captureDataTypes;
+    bool savePointCloudWithTexture = false;
     QString saveFormat;
     QString saveDir;
     QString saveName;

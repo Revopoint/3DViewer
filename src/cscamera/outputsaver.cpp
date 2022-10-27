@@ -45,15 +45,40 @@ void OutputSaver::savePointCloud()
         return;
     }
 
+    QImage texImage;
+    auto frameData = outputDataPort.getFrameData();
+
+    // generate texture image from frame data
+    if (captureConfig.savePointCloudWithTexture)
+    {
+        for (auto& streamData : frameData.data)
+        {
+            STREAM_FORMAT format = streamData.dataInfo.format;
+
+            if (format == STREAM_FORMAT_RGB8)
+            {
+                QImage image = QImage((uchar*)streamData.data.data(), streamData.dataInfo.width, streamData.dataInfo.height, QImage::Format_RGB888);
+                texImage = image.copy(image.rect());
+            }
+            else if (format == STREAM_FORMAT_MJPG)
+            {
+                QImage image;
+                image.loadFromData(streamData.data, "JPG");
+                texImage = image;
+            }
+        }
+    }
+
+    bool saveTexture = texImage.isNull();
+
     if (outputDataPort.hasData(CAMERA_DTA_POINT_CLOUD))
     {
         cs::Pointcloud pointCloud = outputDataPort.getPointCloud();
-        savePointCloud(pointCloud);
+        savePointCloud(pointCloud, texImage);
     }
     else
     {
         cs::Pointcloud pc;
-        auto frameData = outputDataPort.getFrameData();
         for (auto& streamData : frameData.data)
         {
             switch (streamData.dataInfo.format)
@@ -67,14 +92,25 @@ void OutputSaver::savePointCloud()
 
                 Intrinsics depthIntrinsics = frameData.depthIntrinsics;
 
-                pc.generatePoints<ushort>((ushort*)streamData.data.data(), width, height, depthScale, &depthIntrinsics, nullptr, nullptr, true);
-                savePointCloud(pc);
+                if (saveTexture)
+                {
+                    Intrinsics rgbIntrinsics = frameData.rgbIntrinsics;
+                    Extrinsics extrinsics = frameData.extrinsics;
+
+                    pc.generatePoints<ushort>((ushort*)streamData.data.data(), width, height, depthScale, &depthIntrinsics, &rgbIntrinsics, &extrinsics, true);
+                }
+                else 
+                {
+                    pc.generatePoints<ushort>((ushort*)streamData.data.data(), width, height, depthScale, &depthIntrinsics, nullptr, nullptr, true);
+                }
                 break;
             }
             default:
                 break;
             }
         }
+
+        savePointCloud(pc, texImage);
     }
 }
 
@@ -106,10 +142,17 @@ void OutputSaver::saveOutput2D(StreamData& streamData)
     }
 }
 
-void OutputSaver::savePointCloud(cs::Pointcloud& pointCloud)
+void OutputSaver::savePointCloud(cs::Pointcloud& pointCloud, QImage& texImage)
 {
     QString savePath = getSavePath(CAMERA_DTA_POINT_CLOUD);
-    pointCloud.exportToFile(savePath.toStdString(), nullptr, 0, 0);
+    if (texImage.isNull())
+    {
+        pointCloud.exportToFile(savePath.toStdString(), nullptr, 0, 0);
+    }
+    else 
+    {
+        pointCloud.exportToFile(savePath.toStdString(), texImage.bits(), texImage.width(), texImage.height());
+    }
 }
 
 QString OutputSaver::getSavePath(CS_CAMERA_DATA_TYPE dataType)

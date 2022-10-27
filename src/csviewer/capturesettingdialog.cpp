@@ -47,6 +47,7 @@
 #include <QDebug>
 #include <QListView>
 #include <QFile>
+#include <QIntValidator>
 
 #include <icscamera.h>
 
@@ -111,6 +112,8 @@ void CaptureSettingDialog::onStartCapture()
 
         captureConfig.saveDir = fileInfo.absolutePath();
         captureConfig.saveName = fileInfo.fileName();
+        captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
+
         cs::CSApplication::getInstance()->startCapture(captureConfig);
         ui->captureInfo->setText("");
     }
@@ -172,17 +175,22 @@ void CaptureSettingDialog::onSaveFormatChanged(int index)
     }
 }
 
- void CaptureSettingDialog::onCaptureFrameNumberChanged(int para, QVariant value)
+void CaptureSettingDialog::onCaptureFrameNumberChanged()
 {
-    captureConfig.captureNumber = value.toInt();
+    int frameNumber = ui->frameNumberLineEdit->text().toInt();
+    captureConfig.captureNumber = frameNumber;
 }
 
 void CaptureSettingDialog::initDialog()
 {
     ui->startCaptureButton->setProperty("isCSStyle", true);
     ui->stopCaptureButton->setProperty("isCSStyle", true);
+    
+    QString frameRange = QString("(%1, %2)").arg(minCaptureCount).arg(maxCaptureCount);
+    ui->frameNumberRange->setText(frameRange);
 
-    ui->frameNumberSlider->setParaRange(minCaptureCount, maxCaptureCount, 1);
+    QIntValidator* valiator = new QIntValidator(minCaptureCount, maxCaptureCount, this);
+    ui->frameNumberLineEdit->setValidator(valiator);
 
     // default data types
     for (auto type : captureConfig.captureDataTypes)
@@ -209,8 +217,9 @@ void CaptureSettingDialog::initDialog()
     }
 
     // save format combobox
-    ui->saveFormatComboBox->addItems(captureSaveFormats);
-    ui->frameNumberSlider->setValue(captureConfig.captureNumber);
+    ui->saveFormatComboBox->addItems(captureSaveFormats); 
+    ui->frameNumberLineEdit->setText(QString::number(captureConfig.captureNumber));
+
     ui->saveFormatComboBox->setView(new QListView(ui->saveFormatComboBox));
 }
 
@@ -230,7 +239,7 @@ void CaptureSettingDialog::initConnections()
     suc &= (bool)connect(app, &cs::CSApplication::captureNumberUpdated, this, &CaptureSettingDialog::onCaptureNumberUpdated);
     suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged,  this, &CaptureSettingDialog::onCaptureStateChanged);
 
-    suc &= (bool)connect(ui->frameNumberSlider,  &CSSlider::valueChanged, this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
+    suc &= (bool)connect(ui->frameNumberLineEdit,  &QLineEdit::editingFinished, this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
 
     Q_ASSERT(suc);
 }
