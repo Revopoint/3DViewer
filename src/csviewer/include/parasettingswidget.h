@@ -51,6 +51,7 @@
 #include <memory>
 #include <QVariant>
 #include <QTimer>
+#include <QThread>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ParameterSettingsWidget; }
@@ -63,6 +64,8 @@ class HDRSettingsDialog;
 class CaptureSettingDialog;
 class QSpacerItem;
 class CSTextImageButton;
+class ParaMonitorThread;
+
 class ParaSettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -143,7 +146,8 @@ private:
     void updateWidgetsState(int cameraState);
     void updateControlButtonState(int cameraState);
 
-    void stopTimers();
+    void stopParaMonitor();
+    void startParaMonitor();
 private:
     Ui::ParameterSettingsWidget* ui;
     std::shared_ptr<cs::ICSCamera> cameraPtr;
@@ -160,10 +164,24 @@ private:
     CSTextImageButton* topItemButton;
     bool isSingleShotMode = false;
 
-    QTimer* depthAutoExposureTimer;
-    QTimer* rgbAutoExposureTimer;
-    QTimer* autoWhiteBalanceTimer;
+    ParaMonitorThread* paraMonitorThread;
 };
 
+class ParaMonitorThread : public QThread
+{
+    Q_OBJECT
+public:
+    ParaMonitorThread();
+    void run() override;
+
+    void setAutoExposureDepth(bool enable);
+    void setAutoExposureRgb(bool enable);
+    void setAutoWhiteBalance(bool enable);
+private:
+    bool enableAutoExposureDepth = false;
+    bool enableAutoExposureRgb = false;
+    bool enableAutoWhiteBalance = false;
+    std::shared_ptr<cs::ICSCamera> cameraPtr;
+};
 
 #endif //_CS_PARASETTINGSWIDGET_H

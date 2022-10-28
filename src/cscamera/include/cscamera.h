@@ -155,6 +155,10 @@ private:
     void getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step);
 
 private:
+    void correctExposureRange(float& min, float& max, float& step);
+    void correctExposureValue(float& value);
+    void convertExposureValue(float& value);
+private:
     class StreamThread : public QThread
     {
     public:
@@ -199,9 +203,6 @@ private:
     int cachedDepthExposure;
     int cachedDepthGain;
 
-    //roi
-    QRectF roiRectF;
-
     Intrinsics depthIntrinsics;
     Intrinsics rgbIntrinsics;
     Extrinsics extrinsics;
@@ -212,6 +213,9 @@ private:
 
     QThread* cameraThread;
     mutable QReadWriteLock lock;
+
+    float rgbExposureStep = 1;
+    float rgbExposureMin = 0;
 };
 }
 

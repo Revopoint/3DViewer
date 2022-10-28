@@ -245,7 +245,6 @@ CSCamera::CSCamera()
     , cachedDepthExposure(0)
     , cachedDepthGain(0)
     , triggerMode(TRIGGER_MODE_OFF)
-    , roiRectF(QRectF(0.0, 0.0, 1.0, 1.0))
     , depthScale(0.1)
 {
     manualHdrSetting.count = 0;
@@ -926,9 +925,6 @@ void CSCamera::getUserParaPrivate(CAMERA_PARA_ID paraId, QVariant& value)
     case PARA_HAS_DEPTH:
         value = hasDepthStream;
         break;
-    case PARA_DEPTH_ROI:
-        value = roiRectF;
-        break;
     case PARA_DEPTH_INTRINSICS:
         value = QVariant::fromValue(depthIntrinsics);
         break;
@@ -1189,6 +1185,11 @@ void CSCamera::getPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& value)
         Q_ASSERT(false);
     }
 
+    if (paraId == PARA_RGB_EXPOSURE)
+    {
+        correctExposureValue(v);
+    }
+
     value = v;
 
 #ifdef  _DEBUG
@@ -1204,12 +1205,17 @@ void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
     PROPERTY_TYPE propertyType = (PROPERTY_TYPE)CAMERA_PROPERTY_MAP[paraId].id;
 
-    const float valueF = value.toFloat();
+    float valueF = value.toFloat();
 
     // set frame time before set depth exposure
     if (paraId == PARA_DEPTH_EXPOSURE)
     {
         updateFrametime(valueF);
+    }
+
+    if (paraId == PARA_RGB_EXPOSURE)
+    {
+        convertExposureValue(valueF);
     }
 
     ERROR_CODE ret = cameraPtr->setProperty(streamType, propertyType, valueF);
@@ -1235,6 +1241,11 @@ void CSCamera::getPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVa
         qWarning() << "get camera property range failed, paraId:" << paraId << ",ret:" << ret;
         Q_ASSERT(false);
         return;
+    }
+
+    if (paraId == PARA_RGB_EXPOSURE)
+    {
+        correctExposureRange(minf, maxf, stepf);
     }
 
     min = minf;
@@ -1300,9 +1311,16 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
     case PROPERTY_EXT_DEPTH_SCALE:
         value = propExt.depthScale;
         break;  
-    case PROPERTY_EXT_DEPTH_ROI:
-        value = roiRectF;
+    case PROPERTY_EXT_DEPTH_ROI: 
+    {
+        QRectF roiRect;
+        roiRect.setLeft(propExt.depthRoi.left * 1.0 / 100);
+        roiRect.setTop(propExt.depthRoi.top * 1.0 / 100);
+        roiRect.setRight(propExt.depthRoi.right * 1.0 / 100);
+        roiRect.setBottom(propExt.depthRoi.bottom * 1.0 / 100);
+        value = roiRect;
         break;
+    }
     case PROPERTY_EXT_DEPTH_RANGE:
         value = QVariant::fromValue(QPair<float, float>{ (float)propExt.depthRange.min, (float)propExt.depthRange.max});
         break;
@@ -1363,7 +1381,6 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
             propExt.depthRoi.left   = roiRect.left() * 100;
             propExt.depthRoi.right  = roiRect.right() * 100;
             propExt.depthRoi.bottom = roiRect.bottom() * 100;
-            roiRectF = roiRect;
             break;
         }
     case PROPERTY_EXT_DEPTH_RANGE:
@@ -1519,6 +1536,42 @@ void CSCamera::getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& 
     {
         list.push_back({ QString::number(i), i });
     }
+}
+
+void CSCamera::correctExposureRange(float& min, float& max, float& step)
+{
+#ifdef WIN32
+    if (cameraInfo.connectType == CONNECT_TYPE_USB)
+    {
+        rgbExposureMin = min;
+        float d = max - min;
+        min = 1;
+        max = 30000;
+
+        rgbExposureStep = max / d;
+        step = rgbExposureStep;
+    }
+#endif
+}
+
+void CSCamera::correctExposureValue(float& value)
+{
+#ifdef WIN32
+    if (cameraInfo.connectType == CONNECT_TYPE_USB)
+    {
+        value = qRound(rgbExposureStep * (value - rgbExposureMin));
+    }
+#endif
+}
+
+void CSCamera::convertExposureValue(float& value)
+{
+#ifdef WIN32
+    if (cameraInfo.connectType == CONNECT_TYPE_USB)
+    {
+        value = (value / rgbExposureStep) + rgbExposureMin;
+    }
+#endif
 }
 
 void CSCamera::setDepthFormat(STREAM_FORMAT format)

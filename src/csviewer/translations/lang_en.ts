@@ -415,59 +415,59 @@
 <context>
     <name>cs::CSCamera</name>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="80"/>
-        <location filename="../../cscamera/cscamera.cpp" line="88"/>
-        <location filename="../../cscamera/cscamera.cpp" line="147"/>
+        <location filename="../../cscamera/cscamera.cpp" line="82"/>
+        <location filename="../../cscamera/cscamera.cpp" line="90"/>
+        <location filename="../../cscamera/cscamera.cpp" line="149"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="81"/>
+        <location filename="../../cscamera/cscamera.cpp" line="83"/>
         <source>Fix Frame Rate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="82"/>
+        <location filename="../../cscamera/cscamera.cpp" line="84"/>
         <source>High Quality</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="83"/>
+        <location filename="../../cscamera/cscamera.cpp" line="85"/>
         <source>Foreground</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="89"/>
+        <location filename="../../cscamera/cscamera.cpp" line="91"/>
         <source>Smooth</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="90"/>
+        <location filename="../../cscamera/cscamera.cpp" line="92"/>
         <source>Median</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="91"/>
+        <location filename="../../cscamera/cscamera.cpp" line="93"/>
         <source>TDSmooth</source>
         <translation type="unfinished">Time Domain Smooth</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="148"/>
+        <location filename="../../cscamera/cscamera.cpp" line="150"/>
         <source>Shiny</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="149"/>
+        <location filename="../../cscamera/cscamera.cpp" line="151"/>
         <source>Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="150"/>
+        <location filename="../../cscamera/cscamera.cpp" line="152"/>
         <source>Both</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="151"/>
+        <location filename="../../cscamera/cscamera.cpp" line="153"/>
         <source>Manual</source>
         <translation type="unfinished"></translation>
     </message>
@@ -554,12 +554,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="140"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="142"/>
         <source>save frame data is empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="182"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="184"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -567,7 +567,7 @@
 <context>
     <name>cs::CameraCaptureMutiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="409"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="411"/>
         <source>a frame dropped</source>
         <translation type="unfinished"></translation>
     </message>
@@ -628,12 +628,12 @@
 <context>
     <name>CaptureSettingDialog</name>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="106"/>
+        <location filename="../capturesettingdialog.cpp" line="107"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="240"/>
+        <location filename="../capturesettingdialog.cpp" line="249"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
