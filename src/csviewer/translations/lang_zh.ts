@@ -780,14 +780,24 @@
 <context>
     <name>CaptureSettingDialog</name>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="107"/>
+        <location filename="../capturesettingdialog.cpp" line="110"/>
         <source>Capture frame data</source>
         <translation type="unfinished">保存帧数据</translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="249"/>
+        <location filename="../capturesettingdialog.cpp" line="254"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished">已保存%1帧（丢失%2帧）</translation>
+    </message>
+    <message>
+        <location filename="../capturesettingdialog.cpp" line="275"/>
+        <source>Tips</source>
+        <translation type="unfinished">提示</translation>
+    </message>
+    <message>
+        <location filename="../capturesettingdialog.cpp" line="276"/>
+        <source>Capturing, are you sure to stop capture now ?</source>
+        <translation type="unfinished">确定要立即停止保存吗？</translation>
     </message>
 </context>
 <context>
@@ -867,6 +877,14 @@
         <location filename="../ipsettingdialog.cpp" line="89"/>
         <source>The IP address has been modified. Restarting the camera takes effect. Do you want to restart now ?</source>
         <translation type="unfinished">IP地址已经修改，重启相机后生效，立即重启吗？</translation>
+    </message>
+</context>
+<context>
+    <name>CameraPlayerWidget</name>
+    <message>
+        <location filename="../cameraplayer.ui"/>
+        <source>PushButton</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

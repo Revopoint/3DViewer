@@ -56,25 +56,25 @@
 namespace cs 
 {
 class ICSCamera;
+
+enum CAPTURE_TYPE
+{
+    CAPTURE_TYPE_SINGLE,
+    CAPTURE_TYPE_MULTIPLE,
+    CAPTURE_TYPE_COUNT
+};
+
+enum CAPTURE_STATE
+{
+    CAPTURING,
+    CAPTURE_FINISHED,
+    CAPTURE_WARNING,
+    CAPTURE_ERROR
+};
 class CameraCaptureBase : public QThread
 {
     Q_OBJECT
 public:
-    enum CAPTURE_TYPE
-    {
-        CAPTURE_TYPE_SINGLE,
-        CAPTURE_TYPE_MULTIPLE,
-        CAPTURE_TYPE_COUNT
-    };
-
-    enum CAPTURE_STATE
-    {
-        CAPTURING,
-        CAPTURE_FINISHED,
-        CAPTURE_WARNING,
-        CAPTURE_ERROR
-    };
-
     CameraCaptureBase(const CameraCaptureConfig& config, CAPTURE_TYPE captureType);
 
     CAPTURE_TYPE getCaptureType() const;
@@ -92,7 +92,7 @@ signals:
     void captureNumberUpdated(int, int);
 protected:
     virtual void onCaptureDataDone();
-    void saveIntrinsics();
+    void saveCameraPara();
 
 protected:
     CameraCaptureConfig captureConfig;

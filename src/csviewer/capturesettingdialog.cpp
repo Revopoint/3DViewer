@@ -48,12 +48,15 @@
 #include <QListView>
 #include <QFile>
 #include <QIntValidator>
+#include <QMessageBox>
 
 #include <icscamera.h>
 
 #include "csapplication.h"
 #include "appconfig.h"
 #include "ui_capturesetting.h"
+
+#include <cameracapturetool.h>
 
 static QStringList captureSaveFormats = { "images", "raw" };
 
@@ -114,6 +117,7 @@ void CaptureSettingDialog::onStartCapture()
         captureConfig.saveName = fileInfo.fileName();
         captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
 
+        isCapturing = true;
         cs::CSApplication::getInstance()->startCapture(captureConfig);
         ui->captureInfo->setText("");
     }
@@ -127,6 +131,7 @@ void CaptureSettingDialog::onStartCapture()
 void CaptureSettingDialog::onStopCapture()
 {
     qInfo() << "onStopCapture";
+    isCapturing = false;
     cs::CSApplication::getInstance()->stopCapture();
 }
 
@@ -252,10 +257,37 @@ void CaptureSettingDialog::onCaptureNumberUpdated(int captured, int dropped)
 
 void CaptureSettingDialog::onCaptureStateChanged(int state, QString message)
 {
-
+    if (state == cs::CAPTURE_FINISHED)
+    {
+        isCapturing = false;
+    }
 }
 
 void CaptureSettingDialog::onTranslate()
 {
     ui->retranslateUi(this);
+}
+
+void CaptureSettingDialog::reject()
+{
+    if (isCapturing)
+    {
+        int button = QMessageBox::question(this, tr("Tips"),
+            QString(tr("Capturing, are you sure to stop capture now ?")),
+            QMessageBox::Yes | QMessageBox::No);
+
+        if (button == QMessageBox::No)
+        {
+
+        }
+        else if (button == QMessageBox::Yes)
+        {
+            onStopCapture();
+            QDialog::reject();
+        }
+    }
+    else
+    {
+        QDialog::reject();
+    }
 }

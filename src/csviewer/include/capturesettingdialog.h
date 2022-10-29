@@ -63,6 +63,8 @@ public slots:
     void onCaptureNumberUpdated(int number, int dropped);
     void onCaptureStateChanged(int state, QString message);
     void onTranslate();
+
+    void reject() override;
 private slots:
     void onStartCapture();
     void onStopCapture();
@@ -84,6 +86,7 @@ private:
     int defaultCaptureCount = 30;
 
     QVector<QCheckBox*> dataTypeCheckBoxs;
+    bool isCapturing = false;
 };
 
 #endif //_CS_CAPTURE_SETTING_DIALOG_H

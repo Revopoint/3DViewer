@@ -48,7 +48,7 @@ void CameraCaptureTool::startCapture(CameraCaptureConfig config)
     if (cameraCapture)
     {
         qInfo() << "captruing, please wait...";
-        emit captureStateChanged(CameraCaptureBase::CAPTURE_WARNING, tr("captruing, please wait..."));
+        emit captureStateChanged(CAPTURE_WARNING, tr("captruing, please wait..."));
         return;
     }
 
@@ -102,7 +102,7 @@ CameraCaptureBase::CameraCaptureBase(const CameraCaptureConfig& config, CAPTURE_
     //threadPool.setMaxThreadCount(1);
 }
 
-CameraCaptureBase::CAPTURE_TYPE CameraCaptureBase::getCaptureType() const
+CAPTURE_TYPE CameraCaptureBase::getCaptureType() const
 {
     return captureType;
 }
@@ -284,16 +284,17 @@ YAML::Node genYamlNodeFromExtrinsics(const Extrinsics& extrinsics)
     return node;
 }
 
-void CameraCaptureBase::saveIntrinsics()
+void CameraCaptureBase::saveCameraPara()
 {
-    qInfo() << "save camera intrinsics";
+    qInfo() << "save camera parameters";
 
     QVariant hasRgbV;
     camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
 
-    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-intrinsics.yaml";
+    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-camerapara.yaml";
+    auto bytesData = savePath.toLocal8Bit();
+    std::ofstream fout(bytesData.data());
 
-    std::ofstream fout(savePath.toStdString());
     if (!fout.is_open())
     {
         qWarning() << "open file failed, file:" << savePath;
@@ -363,13 +364,12 @@ void CameraCaptureBase::saveIntrinsics()
     }
 
     fout << rootNode;
-    fout.close();
 }
 
 void CameraCaptureBase::onCaptureDataDone()
 {
-    // save camera intrinsics to file
-    saveIntrinsics();
+    // save camera parameters to file
+    saveCameraPara();
 }
 
 CameraCaptureSingle::CameraCaptureSingle(const CameraCaptureConfig& config)

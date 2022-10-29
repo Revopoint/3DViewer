@@ -1,3 +1,6 @@
+#ifndef _CS_IP_SETTING_DIALOG_H
+#define _CS_IP_SETTING_DIALOG_H
+
 #include <QDialog>
 
 namespace Ui {
@@ -21,3 +24,5 @@ private:
 private:
     Ui::IpSettingWidget* ui;
 };
+
+#endif // _CS_IP_SETTING_DIALOG_H
