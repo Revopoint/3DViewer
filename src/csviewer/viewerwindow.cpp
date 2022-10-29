@@ -62,6 +62,7 @@
 #include "csmessagebox.h"
 #include "appconfig.h"
 #include "csaction.h"
+#include "ipsettingdialog.h"
 
 #define GITHUB_URL "https://github.com/Revopoint/3DViewer"
 #define WEBSITE_URL "https://www.revopoint3d.com/"
@@ -133,6 +134,7 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionInfomation,        &QAction::triggered,   this, &ViewerWindow::onTriggeredInformation);
     suc &= (bool)connect(ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
     suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
+    suc &= (bool)connect(ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
 
     suc &= (bool)connect(ui->menuTile, &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuTabs,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
@@ -387,6 +389,11 @@ void ViewerWindow::onTranslate()
     auto config = cs::CSApplication::getInstance()->getAppConfig();
     QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
     ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+
+    if (ipSettingDialog)
+    {
+        ipSettingDialog->onTranslate();
+    }
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
@@ -543,4 +550,14 @@ void ViewerWindow::destoryRenderWindows()
     }
     windowActions.clear();
     onRenderWindowUpdated();
+}
+
+void ViewerWindow::onTriggeredIpSetting()
+{
+    if (!ipSettingDialog) {
+        ipSettingDialog = new IpSettingDialog(this);
+        connect(ipSettingDialog, &IpSettingDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage);
+    }
+
+    ipSettingDialog->show();
 }

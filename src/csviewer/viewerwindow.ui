@@ -115,6 +115,7 @@
     </property>
     <addaction name="actionRestartCamera"/>
     <addaction name="actionInfomation"/>
+    <addaction name="actionIpSetting"/>
    </widget>
    <widget class="QMenu" name="menuWindows">
     <property name="enabled">
@@ -200,6 +201,11 @@
   <action name="actionGithub">
    <property name="text">
     <string>Github</string>
+   </property>
+  </action>
+  <action name="actionIpSetting">
+   <property name="text">
+    <string>IP setting</string>
    </property>
   </action>
  </widget>

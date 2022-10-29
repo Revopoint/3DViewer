@@ -66,6 +66,7 @@ class CameraInfoDialog;
 class CSProgressBar;
 class CSMessageBox;
 class CSAction;
+class IpSettingDialog;
 
 class ViewerWindow : public QMainWindow
 {
@@ -108,6 +109,7 @@ private slots:
     void onTriggeredInformation();
     void onTriggeredLogDir();
     void onTriggeredDefaultSavePath();
+    void onTriggeredIpSetting();
 
     void onAppExit();
 private slots:
@@ -146,5 +148,8 @@ private:
 
     QVector<CSAction*> windowActions;
     WINDOWLAYOUT_MODE renderLayoutMode = LAYOUT_TILE;
+
+    // set ip dialog
+    IpSettingDialog* ipSettingDialog = nullptr;
 };
 #endif // _CS_VIEWERWINDOW_H

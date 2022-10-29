@@ -74,7 +74,7 @@ CSRangeEdit::CSRangeEdit(int paraId, const char* title, QWidget* parent)
     layout->addWidget(titleLabel);
     CSHLine* line = new CSHLine(this);
 
-    QHBoxLayout* hLayout = new QHBoxLayout(this);
+    QHBoxLayout* hLayout = new QHBoxLayout();
     layout->addItem(hLayout);
 
     line->setFixedWidth(10);

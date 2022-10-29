@@ -57,6 +57,10 @@ static CSRange DEPTH_RANGE_LIMIT = { 0, 10000 };
 static CSRange CAMERA_HDR_LEVEL_RANGE = { 2,8 };
 #define HDR_SCALE_DEFAULT  5
 
+#ifdef _DEBUG
+    #define _CS_DEBUG_
+#endif
+
 using namespace cs;
 using namespace cs::parameter;
 
@@ -130,6 +134,7 @@ static const QMap<CAMERA_PARA_ID, int> CAMERA_EXTENSION_PROPERTY_MAP =
     { PARA_DEPTH_ROI,              PROPERTY_EXT_DEPTH_ROI },
     { PARA_DEPTH_RANGE,            PROPERTY_EXT_DEPTH_RANGE },
     { PARA_TRIGGER_MODE,           PROPERTY_EXT_TRIGGER_MODE },
+    { PARA_CAMERA_IP,              PROPERTY_EXT_CAMERA_IP }
 };
 
 static const QList<CAMERA_PARA_ID> CAMERA_OPTION_PARA_LIST =
@@ -1192,14 +1197,14 @@ void CSCamera::getPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& value)
 
     value = v;
 
-#ifdef  _DEBUG
+#ifdef  _CS_DEBUG_
     qDebug() << "getPropertyPrivate, paraId : " << metaEnum.valueToKey(paraId) << ", v  = " << v;
 #endif
 }
 
 void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
 {
-#ifdef  _DEBUG
+#ifdef  _CS_DEBUG_
     qDebug() << "setPropertyPrivate, paraId : " << metaEnum.valueToKey(paraId) << ", value  = " << value.toFloat();
 #endif
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
@@ -1327,6 +1332,9 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
     case PROPERTY_EXT_TRIGGER_MODE:
         value = (int)propExt.triggerMode;
         break;
+    case PROPERTY_EXT_CAMERA_IP:
+        value = QVariant::fromValue(propExt.cameraIp);
+        break;
     default:
         Q_ASSERT(false);
         break;
@@ -1392,6 +1400,9 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
         }
     case PROPERTY_EXT_TRIGGER_MODE:
         propExt.triggerMode = (TRIGGER_MODE)value.toInt();;
+        break;
+    case PROPERTY_EXT_CAMERA_IP:
+        propExt.cameraIp = value.value<CameraIpSetting>();   
         break;
     default:
         Q_ASSERT(false);
@@ -1860,8 +1871,6 @@ void CSCamera::stopStreamThread()
         streamThread->requestInterruption();
         streamThread->wait();
     }
-
-    Q_ASSERT(streamThread->isFinished());
 }
 
 void CSCamera::startStreamThread()

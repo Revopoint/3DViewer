@@ -131,6 +131,7 @@ Q_DECLARE_METATYPE(Extrinsics)
 Q_DECLARE_METATYPE(Intrinsics)
 Q_DECLARE_METATYPE(HdrExposureParam)
 Q_DECLARE_METATYPE(HdrExposureSetting)
+Q_DECLARE_METATYPE(CameraIpSetting)
 
 enum FILTER_TYPE
 {

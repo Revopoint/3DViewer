@@ -58,6 +58,7 @@ namespace cs{
             PARA_EXTRINSICS,
             PARA_DEPTH_HAS_IR,
             PARA_TRIGGER_MODE,
+            PARA_CAMERA_IP,
 
             //depth
             PARA_DEPTH_STREAM_FORMAT,

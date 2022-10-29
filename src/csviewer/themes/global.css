@@ -123,6 +123,9 @@ QMenuBar:disabled {
 }
 
 /* QFrame */
+QDialog {
+    background: rgb(204, 204, 204);
+}
 
 /* QPushButton */
 QPushButton {
@@ -140,7 +143,7 @@ QPushButton[isCameraButton] {
 QPushButton[isCameraButton]:checked {
     background: rgb(204, 204, 204);
     border: none;
-    outline:none;
+    outline: none;
 }
 
 QWidget#cameraBtnCtlArea QPushButton {
@@ -224,14 +227,14 @@ QPushButton#captureMultipleButton:hover{
     background-image: url(:/resources/vedio_active.png);
 }
 
-QPushButton[isCSStyle]{
+QMessageBox QPushButton, QPushButton[isCSStyle] {
     border: 1px solid rgb(140, 140, 140);
     width: 92px;
     height: 26px;
     border-radius: 3px;
 }
 
-QPushButton[isCSStyle]:hover{
+QMessageBox QPushButton:hover, QPushButton[isCSStyle]:hover {
     border: 1px solid rgb(0, 169, 255);
     color: rgb(0, 169, 255);
 }
@@ -592,4 +595,54 @@ CSROIWidget{
     /*border: 1px solid red;*/
 }
 
+/*QSpinBox*/
+QSpinBox {
+    border: 1px solid rgb(150, 150, 150);
+    background-color: rgb(179, 179, 179);
+    height: 26px;
+    min-width: 50px;
+    border-radius: 3px;
+}
+
+QSpinBox::up-button, QSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    border-left: 1px solid rgb(150, 150, 150);
+    width: 26px;
+    margin: 0;
+}
+
+QSpinBox::down-button {
+    subcontrol-position: bottom right;
+}
+
+QSpinBox::up-arrow {
+    image: url(:/resources/triangle_arrow_up.png);
+    width: 16px;
+    height: 16px;
+    padding-top: 2px;
+}
+
+QSpinBox::up-arrow:hover {
+    image: url(:/resources/triangle_arrow_up_active.png);
+}
+
+QSpinBox::up-arrow:disabled, QSpinBox::up-arrow:off {
+    image: url(:/resources/triangle_arrow_up.png);
+}
+
+QSpinBox::down-arrow {
+    image: url(:/resources/triangle_arrow_down.png);
+    width: 16px;
+    height: 16px;
+    padding-bottom: 2px;
+}
+
+QSpinBox::down-arrow:hover {
+    image: url(:/resources/triangle_arrow_down_active.png);
+}
+
+QSpinBox::down-arrow:disabled, QSpinBox::down-arrow:off {
+    image: url(:/resources/triangle_arrow_down.png);
+}
 

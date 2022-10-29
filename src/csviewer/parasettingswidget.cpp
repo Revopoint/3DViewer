@@ -640,7 +640,7 @@ void ParaSettingsWidget::onCameraParaUpdated(int paraId, QVariant value)
             emit showMessage(QString(tr("Set ROI ")) + str);
         }
     }
-    else if (paraId == PARA_DEPTH_FRAMETIME)
+    else if (paraId == PARA_DEPTH_FRAMETIME || paraId == PARA_CAMERA_IP)
     {
         
     }
