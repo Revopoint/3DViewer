@@ -263,12 +263,20 @@ QWidget#RoiButtonArea
     background-color: #666666;
 }
 
+QWidget#playerRenderWindow, QWidget#CameraPlayerWidget {
+    background-color: rgb(240, 240, 240);
+}
+
 /*QLabel*/
 QLabel {
 }
 
 QLabel:hover {
     
+}
+
+QLabel[isImage] {
+    background: rgb(0, 0, 0);
 }
 
 QLabel[ButtonTitle] {

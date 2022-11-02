@@ -89,6 +89,7 @@
      <string>File</string>
     </property>
     <addaction name="actionsetDefaultSaveDir"/>
+    <addaction name="actionloadFile"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuLanguage">
@@ -206,6 +207,11 @@
   <action name="actionIpSetting">
    <property name="text">
     <string>IP setting</string>
+   </property>
+  </action>
+  <action name="actionloadFile">
+   <property name="text">
+    <string>Load file</string>
    </property>
   </action>
  </widget>

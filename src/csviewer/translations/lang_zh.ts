@@ -112,7 +112,7 @@
         <translation type="obsolete">重启相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="336"/>
+        <location filename="../viewerwindow.cpp" line="338"/>
         <source>Set default save path (</source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
@@ -121,78 +121,78 @@
         <translation type="obsolete">相机列表</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="158"/>
-        <location filename="../viewerwindow.cpp" line="390"/>
+        <location filename="../viewerwindow.cpp" line="160"/>
+        <location filename="../viewerwindow.cpp" line="392"/>
         <source>Set default save path </source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="224"/>
+        <location filename="../viewerwindow.cpp" line="226"/>
         <source>Connecting camera</source>
         <translation type="unfinished">正在连接相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="227"/>
+        <location filename="../viewerwindow.cpp" line="229"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished">相机连接成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="230"/>
+        <location filename="../viewerwindow.cpp" line="232"/>
         <source>Camera connection failed</source>
         <translation type="unfinished">相机连接失败</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="233"/>
+        <location filename="../viewerwindow.cpp" line="235"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished">正在断开相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="236"/>
+        <location filename="../viewerwindow.cpp" line="238"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished">相机断开成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="239"/>
+        <location filename="../viewerwindow.cpp" line="241"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished">相机断开失败</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="242"/>
+        <location filename="../viewerwindow.cpp" line="244"/>
         <source>Starting preview</source>
         <translation type="unfinished">正在启动预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="245"/>
+        <location filename="../viewerwindow.cpp" line="247"/>
         <source>Start preview successfully</source>
         <translation type="unfinished">启动预览成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="248"/>
+        <location filename="../viewerwindow.cpp" line="250"/>
         <source>Pausing preview</source>
         <translation type="unfinished">正在暂停预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="251"/>
+        <location filename="../viewerwindow.cpp" line="253"/>
         <source>Preview has been paused</source>
         <translation type="unfinished">已经暂停预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="254"/>
+        <location filename="../viewerwindow.cpp" line="256"/>
         <source>Restarting camera</source>
         <translation type="unfinished">正在重启相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="257"/>
+        <location filename="../viewerwindow.cpp" line="259"/>
         <source>Stopping preview</source>
         <translation type="unfinished">正在停止预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="260"/>
+        <location filename="../viewerwindow.cpp" line="262"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished">已经停止预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="330"/>
+        <location filename="../viewerwindow.cpp" line="332"/>
         <source>Set default save path</source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
@@ -201,7 +201,7 @@
         <translation type="obsolete">保存点云</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="401"/>
+        <location filename="../viewerwindow.cpp" line="403"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished">当前相机已经断开</translation>
     </message>
@@ -280,6 +280,11 @@
         <location filename="../viewerwindow.ui"/>
         <source>IP setting</source>
         <translation type="unfinished">IP设置</translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>Load file</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -701,17 +706,17 @@
 <context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="116"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="118"/>
         <source>Start capturing</source>
         <translation type="unfinished">开始保存</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="142"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="144"/>
         <source>save frame data is empty</source>
         <translation type="unfinished">保存数据为空</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="184"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="186"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished">保存完毕，已保存%1帧（丢失%2帧）</translation>
     </message>
@@ -719,9 +724,8 @@
 <context>
     <name>cs::CameraCaptureMutiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="411"/>
         <source>a frame dropped</source>
-        <translation type="unfinished">丢失一帧数据</translation>
+        <translation type="obsolete">丢失一帧数据</translation>
     </message>
 </context>
 <context>
@@ -785,17 +789,17 @@
         <translation type="unfinished">保存帧数据</translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="254"/>
+        <location filename="../capturesettingdialog.cpp" line="255"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished">已保存%1帧（丢失%2帧）</translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="275"/>
+        <location filename="../capturesettingdialog.cpp" line="276"/>
         <source>Tips</source>
         <translation type="unfinished">提示</translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="276"/>
+        <location filename="../capturesettingdialog.cpp" line="277"/>
         <source>Capturing, are you sure to stop capture now ?</source>
         <translation type="unfinished">确定要立即停止保存吗？</translation>
     </message>
@@ -803,7 +807,7 @@
 <context>
     <name>cs::CameraCaptureTool</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="51"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="53"/>
         <source>captruing, please wait...</source>
         <translation type="unfinished">正在保存，请稍等</translation>
     </message>
@@ -883,7 +887,45 @@
     <name>CameraPlayerWidget</name>
     <message>
         <location filename="../cameraplayer.ui"/>
-        <source>PushButton</source>
+        <source>Depth</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cameraplayer.ui"/>
+        <source>RGB</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cameraplayer.ui"/>
+        <source>IR(L/R)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cameraplayer.ui"/>
+        <source>Point Clopud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cameraplayer.ui"/>
+        <source>&lt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cameraplayer.ui"/>
+        <source>&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>cs::CameraCaptureMultiple</name>
+    <message>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="434"/>
+        <source>a frame dropped</source>
+        <translation type="unfinished">丢失一帧数据</translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="541"/>
+        <source>Failed to compress zip file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

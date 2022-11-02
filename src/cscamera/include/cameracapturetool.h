@@ -116,6 +116,9 @@ protected:
     QThreadPool threadPool;
 
     std::shared_ptr<ICSCamera> camera;
+
+    // real save folder
+    QString realSaveFolder;
 };
 
 // save a frame of data
@@ -130,17 +133,19 @@ protected:
 };
 
 // save multi-frame data
-class CameraCaptureMutiple : public CameraCaptureBase
+class CameraCaptureMultiple : public CameraCaptureBase
 {
     Q_OBJECT
 public:
-    CameraCaptureMutiple(const CameraCaptureConfig& config);
+    CameraCaptureMultiple(const CameraCaptureConfig& config);
     void addOutputData(const OutputDataPort& outputDataPort) override;
     void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 
 protected:
     void onCaptureDataDone() override;
     void saveTimeStamps();
+    void compressToZip();
+    QString genTmpSaveDir(QString saveDir);
 private:
     int capturedRgbCount = 0;
     int capturedDepthCount = 0;

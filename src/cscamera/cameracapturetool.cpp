@@ -2,6 +2,7 @@
 #include <QMutexLocker>
 #include <QDebug>
 #include <QTime>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QTextStream>
@@ -10,6 +11,7 @@
 #include <icscamera.h>
 #include <fstream>
 #include <yaml-cpp/yaml.h>
+#include <JlCompress.h>
 
 #include "outputsaver.h"
 
@@ -52,9 +54,9 @@ void CameraCaptureTool::startCapture(CameraCaptureConfig config)
         return;
     }
 
-    if (config.captureNumber > 1)
+    if (config.captureType == CAPTURE_TYPE_MULTIPLE)
     {
-        cameraCapture = new CameraCaptureMutiple(config);
+        cameraCapture = new CameraCaptureMultiple(config);
     }
     else 
     {
@@ -375,7 +377,7 @@ void CameraCaptureBase::onCaptureDataDone()
 CameraCaptureSingle::CameraCaptureSingle(const CameraCaptureConfig& config)
     : CameraCaptureBase(config, CAPTURE_TYPE_SINGLE)
 {
-
+    realSaveFolder = config.saveDir;
 }
 
 void CameraCaptureSingle::getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex)
@@ -383,13 +385,34 @@ void CameraCaptureSingle::getCaptureIndex(OutputDataPort& output, int& rgbFrameI
     rgbFrameIndex = depthFrameIndex = pointCloudIndex = -1;
 }
 
-CameraCaptureMutiple::CameraCaptureMutiple(const CameraCaptureConfig& config)
+CameraCaptureMultiple::CameraCaptureMultiple(const CameraCaptureConfig& config)
     : CameraCaptureBase(config, CAPTURE_TYPE_MULTIPLE)
 {
-
+    realSaveFolder = captureConfig.saveDir;
+    captureConfig.saveDir = genTmpSaveDir(config.saveDir);
 }
 
-void CameraCaptureMutiple::addOutputData(const OutputDataPort& outputDataPort)
+QString CameraCaptureMultiple::genTmpSaveDir(QString saveDir)
+{
+    QDir dir(saveDir);
+    
+    // make tmp dir 
+    QDateTime timeCurrent = QDateTime::currentDateTime();
+    QString timeStr = timeCurrent.toString("yyMMddhhmmss");
+
+    QString tmpDir = saveDir;
+
+    QString tmpName = QString("~capture-%1").arg(timeStr);
+    if (!dir.mkdir(tmpName))
+    {
+        qWarning() << "mkdir failed, dir:" << saveDir << "/" << tmpName;
+        Q_ASSERT(false);
+    }
+
+    return saveDir + QDir::separator() + tmpName;
+}
+
+void CameraCaptureMultiple::addOutputData(const OutputDataPort& outputDataPort)
 {
     if (captureFinished)
     {
@@ -417,7 +440,7 @@ void CameraCaptureMutiple::addOutputData(const OutputDataPort& outputDataPort)
     }
 }
 
-void CameraCaptureMutiple::getCaptureIndex(OutputDataPort& output, int& rgbFrameIdx, int& depthFrameIdx, int& pointCloudIdx)
+void CameraCaptureMultiple::getCaptureIndex(OutputDataPort& output, int& rgbFrameIdx, int& depthFrameIdx, int& pointCloudIdx)
 {
     rgbFrameIdx = capturedRgbCount;
     depthFrameIdx = capturedDepthCount;
@@ -442,15 +465,18 @@ void CameraCaptureMutiple::getCaptureIndex(OutputDataPort& output, int& rgbFrame
     }
 }
 
-void CameraCaptureMutiple::onCaptureDataDone()
+void CameraCaptureMultiple::onCaptureDataDone()
 {
     // save time stamps to file
     saveTimeStamps();
 
     CameraCaptureBase::onCaptureDataDone();
+
+    // compress to zip file
+    compressToZip();
 }
 
-void CameraCaptureMutiple::saveTimeStamps()
+void CameraCaptureMultiple::saveTimeStamps()
 {
     qInfo() << "save time stamps";
 
@@ -498,4 +524,27 @@ void CameraCaptureMutiple::saveTimeStamps()
             ts << s;
         }
     }
+}
+
+void CameraCaptureMultiple::compressToZip()
+{
+    emit captureStateChanged(CAPTURING, tr("Please wait for the file to be compressed to zip"));
+
+    QString zipFile = realSaveFolder + QDir::separator() + captureConfig.saveName + ".zip";
+
+    int result = JlCompress::compressDir(zipFile, captureConfig.saveDir, false, QDir::Files);
+    if (result)
+    {
+        qInfo() << "Compress zip file success.";
+    }
+    else 
+    {
+        qWarning() << "Compress zip file failed, zip file : " << zipFile;
+        emit captureStateChanged(CAPTURE_ERROR, tr("Failed to compress zip file"));
+    }
+
+    // delete tmp folder
+    qInfo() << "delete tmp dir:" << captureConfig.saveDir;
+    QDir dir(captureConfig.saveDir);
+    dir.removeRecursively();
 }

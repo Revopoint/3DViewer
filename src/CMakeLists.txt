@@ -71,6 +71,11 @@ set(LIBPNG_CPP_INC ${THIRDPARTY_DIR}/libpng/include)
 set(LIBPNG_CPP_LIB ${THIRDPARTY_DIR}/libpng/${PLATFORM}/lib)
 set(LIBPNG_CPP_BIN ${THIRDPARTY_DIR}/libpng/${PLATFORM}/bin)
 
+## quazip
+set(QUAZIP_CPP_INC ${THIRDPARTY_DIR}/quazip/include/quazip)
+set(QUAZIP_CPP_LIB ${THIRDPARTY_DIR}/quazip/${PLATFORM}/lib)
+set(QUAZIP_CPP_BIN ${THIRDPARTY_DIR}/quazip/${PLATFORM}/bin)
+
 add_definitions(-D_UNICODE -DUNICODE)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 

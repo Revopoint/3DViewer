@@ -63,6 +63,7 @@
 #include "appconfig.h"
 #include "csaction.h"
 #include "ipsettingdialog.h"
+#include "cameraplayerdialog.h"
 
 #define GITHUB_URL "https://github.com/Revopoint/3DViewer"
 #define WEBSITE_URL "https://www.revopoint3d.com/"
@@ -135,6 +136,7 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
     suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
     suc &= (bool)connect(ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
+    suc &= (bool)connect(ui->actionloadFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
 
     suc &= (bool)connect(ui->menuTile, &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuTabs,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
@@ -560,4 +562,14 @@ void ViewerWindow::onTriggeredIpSetting()
     }
 
     ipSettingDialog->show();
+}
+
+void ViewerWindow::onTriggeredLoadFile()
+{
+    if (!cameraPlayerDialog)
+    {
+        cameraPlayerDialog = new CameraPlayerDialog(this);
+    }
+
+    cameraPlayerDialog->show();
 }

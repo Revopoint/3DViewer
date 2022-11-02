@@ -171,8 +171,14 @@ struct CSCameraInfo
     QString sdkVersion;
 };
 
+enum CAMERA_CAPTURE_TYPE
+{
+    CAPTURE_TYPE_SINGLE,
+    CAPTURE_TYPE_MULTIPLE
+};
 struct CameraCaptureConfig
 {
+    CAMERA_CAPTURE_TYPE captureType;
     int captureNumber = 1;
     QVector<CS_CAMERA_DATA_TYPE> captureDataTypes;
     bool savePointCloudWithTexture = false;

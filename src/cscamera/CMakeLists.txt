@@ -15,10 +15,12 @@ include_directories(include)
 include_directories(${CAMERA_SDK_INC}) 
 include_directories(${YAML_CPP_INC}) 
 include_directories(${LIBPNG_CPP_INC})
+include_directories(${QUAZIP_CPP_INC})
 
 link_directories(${CAMERA_SDK_LIB})
 link_directories(${YAML_CPP_LIB})
 link_directories(${LIBPNG_CPP_LIB})
+link_directories(${QUAZIP_CPP_LIB})
 
 add_definitions(-DCS_CAMERA_API)
 
@@ -41,16 +43,19 @@ if(MSVC)
     set(3DCAMERA_LIBRARY optimized 3DCamera debug 3DCamerad)
     set(YAMLCPP_LIBRARY optimized yaml-cpp debug yaml-cppd)
     set(LIBPNG_LIBRARY optimized libpng debug libpngd)
+    set(QUAZIP_LIBRARY optimized quazip debug quazipd)
 else()
     set(3DCAMERA_LIBRARY 3DCamera)
     set(YAMLCPP_LIBRARY yaml-cpp)
     set(LIBPNG_LIBRARY libpng)
+    set(QUAZIP_LIBRARY quazip)
 endif()
 
 target_link_libraries(${TARGET_NAME}  PRIVATE
     ${3DCAMERA_LIBRARY}
     ${YAMLCPP_LIBRARY}
     ${LIBPNG_LIBRARY}
+    ${QUAZIP_LIBRARY}
     Qt5::Core
     Qt5::Gui)
 

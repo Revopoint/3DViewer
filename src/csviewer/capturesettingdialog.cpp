@@ -140,6 +140,7 @@ void CaptureSettingDialog::initDefaultCaptureConfig()
     captureConfig.captureNumber = defaultCaptureCount;
     captureConfig.captureDataTypes = { CAMERA_DATA_DEPTH, CAMERA_DATA_RGB };
     captureConfig.saveFormat = captureSaveFormats.first();
+    captureConfig.captureType = CAPTURE_TYPE_MULTIPLE;
 }
 
 void CaptureSettingDialog::onDataTypeChanged()
