@@ -146,11 +146,18 @@ QPushButton[isCameraButton]:checked {
     outline: none;
 }
 
-QWidget#cameraBtnCtlArea QPushButton {
+QWidget#cameraBtnCtlArea QPushButton{
     width: 52px;
     height: 52px;
     border-radius: 4px;
     background-color: rgb(179, 179, 179);
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+QWidget#cameraPlayerBtnArea QPushButton {
+    width: 30px;
+    height: 30px;
     background-position: center;
     background-repeat: no-repeat;
 }
@@ -229,9 +236,11 @@ QPushButton#captureMultipleButton:hover{
 
 QMessageBox QPushButton, QPushButton[isCSStyle] {
     border: 1px solid rgb(140, 140, 140);
-    width: 92px;
-    height: 26px;
+    min-width: 92px;
+    min-height: 26px;
     border-radius: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 QMessageBox QPushButton:hover, QPushButton[isCSStyle]:hover {
@@ -389,8 +398,6 @@ QLineEdit {
     height: 26px;
     padding-left: 5px;
     border-radius: 3px;
-    max-width: 86px;
-    min-width: 86px;
     background-color: rgb(179, 179, 179);
 }
 
@@ -402,6 +409,11 @@ QLineEdit#frameEdit {
     max-width: 60px;
     min-width: 60px;
 }
+
+ParaSettingsWidget QLineEdit {
+    max-width: 86px;
+    min-width: 86px;
+}   
 
 /*QSlider*/
 QSlider {
@@ -668,4 +680,17 @@ QSpinBox::down-arrow:hover {
 QSpinBox::down-arrow:disabled, QSpinBox::down-arrow:off {
     image: url(:/resources/triangle_arrow_down.png);
 }
+
+/* QProgressBar*/
+QProgressBar {
+    height: 16px;
+    border-radius: 4px;
+    border: 1px solid rgb(179, 179, 179);
+}
+
+QProgressBar::chunk {
+    background: rgb(0, 169, 255);
+    border-radius: 4px;
+}
+
 

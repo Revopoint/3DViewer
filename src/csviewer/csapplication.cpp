@@ -239,7 +239,7 @@ void CSApplication::onWindowLayoutChanged(QVector<int> windows)
             }
             else if (straType == STRATEGY_CLOUD_POINT)
             {
-                bool enable = windows.contains(CAMERA_DTA_POINT_CLOUD);
+                bool enable = windows.contains(CAMERA_DATA_POINT_CLOUD);
                 stra->setStrategyEnable(enable);
             }
             else if (straType == STRATEGY_RGB)

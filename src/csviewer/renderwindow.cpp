@@ -251,7 +251,7 @@ void RenderWindow::initRenderWidgetsTab()
                 tabWidget->addTab(widget, "RGB");
                 break;
             } 
-            case CAMERA_DTA_POINT_CLOUD:
+            case CAMERA_DATA_POINT_CLOUD:
             {
                 tabWidget->addTab(widget, "Point Cloud");
                 break;
@@ -274,7 +274,7 @@ void RenderWindow::onOutput2DUpdated(OutputData2D outputData)
 
 void RenderWindow::onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image)
 {
-    RenderWidget3D* widget = qobject_cast<RenderWidget3D*>(renderWidgets[CAMERA_DTA_POINT_CLOUD]);
+    RenderWidget3D* widget = qobject_cast<RenderWidget3D*>(renderWidgets[CAMERA_DATA_POINT_CLOUD]);
     if (widget)
     {
         widget->onRenderDataUpdated(pointCloud, image);
@@ -318,7 +318,7 @@ void RenderWindow::initRenderWidgets()
 
             break;
         }
-        case CAMERA_DTA_POINT_CLOUD:
+        case CAMERA_DATA_POINT_CLOUD:
         {
             auto renderWidget = new RenderWidget3D((int)dataType, this);
             renderWidgets[dataType] = renderWidget;
@@ -414,7 +414,7 @@ void RenderWindow::hideRenderFps()
 
 void RenderWindow::setRender3DTextureVisible(bool visible)
 {
-    RenderWidget3D* widget = qobject_cast<RenderWidget3D*>(renderWidgets[CAMERA_DTA_POINT_CLOUD]);
+    RenderWidget3D* widget = qobject_cast<RenderWidget3D*>(renderWidgets[CAMERA_DATA_POINT_CLOUD]);
     if (widget)
     {
         widget->setTextureEnable(visible);

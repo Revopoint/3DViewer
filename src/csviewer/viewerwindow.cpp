@@ -64,6 +64,7 @@
 #include "csaction.h"
 #include "ipsettingdialog.h"
 #include "cameraplayerdialog.h"
+#include "formatconvertdialog.h"
 
 #define GITHUB_URL "https://github.com/Revopoint/3DViewer"
 #define WEBSITE_URL "https://www.revopoint3d.com/"
@@ -103,6 +104,11 @@ ViewerWindow::~ViewerWindow()
     if (cameraPlayerDialog)
     {
         delete cameraPlayerDialog;
+    }
+
+    if (formatConvertDialog)
+    {
+        delete formatConvertDialog;
     }
 }
 
@@ -144,6 +150,7 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
     suc &= (bool)connect(ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
     suc &= (bool)connect(ui->actionloadFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
+    suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
 
     suc &= (bool)connect(ui->menuTile, &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuTabs,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
@@ -403,6 +410,16 @@ void ViewerWindow::onTranslate()
     {
         ipSettingDialog->onTranslate();
     }
+
+    if (formatConvertDialog)
+    {
+        formatConvertDialog->onTranslate();
+    }
+
+    if (cameraPlayerDialog)
+    {
+        cameraPlayerDialog->onTranslate();
+    }
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
@@ -461,7 +478,7 @@ void ViewerWindow::onCameraStreamStarted()
     if (hasDepthV.toBool())
     {
         windowActions.push_back(new CSAction(CAMERA_DATA_DEPTH, "Depth"));
-        windowActions.push_back(new CSAction(CAMERA_DTA_POINT_CLOUD, "Point Cloud"));
+        windowActions.push_back(new CSAction(CAMERA_DATA_POINT_CLOUD, "Point Cloud"));
     }
 
     if (hasRgbV.toBool())
@@ -580,4 +597,15 @@ void ViewerWindow::onTriggeredLoadFile()
     }
 
     cameraPlayerDialog->onLoadFile();
+}
+
+void ViewerWindow::onTriggeredFormatConvert()
+{
+    if (!formatConvertDialog)
+    {
+        formatConvertDialog = new FormatConvertDialog();
+        connect(formatConvertDialog, &FormatConvertDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
+    }
+
+    formatConvertDialog->show();
 }

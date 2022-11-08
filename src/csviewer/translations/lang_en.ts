@@ -76,7 +76,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="345"/>
+        <location filename="../viewerwindow.cpp" line="352"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,83 +85,83 @@
         <translation type="obsolete">Camera List</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="167"/>
-        <location filename="../viewerwindow.cpp" line="399"/>
+        <location filename="../viewerwindow.cpp" line="174"/>
+        <location filename="../viewerwindow.cpp" line="406"/>
         <source>Set default save path </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="233"/>
+        <location filename="../viewerwindow.cpp" line="240"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="236"/>
+        <location filename="../viewerwindow.cpp" line="243"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="239"/>
+        <location filename="../viewerwindow.cpp" line="246"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="242"/>
+        <location filename="../viewerwindow.cpp" line="249"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="245"/>
+        <location filename="../viewerwindow.cpp" line="252"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="248"/>
+        <location filename="../viewerwindow.cpp" line="255"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="251"/>
+        <location filename="../viewerwindow.cpp" line="258"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="254"/>
+        <location filename="../viewerwindow.cpp" line="261"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="257"/>
+        <location filename="../viewerwindow.cpp" line="264"/>
         <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="260"/>
+        <location filename="../viewerwindow.cpp" line="267"/>
         <source>Preview has been paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="263"/>
+        <location filename="../viewerwindow.cpp" line="270"/>
         <source>Restarting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="266"/>
+        <location filename="../viewerwindow.cpp" line="273"/>
         <source>Stopping preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="269"/>
+        <location filename="../viewerwindow.cpp" line="276"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="339"/>
+        <location filename="../viewerwindow.cpp" line="346"/>
         <source>Set default save path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="410"/>
+        <location filename="../viewerwindow.cpp" line="427"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -228,6 +228,11 @@
     <message>
         <location filename="../viewerwindow.ui"/>
         <source>Load file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>Convert depth data to point cloud</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -630,22 +635,22 @@
 <context>
     <name>CaptureSettingDialog</name>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="112"/>
+        <location filename="../capturesettingdialog.cpp" line="113"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="257"/>
+        <location filename="../capturesettingdialog.cpp" line="261"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="278"/>
+        <location filename="../capturesettingdialog.cpp" line="282"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="279"/>
+        <location filename="../capturesettingdialog.cpp" line="283"/>
         <source>Capturing, are you sure to stop capture now ?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -780,17 +785,17 @@
 <context>
     <name>cs::CameraCaptureMultiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="539"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="551"/>
         <source>a frame dropped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="638"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="650"/>
         <source>Please wait for the file to be compressed to zip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="650"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="662"/>
         <source>Failed to compress zip file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -798,7 +803,14 @@
 <context>
     <name>CameraPlayerDialog</name>
     <message>
-        <location filename="../cameraplayerdialog.cpp" line="116"/>
+        <location filename="../cameraplayerdialog.cpp" line="64"/>
+        <location filename="../cameraplayerdialog.cpp" line="300"/>
+        <location filename="../cameraplayerdialog.cpp" line="315"/>
+        <source>Save current frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../cameraplayerdialog.cpp" line="125"/>
         <source>Load captured file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -806,28 +818,146 @@
 <context>
     <name>cs::CameraPlayer</name>
     <message>
-        <location filename="../../cscamera/cameraplayer.cpp" line="65"/>
+        <location filename="../../cscamera/cameraplayer.cpp" line="67"/>
         <source>Loading file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameraplayer.cpp" line="71"/>
+        <location filename="../../cscamera/cameraplayer.cpp" line="74"/>
         <source>Invalid zip file, not find CaptureParameters.yaml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameraplayer.cpp" line="79"/>
+        <location filename="../../cscamera/cameraplayer.cpp" line="81"/>
         <source>Parse zip file failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameraplayer.cpp" line="83"/>
+        <location filename="../../cscamera/cameraplayer.cpp" line="85"/>
         <source>Ready to play</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameraplayer.cpp" line="421"/>
-        <source>Failed to read data</source>
+        <location filename="../../cscamera/cameraplayer.cpp" line="151"/>
+        <source>Failed to generate image</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/cameraplayer.cpp" line="169"/>
+        <source>Failed to generate point cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/cameraplayer.cpp" line="183"/>
+        <source>Saving current frame</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/cameraplayer.cpp" line="187"/>
+        <source>Save current frame successfuly</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/cameraplayer.cpp" line="191"/>
+        <source>Save current frame failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FormatConvertDialog</name>
+    <message>
+        <location filename="../formatconvert.ui"/>
+        <source>With texture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvert.ui"/>
+        <source>Browse</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvert.ui"/>
+        <source>Select source file:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvert.ui"/>
+        <source>Select Output Directory:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvert.ui"/>
+        <source>Convert</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvertdialog.cpp" line="93"/>
+        <location filename="../formatconvertdialog.cpp" line="124"/>
+        <source>Select source file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvertdialog.cpp" line="162"/>
+        <location filename="../formatconvertdialog.cpp" line="179"/>
+        <source>Tips</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvertdialog.cpp" line="180"/>
+        <source>Converting, are you sure to stop now ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvert.ui"/>
+        <source>Convert depth data to point cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>cs::FormatConverter</name>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="85"/>
+        <source>Converting, please wait</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="100"/>
+        <source>Start conversion</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="105"/>
+        <source>Invalid zip file, not find CaptureParameters.yaml</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="113"/>
+        <source>Parse zip file failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="121"/>
+        <source>No depth data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="131"/>
+        <source>Failed to create folder</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="153"/>
+        <source>Failed to generate point cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="170"/>
+        <source>Converting...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="175"/>
+        <source>Conversion completed, %1 successful, %2 failed</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

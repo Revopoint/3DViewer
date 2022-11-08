@@ -90,6 +90,7 @@
     </property>
     <addaction name="actionsetDefaultSaveDir"/>
     <addaction name="actionloadFile"/>
+    <addaction name="actionConvertDepth2PC"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuLanguage">
@@ -214,8 +215,19 @@
     <string>Load file</string>
    </property>
   </action>
+  <action name="actionConvertDepth2PC">
+   <property name="text">
+    <string>Convert depth data to point cloud</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>RenderWindow</class>
+   <extends>QWidget</extends>
+   <header>renderwindow.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>CameraListWidget</class>
    <extends>QWidget</extends>
@@ -226,12 +238,6 @@
    <class>ParaSettingsWidget</class>
    <extends>QWidget</extends>
    <header>parasettingswidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>RenderWindow</class>
-   <extends>QWidget</extends>
-   <header>renderwindow.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

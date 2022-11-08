@@ -49,20 +49,23 @@
 #include <cameraplayer.h>
 #include "appconfig.h"
 #include "csapplication.h"
+#include "csprogressbar.h"
 
 CameraPlayerDialog::CameraPlayerDialog(QWidget* parent)
     : QDialog(parent)
     , ui(new Ui::CameraPlayerWidget)
     , cameraPlayer(nullptr)
+    , circleProgressBar(new CSProgressBar(this))
 {
     setWindowFlags(this->windowFlags() & Qt::WindowCloseButtonHint  & Qt::WindowMinMaxButtonsHint);
 
     ui->setupUi(this);
     ui->frameEdit->setValidator(new QIntValidator(-10000000, 10000000, this));
+    ui->captureSingleButton->setToolTip(tr("Save current frame"));
 
     dataTypeCheckBoxs[(int)CAMERA_DATA_DEPTH] = ui->checkBoxDepth;
     dataTypeCheckBoxs[(int)CAMERA_DATA_RGB] = ui->checkBoxRgb;
-    dataTypeCheckBoxs[(int)CAMERA_DTA_POINT_CLOUD] = ui->checkBoxPC;
+    dataTypeCheckBoxs[(int)CAMERA_DATA_POINT_CLOUD] = ui->checkBoxPC;
     dataTypeCheckBoxs[(int)(CAMERA_DATA_R)] = ui->checkBoxIrR;
     dataTypeCheckBoxs[(int)(CAMERA_DATA_L)] = ui->checkBoxIrL;
 
@@ -89,11 +92,14 @@ CameraPlayerDialog::CameraPlayerDialog(QWidget* parent)
     suc &= (bool)connect(ui->frameEdit, &QLineEdit::editingFinished, this, &CameraPlayerDialog::onLineEditFinished);
     //suc &= (bool)connect(ui->frameEdit, &CSLineEdit::focusOutSignal, this, &CameraPlayerDialog::onLineEditFinished);
 
-    suc &= (bool)connect(ui->playerRenderWindow, &RenderWindow::renderExit, this, &CameraPlayerDialog::onRenderExit);
+    suc &= (bool)connect(ui->playerRenderWindow,  &RenderWindow::renderExit, this, &CameraPlayerDialog::onRenderExit);
+    suc &= (bool)connect(ui->captureSingleButton, &QPushButton::clicked,     this, &CameraPlayerDialog::onClickedSave);
 
     suc &= (bool)connect(this, &CameraPlayerDialog::output2DUpdated, ui->playerRenderWindow, &RenderWindow::onOutput2DUpdated);
     suc &= (bool)connect(this, &CameraPlayerDialog::output3DUpdated, ui->playerRenderWindow, &RenderWindow::onOutput3DUpdated);
     suc &= (bool)connect(cs::CSApplication::getInstance(), &cs::CSApplication::show3DTextureChanged, this, &CameraPlayerDialog::onShowTextureUpdated);
+
+    
     Q_ASSERT(suc);
 }
 
@@ -126,10 +132,11 @@ void CameraPlayerDialog::onLoadFile()
             cameraPlayer = new cs::CameraPlayer();
 
             connect(cameraPlayer, &cs::CameraPlayer::playerStateChanged, this, &CameraPlayerDialog::onPlayerStateChanged);    
-            connect(cameraPlayer, &cs::CameraPlayer::output2DUpdated, this, &CameraPlayerDialog::output2DUpdated);
-            connect(cameraPlayer, &cs::CameraPlayer::output3DUpdated, this, &CameraPlayerDialog::output3DUpdated);
-            connect(this, &CameraPlayerDialog::loadFile, cameraPlayer, &cs::CameraPlayer::onLoadFile);
-            connect(this, &CameraPlayerDialog::currentFrameUpdated, cameraPlayer, &cs::CameraPlayer::onPalyFrameUpdated);
+            connect(cameraPlayer, &cs::CameraPlayer::output2DUpdated,    this, &CameraPlayerDialog::output2DUpdated);
+            connect(cameraPlayer, &cs::CameraPlayer::output3DUpdated,    this, &CameraPlayerDialog::output3DUpdated);
+            connect(this, &CameraPlayerDialog::loadFile, cameraPlayer,   &cs::CameraPlayer::onLoadFile);
+            connect(this, &CameraPlayerDialog::currentFrameUpdated,      cameraPlayer, &cs::CameraPlayer::onPalyFrameUpdated);
+            connect(this, &CameraPlayerDialog::saveCurrentFrame,         cameraPlayer, &cs::CameraPlayer::onSaveCurrentFrame);
         }
 
         emit loadFile(filePath);
@@ -153,6 +160,13 @@ void CameraPlayerDialog::onPlayerStateChanged(int state, QString msg)
         onPlayReady();
         break;
     case cs::CameraPlayer::PLAYER_ERROR:
+        break;
+    case cs::CameraPlayer::PLAYER_SAVE_SUCCESS:
+    case cs::CameraPlayer::PLAYER_SAVE_FAILED:
+        circleProgressBar->close();
+        break;
+    case cs::CameraPlayer::PLAYER_SAVING:
+        circleProgressBar->open();
         break;
     default:
         break;
@@ -230,7 +244,7 @@ void CameraPlayerDialog::onToggledCheckBox()
 
 void CameraPlayerDialog::onSliderValueChanged()
 {
-    qDebug() << "onSliderValueChanged, value = " << ui->frameNumberSlider->value();
+    //qDebug() << "onSliderValueChanged, value = " << ui->frameNumberSlider->value();
     QString text = QString::number(ui->frameNumberSlider->value());
     ui->frameEdit->setText(text);
 
@@ -276,4 +290,27 @@ void CameraPlayerDialog::onShowTextureUpdated(bool texture)
         cameraPlayer->onShow3DTextureChanged(texture);
         emit currentFrameUpdated(ui->frameNumberSlider->value(), true);
     }
+}
+
+void CameraPlayerDialog::onClickedSave()
+{
+    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+
+    qInfo() << "click capture single";
+    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Save current frame"), openDir);
+
+    if (url.isValid())
+    {
+        emit saveCurrentFrame(url.toLocalFile());
+    }
+    else
+    {
+        qInfo() << "Cancel capture";
+    }
+}
+
+void CameraPlayerDialog::onTranslate()
+{
+    ui->retranslateUi(this);
+    ui->captureSingleButton->setToolTip(tr("Save current frame"));
 }

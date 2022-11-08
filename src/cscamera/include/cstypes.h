@@ -109,7 +109,7 @@ enum CS_CAMERA_DATA_TYPE
     CAMERA_DATA_R          = (1 << 1),
     CAMERA_DATA_DEPTH      = (1 << 2),
     CAMERA_DATA_RGB        = (1 << 3),
-    CAMERA_DTA_POINT_CLOUD = (1 << 4)
+    CAMERA_DATA_POINT_CLOUD = (1 << 4)
 };
 
 struct OutputInfo2D

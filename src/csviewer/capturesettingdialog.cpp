@@ -108,15 +108,19 @@ void CaptureSettingDialog::onStartCapture()
 {
     qInfo() << "onStartCapture";
 
+    QString filters = "Zip file(*.zip)";
     QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
-    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir);
+    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir, filters);
 
     if (url.isValid())
     {
         QFileInfo fileInfo(url.toLocalFile());
 
         captureConfig.saveDir = fileInfo.absolutePath();
-        captureConfig.saveName = fileInfo.fileName();
+
+        QString name = fileInfo.fileName();
+
+        captureConfig.saveName = name.endsWith(".zip") ? (name.replace(name.lastIndexOf(".zip"), 4, "")) : name;
         captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
 
         isCapturing = true;
@@ -167,7 +171,7 @@ void CaptureSettingDialog::onDataTypeChanged()
 
     if (ui->pointCloudCheckBox->isChecked())
     {
-        captureConfig.captureDataTypes.push_back(CAMERA_DTA_POINT_CLOUD);
+        captureConfig.captureDataTypes.push_back(CAMERA_DATA_POINT_CLOUD);
     }
 }
 
@@ -215,7 +219,7 @@ void CaptureSettingDialog::initDialog()
         case CAMERA_DATA_DEPTH:
             ui->depthCheckBox->setChecked(true);
             break;
-        case CAMERA_DTA_POINT_CLOUD:
+        case CAMERA_DATA_POINT_CLOUD:
             ui->pointCloudCheckBox->setChecked(true);
             break;
         default:

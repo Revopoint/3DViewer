@@ -40,60 +40,41 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_CAMERA_PLAYER_DIALOG
-#define _CS_CAMERA_PLAYER_DIALOG
-
+#ifndef _CS_FORMATCONVERTDIALOG_H
+#define _CS_FORMATCONVERTDIALOG_H
 #include <QDialog>
-#include <QCheckBox>
-#include <QMap>
-#include <QImage>
-#include <hpp/Processing.hpp>
-#include <cstypes.h>
 
 namespace Ui 
 {
-    class CameraPlayerWidget;
+    class FormatConvertDialog;
 }
 
 namespace cs 
 {
-    class CameraPlayer;
+    class FormatConverter;
 }
 
-class CSProgressBar;
-class CameraPlayerDialog : public QDialog
+class FormatConvertDialog : public QDialog
 {
     Q_OBJECT
 public:
-    CameraPlayerDialog(QWidget* parent = nullptr);
-    ~CameraPlayerDialog();
+    FormatConvertDialog();
+    ~FormatConvertDialog();
     void onTranslate();
-public slots:
-    void onPlayerStateChanged(int state, QString msg);
-    void onLoadFile();
-    void onRenderExit(int renderId);
-    void onShowTextureUpdated(bool texture);
+    void reject() override;
 signals:
     void showMessage(QString msg, int time);
-    void loadFile(QString file);
-    void currentFrameUpdated(int curFrame, bool updateForce = false);
-    void output2DUpdated(OutputData2D outputData);
-    void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-    void saveCurrentFrame(QString filePath);
-private:
-    void onPlayReady();
-    void updateFrameRange(int frameNumer);
+public slots:
+    void onConvertStateChanged(int state, int convertedCount, QString message);
 private slots:
-    void onToggledCheckBox();
-    void onSliderValueChanged();
-    void onLineEditFinished();
-    void onClickedSave();
+    void onClickedBrowseSource();
+    void onClickedBrowseOutputDirectory();
+    void onShowTextureChanged(bool show);
 private:
-    Ui::CameraPlayerWidget* ui;
-    cs::CameraPlayer* cameraPlayer;
-
-    QMap<int, QCheckBox*> dataTypeCheckBoxs;
-    CSProgressBar* circleProgressBar;
+    void showMessageBox(QString message);
+private:
+    Ui::FormatConvertDialog* ui;
+    cs::FormatConverter* formatConverter = nullptr;
 };
 
-#endif  // _CS_CAMERA_PLAYER_DIALOG
+#endif //  _CS_FORMATCONVERTDIALOG_H

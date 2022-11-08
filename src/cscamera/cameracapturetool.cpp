@@ -350,7 +350,7 @@ YAML::Node genYamlNodeFromDataTypes(QVector<CS_CAMERA_DATA_TYPE> captureDataType
         case CAMERA_DATA_RGB:
             node[i] = "RGB";
             break;
-        case CAMERA_DTA_POINT_CLOUD:
+        case CAMERA_DATA_POINT_CLOUD:
             node[i] = "Point Cloud";
             break;
         default:
@@ -420,6 +420,18 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         {
             depthScale = value.toFloat();
             rootNode["Depth Scale"] = depthScale;
+        }
+    }
+
+    {
+        // save depth range
+        QVariant value;
+        camera->getCameraPara(cs::parameter::PARA_DEPTH_RANGE, value);
+        if (value.isValid())
+        {
+            auto range = value.value<QPair<float, float>>();
+            rootNode["Depth Min"] = range.first;
+            rootNode["Depth Max"] = range.second;
         }
     }
 

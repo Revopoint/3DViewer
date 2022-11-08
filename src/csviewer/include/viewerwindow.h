@@ -68,6 +68,7 @@ class CSMessageBox;
 class CSAction;
 class IpSettingDialog;
 class CameraPlayerDialog;
+class FormatConvertDialog;
 
 class ViewerWindow : public QMainWindow
 {
@@ -112,6 +113,7 @@ private slots:
     void onTriggeredDefaultSavePath();
     void onTriggeredIpSetting();
     void onTriggeredLoadFile();
+    void onTriggeredFormatConvert();
 
     void onAppExit();
 private slots:
@@ -154,5 +156,6 @@ private:
     // set ip dialog
     IpSettingDialog* ipSettingDialog = nullptr;
     CameraPlayerDialog* cameraPlayerDialog = nullptr;
+    FormatConvertDialog* formatConvertDialog = nullptr;
 };
 #endif // _CS_VIEWERWINDOW_H

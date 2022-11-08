@@ -45,6 +45,7 @@
 
 #include <QThread>
 #include <QString>
+#include <QReadWriteLock> 
 
 #include "cstypes.h"
 #include "cscameraapi.h"
@@ -53,6 +54,7 @@
 
 namespace cs
 {
+class CapturedZipParser;
 class CS_CAMERA_EXPORT CameraPlayer : public QThread
 {
     Q_OBJECT
@@ -62,64 +64,40 @@ public:
     {
         PLAYER_LOADING,
         PLAYER_READY,
-        PLAYER_ERROR
+        PLAYER_ERROR,
+        PLAYER_SAVING,
+        PLAYER_SAVE_SUCCESS,
+        PLAYER_SAVE_FAILED
     };
 
     CameraPlayer(QObject* parent = nullptr);
     ~CameraPlayer();
     
-    QVector<CS_CAMERA_DATA_TYPE> getDataTypes();
+    QVector<int> getDataTypes();
     int getFrameNumber();
     void currentDataTypesUpdated(QVector<int> dataTypes);
     void onShow3DTextureChanged(bool show);
 public slots:
     void onLoadFile(QString file);
     void onPalyFrameUpdated(int curFrame, bool force = false);
+    void onSaveCurrentFrame(QString filePath);
 signals:
     void playerStateChanged(int state, QString msg);
     void output2DUpdated(OutputData2D outputData);
     void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
 private:
-    bool checkFileValid(QString file);
-    bool parseZipFile();
-    bool readDataFromZip(QString fileName, QByteArray& data);
-
     void updateCurrentFrame();
     void updateCurrentImage(int type);
     void updateCurrentPointCloud();
 
-    // images format
-    void updateCurrentFromPng(int type);
-    // raw format
-    void updateCurrentFromRaw(int type);
-
-    QImage genImageFromPngData(int type);
-    QImage genImageFromPixelData(int type);
-
-    QImage genDepthImage(int width, int height, QByteArray data);
-    QString getCurrentFileName(CS_CAMERA_DATA_TYPE dataType);
-    bool genPointCloudFromDepthData();
-    bool genPointCloudFromDepthImage();
 private:
-    QString zipFile = "";
 
-    QString playName = "";
-    int frameNumber = 0;
-    QStringList dataTypes;
-    QString dataFormat = "";
-    QSize depthResolution = QSize(0, 0);
-    QSize rgbResolution = QSize(0, 0);
-
-    // camera parameter
-    Intrinsics depthIntrinsics;
-    Intrinsics rgbIntrinsics;
-    Extrinsics extrinsics;
-    float depthScale = 0.0;
-
+    CapturedZipParser* zipParser = nullptr;
     int currentFrame = 0;
     QVector<int> currentDataTypes;
-
     bool show3dTexture = false;
+
+    QReadWriteLock lock;
 };
 }
 #endif //_CS_CAMERA_PLAYER_H

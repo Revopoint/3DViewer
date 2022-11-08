@@ -40,60 +40,52 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_CAMERA_PLAYER_DIALOG
-#define _CS_CAMERA_PLAYER_DIALOG
+#include <QThread>
+#include "cscameraapi.h"
 
-#include <QDialog>
-#include <QCheckBox>
-#include <QMap>
-#include <QImage>
-#include <hpp/Processing.hpp>
-#include <cstypes.h>
-
-namespace Ui 
+namespace cs
 {
-    class CameraPlayerWidget;
-}
 
-namespace cs 
-{
-    class CameraPlayer;
-}
-
-class CSProgressBar;
-class CameraPlayerDialog : public QDialog
+class CapturedZipParser;
+class CS_CAMERA_EXPORT FormatConverter : public QThread
 {
     Q_OBJECT
 public:
-    CameraPlayerDialog(QWidget* parent = nullptr);
-    ~CameraPlayerDialog();
-    void onTranslate();
-public slots:
-    void onPlayerStateChanged(int state, QString msg);
-    void onLoadFile();
-    void onRenderExit(int renderId);
-    void onShowTextureUpdated(bool texture);
-signals:
-    void showMessage(QString msg, int time);
-    void loadFile(QString file);
-    void currentFrameUpdated(int curFrame, bool updateForce = false);
-    void output2DUpdated(OutputData2D outputData);
-    void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-    void saveCurrentFrame(QString filePath);
-private:
-    void onPlayReady();
-    void updateFrameRange(int frameNumer);
-private slots:
-    void onToggledCheckBox();
-    void onSliderValueChanged();
-    void onLineEditFinished();
-    void onClickedSave();
-private:
-    Ui::CameraPlayerWidget* ui;
-    cs::CameraPlayer* cameraPlayer;
 
-    QMap<int, QCheckBox*> dataTypeCheckBoxs;
-    CSProgressBar* circleProgressBar;
+    enum CONVERT_STATE
+    {
+        CONVERTING,
+        CONVERT_SUCCESS,
+        CONVERT_FAILED,
+        CONVERT_ERROR
+    };
+    FormatConverter();
+    ~FormatConverter();
+
+    void setSourceFile(QString sourceFile);
+    void setOutputDirectory(QString output);
+    void setWithTexture(bool withTexture);
+
+    bool getIsConverting();
+    void setIsConverting(bool value);
+    void setInterruptConvert(bool value);
+    bool getInterruptConvert();
+public slots:
+    void onConvert();
+signals:
+    void convertStateChanged(int state, int progress, QString message);
+private:
+    // zip file
+    QString sourceFile;
+    // output directory
+    QString outputDirectory;
+
+    bool withTexture = false;
+
+    CapturedZipParser* capturedZipParser = nullptr;
+
+    bool isConverting = false;
+    bool interruptConvert = false;
 };
 
-#endif  // _CS_CAMERA_PLAYER_DIALOG
+}

@@ -59,7 +59,7 @@ static QMap<int, QString> renderTitleMap =
     {(int)CAMERA_DATA_R, "IR(R)"},
     {(int)CAMERA_DATA_DEPTH, "Depth"},
     {(int)CAMERA_DATA_RGB, "RGB"},
-    {(int)CAMERA_DTA_POINT_CLOUD, "Point Cloud"},
+    {(int)CAMERA_DATA_POINT_CLOUD, "Point Cloud"},
 };
 
 RenderWidget2D::RenderWidget2D(int renderId, QWidget* parent)

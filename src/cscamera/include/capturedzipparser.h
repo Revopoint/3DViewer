@@ -40,60 +40,77 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_CAMERA_PLAYER_DIALOG
-#define _CS_CAMERA_PLAYER_DIALOG
-
-#include <QDialog>
-#include <QCheckBox>
-#include <QMap>
+#ifndef _CS_CAPTUREDZIPPARSER_H
+#define _CS_CAPTUREDZIPPARSER_H
+#include <QObject>
+#include <QVector>
+#include <QString>
 #include <QImage>
+
+#include "cstypes.h"
+#include "cscameraapi.h"
 #include <hpp/Processing.hpp>
-#include <cstypes.h>
 
-namespace Ui 
+namespace cs
 {
-    class CameraPlayerWidget;
-}
 
-namespace cs 
-{
-    class CameraPlayer;
-}
-
-class CSProgressBar;
-class CameraPlayerDialog : public QDialog
+class CS_CAMERA_EXPORT CapturedZipParser : public QObject
 {
     Q_OBJECT
 public:
-    CameraPlayerDialog(QWidget* parent = nullptr);
-    ~CameraPlayerDialog();
-    void onTranslate();
-public slots:
-    void onPlayerStateChanged(int state, QString msg);
-    void onLoadFile();
-    void onRenderExit(int renderId);
-    void onShowTextureUpdated(bool texture);
-signals:
-    void showMessage(QString msg, int time);
-    void loadFile(QString file);
-    void currentFrameUpdated(int curFrame, bool updateForce = false);
-    void output2DUpdated(OutputData2D outputData);
-    void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-    void saveCurrentFrame(QString filePath);
-private:
-    void onPlayReady();
-    void updateFrameRange(int frameNumer);
-private slots:
-    void onToggledCheckBox();
-    void onSliderValueChanged();
-    void onLineEditFinished();
-    void onClickedSave();
-private:
-    Ui::CameraPlayerWidget* ui;
-    cs::CameraPlayer* cameraPlayer;
+    CapturedZipParser(QString filePath = "");
+    ~CapturedZipParser();
 
-    QMap<int, QCheckBox*> dataTypeCheckBoxs;
-    CSProgressBar* circleProgressBar;
+    void setZipFile(QString filePath);
+    bool checkFileValid();
+    bool parserCaptureInfo();
+
+    QByteArray getFrameData(int frameIndex, int dataType);
+    QImage getImageOfFrame(int frameIndex, int dataType);
+
+    bool generatePointCloud(int frameIndex, bool withTexture, Pointcloud& pc, QImage& tex);
+    bool saveFrameToLocal(int frameIndex, bool withTexture, QString filePath);
+
+    // get parameters
+    QVector<int> getDataTypes();
+    int getFrameCount();
+    bool isRawFormat();
+    QString getCaptureName();
+private:
+    QString getFileName(int frameIndex, int dataType);
+    QString getFileName(int dataType, QString name);
+
+    QImage convertPng2QImage(QByteArray data, int dataType);
+    QImage convertPixels2QImage(QByteArray data, int dataType);
+    QImage convertData2QImage(int width, int height, QByteArray data);
+
+    bool saveImageData(int frameIndex, int dataType, QString filePath);
+    bool savePointCloud(int frameIndex, bool withTexture, QString filePath);
+private:
+    // zip file path
+    QString zipFile = "";
+    // name of capture 
+    QString captureName = "";
+    // captured data types
+    QVector<int> dataTypes;
+    // captured data format: images or raw
+    QString dataFormat = "";
+    // resolution
+    QSize depthResolution = QSize(0, 0);
+    QSize rgbResolution = QSize(0, 0);
+    // the frame count of capture
+    int capturedFrameCount = 0;
+
+    // camera parameter
+    Intrinsics depthIntrinsics;
+    Intrinsics rgbIntrinsics;
+    Extrinsics extrinsics;
+    float depthScale = 0.0f;
+    float depthMin = 0.0f;
+    float depthMax = 0.0f;
 };
 
-#endif  // _CS_CAMERA_PLAYER_DIALOG
+}
+
+
+#endif // _CS_CAPTUREDZIPPARSER_H
