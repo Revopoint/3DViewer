@@ -863,8 +863,8 @@ void ParaSettingsWidget::onClickCaptureSingle()
         CameraCaptureConfig config;
         config.captureType = CAPTURE_TYPE_SINGLE;
         config.captureNumber = 1;
-        config.captureDataTypes = { CAMERA_DATA_L, CAMERA_DATA_R, CAMERA_DATA_L, CAMERA_DATA_DEPTH, CAMERA_DATA_RGB, CAMERA_DTA_POINT_CLOUD };
-        config.saveFormat = QString("Images(*.)");
+        config.captureDataTypes = { CAMERA_DATA_L, CAMERA_DATA_R, CAMERA_DATA_DEPTH, CAMERA_DATA_RGB, CAMERA_DTA_POINT_CLOUD };
+        config.saveFormat = QString("images");
         config.saveDir = fileInfo.absolutePath();
         config.saveName = fileInfo.fileName();
         config.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
@@ -905,7 +905,6 @@ void ParaMonitorThread::run()
 {
     const int interval = 100;
     int count = 0;
-
 
     while (!isInterruptionRequested())
     {

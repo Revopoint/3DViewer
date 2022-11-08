@@ -40,55 +40,19 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_CAMERA_PLAYER_DIALOG
-#define _CS_CAMERA_PLAYER_DIALOG
+#ifndef _CS_IMAGEUTIL_H
+#define _CS_IMAGEUTIL_H
 
-#include <QDialog>
-#include <QCheckBox>
-#include <QMap>
-#include <QImage>
-#include <hpp/Processing.hpp>
-#include <cstypes.h>
+#include <QByteArray>
+#include <QString>
 
-namespace Ui 
+#include "csutilsapi.h"
+
+class CS_UTILS_EXPORT ImageUtil
 {
-    class CameraPlayerWidget;
-}
-
-namespace cs 
-{
-    class CameraPlayer;
-}
-
-class CameraPlayerDialog : public QDialog
-{
-    Q_OBJECT
 public:
-    CameraPlayerDialog(QWidget* parent = nullptr);
-    ~CameraPlayerDialog();
-public slots:
-    void onPlayerStateChanged(int state, QString msg);
-    void onLoadFile();
-    void onRenderExit(int renderId);
-    void onShowTextureUpdated(bool texture);
-signals:
-    void showMessage(QString msg, int time);
-    void loadFile(QString file);
-    void currentFrameUpdated(int curFrame, bool updateForce = false);
-    void output2DUpdated(OutputData2D outputData);
-    void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-private:
-    void onPlayReady();
-    void updateFrameRange(int frameNumer);
-private slots:
-    void onToggledCheckBox();
-    void onSliderValueChanged();
-    void onLineEditFinished();
-private:
-    Ui::CameraPlayerWidget* ui;
-    cs::CameraPlayer* cameraPlayer;
-
-    QMap<int, QCheckBox*> dataTypeCheckBoxs;
+    static bool saveGrayScale16ByLibpng(int width, int height, QByteArray data, QString path);
+    static bool genPixDataFromPngData(QByteArray pngData, int& width, int& height, int& bitDepth,  QByteArray& pixData);
 };
 
-#endif  // _CS_CAMERA_PLAYER_DIALOG
+#endif // _CS_IMAGEUTIL_H

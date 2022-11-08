@@ -64,6 +64,8 @@ CaptureSettingDialog::CaptureSettingDialog(QWidget* parent)
     : QDialog(parent)
     , ui(new Ui::CaptureSettingWidget)
 {
+    setWindowFlags(this->windowFlags() & Qt::WindowCloseButtonHint);
+
     ui->setupUi(this);
     dataTypeCheckBoxs = { ui->rgbCheckBox, ui->irCheckBox, ui->depthCheckBox, ui->pointCloudCheckBox, };
 

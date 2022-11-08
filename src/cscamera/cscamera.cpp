@@ -283,7 +283,6 @@ bool CSCamera::startStream()
 
     qInfo() << "begin start stream";
     setCameraState(CAMERA_STARTING_STREAM);
-
     bool result = true;
     if (isDepthStreamSup)
     {
@@ -919,7 +918,7 @@ void CSCamera::getUserParaPrivate(CAMERA_PARA_ID paraId, QVariant& value)
         value = (int)rgbFormat;
         break;
     case PARA_RGB_RESOLUTION:
-        value = depthResolution;
+        value = rgbResolution;
         break;
     case PARA_HAS_RGB:
         value = isRgbStreamSup;
@@ -1344,7 +1343,7 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
 void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
 {
     PROPERTY_TYPE_EXTENSION type = (PROPERTY_TYPE_EXTENSION)CAMERA_EXTENSION_PROPERTY_MAP[paraId];
-    
+
     PropertyExtension propExt;
     switch (type)
     {
@@ -1355,54 +1354,54 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
         propExt.algorithmContrast = value.toInt();
         break;
     case PROPERTY_EXT_HDR_MODE:
+    {
+        // cached exposure and gain
+        if (hdrMode == HDR_MODE_CLOSE && value.toInt() != HDR_MODE_CLOSE)
         {
-            // cached exposure and gain
-            if (hdrMode == HDR_MODE_CLOSE && value.toInt() != HDR_MODE_CLOSE)
-            {
-                QVariant tmp;
-                getCameraPara(PARA_DEPTH_EXPOSURE, tmp);
-                cachedDepthExposure = qRound(tmp.toFloat());
+            QVariant tmp;
+            getCameraPara(PARA_DEPTH_EXPOSURE, tmp);
+            cachedDepthExposure = qRound(tmp.toFloat());
 
-                getCameraPara(PARA_DEPTH_GAIN, tmp);
-                cachedDepthGain = qRound(tmp.toFloat());
-            }
-            // update HDR mode
-            hdrMode = (CAMERA_HDR_MODE)value.toInt();
-            int autoHdrMode = getAutoHdrMode(hdrMode);
-            propExt.hdrMode = (HDR_MODE)autoHdrMode;
-            break;
+            getCameraPara(PARA_DEPTH_GAIN, tmp);
+            cachedDepthGain = qRound(tmp.toFloat());
         }
-    case PROPERTY_EXT_HDR_EXPOSURE:
-        propExt.hdrExposureSetting = value.value<HdrExposureSetting>();   
+        // update HDR mode
+        hdrMode = (CAMERA_HDR_MODE)value.toInt();
+        int autoHdrMode = getAutoHdrMode(hdrMode);
+        propExt.hdrMode = (HDR_MODE)autoHdrMode;
         break;
-    case PROPERTY_EXT_HDR_SCALE_SETTING: 
-        {
-            HdrScaleSetting settings;
-            setHdrTimes(settings, value.toInt());
-            propExt.hdrScaleSetting = settings;
-            break;
-        }
+    }
+    case PROPERTY_EXT_HDR_EXPOSURE:
+        propExt.hdrExposureSetting = value.value<HdrExposureSetting>();
+        break;
+    case PROPERTY_EXT_HDR_SCALE_SETTING:
+    {
+        HdrScaleSetting settings;
+        setHdrTimes(settings, value.toInt());
+        propExt.hdrScaleSetting = settings;
+        break;
+    }
     case PROPERTY_EXT_DEPTH_ROI:
-        {
-            QRectF roiRect = value.toRectF();
-            propExt.depthRoi.top    = roiRect.top() * 100;
-            propExt.depthRoi.left   = roiRect.left() * 100;
-            propExt.depthRoi.right  = roiRect.right() * 100;
-            propExt.depthRoi.bottom = roiRect.bottom() * 100;
-            break;
-        }
+    {
+        QRectF roiRect = value.toRectF();
+        propExt.depthRoi.top = roiRect.top() * 100;
+        propExt.depthRoi.left = roiRect.left() * 100;
+        propExt.depthRoi.right = roiRect.right() * 100;
+        propExt.depthRoi.bottom = roiRect.bottom() * 100;
+        break;
+    }
     case PROPERTY_EXT_DEPTH_RANGE:
-        {
-            auto range = value.value<QPair<float, float>>();
-            propExt.depthRange.min = qRound(range.first);
-            propExt.depthRange.max = qRound(range.second);
-            break;
-        }
+    {
+        auto range = value.value<QPair<float, float>>();
+        propExt.depthRange.min = qRound(range.first);
+        propExt.depthRange.max = qRound(range.second);
+        break;
+    }
     case PROPERTY_EXT_TRIGGER_MODE:
         propExt.triggerMode = (TRIGGER_MODE)value.toInt();;
         break;
     case PROPERTY_EXT_CAMERA_IP:
-        propExt.cameraIp = value.value<CameraIpSetting>();   
+        propExt.cameraIp = value.value<CameraIpSetting>();
         break;
     default:
         Q_ASSERT(false);

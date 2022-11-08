@@ -168,7 +168,8 @@ void DepthProcessStrategy::onProcessDepthData(const ushort* dataPtr, int length,
     color.setRange(depthRange.first, depthRange.second);
 
     depthImage =  QImage(width, height, QImage::Format_RGB888);
-    color.process<float>(floatPtr, depthScale, depthImage.bits(), length);
+    //color.process<float>(floatPtr, depthScale, depthImage.bits(), length);
+    color.process<ushort>((ushort*)dataPtr, depthScale, depthImage.bits(), length);
 }
 
 void DepthProcessStrategy::timeDomainSmooth(const ushort* dataPtr, int length, int width, int height, float* output)

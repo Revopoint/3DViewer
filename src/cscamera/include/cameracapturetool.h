@@ -92,8 +92,7 @@ signals:
     void captureNumberUpdated(int, int);
 protected:
     virtual void onCaptureDataDone();
-    void saveCameraPara();
-
+    void saveCameraPara(QString filePath);
 protected:
     CameraCaptureConfig captureConfig;
     CAPTURE_TYPE captureType;

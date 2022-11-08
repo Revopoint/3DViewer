@@ -89,8 +89,7 @@ class RenderWidget2D : public RenderWidget
 public:
     RenderWidget2D(int renderId, QWidget* parent = nullptr);
     ~RenderWidget2D();
-    void setWHRatio(float ratio);
-   
+
     void setEnableScale(bool enable);
 
     void resizeEvent(QResizeEvent* event) override;
@@ -98,6 +97,7 @@ public:
     void keyPressEvent(QKeyEvent* event);
     void keyReleaseEvent(QKeyEvent* event);
 
+    void hideRenderFps();
     void setShowFullScreen(bool value) override;
     void onTranslate();
 public slots:
@@ -109,6 +109,7 @@ protected:
     virtual void onPainterInfos(OutputData2D outputData);
     void updateFps();
     void initButtons();
+    void setWHRatio(float ratio);
 private:
     void onClickExitButton();
     void onClickFullScreen(bool checked);
@@ -145,6 +146,7 @@ protected:
     QImage cachedImage;
 
     int bottomOffset = 0;
+    bool isFirstFrame = true;
 };
 
 class CSROIWidget;

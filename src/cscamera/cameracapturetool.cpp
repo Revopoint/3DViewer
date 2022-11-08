@@ -1,3 +1,45 @@
+/*******************************************************************************
+* This file is part of the 3DViewer
+*
+* Copyright 2022-2026 (C) Revopoint3D AS
+* All rights reserved.
+*
+* Revopoint3D Software License, v1.0
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*
+* 1. Redistribution of source code must retain the above copyright notice,
+* this list of conditions and the following disclaimer.
+*
+* 2. Redistribution in binary form must reproduce the above copyright notice,
+* this list of conditions and the following disclaimer in the documentation
+* and/or other materials provided with the distribution.
+*
+* 3. Neither the name of Revopoint3D AS nor the names of its contributors may be used
+* to endorse or promote products derived from this software without specific
+* prior written permission.
+*
+* 4. This software, with or without modification, must not be used with any
+* other 3D camera than from Revopoint3D AS.
+*
+* 5. Any software provided in binary form under this license must not be
+* reverse engineered, decompiled, modified and/or disassembled.
+*
+* THIS SOFTWARE IS PROVIDED BY REVOPOINT3D AS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+* MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL REVOPOINT3D AS OR CONTRIBUTORS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*
+* Info:  https://www.revopoint3d.com
+******************************************************************************/
+
 #include "cameracapturetool.h"
 #include <QMutexLocker>
 #include <QDebug>
@@ -161,7 +203,7 @@ void CameraCaptureBase::run()
 
             outputSaver->setSaveIndex(rgbFrameIndex, depthFrameIndex, pointCloudIndex);
 
-            threadPool.start(outputSaver, QThread::LowPriority);
+            threadPool.start(outputSaver, QThread::NormalPriority);
         }
 
         {
@@ -286,20 +328,49 @@ YAML::Node genYamlNodeFromExtrinsics(const Extrinsics& extrinsics)
     return node;
 }
 
-void CameraCaptureBase::saveCameraPara()
+YAML::Node genYamlNodeFromDataTypes(QVector<CS_CAMERA_DATA_TYPE> captureDataTypes)
+{
+    YAML::Node node;
+    node.SetStyle(YAML::EmitterStyle::Flow);
+
+    for (int i = 0; i < captureDataTypes.size(); i++)
+    {
+        CS_CAMERA_DATA_TYPE dataType = captureDataTypes.at(i);
+        switch (dataType)
+        {
+        case CAMERA_DATA_L:
+            node[i] = "IR(L)";
+            break;
+        case CAMERA_DATA_R:
+            node[i] = "IR(R)";
+            break;
+        case CAMERA_DATA_DEPTH:
+            node[i] = "Depth";
+            break;
+        case CAMERA_DATA_RGB:
+            node[i] = "RGB";
+            break;
+        case CAMERA_DTA_POINT_CLOUD:
+            node[i] = "Point Cloud";
+            break;
+        default:
+            break;
+        }
+    }
+
+    return node;
+}
+
+void CameraCaptureBase::saveCameraPara(QString filePath)
 {
     qInfo() << "save camera parameters";
-
-    QVariant hasRgbV;
-    camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
-
-    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-camerapara.yaml";
-    auto bytesData = savePath.toLocal8Bit();
+  
+    auto bytesData = filePath.toLocal8Bit();
     std::ofstream fout(bytesData.data());
 
     if (!fout.is_open())
     {
-        qWarning() << "open file failed, file:" << savePath;
+        qWarning() << "open file failed, file:" << filePath;
         return;
     }
 
@@ -307,12 +378,71 @@ void CameraCaptureBase::saveCameraPara()
     fout << "---\n";
 
     YAML::Node rootNode;
-    // RGB intrinsics
-    if (hasRgbV.isValid() && hasRgbV.toBool())
+
+    // 
+    rootNode["Frame Number"] = capturedDataCount;
+    rootNode["Data Types"] = genYamlNodeFromDataTypes(captureConfig.captureDataTypes);
+    rootNode["Save Format"] = captureConfig.saveFormat.toStdString();
+    rootNode["Name"] = captureConfig.saveName.toStdString();
+
+    // save depth resolution
     {
-        Intrinsics rgbIntrinsics;
+        QVariant value;
+        camera->getCameraPara(cs::parameter::PARA_DEPTH_RESOLUTION, value);
+        QSize res = value.toSize();
+
+        YAML::Node nodeRes;
+        nodeRes["width"] = res.width();
+        nodeRes["height"] = res.height();
+        rootNode["Depth resolution"] = nodeRes;
+    }
+
+    {
+        // Depth intrinsics
+        Intrinsics depthIntrinsics;
         QVariant intrinsics;
         camera->getCameraPara(cs::parameter::PARA_DEPTH_INTRINSICS, intrinsics);
+        if (intrinsics.isValid())
+        {
+            depthIntrinsics = intrinsics.value<Intrinsics>();
+            YAML::Node node = genYamlNodeFromIntrinsics(depthIntrinsics);
+
+            rootNode["Depth intrinsics"] = node;
+        }
+    }
+    
+    {
+        // save depth scale
+        QVariant value;
+        float depthScale;
+        camera->getCameraPara(cs::parameter::PARA_DEPTH_SCALE, value);
+        if (value.isValid())
+        {
+            depthScale = value.toFloat();
+            rootNode["Depth Scale"] = depthScale;
+        }
+    }
+
+    // RGB intrinsics
+    QVariant hasRgbV;
+    camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+
+    if (hasRgbV.isValid() && hasRgbV.toBool())
+    {
+        // save RGB resolution
+        QVariant value;
+        camera->getCameraPara(cs::parameter::PARA_RGB_RESOLUTION, value);
+        QSize res = value.toSize();
+        {
+            YAML::Node nodeRes;
+            nodeRes["width"] = res.width();
+            nodeRes["height"] = res.height();
+            rootNode["RGB resolution"] = nodeRes;
+        }
+
+        Intrinsics rgbIntrinsics;
+        QVariant intrinsics;
+        camera->getCameraPara(cs::parameter::PARA_RGB_INTRINSICS, intrinsics);
 
         if (intrinsics.isValid())
         {
@@ -328,33 +458,7 @@ void CameraCaptureBase::saveCameraPara()
     }
 
     {
-        // Depth intrinsics
-        Intrinsics depthIntrinsics;
-        QVariant intrinsics;
-        camera->getCameraPara(cs::parameter::PARA_RGB_INTRINSICS, intrinsics);
-        if (intrinsics.isValid())
-        {
-            depthIntrinsics = intrinsics.value<Intrinsics>();
-            YAML::Node node = genYamlNodeFromIntrinsics(depthIntrinsics);
-
-            rootNode["Depth intrinsics"] = node;
-        }
-    }
-    
-    {
-        // depth scale
-        QVariant value;
-        float depthScale;
-        camera->getCameraPara(cs::parameter::PARA_DEPTH_SCALE, value);
-        if (value.isValid())
-        {
-            depthScale = value.toFloat();
-            rootNode["Depth Scale"] = depthScale;
-        }
-    }
-
-    {
-        // extrinsics
+        // save extrinsics
         QVariant value;
         Extrinsics extrinsics;
         camera->getCameraPara(cs::parameter::PARA_EXTRINSICS, value);
@@ -371,7 +475,8 @@ void CameraCaptureBase::saveCameraPara()
 void CameraCaptureBase::onCaptureDataDone()
 {
     // save camera parameters to file
-    saveCameraPara();
+    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-CaptureParameters.yaml";
+    saveCameraPara(savePath);
 }
 
 CameraCaptureSingle::CameraCaptureSingle(const CameraCaptureConfig& config)
@@ -470,7 +575,9 @@ void CameraCaptureMultiple::onCaptureDataDone()
     // save time stamps to file
     saveTimeStamps();
 
-    CameraCaptureBase::onCaptureDataDone();
+    // save camera parameters and capture information
+    QString savePath = captureConfig.saveDir + QDir::separator() + "CaptureParameters.yaml";
+    saveCameraPara(savePath);
 
     // compress to zip file
     compressToZip();

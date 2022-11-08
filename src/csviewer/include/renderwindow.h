@@ -58,6 +58,8 @@ public:
     ~RenderWindow();
 
     void onWindowLayoutUpdated();
+    void hideRenderFps();
+    void setRender3DTextureVisible(bool visible);
 signals:
     void roiRectFUpdated(QRectF rect);
     void renderExit(int renderId);

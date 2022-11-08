@@ -149,6 +149,21 @@ void RenderWidget2D::onFrameIncrease()
 
 void RenderWidget2D::onRenderDataUpdated(OutputData2D outputData)
 {
+    if (outputData.image.isNull())
+    {
+        qWarning() << "render image is null";
+        return;
+    }
+
+    if (isFirstFrame)
+    {
+        isFirstFrame = false;
+        int width = outputData.image.width();
+        int height = outputData.image.height();
+        float ratio = width * 1.0 / height;
+        setWHRatio(ratio);
+    }
+
     cachedImage = outputData.image;
 
     QPixmap pixmap = QPixmap::fromImage(outputData.image);
@@ -202,6 +217,11 @@ void RenderWidget2D::setShowFullScreen(bool value)
     }
 
     titleLabel->setVisible(value);
+}
+
+void RenderWidget2D::hideRenderFps()
+{
+    fpsLabel->setVisible(false);
 }
 
 void RenderWidget2D::initButtons()

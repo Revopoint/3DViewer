@@ -98,6 +98,7 @@ signals:
     void captureNumberUpdated(int captured, int dropped);
     void captureStateChanged(int state, QString message);
 
+    void show3DTextureChanged(bool texture);
 private slots:
     void onCameraStateChanged(int state);
     void onCameraParaUpdated(int paraId, QVariant value);

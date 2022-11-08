@@ -40,55 +40,86 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_CAMERA_PLAYER_DIALOG
-#define _CS_CAMERA_PLAYER_DIALOG
+#ifndef _CS_CAMERA_PLAYER_H
+#define _CS_CAMERA_PLAYER_H
 
-#include <QDialog>
-#include <QCheckBox>
-#include <QMap>
-#include <QImage>
+#include <QThread>
+#include <QString>
+
+#include "cstypes.h"
+#include "cscameraapi.h"
+#include <hpp/Types.hpp>
 #include <hpp/Processing.hpp>
-#include <cstypes.h>
 
-namespace Ui 
+namespace cs
 {
-    class CameraPlayerWidget;
-}
-
-namespace cs 
-{
-    class CameraPlayer;
-}
-
-class CameraPlayerDialog : public QDialog
+class CS_CAMERA_EXPORT CameraPlayer : public QThread
 {
     Q_OBJECT
 public:
-    CameraPlayerDialog(QWidget* parent = nullptr);
-    ~CameraPlayerDialog();
+
+    enum PLAYER_STATE
+    {
+        PLAYER_LOADING,
+        PLAYER_READY,
+        PLAYER_ERROR
+    };
+
+    CameraPlayer(QObject* parent = nullptr);
+    ~CameraPlayer();
+    
+    QVector<CS_CAMERA_DATA_TYPE> getDataTypes();
+    int getFrameNumber();
+    void currentDataTypesUpdated(QVector<int> dataTypes);
+    void onShow3DTextureChanged(bool show);
 public slots:
-    void onPlayerStateChanged(int state, QString msg);
-    void onLoadFile();
-    void onRenderExit(int renderId);
-    void onShowTextureUpdated(bool texture);
+    void onLoadFile(QString file);
+    void onPalyFrameUpdated(int curFrame, bool force = false);
 signals:
-    void showMessage(QString msg, int time);
-    void loadFile(QString file);
-    void currentFrameUpdated(int curFrame, bool updateForce = false);
+    void playerStateChanged(int state, QString msg);
     void output2DUpdated(OutputData2D outputData);
     void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
 private:
-    void onPlayReady();
-    void updateFrameRange(int frameNumer);
-private slots:
-    void onToggledCheckBox();
-    void onSliderValueChanged();
-    void onLineEditFinished();
+    bool checkFileValid(QString file);
+    bool parseZipFile();
+    bool readDataFromZip(QString fileName, QByteArray& data);
+
+    void updateCurrentFrame();
+    void updateCurrentImage(int type);
+    void updateCurrentPointCloud();
+
+    // images format
+    void updateCurrentFromPng(int type);
+    // raw format
+    void updateCurrentFromRaw(int type);
+
+    QImage genImageFromPngData(int type);
+    QImage genImageFromPixelData(int type);
+
+    QImage genDepthImage(int width, int height, QByteArray data);
+    QString getCurrentFileName(CS_CAMERA_DATA_TYPE dataType);
+    bool genPointCloudFromDepthData();
+    bool genPointCloudFromDepthImage();
 private:
-    Ui::CameraPlayerWidget* ui;
-    cs::CameraPlayer* cameraPlayer;
+    QString zipFile = "";
 
-    QMap<int, QCheckBox*> dataTypeCheckBoxs;
+    QString playName = "";
+    int frameNumber = 0;
+    QStringList dataTypes;
+    QString dataFormat = "";
+    QSize depthResolution = QSize(0, 0);
+    QSize rgbResolution = QSize(0, 0);
+
+    // camera parameter
+    Intrinsics depthIntrinsics;
+    Intrinsics rgbIntrinsics;
+    Extrinsics extrinsics;
+    float depthScale = 0.0;
+
+    int currentFrame = 0;
+    QVector<int> currentDataTypes;
+
+    bool show3dTexture = false;
 };
-
-#endif  // _CS_CAMERA_PLAYER_DIALOG
+}
+#endif //_CS_CAMERA_PLAYER_H

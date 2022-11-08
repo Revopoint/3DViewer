@@ -489,7 +489,8 @@ void RenderWidget3D::onTranslate()
 
 void RenderWidget3D::setTextureEnable(bool enable)
 {
-    textureButton->setEnabled(enable);
+    //textureButton->setEnabled(enable);
+    textureButton->setVisible(enable);
 }
 
 void RenderWidget3D::setShowFullScreen(bool value)

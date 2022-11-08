@@ -16,6 +16,9 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QWidget" name="widget_3" native="true">
@@ -34,28 +37,35 @@
        </spacer>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox">
+       <widget class="QCheckBox" name="checkBoxDepth">
         <property name="text">
          <string>Depth</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox_2">
+       <widget class="QCheckBox" name="checkBoxRgb">
         <property name="text">
          <string>RGB</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox_4">
+       <widget class="QCheckBox" name="checkBoxIrL">
         <property name="text">
-         <string>IR(L/R)</string>
+         <string>IR(L)</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="checkBox_3">
+       <widget class="QCheckBox" name="checkBoxIrR">
+        <property name="text">
+         <string>IR(R)</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxPC">
         <property name="text">
          <string>Point Clopud</string>
         </property>
@@ -82,7 +92,13 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>6</number>
+      </property>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -97,24 +113,42 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLineEdit" name="lineEdit"/>
+       <widget class="CSLineEdit" name="frameEdit">
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="frameDecrease">
         <property name="text">
          <string>&lt;</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QSlider" name="horizontalSlider">
+       <widget class="QLabel" name="frameMinText">
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="frameNumberSlider">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButton_2">
+       <widget class="QLabel" name="frameMaxText">
+        <property name="text">
+         <string>30</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="frameIncrease">
         <property name="text">
          <string>&gt;</string>
         </property>
@@ -144,6 +178,11 @@
    <extends>QWidget</extends>
    <header>renderwindow.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CSLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>cslineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -100,6 +100,10 @@ ViewerWindow::~ViewerWindow()
     qApp->removeTranslator(translator);
     delete ui;
     delete cameraInfoDialog;
+    if (cameraPlayerDialog)
+    {
+        delete cameraPlayerDialog;
+    }
 }
 
 void ViewerWindow::initConnections()
@@ -124,6 +128,9 @@ void ViewerWindow::initConnections()
 
     suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,           ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,       ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
+    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated,           ui->renderWindow,   &RenderWindow::onOutput3DUpdated);
+    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated,           ui->renderWindow,   &RenderWindow::onOutput2DUpdated);
+
     suc &= (bool)connect(ui->renderWindow, &RenderWindow::roiRectFUpdated,   this,               &ViewerWindow::onRoiRectFUpdated);
     suc &= (bool)connect(ui->renderWindow, &RenderWindow::renderExit,        this,               &ViewerWindow::onRenderExit, Qt::QueuedConnection);
 
@@ -568,8 +575,9 @@ void ViewerWindow::onTriggeredLoadFile()
 {
     if (!cameraPlayerDialog)
     {
-        cameraPlayerDialog = new CameraPlayerDialog(this);
+        cameraPlayerDialog = new CameraPlayerDialog();
+        connect(cameraPlayerDialog, &CameraPlayerDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
     }
 
-    cameraPlayerDialog->show();
+    cameraPlayerDialog->onLoadFile();
 }

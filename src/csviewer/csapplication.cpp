@@ -253,6 +253,8 @@ void CSApplication::onWindowLayoutChanged(QVector<int> windows)
 void CSApplication::onShow3DTextureChanged(bool texture)
 {
     show3DTexture = texture;
+
+    emit show3DTextureChanged(show3DTexture);
 }
 
 void CSApplication::onShowCoordChanged(bool show, QPointF pos)
