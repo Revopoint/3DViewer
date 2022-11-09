@@ -107,7 +107,7 @@ void FormatConverter::onConvert()
         }
 
         // parse the zip file
-        if (!capturedZipParser->parserCaptureInfo())
+        if (!capturedZipParser->parseCaptureInfo())
         {
             qWarning() << "Parse zip file failed";
             emit convertStateChanged(CONVERT_FAILED, couvertCount, tr("Parse zip file failed"));
@@ -146,7 +146,15 @@ void FormatConverter::onConvert()
 
             Pointcloud pc;
             QImage texImage;
-            if (!capturedZipParser->generatePointCloud(couvertCount, withTexture, pc, texImage))
+            int rgbIndex = couvertCount;
+
+            // If the timestamp is valid, find the RGB frame index through the timestamp
+            if (withTexture && capturedZipParser->getIsTimeStampsValid())
+            {
+                rgbIndex = capturedZipParser->getRgbFrameIndexByTimeStamp(couvertCount);
+            }
+
+            if (!capturedZipParser->generatePointCloud(couvertCount, rgbIndex, withTexture, pc, texImage))
             {
                 qWarning() << "Failed to generate point cloud";
                 int progress = couvertCount * 1.0 / totalCount * 100;

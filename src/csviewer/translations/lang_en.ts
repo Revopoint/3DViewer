@@ -921,11 +921,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="100"/>
-        <source>Start conversion</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../cscamera/formatconverter.cpp" line="105"/>
         <source>Invalid zip file, not find CaptureParameters.yaml</source>
         <translation type="unfinished"></translation>
@@ -951,6 +946,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="100"/>
         <location filename="../../cscamera/formatconverter.cpp" line="170"/>
         <source>Converting...</source>
         <translation type="unfinished"></translation>

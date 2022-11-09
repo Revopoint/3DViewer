@@ -1075,9 +1075,8 @@
         <translation type="unfinished">正在转换，请稍等</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="100"/>
         <source>Start conversion</source>
-        <translation type="unfinished">开始转换</translation>
+        <translation type="obsolete">开始转换</translation>
     </message>
     <message>
         <location filename="../../cscamera/formatconverter.cpp" line="105"/>
@@ -1105,6 +1104,7 @@
         <translation type="unfinished">生成点云失败</translation>
     </message>
     <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="100"/>
         <location filename="../../cscamera/formatconverter.cpp" line="170"/>
         <source>Converting...</source>
         <translation type="unfinished">转换中...</translation>

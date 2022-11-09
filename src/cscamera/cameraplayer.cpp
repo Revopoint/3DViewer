@@ -76,7 +76,7 @@ void CameraPlayer::onLoadFile(QString file)
     }
 
     // parse the zip file
-    if (!zipParser->parserCaptureInfo())
+    if (!zipParser->parseCaptureInfo())
     {
         emit playerStateChanged(PLAYER_ERROR, tr("Parse zip file failed"));
         return;
@@ -102,19 +102,21 @@ void CameraPlayer::onPalyFrameUpdated(int curFrame, bool force)
 void CameraPlayer::updateCurrentFrame()
 {
     QReadLocker locker(&lock);
+   
     for (auto type : currentDataTypes)
     {
-        CS_CAMERA_DATA_TYPE dataType = (CS_CAMERA_DATA_TYPE)type;
-        switch (dataType)
+        switch (type)
         {
         case CAMERA_DATA_L:
         case CAMERA_DATA_R:
-        case CAMERA_DATA_RGB:
         case CAMERA_DATA_DEPTH:
-            updateCurrentImage(dataType);
+        case CAMERA_DATA_RGB:
+            updateCurrentImage(type);
             break;
         case CAMERA_DATA_POINT_CLOUD:
             updateCurrentPointCloud();
+            break;
+        default:
             break;
         }
     }
@@ -144,7 +146,17 @@ void CameraPlayer::currentDataTypesUpdated(QVector<int> dataTypes)
 
 void CameraPlayer::updateCurrentImage(int type)
 {
-    QImage image = zipParser->getImageOfFrame(currentFrame - 1, type);
+    // If the timestamp is valid, find the RGB frame index through the timestamp
+    int frameIndex = currentFrame - 1;
+    if (type == CAMERA_DATA_RGB && zipParser->getIsTimeStampsValid())
+    {
+        int rgbIndex = zipParser->getRgbFrameIndexByTimeStamp(frameIndex);
+        qInfo() << "update rgb frame, depth index : " << frameIndex << ", rgb index:" << rgbIndex;
+
+        frameIndex = rgbIndex;
+    }
+
+    QImage image = zipParser->getImageOfFrame(frameIndex, type);
     if (image.isNull())
     {
         qWarning() << "Failed to generate image";
@@ -163,7 +175,15 @@ void CameraPlayer::updateCurrentPointCloud()
 {
     Pointcloud pc;
     QImage texImage;
-    if (!zipParser->generatePointCloud(currentFrame - 1, show3dTexture, pc, texImage))
+    int rgbFrame = currentFrame - 1;
+
+    // If the timestamp is valid, find the RGB frame index through the timestamp
+    if (show3dTexture && zipParser->getIsTimeStampsValid())
+    {
+        rgbFrame = zipParser->getRgbFrameIndexByTimeStamp(currentFrame - 1);
+    }
+
+    if (!zipParser->generatePointCloud(currentFrame - 1, rgbFrame, show3dTexture, pc, texImage))
     {
         qWarning() << "Failed to generate point cloud";
         emit playerStateChanged(PLAYER_ERROR, tr("Failed to generate point cloud"));

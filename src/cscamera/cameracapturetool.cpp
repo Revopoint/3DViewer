@@ -599,7 +599,7 @@ void CameraCaptureMultiple::saveTimeStamps()
 {
     qInfo() << "save time stamps";
 
-    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-TimeStamps.txt";
+    QString savePath = captureConfig.saveDir + QDir::separator() + "TimeStamps.txt";
 
     if (depthTimeStamps.isEmpty() && rgbTimeStamps.isEmpty())
     {

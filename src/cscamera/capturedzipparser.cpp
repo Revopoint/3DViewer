@@ -45,6 +45,9 @@
 #include <yaml-cpp/yaml.h>
 #include <QDebug>
 #include <QMap>
+#include <CMath>
+#include <QTextStream>
+#include <limits.h>
 
 using namespace cs;
 
@@ -211,11 +214,11 @@ QImage CapturedZipParser::getImageOfFrame(int frameIndex, int dataType)
     }
 }
 
-bool CapturedZipParser::generatePointCloud(int frameIndex, bool withTexture, Pointcloud& pc, QImage& tex)
+bool CapturedZipParser::generatePointCloud(int depthIndex, int rgbIndex, bool withTexture, Pointcloud& pc, QImage& tex)
 {
     ushort* dataPtr = nullptr;
 
-    QByteArray data = getFrameData(frameIndex, CAMERA_DATA_DEPTH);
+    QByteArray data = getFrameData(depthIndex, CAMERA_DATA_DEPTH);
     if (data.isNull() || data.isEmpty())
     {
         qWarning() << "depth frame data is empty";
@@ -239,7 +242,7 @@ bool CapturedZipParser::generatePointCloud(int frameIndex, bool withTexture, Poi
 
     if (withTexture)
     {
-        tex = getImageOfFrame(frameIndex, CAMERA_DATA_RGB);
+        tex = getImageOfFrame(rgbIndex, CAMERA_DATA_RGB);
         pc.generatePoints<ushort>((ushort*)pixData.data(), width, height, depthScale, &depthIntrinsics, &rgbIntrinsics, &extrinsics, true);
     }
     else
@@ -267,7 +270,8 @@ QImage CapturedZipParser::convertPng2QImage(QByteArray data, int dataType)
     }
     else
     {
-        image = QImage::fromData(data, "PNG");
+        image = QImage::fromData(data, "PNG"); // load format is RGB32
+        image = image.convertToFormat(QImage::Format_RGB888);
     }
 
     return image;
@@ -310,7 +314,7 @@ QImage CapturedZipParser::convertData2QImage(int width, int height, QByteArray d
     return image;
 }
 
-bool CapturedZipParser::parserCaptureInfo()
+bool CapturedZipParser::parseCaptureInfo()
 {
     qInfo() << "Parse zip file";
 
@@ -414,8 +418,137 @@ bool CapturedZipParser::parserCaptureInfo()
         result = false;
     }
 
+    // time stamps
+    if (!parseTimeStamps())
+    {
+        result = false;
+    }
+
     qInfo() << "Parse zip file end";
     return result;
+}
+
+bool CapturedZipParser::parseTimeStamps()
+{
+    bool result = true;
+
+    do
+    {
+        QuaZip zip(zipFile);
+        if (!zip.open(QuaZip::mdUnzip))
+        {
+            result = false;
+            break;
+        }
+
+        if (!zip.setCurrentFile("TimeStamps.txt"))
+        {
+            zip.close();
+            result = false;
+            break;
+        }
+
+        QuaZipFile file(&zip);
+        file.open(QIODevice::ReadOnly);
+        if (!file.isOpen())
+        {
+            result = false;
+            break;
+        }
+
+        QTextStream ss(&file);
+
+        int i = 0;
+        bool findHeader = false;
+        // depth time stamps
+        depthTimeStamps.clear();
+        while (!ss.atEnd() && i < capturedFrameCount)
+        {
+            QString line = ss.readLine();
+            if (!findHeader)
+            {
+                if (line.contains("Depth"))
+                {
+                    findHeader = true;
+                }
+                continue;
+            }
+
+            // get time stamp
+            auto arr = line.split("=");
+            if (arr.size() >= 2)
+            {
+                int timeStamp = arr.last().toInt();
+                depthTimeStamps.push_back(timeStamp);
+            }
+
+            i++;
+        }
+
+        // rgb time stamps
+        rgbTimeStamps.clear();
+        findHeader = false;
+        i = 0;
+        while (!ss.atEnd() && i < capturedFrameCount)
+        {
+            QString line = ss.readLine();
+            if (!findHeader)
+            {
+                if (line.contains("RGB"))
+                {
+                    findHeader = true;
+                }
+
+                continue;
+            }
+
+            // get time stamp
+            auto arr = line.split("=");
+            if (arr.size() >= 2)
+            {
+                int timeStamp = arr.last().toInt();
+                rgbTimeStamps.push_back(timeStamp);
+            }
+
+            i++;
+        }
+         
+    } while (false);
+
+
+    // check the time stamps in zip file 
+    if (!checkTimeStampsValid())
+    {
+        qInfo() << "Time stamps is valid";
+    }
+    else
+    {
+        qInfo() << "Time stamps is invalid";
+    }
+
+    return result;
+}
+
+bool CapturedZipParser::checkTimeStampsValid()
+{
+    int zeroCount = 0;
+    const qreal oneQuarter = 0.25;
+
+    // Check 20 timestamps at most.If one quarter is 0, it is illegal
+    const int maxCheckTimeStamp = (depthTimeStamps.size() > 20) ? 20 : depthTimeStamps.size();
+    for (int i = 0; i < maxCheckTimeStamp; i++)
+    {
+        int timeStamp = depthTimeStamps.at(i);
+        if (timeStamp == 0)
+        {
+            zeroCount++;
+        }
+    }
+
+    //If one quarter is 0, the timestamps are illegal
+    isTimeStampsValid = (zeroCount * 1.0 / maxCheckTimeStamp) < oneQuarter;
+
+    return isTimeStampsValid;
 }
 
 QVector<int> CapturedZipParser::getDataTypes()
@@ -436,6 +569,11 @@ bool CapturedZipParser::isRawFormat()
 QString CapturedZipParser::getCaptureName()
 {
     return captureName;
+}
+
+bool CapturedZipParser::getIsTimeStampsValid()
+{
+    return isTimeStampsValid;
 }
 
 QString CapturedZipParser::getFileName(int frameIndex, int dataType)
@@ -581,8 +719,15 @@ bool CapturedZipParser::savePointCloud(int frameIndex, bool withTexture, QString
 {
     Pointcloud pc;
     QImage texImage;
+    int rgbFrame = frameIndex;
+    
+    //If the timestamp is valid, find the RGB frame index through the timestamp
+    if (withTexture && getIsTimeStampsValid())
+    {
+        rgbFrame = getRgbFrameIndexByTimeStamp(frameIndex);
+    }
 
-    if (!generatePointCloud(frameIndex, withTexture, pc, texImage))
+    if (!generatePointCloud(frameIndex, rgbFrame, withTexture, pc, texImage))
     {
         return false;
     }
@@ -597,4 +742,72 @@ bool CapturedZipParser::savePointCloud(int frameIndex, bool withTexture, QString
     }
 
     return true;
+}
+
+// Find Rules: Compare RGB and depth timestamp to find the nearest one
+int CapturedZipParser::getRgbFrameIndexByTimeStamp(int depthIndex)
+{
+    const int depthTimeStamp = getTimeStampOfFrame(depthIndex, CAMERA_DATA_DEPTH);
+    
+    return getNearestRgbFrame(depthIndex, depthTimeStamp);
+}
+
+int CapturedZipParser::getNearestRgbFrame(int depthIndex, int timeStamp)
+{
+    int start = 0;
+    int end = rgbTimeStamps.size() - 1;
+    int mid;
+
+    if (depthIndex < start || depthIndex > end)
+    {
+        mid = std::floor((start + end) * 1.0f / 2);   
+    }
+    else 
+    {
+        mid = depthIndex;
+    }
+
+    // Differential dichotomy search
+    do 
+    {
+        // in left
+        if (timeStamp < rgbTimeStamps.at(mid))
+        {
+            end = mid;
+        }
+        else 
+        {
+            start = mid;
+        }
+        
+        mid = std::floor((start + end) * 1.0f / 2);
+
+    } while (end - start > 1);
+
+    return (std::abs(timeStamp - rgbTimeStamps.at(start)) <= std::abs(timeStamp - rgbTimeStamps.at(end))) ? start  : end;
+}
+
+int CapturedZipParser::getTimeStampOfFrame(int frameIndex, int dataType)
+{
+    if (dataType != CAMERA_DATA_DEPTH && dataType != CAMERA_DATA_RGB)
+    {
+        return 0;
+    }
+
+    if (dataType == CAMERA_DATA_DEPTH)
+    {
+        if (frameIndex < depthTimeStamps.size() && frameIndex >= 0)
+        {
+            return depthTimeStamps.at(frameIndex);
+        }
+    }
+    else 
+    {
+        if (frameIndex < rgbTimeStamps.size() && frameIndex >= 0)
+        {
+            return rgbTimeStamps.at(frameIndex);
+        }
+    }
+
+    return 0;
 }

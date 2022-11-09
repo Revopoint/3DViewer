@@ -63,19 +63,23 @@ public:
 
     void setZipFile(QString filePath);
     bool checkFileValid();
-    bool parserCaptureInfo();
+    bool parseCaptureInfo();
+    bool parseTimeStamps();
+    bool checkTimeStampsValid();
 
     QByteArray getFrameData(int frameIndex, int dataType);
     QImage getImageOfFrame(int frameIndex, int dataType);
 
-    bool generatePointCloud(int frameIndex, bool withTexture, Pointcloud& pc, QImage& tex);
+    bool generatePointCloud(int depthIndex, int rgbIndex, bool withTexture, Pointcloud& pc, QImage& tex);
     bool saveFrameToLocal(int frameIndex, bool withTexture, QString filePath);
+    int getRgbFrameIndexByTimeStamp(int depthIndex);
 
     // get parameters
     QVector<int> getDataTypes();
     int getFrameCount();
     bool isRawFormat();
     QString getCaptureName();
+    bool getIsTimeStampsValid();
 private:
     QString getFileName(int frameIndex, int dataType);
     QString getFileName(int dataType, QString name);
@@ -86,6 +90,10 @@ private:
 
     bool saveImageData(int frameIndex, int dataType, QString filePath);
     bool savePointCloud(int frameIndex, bool withTexture, QString filePath);
+
+    // time stamp
+    int getTimeStampOfFrame(int frameIndex, int dataType);
+    int getNearestRgbFrame(int depthIndex, int timeStamp);
 private:
     // zip file path
     QString zipFile = "";
@@ -100,6 +108,11 @@ private:
     QSize rgbResolution = QSize(0, 0);
     // the frame count of capture
     int capturedFrameCount = 0;
+    // the time stamps in zip file is valid
+    bool isTimeStampsValid = false;
+    // the time stamps of frames
+    QVector<int> depthTimeStamps;
+    QVector<int> rgbTimeStamps;
 
     // camera parameter
     Intrinsics depthIntrinsics;
@@ -111,6 +124,4 @@ private:
 };
 
 }
-
-
 #endif // _CS_CAPTUREDZIPPARSER_H

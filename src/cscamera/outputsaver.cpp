@@ -410,7 +410,7 @@ void RawOutputSaver::saveOutputIr(StreamData& streamData)
 
             const int offset2 = pair.second * width * height + offset;
 
-            QByteArray data = streamData.data.right(streamData.data.size() - offset);  
+            QByteArray data = streamData.data.right(streamData.data.size() - offset2);
             saveDataToFile(savePath, data);
         }
         break;
