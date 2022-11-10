@@ -77,6 +77,7 @@ public:
     int getFrameNumber();
     void currentDataTypesUpdated(QVector<int> dataTypes);
     void onShow3DTextureChanged(bool show);
+    bool enablePointCloudTexture();
 public slots:
     void onLoadFile(QString file);
     void onPalyFrameUpdated(int curFrame, bool force = false);
@@ -95,7 +96,7 @@ private:
     CapturedZipParser* zipParser = nullptr;
     int currentFrame = 0;
     QVector<int> currentDataTypes;
-    bool show3dTexture = false;
+    bool show3dTexture = true;
 
     QReadWriteLock lock;
 };

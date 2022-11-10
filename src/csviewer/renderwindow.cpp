@@ -131,6 +131,7 @@ void RenderWindow::onWindowLayoutUpdated()
         }
     }
 
+    setRender3DTextureVisible(showTextureEnable);
     rootLayout->addWidget(renderMainWidget);
 }
 
@@ -419,4 +420,9 @@ void RenderWindow::setRender3DTextureVisible(bool visible)
     {
         widget->setTextureEnable(visible);
     }
+}
+
+void RenderWindow::setShowTextureEnable(bool enable)
+{
+    showTextureEnable = enable;
 }

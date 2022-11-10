@@ -59,17 +59,19 @@ public:
 
     void onWindowLayoutUpdated();
     void hideRenderFps();
-    void setRender3DTextureVisible(bool visible);
+    void setShowTextureEnable(bool enable);
 signals:
     void roiRectFUpdated(QRectF rect);
     void renderExit(int renderId);
     void fullScreenUpdated(int renderID, bool value);
+
 public slots:
     void onRenderWindowsUpdated(QVector<int> windows);
     void onWindowLayoutModeUpdated(int mode);
     void onOutput2DUpdated(OutputData2D outputData);
     void onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
     void onRoiEditStateChanged(bool edit,  QRectF rect);
+
 private slots:
     void onFullScreenUpdated(int renderId, bool value);
     void onShow3DTextureChanged(bool texture);
@@ -79,6 +81,8 @@ private:
     void initConnections();
     void initRenderWidgets();
     void initGridLayout();
+
+    void setRender3DTextureVisible(bool visible);
 private:
     WINDOWLAYOUT_MODE layoutMode = LAYOUT_TILE;// LAYOUT_TITLE;
     QVector<int> displayWindows;
@@ -88,6 +92,7 @@ private:
     QWidget* renderMainWidget = nullptr;
     QLayout* rootLayout;
     bool show3DTexture = false;
+    bool showTextureEnable = true;
 };
 
 #endif //_CS_RENDER_WINDOWS_H

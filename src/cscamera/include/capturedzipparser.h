@@ -69,11 +69,13 @@ public:
 
     QByteArray getFrameData(int frameIndex, int dataType);
     QImage getImageOfFrame(int frameIndex, int dataType);
+    bool getPointCloud(int frameIndex, Pointcloud& pc, QImage& texImage);
 
     bool generatePointCloud(int depthIndex, int rgbIndex, bool withTexture, Pointcloud& pc, QImage& tex);
     bool saveFrameToLocal(int frameIndex, bool withTexture, QString filePath);
     int getRgbFrameIndexByTimeStamp(int depthIndex);
 
+    bool enablePointCloudTexture();
     // get parameters
     QVector<int> getDataTypes();
     int getFrameCount();
@@ -113,6 +115,7 @@ private:
     // the time stamps of frames
     QVector<int> depthTimeStamps;
     QVector<int> rgbTimeStamps;
+    bool enableTexture = false;
 
     // camera parameter
     Intrinsics depthIntrinsics;

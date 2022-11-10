@@ -256,11 +256,11 @@ void RenderWidget3D::updateNodeVertexs(cs::Pointcloud& pointCloud)
 
 void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage& image)
 {
-    unsigned char* tex_frame = (uchar*)image.bits();
+    unsigned char* texFrame = (uchar*)image.bits();
     const int width = image.width();
     const int height = image.height();
 
-    bool bTexture = (!image.isNull() && tex_frame != nullptr && width > 0 && height > 0);
+    bool bTexture = (!image.isNull() && texFrame != nullptr && width > 0 && height > 0);
     if (!bTexture || !textureButton->isChecked())
     {
         osg::StateSet* ss = geom->getOrCreateStateSet();
@@ -273,16 +273,16 @@ void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage&
     
     geom->getOrCreateStateSet()->removeAttribute(material);
 
-    auto color_arr = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
-    int num_ver = qMin(pointCloud.getNormals().size(), pointCloud.getVertices().size());
-    num_ver = qMin(pointCloud.getTexcoords().size(), size_t(num_ver));
-    color_arr->resize(num_ver);
+    auto colorArr = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
+    int numVer = qMin(pointCloud.getNormals().size(), pointCloud.getVertices().size());
+    numVer = qMin(pointCloud.getTexcoords().size(), size_t(numVer));
+    colorArr->resize(numVer);
     
     unsigned char* color;
     cs::float2* pcTexcoord = pointCloud.getTexcoords().data();
-    osg::Vec4* osgColor = (osg::Vec4*)color_arr->getDataPointer();
+    osg::Vec4* osgColor = (osg::Vec4*)colorArr->getDataPointer();
    
-    for (int i = 0; i < num_ver; ++i)
+    for (int i = 0; i < numVer; ++i)
     {
         int x = qRound(pcTexcoord[i].u * width);
         x = (x >= width) ? (width - 1) : x;
@@ -290,12 +290,12 @@ void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage&
         int y = qRound(pcTexcoord[i].v * height);
         y = (y >= height) ? (height - 1) : y;
 
-        color = tex_frame + (y * width + x) * 3;
+        color = texFrame + (y * width + x) * 3;
         osgColor[i] = std::move(osg::Vec4(color[0] / 255.f, color[1] / 255.f, color[2] / 255.f, 1.f));
     }
 
     osg::StateSet* ss = geom->getOrCreateStateSet();
-    geom->setColorArray(color_arr);
+    geom->setColorArray(colorArr);
     geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
     ss->setMode(GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 }

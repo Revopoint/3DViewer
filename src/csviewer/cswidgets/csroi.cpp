@@ -224,13 +224,19 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     QPoint pt = this->mapFromGlobal(event->globalPos());
     lastPosition = pt;
 
+    if (left == right && top == bottom)
+    {
+        pressPositon = RIGHT_BOTTOM;
+        return;
+    }
+
     //left top
     int x = left - halfWidth; x = x < 0 ? 0 : x;
     int y =  top - halfWidth; y = y < 0 ? 0 : y;
     QRect rect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon =LEFT_TOP;
+        pressPositon = LEFT_TOP;
         return;
     }
 
@@ -284,7 +290,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon =CENTER_BOTTOM;
+        pressPositon = CENTER_BOTTOM;
         return;
     }
 
@@ -293,7 +299,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon =RIGHT_BOTTOM;
+        pressPositon = RIGHT_BOTTOM;
         return;
     }
 }

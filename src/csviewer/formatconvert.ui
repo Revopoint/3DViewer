@@ -10,6 +10,9 @@
     <height>302</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
   <property name="windowTitle">
    <string>Convert depth data to point cloud</string>
   </property>
@@ -63,6 +66,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="text">
          <string>Browse</string>
         </property>
@@ -78,6 +84,9 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
         </property>
         <property name="text">
          <string>Browse</string>
@@ -150,6 +159,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="convertButton">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="text">
          <string>Convert</string>
         </property>

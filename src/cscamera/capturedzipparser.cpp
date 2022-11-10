@@ -214,6 +214,147 @@ QImage CapturedZipParser::getImageOfFrame(int frameIndex, int dataType)
     }
 }
 
+// generate PoinCloud from .ply file
+bool CapturedZipParser::getPointCloud(int frameIndex, Pointcloud& pc, QImage& texImage)
+{
+    bool result = true;
+    do 
+    {
+        QuaZip zip(zipFile);
+        result = zip.open(QuaZip::mdUnzip);
+        if (!result)
+        {
+            qWarning() << "open zip file failed, file:" << zipFile;
+            break;
+        }
+
+        QString fileName = getFileName(frameIndex, CAMERA_DATA_POINT_CLOUD);
+        result = zip.setCurrentFile(fileName);
+        if (!result)
+        {
+            qWarning() << "set current file failed, file name:" << fileName;
+            break;
+        }
+
+        QuaZipFile file(&zip);
+        result = file.open(QIODevice::ReadOnly);
+        if (!result)
+        {
+            qWarning() << "open file failed, file name:" << fileName;
+            break;
+        }
+
+        QTextStream ts(&file);
+        int vertexCount = 0;
+        bool hasTexture = false;
+        bool hasNormal = false;
+        // read header
+        while (!ts.atEnd())
+        {
+            QString line = ts.readLine();
+            if (line.startsWith("element vertex"))
+            {
+                auto arr = line.split(" ");
+                if (arr.size() >= 3)
+                {
+                    vertexCount = arr[2].toInt();
+                }
+                continue;
+            }
+
+            // read header end
+            if (line.startsWith("end_header"))
+            {
+                break;
+            }
+
+            // check has texture info or not
+            if (line.contains("red"))
+            {
+                hasTexture = true;
+            }
+
+            if (line.contains("nx"))
+            {
+                hasNormal = true;
+            }
+        }
+
+        std::vector<float3>& points = pc.getVertices();
+        std::vector<float2>& textures = pc.getTexcoords();
+        std::vector<float3>& normals = pc.getNormals();
+
+        float3 p(0, 0, 0);
+        float3 n(0, 0, 0);
+        int3 rgb(0, 0, 0);
+        int texWidth = 0, texHeight = 0;
+
+        QByteArray textureData;
+        if (hasTexture)
+        {
+            texWidth = depthResolution.width();
+            texHeight = vertexCount / texWidth + ((vertexCount % texWidth) == 0 ? 0 : 1);
+            textureData.resize(texWidth * texHeight * 3); // RGB888
+        }
+
+        points.clear();
+        textures.clear();
+        normals.clear();
+
+        int vIndex = 0;
+        uchar* texPtr = (uchar*)textureData.data();
+
+        int w = 0, h = 0;
+        // read point data
+        while (!ts.atEnd() && vIndex < vertexCount)
+        {
+            ts >> p.x >> p.y >> p.z;
+            points.push_back(p);
+
+            if (hasNormal)
+            {
+                ts >> n.x >> n.y >> n.z;
+                normals.push_back(n);
+            }
+
+            if (hasTexture)
+            {
+                ts >> rgb.x >> rgb.y >> rgb.z;
+                float2 texPos(0, 0);
+
+                texPtr[3 * vIndex] = rgb.x;
+                texPtr[3 * vIndex + 1] = rgb.y;
+                texPtr[3 * vIndex + 2] = rgb.z;
+
+                texPos.u = w * 1.0f / texWidth;
+                texPos.v = h * 1.0f / texHeight;
+                textures.push_back(texPos);
+
+                w++;
+                if (w == texWidth)
+                {
+                    h++;
+                    w = 0;
+                }
+            }
+
+            vIndex++;
+        }
+
+        if (hasTexture)
+        {
+            QImage image = QImage(texPtr, texWidth, texHeight, QImage::Format_RGB888);
+            texImage = image.copy(image.rect());
+        }
+
+        zip.close();
+        file.close();
+    } while (false);
+
+
+    return result;
+}
+
 bool CapturedZipParser::generatePointCloud(int depthIndex, int rgbIndex, bool withTexture, Pointcloud& pc, QImage& tex)
 {
     ushort* dataPtr = nullptr;
@@ -353,6 +494,13 @@ bool CapturedZipParser::parseCaptureInfo()
 
         // data format
         dataFormat = node["Save Format"].as<std::string>().c_str();
+
+        // with texture or not
+        YAML::Node nodeTmp = node["With Texture"];
+        if (nodeTmp.IsDefined())
+        {
+            enableTexture = nodeTmp.as<bool>();
+        }
     }
     catch (const YAML::Exception& e)
     {
@@ -810,4 +958,9 @@ int CapturedZipParser::getTimeStampOfFrame(int frameIndex, int dataType)
     }
 
     return 0;
+}
+
+bool CapturedZipParser::enablePointCloudTexture()
+{
+    return enableTexture || (dataTypes.contains(CAMERA_DATA_RGB) && dataTypes.contains(CAMERA_DATA_DEPTH));
 }

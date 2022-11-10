@@ -87,6 +87,11 @@ void OutputSaver::savePointCloud()
         return;
     }
 
+    if (!outputDataPort.hasData(CAMERA_DATA_POINT_CLOUD) && !outputDataPort.hasData(CAMERA_DATA_DEPTH))
+    {
+        return;
+    }
+
     QImage texImage;
     auto frameData = outputDataPort.getFrameData();
 
@@ -187,13 +192,16 @@ void OutputSaver::saveOutput2D(StreamData& streamData)
 void OutputSaver::savePointCloud(cs::Pointcloud& pointCloud, QImage& texImage)
 {
     QString savePath = getSavePath(CAMERA_DATA_POINT_CLOUD);
+    QByteArray pathData = savePath.toLocal8Bit();
+    std::string realPath = pathData.data();
+
     if (texImage.isNull())
     {
-        pointCloud.exportToFile(savePath.toStdString(), nullptr, 0, 0);
+        pointCloud.exportToFile(realPath, nullptr, 0, 0);
     }
     else 
     {
-        pointCloud.exportToFile(savePath.toStdString(), texImage.bits(), texImage.width(), texImage.height());
+        pointCloud.exportToFile(realPath, texImage.bits(), texImage.width(), texImage.height());
     }
 }
 

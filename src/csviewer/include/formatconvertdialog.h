@@ -70,6 +70,8 @@ private slots:
     void onClickedBrowseSource();
     void onClickedBrowseOutputDirectory();
     void onShowTextureChanged(bool show);
+    void onSourceFilePathChanged();
+    void onOutputPathChanged();
 private:
     void showMessageBox(QString message);
 private:

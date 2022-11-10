@@ -486,6 +486,8 @@ void ViewerWindow::onCameraStreamStarted()
         windowActions.push_back( new CSAction(CAMERA_DATA_RGB, "RGB"));
     }
 
+    ui->renderWindow->setShowTextureEnable(hasRgbV.toBool());
+
     updateWindowActions();
     onRenderWindowUpdated();
 }

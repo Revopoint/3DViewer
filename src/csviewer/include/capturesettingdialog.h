@@ -51,6 +51,7 @@ namespace Ui {
 }
 
 class QCheckBox;
+class QIntValidator;
 class CaptureSettingDialog : public QDialog
 {
     Q_OBJECT
@@ -79,6 +80,8 @@ private:
 private:
     Ui::CaptureSettingWidget* ui;
     CameraCaptureConfig captureConfig;
+
+    QIntValidator* intValidator = nullptr;
 
     // min / max capture count
     int minCaptureCount = 1;

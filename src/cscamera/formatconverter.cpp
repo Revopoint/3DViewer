@@ -163,13 +163,16 @@ void FormatConverter::onConvert()
             }
 
             QString savePath = QString("%1/%2-%3.ply").arg(outputDirectory).arg(fileName).arg(couvertCount, 4, 10, QChar('0'));
+            QByteArray pathData = savePath.toLocal8Bit();
+            std::string savePathNew = pathData.data();
+
             if (withTexture && !texImage.isNull())
             {
-                pc.exportToFile(savePath.toStdString(), texImage.bits(), texImage.width(), texImage.height());
+                pc.exportToFile(savePathNew, texImage.bits(), texImage.width(), texImage.height());
             }
             else
             {
-                pc.exportToFile(savePath.toStdString(), nullptr, 0, 0);
+                pc.exportToFile(savePathNew, nullptr, 0, 0);
             }
 
             successCount++;

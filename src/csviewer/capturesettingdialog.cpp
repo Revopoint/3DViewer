@@ -100,6 +100,10 @@ void CaptureSettingDialog::showEvent(QShowEvent* event)
     ui->depthCheckBox->setEnabled(hasDepth);
     ui->irCheckBox->setEnabled(hasIr);
     ui->pointCloudCheckBox->setEnabled(hasDepth);
+    ui->captureInfo->setText("");
+
+    ui->startCaptureButton->setEnabled(true);
+    ui->stopCaptureButton->setEnabled(false);
 
     QDialog::showEvent(event);
 }
@@ -126,6 +130,9 @@ void CaptureSettingDialog::onStartCapture()
         isCapturing = true;
         cs::CSApplication::getInstance()->startCapture(captureConfig);
         ui->captureInfo->setText("");
+
+        ui->startCaptureButton->setEnabled(false);
+        ui->stopCaptureButton->setEnabled(true);
     }
     else
     {
@@ -138,6 +145,9 @@ void CaptureSettingDialog::onStopCapture()
 {
     qInfo() << "onStopCapture";
     isCapturing = false;
+
+    ui->startCaptureButton->setEnabled(true);
+    ui->stopCaptureButton->setEnabled(false);
     cs::CSApplication::getInstance()->stopCapture();
 }
 
@@ -189,8 +199,17 @@ void CaptureSettingDialog::onSaveFormatChanged(int index)
 
 void CaptureSettingDialog::onCaptureFrameNumberChanged()
 {
-    int frameNumber = ui->frameNumberLineEdit->text().toInt();
-    captureConfig.captureNumber = frameNumber;
+    auto tex = ui->frameNumberLineEdit->text();
+    int pos = 0;
+    if (intValidator->validate(tex, pos) != QIntValidator::Acceptable)
+    {
+        ui->frameNumberLineEdit->setText(QString::number(1));
+        captureConfig.captureNumber = 1;
+    }
+    else 
+    {
+        captureConfig.captureNumber = tex.toInt();
+    }
 }
 
 void CaptureSettingDialog::initDialog()
@@ -201,8 +220,8 @@ void CaptureSettingDialog::initDialog()
     QString frameRange = QString("(%1, %2)").arg(minCaptureCount).arg(maxCaptureCount);
     ui->frameNumberRange->setText(frameRange);
 
-    QIntValidator* valiator = new QIntValidator(minCaptureCount, maxCaptureCount, this);
-    ui->frameNumberLineEdit->setValidator(valiator);
+    intValidator = new QIntValidator(minCaptureCount, maxCaptureCount, this);
+    ui->frameNumberLineEdit->setValidator(intValidator);
 
     // default data types
     for (auto type : captureConfig.captureDataTypes)
@@ -252,6 +271,7 @@ void CaptureSettingDialog::initConnections()
     suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged,  this, &CaptureSettingDialog::onCaptureStateChanged);
 
     suc &= (bool)connect(ui->frameNumberLineEdit,  &QLineEdit::editingFinished, this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
+    suc &= (bool)connect(ui->frameNumberLineEdit, &CSLineEdit::focusOutSignal,  this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
 
     Q_ASSERT(suc);
 }
@@ -267,6 +287,8 @@ void CaptureSettingDialog::onCaptureStateChanged(int state, QString message)
     if (state == cs::CAPTURE_FINISHED)
     {
         isCapturing = false;
+        ui->startCaptureButton->setEnabled(true);
+        ui->stopCaptureButton->setEnabled(false);
     }
 }
 

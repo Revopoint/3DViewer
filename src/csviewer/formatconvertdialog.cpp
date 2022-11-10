@@ -71,7 +71,8 @@ FormatConvertDialog::FormatConvertDialog()
     suc &= (bool)connect(ui->selectOutputButton,  &QPushButton::clicked, this, &FormatConvertDialog::onClickedBrowseOutputDirectory);
     suc &= (bool)connect(ui->withTextureCheckBox, &QCheckBox::toggled,   this, &FormatConvertDialog::onShowTextureChanged);
 
-    Q_ASSERT(suc);
+    suc &= (bool)connect(ui->lineEditSrc,    &QLineEdit::editingFinished, this, &FormatConvertDialog::onSourceFilePathChanged);
+    suc &= (bool)connect(ui->lineEditOutput, &QLineEdit::editingFinished, this, &FormatConvertDialog::onOutputPathChanged);
 }
 
 FormatConvertDialog::~FormatConvertDialog()
@@ -194,4 +195,14 @@ void FormatConvertDialog::reject()
     {
         QDialog::reject();
     }
+}
+
+void FormatConvertDialog::onSourceFilePathChanged()
+{
+    formatConverter->setSourceFile(ui->lineEditSrc->text());
+}
+
+void FormatConvertDialog::onOutputPathChanged()
+{
+    formatConverter->setOutputDirectory(ui->lineEditOutput->text());
 }

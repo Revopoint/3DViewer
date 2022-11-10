@@ -186,6 +186,7 @@ void CameraPlayerDialog::onPlayReady()
         windows.push_back(type);
     }
 
+    ui->playerRenderWindow->setShowTextureEnable(cameraPlayer->enablePointCloudTexture());
     ui->playerRenderWindow->onRenderWindowsUpdated(windows);
 
     // update check boxs
@@ -207,8 +208,7 @@ void CameraPlayerDialog::onPlayReady()
     cameraPlayer->currentDataTypesUpdated(windows);
     int frameNumber = cameraPlayer->getFrameNumber();
     updateFrameRange(frameNumber);
-    
-    ui->playerRenderWindow->setRender3DTextureVisible(dataTypes.contains(CAMERA_DATA_RGB));
+     
     ui->playerRenderWindow->hideRenderFps();
 
     show();
@@ -220,6 +220,7 @@ void CameraPlayerDialog::updateFrameRange(int frameNumer)
     ui->frameMinText->setText("1");
     ui->frameMaxText->setText(QString::number(frameNumer));
     ui->frameEdit->setText("1");
+    ui->frameNumberSlider->setValue(1);
 
     emit currentFrameUpdated(1);
 }

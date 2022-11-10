@@ -173,21 +173,48 @@ void CameraPlayer::updateCurrentImage(int type)
 
 void CameraPlayer::updateCurrentPointCloud()
 {
+    auto dataTypes = zipParser->getDataTypes();
     Pointcloud pc;
     QImage texImage;
-    int rgbFrame = currentFrame - 1;
 
-    // If the timestamp is valid, find the RGB frame index through the timestamp
-    if (show3dTexture && zipParser->getIsTimeStampsValid())
+    if (dataTypes.contains(CAMERA_DATA_POINT_CLOUD))
     {
-        rgbFrame = zipParser->getRgbFrameIndexByTimeStamp(currentFrame - 1);
+        // generate Pointcloud from ply file
+        if (!zipParser->getPointCloud(currentFrame - 1, pc, texImage))
+        {
+            emit playerStateChanged(PLAYER_ERROR, tr("Failed to generate point cloud"));
+            return;
+        }
+
+        if (texImage.isNull())
+        {
+            // generate Pointcloud from depth data 
+            int rgbFrame = currentFrame - 1;
+            // If the timestamp is valid, find the RGB frame index through the timestamp
+            if (show3dTexture && zipParser->getIsTimeStampsValid())
+            {
+                rgbFrame = zipParser->getRgbFrameIndexByTimeStamp(currentFrame - 1);
+            }
+
+            texImage = zipParser->getImageOfFrame(rgbFrame, CAMERA_DATA_RGB);
+        }
     }
-
-    if (!zipParser->generatePointCloud(currentFrame - 1, rgbFrame, show3dTexture, pc, texImage))
+    else 
     {
-        qWarning() << "Failed to generate point cloud";
-        emit playerStateChanged(PLAYER_ERROR, tr("Failed to generate point cloud"));
-        return;
+        // generate Pointcloud from depth data 
+        int rgbFrame = currentFrame - 1;
+        // If the timestamp is valid, find the RGB frame index through the timestamp
+        if (show3dTexture && zipParser->getIsTimeStampsValid())
+        {
+            rgbFrame = zipParser->getRgbFrameIndexByTimeStamp(currentFrame - 1);
+        }
+
+        if (!zipParser->generatePointCloud(currentFrame - 1, rgbFrame, show3dTexture, pc, texImage))
+        {
+            qWarning() << "Failed to generate point cloud";
+            emit playerStateChanged(PLAYER_ERROR, tr("Failed to generate point cloud"));
+            return;
+        }
     }
 
     emit output3DUpdated(pc, texImage);
@@ -210,4 +237,9 @@ void CameraPlayer::onSaveCurrentFrame(QString filePath)
     {
         emit playerStateChanged(PLAYER_SAVE_FAILED, tr("Save current frame failed"));
     }
+}
+
+bool CameraPlayer::enablePointCloudTexture()
+{
+    return zipParser->enablePointCloudTexture();
 }

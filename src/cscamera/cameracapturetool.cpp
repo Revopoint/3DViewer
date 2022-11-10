@@ -380,10 +380,16 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
     YAML::Node rootNode;
 
     // 
+    rootNode["Version"] = "1.0.0";
     rootNode["Frame Number"] = capturedDataCount;
     rootNode["Data Types"] = genYamlNodeFromDataTypes(captureConfig.captureDataTypes);
     rootNode["Save Format"] = captureConfig.saveFormat.toStdString();
     rootNode["Name"] = captureConfig.saveName.toStdString();
+
+    if (captureConfig.captureDataTypes.contains(CAMERA_DATA_POINT_CLOUD) && captureConfig.savePointCloudWithTexture)
+    {
+        rootNode["With Texture"] = true;
+    }
 
     // save depth resolution
     {
