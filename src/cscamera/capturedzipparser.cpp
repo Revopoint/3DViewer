@@ -45,7 +45,7 @@
 #include <yaml-cpp/yaml.h>
 #include <QDebug>
 #include <QMap>
-#include <CMath>
+#include <math.h>
 #include <QTextStream>
 #include <limits.h>
 

@@ -250,6 +250,16 @@
         <source>Off</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>Layout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>Views</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HDRSettingsDialog</name>
@@ -557,21 +567,21 @@
 <context>
     <name>RenderWidget3D</name>
     <message>
-        <location filename="../renderwidget3d.cpp" line="403"/>
-        <location filename="../renderwidget3d.cpp" line="487"/>
+        <location filename="../renderwidget3d.cpp" line="412"/>
+        <location filename="../renderwidget3d.cpp" line="496"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="408"/>
-        <location filename="../renderwidget3d.cpp" line="442"/>
-        <location filename="../renderwidget3d.cpp" line="484"/>
+        <location filename="../renderwidget3d.cpp" line="417"/>
+        <location filename="../renderwidget3d.cpp" line="451"/>
+        <location filename="../renderwidget3d.cpp" line="493"/>
         <source>Texture on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="438"/>
-        <location filename="../renderwidget3d.cpp" line="480"/>
+        <location filename="../renderwidget3d.cpp" line="447"/>
+        <location filename="../renderwidget3d.cpp" line="489"/>
         <source>Texture off</source>
         <translation type="unfinished"></translation>
     </message>

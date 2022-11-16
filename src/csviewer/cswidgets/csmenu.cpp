@@ -40,6 +40,7 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 #include "csmenu.h"
+#include <QDebug>
 
 CSMenu::CSMenu(QWidget* parent)
     : QMenu(parent)

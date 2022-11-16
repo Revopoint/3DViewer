@@ -123,8 +123,8 @@ private slots:
     void onAboutToQuit();
     void onRenderWindowUpdated();
     void onWindowsMenuTriggered(QAction* action);
-    void onTriggeredWindowsTitle();
-    void onTriggeredWindowsTab();
+    void onTriggeredWindowsTile();
+    void onTriggeredWindowsTabs();
     void onAutoNameMenuTriggered(QAction* action);
 
     void onRenderExit(int renderId);

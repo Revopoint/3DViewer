@@ -81,7 +81,7 @@
      <x>0</x>
      <y>0</y>
      <width>1056</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -134,18 +134,20 @@
     <property name="title">
      <string>Windows</string>
     </property>
-    <widget class="CSMenu" name="menuTile">
+    <widget class="CSMenu" name="menuLayout">
      <property name="title">
-      <string>Tile</string>
+      <string>Layout</string>
+     </property>
+     <addaction name="actionTile"/>
+     <addaction name="actionTabs"/>
+    </widget>
+    <widget class="CSMenu" name="menuViews">
+     <property name="title">
+      <string>Views</string>
      </property>
     </widget>
-    <widget class="CSMenu" name="menuTabs">
-     <property name="title">
-      <string>Tabs</string>
-     </property>
-    </widget>
-    <addaction name="menuTile"/>
-    <addaction name="menuTabs"/>
+    <addaction name="menuLayout"/>
+    <addaction name="menuViews"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCamera"/>
@@ -242,6 +244,25 @@
    </property>
    <property name="text">
     <string>Off</string>
+   </property>
+  </action>
+  <action name="actionTile">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tile</string>
+   </property>
+  </action>
+  <action name="actionTabs">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tabs</string>
    </property>
   </action>
  </widget>

@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>themes/global.css</file>
-        <file>resources/3DViewer.icns</file>
         <file>resources/3DViewer.ico</file>
         <file>resources/arrow_down.png</file>
         <file>resources/arrow_down_active.png</file>
@@ -60,6 +59,7 @@
         <file>resources/vedio_active.png</file>
         <file>resources/vedio_disable.png</file>
         <file>resources/stop_stream.png</file>
+        <file>resources/3DViewer.icns</file>
     </qresource>
     <qresource prefix="/ui">
         <file>cameralist.ui</file>

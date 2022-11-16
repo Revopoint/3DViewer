@@ -22,7 +22,7 @@ add_library(${TARGET_NAME} SHARED
 if(MSVC)
     set(LIBPNG_LIBRARY optimized libpng debug libpngd)
 else()
-    set(LIBPNG_LIBRARY libpng)
+    set(LIBPNG_LIBRARY png)
 endif()
 
 target_link_libraries(${TARGET_NAME} PRIVATE 

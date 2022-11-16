@@ -151,10 +151,10 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
     suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
 
-    suc &= (bool)connect(ui->menuTile, &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
-    suc &= (bool)connect(ui->menuTabs,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
-    suc &= (bool)connect(ui->menuTile, &CSMenu::clicked,    this, &ViewerWindow::onTriggeredWindowsTitle);
-    suc &= (bool)connect(ui->menuTabs,  &CSMenu::clicked,    this, &ViewerWindow::onTriggeredWindowsTab);
+    suc &= (bool)connect(ui->actionTile,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTile);
+    suc &= (bool)connect(ui->actionTabs,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTabs);
+
+    suc &= (bool)connect(ui->menuViews,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuAutoNameWhenCapturuing, &QMenu::triggered, this, &ViewerWindow::onAutoNameMenuTriggered);
 
     Q_ASSERT(suc);      
@@ -520,16 +520,20 @@ void ViewerWindow::onRenderWindowUpdated()
     onWindowLayoutChanged();
 }
 
-void ViewerWindow::onTriggeredWindowsTitle()
+void ViewerWindow::onTriggeredWindowsTile()
 {
     renderLayoutMode = LAYOUT_TILE;
+    ui->actionTabs->setChecked(false);
+
     emit windowLayoutModeUpdated(LAYOUT_TILE);
     onWindowLayoutChanged();
 }
 
-void ViewerWindow::onTriggeredWindowsTab()
+void ViewerWindow::onTriggeredWindowsTabs()
 {
     renderLayoutMode = LAYOUT_TAB;
+    ui->actionTile->setChecked(false);
+
     emit windowLayoutModeUpdated(LAYOUT_TAB);
     onWindowLayoutChanged();
 }
@@ -552,8 +556,7 @@ void ViewerWindow::updateWindowActions()
 {
     for (auto action : windowActions)
     {
-        ui->menuTile->addAction(action);
-        ui->menuTabs->addAction(action);
+        ui->menuViews->addAction(action);
 
         action->setCheckable(true);
         action->setChecked(true);

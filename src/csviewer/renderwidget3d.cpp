@@ -43,6 +43,7 @@
 #include "renderwidget.h"
 
 #include <QApplication>
+#include <QDebug>
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <osgViewer/Viewer>
@@ -150,6 +151,13 @@ RenderWidget3D::~RenderWidget3D()
 void RenderWidget3D::resizeEvent(QResizeEvent* event)
 {
     updateButtonArea();
+
+    osgViewer::Viewer* pViewer = osgQOpenGLWidgetPtr->getOsgViewer();
+    if(pViewer)
+    {
+        osg::ref_ptr<osg::Camera> camera = pViewer->getCamera();
+        camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(osgQOpenGLWidgetPtr->width()) / static_cast<double>(osgQOpenGLWidgetPtr->height()), 1.0f, 10000.0f);
+    }
 }
 
 void RenderWidget3D::initWindow()
@@ -158,10 +166,11 @@ void RenderWidget3D::initWindow()
 
     osg::ref_ptr<osg::Camera> camera = pViewer->getCamera();
     camera->setClearColor(osg::Vec4(242.0 / 255.0, 242.0 / 255, 242.0 / 255, 1.0));
+
     camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     camera->setComputeNearFarMode(osg::Camera::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
-    camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(width()) / static_cast<double>(height()), 1.0f, 10000.0f);
-    camera->setViewport(0, 0, width(), height());
+    camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(osgQOpenGLWidgetPtr->width()) / static_cast<double>(osgQOpenGLWidgetPtr->height()), 1.0f, 10000.0f);
+    //camera->setViewport(0, 0, width(), height());
 
     pViewer->setKeyEventSetsDone(0);
     pViewer->setQuitEventSetsDone(false);
