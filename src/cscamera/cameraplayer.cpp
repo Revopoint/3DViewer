@@ -71,7 +71,7 @@ void CameraPlayer::onLoadFile(QString file)
     {
         qWarning() << "Illegal zip file, or the zip file does not contain CaptureParameters.yaml";
         // notify to ui
-        emit playerStateChanged(PLAYER_ERROR, tr("Invalid zip file, not find CaptureParameters.yaml"));
+        emit playerStateChanged(PLAYER_ERROR, tr("Invalid zip file, or the zip file does not contain CaptureParameters.yaml"));
         return;
     }
 

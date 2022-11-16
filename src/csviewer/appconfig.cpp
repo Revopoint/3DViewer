@@ -52,6 +52,7 @@ AppConfig::AppConfig()
 
     language = settings->value("language", "en").toString();
     defaultSavePath = settings->value("defaultSavePath", QDir::homePath()).toString();
+    autoNameWhenCaptring = settings->value("autoNameWhenCapturing", false).toBool();
 }
 
 AppConfig::~AppConfig()
@@ -85,5 +86,17 @@ void AppConfig::save()
 {
     settings->setValue("language", language);
     settings->setValue("defaultSavePath", defaultSavePath);
+    settings->setValue("autoNameWhenCapturing", autoNameWhenCaptring);
     settings->sync();
+}
+
+void AppConfig::setAutoNameWhenCapturing(bool autoName)
+{
+    autoNameWhenCaptring = autoName;
+    save();
+}
+
+bool AppConfig::getAutoNameWhenCapturing() const
+{
+    return autoNameWhenCaptring;
 }

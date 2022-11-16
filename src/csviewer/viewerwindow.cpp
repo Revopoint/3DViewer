@@ -48,7 +48,6 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QTranslator>
-#include <QDesktopServices>
 #include <QThread>
 
 #include <cstypes.h>
@@ -119,7 +118,7 @@ void ViewerWindow::initConnections()
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app,  &cs::CSApplication::cameraStateChanged,   this, &ViewerWindow::onCameraStateChanged);
     suc &= (bool)connect(app,  &cs::CSApplication::removedCurrentCamera, this, &ViewerWindow::onRemovedCurrentCamera);
-    suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged,   this, &ViewerWindow::onCaptureStateChanged);
+    suc &= (bool)connect(app,  &cs::CSApplication::captureStateChanged,  this, &ViewerWindow::onCaptureStateChanged);
 
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutChanged,       app,  &cs::CSApplication::onWindowLayoutChanged, Qt::QueuedConnection);
@@ -149,13 +148,14 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
     suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
     suc &= (bool)connect(ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
-    suc &= (bool)connect(ui->actionloadFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
+    suc &= (bool)connect(ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
     suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
 
     suc &= (bool)connect(ui->menuTile, &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuTabs,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuTile, &CSMenu::clicked,    this, &ViewerWindow::onTriggeredWindowsTitle);
     suc &= (bool)connect(ui->menuTabs,  &CSMenu::clicked,    this, &ViewerWindow::onTriggeredWindowsTab);
+    suc &= (bool)connect(ui->menuAutoNameWhenCapturuing, &QMenu::triggered, this, &ViewerWindow::onAutoNameMenuTriggered);
 
     Q_ASSERT(suc);      
 }
@@ -173,6 +173,10 @@ void ViewerWindow::initWindow()
     auto config = cs::CSApplication::getInstance()->getAppConfig();
     QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
     ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+
+    bool autoName = config->getAutoNameWhenCapturing();
+    ui->actionOff->setChecked(!autoName);
+    ui->actionOn->setChecked(autoName);
 }
 
 void ViewerWindow::onRenderPageChanged(int idx)
@@ -447,7 +451,7 @@ void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
     }
 }
 
-void ViewerWindow::onCaptureStateChanged(int state, QString message)
+void ViewerWindow::onCaptureStateChanged(int captureType, int state, QString message)
 {
     onShowStatusBarMessage(message, 5000);
 }
@@ -610,4 +614,24 @@ void ViewerWindow::onTriggeredFormatConvert()
     }
 
     formatConvertDialog->show();
+}
+
+void ViewerWindow::onAutoNameMenuTriggered(QAction* action)
+{
+    bool autoName = false;
+    if (action == ui->actionOff)
+    {
+        bool isChekcked = ui->actionOff->isChecked();
+        ui->actionOn->setChecked(!isChekcked);
+        autoName = !isChekcked;
+    }
+    else 
+    {
+        bool isChekcked = ui->actionOn->isChecked();
+        ui->actionOff->setChecked(!isChekcked);
+        autoName = isChekcked;
+    }
+
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    config->setAutoNameWhenCapturing(autoName);
 }

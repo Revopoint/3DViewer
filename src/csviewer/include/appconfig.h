@@ -53,9 +53,12 @@ public:
 
     void setLanguage(QString lan);
     void setDefaultSavePath(QString path);
+    void setAutoNameWhenCapturing(bool autoName);
 
     QString getLanguage() const;
     QString getDefaultSavePath() const;
+    bool getAutoNameWhenCapturing() const;
+
 private:
     void save();
 private:
@@ -66,6 +69,8 @@ private:
     QString defaultSavePath;
     // current language
     QString language;
+    // Auto name when capturing
+    bool autoNameWhenCaptring = false;
 };
 
 #endif //_CS_APP_CONFIG_H

@@ -268,9 +268,9 @@ void CSApplication::onShowCoordChanged(bool show, QPointF pos)
     }
 }
 
-void CSApplication::startCapture(CameraCaptureConfig config)
+void CSApplication::startCapture(CameraCaptureConfig config, bool autoName)
 {
-    cameraCaptureTool->startCapture(config);
+    cameraCaptureTool->startCapture(config, autoName);
 }
 
 void CSApplication::stopCapture()

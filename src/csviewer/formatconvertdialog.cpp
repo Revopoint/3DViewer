@@ -146,10 +146,12 @@ void FormatConvertDialog::onConvertStateChanged(int state, int progress, QString
     case cs::FormatConverter::CONVERTING:
         emit showMessage(message, 0);
         ui->convertProgress->setValue(progress);
+        ui->convertButton->setEnabled(false);
         break;
     case cs::FormatConverter::CONVERT_SUCCESS:
     case cs::FormatConverter::CONVERT_FAILED:
         showMessageBox(message);
+        ui->convertButton->setEnabled(true);
         break;
     case cs::FormatConverter::CONVERT_ERROR:
         break;
@@ -205,4 +207,10 @@ void FormatConvertDialog::onSourceFilePathChanged()
 void FormatConvertDialog::onOutputPathChanged()
 {
     formatConverter->setOutputDirectory(ui->lineEditOutput->text());
+}
+
+void FormatConvertDialog::showEvent(QShowEvent* event)
+{
+    ui->lineEditSrc->setText("");
+    ui->lineEditOutput->setText("");
 }

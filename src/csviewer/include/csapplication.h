@@ -69,7 +69,7 @@ public:
     void start();
     std::shared_ptr<ICSCamera> getCamera() const;
 
-    void startCapture(CameraCaptureConfig config);
+    void startCapture(CameraCaptureConfig config, bool autoName = false);
     void stopCapture();
 
     std::shared_ptr<AppConfig> getAppConfig();
@@ -96,7 +96,7 @@ signals:
 
     // save frame data
     void captureNumberUpdated(int captured, int dropped);
-    void captureStateChanged(int state, QString message);
+    void captureStateChanged(int captureType, int state, QString message);
 
     void show3DTextureChanged(bool texture);
 private slots:

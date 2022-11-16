@@ -53,6 +53,8 @@
 #include <QTimer>
 #include <QThread>
 
+#include <cstypes.h>
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class ParameterSettingsWidget; }
 namespace cs { class ICSCamera; }
@@ -95,6 +97,8 @@ public slots:
 
     void onClickCaptureSingle();
     void onClickCaptureMultiple();
+
+    void onCaptureStateChanged(int captureType, int state, QString message);
 private slots:
     void onClickDepthButton();
     void onClickRgbButton();
@@ -165,6 +169,8 @@ private:
     bool isSingleShotMode = false;
 
     ParaMonitorThread* paraMonitorThread;
+
+    CameraCaptureConfig captureConfig;
 };
 
 class ParaMonitorThread : public QThread

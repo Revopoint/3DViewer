@@ -88,7 +88,7 @@ public:
 
     void setCamera(std::shared_ptr<ICSCamera>& camera);
 signals:
-    void captureStateChanged(int state, QString message);
+    void captureStateChanged(int captureType, int state, QString message);
     void captureNumberUpdated(int, int);
 protected:
     virtual void onCaptureDataDone();
@@ -164,13 +164,13 @@ public:
     ~CameraCaptureTool();
     void process(const OutputDataPort& outputDataPort) override;
     
-    void startCapture(CameraCaptureConfig config);
+    void startCapture(CameraCaptureConfig config, bool autoNaming = false);
     void setCamera(std::shared_ptr<ICSCamera>& camera);
 public slots:
     void stopCapture();
 signals:
     void captureNumberUpdated(int captured, int dropped);
-    void captureStateChanged(int state, QString message);
+    void captureStateChanged(int captureType, int state, QString message);
 private:
     QMutex mutex;
     // for saving data

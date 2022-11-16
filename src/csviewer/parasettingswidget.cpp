@@ -55,6 +55,7 @@
 #include <QFileDialog>
 #include <QSpacerItem>
 #include <QDir>
+#include <QDesktopServices>
 
 #include <cameraproxy.h>
 #include <icscamera.h>
@@ -89,6 +90,11 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
     ui->setupUi(this);
     initWidget();
     initConnections();
+
+    captureConfig.captureType = CAPTURE_TYPE_SINGLE;
+    captureConfig.captureNumber = 1;
+    captureConfig.captureDataTypes = { CAMERA_DATA_L, CAMERA_DATA_R, CAMERA_DATA_DEPTH, CAMERA_DATA_RGB, CAMERA_DATA_POINT_CLOUD };
+    captureConfig.saveFormat = QString("images");
 }
 
 ParaSettingsWidget::~ParaSettingsWidget()
@@ -282,7 +288,9 @@ void ParaSettingsWidget::initConnections()
 
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app, &cs::CSApplication::cameraStateChanged, this, &ParaSettingsWidget::onCameraStateChanged);
+    suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged, this, &ParaSettingsWidget::onCaptureStateChanged);
     suc &= (bool)connect(this, &ParaSettingsWidget::translateSignal, this, &ParaSettingsWidget::onTranslate);
+
     Q_ASSERT(suc);
 
     // connections
@@ -851,29 +859,40 @@ void ParaSettingsWidget::onClickedDisconnCamera()
 
 void ParaSettingsWidget::onClickCaptureSingle()
 {
-    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    bool autoName = config->getAutoNameWhenCapturing();
+    QString openDir = config->getDefaultSavePath();
 
-    qInfo() << "click capture single";
-    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir);
-
-    if (url.isValid())
+    if (autoName)
     {
-        QFileInfo fileInfo(url.toLocalFile());
+        QDateTime now = QDateTime::currentDateTime();
+        QString time = now.toString("yyyyMMddHHmmsszzz");
 
-        CameraCaptureConfig config;
-        config.captureType = CAPTURE_TYPE_SINGLE;
-        config.captureNumber = 1;
-        config.captureDataTypes = { CAMERA_DATA_L, CAMERA_DATA_R, CAMERA_DATA_DEPTH, CAMERA_DATA_RGB, CAMERA_DATA_POINT_CLOUD };
-        config.saveFormat = QString("images");
-        config.saveDir = fileInfo.absolutePath();
-        config.saveName = fileInfo.fileName();
-        config.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
+        captureConfig.saveDir = openDir;
+        captureConfig.saveName = time;
+        captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
 
-        cs::CSApplication::getInstance()->startCapture(config);
+        cs::CSApplication::getInstance()->startCapture(captureConfig, true);
     }
-    else
+    else 
     {
-        qInfo() << "Cancel capture";
+        qInfo() << "click capture single";
+        QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir);
+
+        if (url.isValid())
+        {
+            QFileInfo fileInfo(url.toLocalFile());
+
+            captureConfig.saveDir = fileInfo.absolutePath();
+            captureConfig.saveName = fileInfo.fileName();
+            captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
+
+            cs::CSApplication::getInstance()->startCapture(captureConfig, false);
+        }
+        else
+        {
+            qInfo() << "Cancel capture";
+        }
     }
 }
 
@@ -893,6 +912,17 @@ void ParaSettingsWidget::stopParaMonitor()
 {
     paraMonitorThread->requestInterruption();
     paraMonitorThread->wait();
+}
+
+void ParaSettingsWidget::onCaptureStateChanged(int captureType, int state, QString message)
+{
+    if (captureType != CAPTURE_TYPE_SINGLE)
+    {
+        return;
+    }
+
+    QString dir = QString("file:///%1").arg(captureConfig.saveDir);
+    QDesktopServices::openUrl(QUrl(dir));
 }
 
 ParaMonitorThread::ParaMonitorThread()

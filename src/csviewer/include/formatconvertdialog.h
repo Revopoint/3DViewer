@@ -62,6 +62,7 @@ public:
     ~FormatConvertDialog();
     void onTranslate();
     void reject() override;
+    void showEvent(QShowEvent* event) override;
 signals:
     void showMessage(QString msg, int time);
 public slots:

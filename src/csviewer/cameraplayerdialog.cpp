@@ -268,6 +268,7 @@ void CameraPlayerDialog::onLineEditFinished()
     else 
     {
         ui->frameEdit->setText(QString::number(ui->frameNumberSlider->value()));
+        emit currentFrameUpdated(ui->frameNumberSlider->value());
     }
 }
 

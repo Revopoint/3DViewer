@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1077</width>
-    <height>799</height>
+    <width>1056</width>
+    <height>725</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -80,7 +80,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1077</width>
+     <width>1056</width>
      <height>23</height>
     </rect>
    </property>
@@ -88,8 +88,16 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuAutoNameWhenCapturuing">
+     <property name="title">
+      <string>Auto name when capturuing</string>
+     </property>
+     <addaction name="actionOn"/>
+     <addaction name="actionOff"/>
+    </widget>
     <addaction name="actionsetDefaultSaveDir"/>
-    <addaction name="actionloadFile"/>
+    <addaction name="menuAutoNameWhenCapturuing"/>
+    <addaction name="actionplayFile"/>
     <addaction name="actionConvertDepth2PC"/>
     <addaction name="actionExit"/>
    </widget>
@@ -210,14 +218,30 @@
     <string>IP setting</string>
    </property>
   </action>
-  <action name="actionloadFile">
+  <action name="actionplayFile">
    <property name="text">
-    <string>Load file</string>
+    <string>Play file</string>
    </property>
   </action>
   <action name="actionConvertDepth2PC">
    <property name="text">
     <string>Convert depth data to point cloud</string>
+   </property>
+  </action>
+  <action name="actionOn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>On</string>
+   </property>
+  </action>
+  <action name="actionOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Off</string>
    </property>
   </action>
  </widget>

@@ -62,7 +62,7 @@ public:
     void showEvent(QShowEvent* event) override;
 public slots:
     void onCaptureNumberUpdated(int number, int dropped);
-    void onCaptureStateChanged(int state, QString message);
+    void onCaptureStateChanged(int captureType, int state, QString message);
     void onTranslate();
 
     void reject() override;

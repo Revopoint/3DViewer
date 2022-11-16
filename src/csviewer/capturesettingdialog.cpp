@@ -282,8 +282,13 @@ void CaptureSettingDialog::onCaptureNumberUpdated(int captured, int dropped)
     ui->captureInfo->setText(msg);
 }
 
-void CaptureSettingDialog::onCaptureStateChanged(int state, QString message)
+void CaptureSettingDialog::onCaptureStateChanged(int captureType, int state, QString message)
 {
+    if (captureType != CAPTURE_TYPE_MULTIPLE)
+    {
+        return;
+    }
+
     if (state == cs::CAPTURE_FINISHED)
     {
         isCapturing = false;

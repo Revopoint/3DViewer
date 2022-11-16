@@ -99,7 +99,7 @@ private slots:
     void onShowStatusBarMessage(QString msg, int timeout);
 
     // capture frame data
-    void onCaptureStateChanged(int state, QString message);
+    void onCaptureStateChanged(int captureType, int state, QString message);
 
     // start the stream
     void onCameraStreamStarted();
@@ -125,6 +125,7 @@ private slots:
     void onWindowsMenuTriggered(QAction* action);
     void onTriggeredWindowsTitle();
     void onTriggeredWindowsTab();
+    void onAutoNameMenuTriggered(QAction* action);
 
     void onRenderExit(int renderId);
     void onWindowLayoutChanged();

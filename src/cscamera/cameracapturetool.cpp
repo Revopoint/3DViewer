@@ -86,13 +86,13 @@ void CameraCaptureTool::process(const OutputDataPort& outputDataPort)
     }
 }
 
-void CameraCaptureTool::startCapture(CameraCaptureConfig config)
+void CameraCaptureTool::startCapture(CameraCaptureConfig config, bool autoNaming)
 {
     QMutexLocker locker(&mutex);
     if (cameraCapture)
     {
         qInfo() << "captruing, please wait...";
-        emit captureStateChanged(CAPTURE_WARNING, tr("captruing, please wait..."));
+        emit captureStateChanged(config.captureType, CAPTURE_WARNING, tr("captruing, please wait..."));
         return;
     }
 
@@ -157,7 +157,7 @@ void CameraCaptureBase::run()
     QTime time;
     time.start();
 
-    emit captureStateChanged(CAPTURING, tr("Start capturing"));
+    emit captureStateChanged(captureConfig.captureType, CAPTURING, tr("Start capturing"));
 
     int captured = 0;
     {
@@ -183,7 +183,7 @@ void CameraCaptureBase::run()
 
             if (outputData.isEmpty())
             {
-                emit captureStateChanged(CAPTURE_ERROR, tr("save frame data is empty"));
+                emit captureStateChanged(captureConfig.captureType, CAPTURE_ERROR, tr("save frame data is empty"));
                 continue;
             }
 
@@ -226,7 +226,7 @@ void CameraCaptureBase::run()
     qInfo("captured %d frames (%d dropped), spend time : %d ms", capturedDataCount, skipDataCount, timeMs);
 
     QString msg = QString(tr("End capture, captured %1 frames (%2 dropped)")).arg(capturedDataCount).arg(skipDataCount);
-    emit captureStateChanged(CAPTURE_FINISHED, msg);
+    emit captureStateChanged(captureConfig.captureType, CAPTURE_FINISHED, msg);
 }
 
 void CameraCaptureBase::saveFinished()
@@ -554,7 +554,7 @@ void CameraCaptureMultiple::addOutputData(const OutputDataPort& outputDataPort)
         skipDataCount++;
         qWarning() << "skip one frame, skipDataCount=" << skipDataCount << ", (skipDataCount + cachedDataCount) = " << cachedDataCount + skipDataCount;
 
-        emit captureStateChanged(CAPTURE_WARNING, tr("a frame dropped"));
+        emit captureStateChanged(captureConfig.captureType, CAPTURE_WARNING, tr("a frame dropped"));
     }
     else 
     {
@@ -653,7 +653,7 @@ void CameraCaptureMultiple::saveTimeStamps()
 
 void CameraCaptureMultiple::compressToZip()
 {
-    emit captureStateChanged(CAPTURING, tr("Please wait for the file to be compressed to zip"));
+    emit captureStateChanged(captureConfig.captureType, CAPTURING, tr("Please wait for the file to be compressed to zip"));
 
     QString zipFile = realSaveFolder + QDir::separator() + captureConfig.saveName + ".zip";
 
@@ -665,7 +665,7 @@ void CameraCaptureMultiple::compressToZip()
     else 
     {
         qWarning() << "Compress zip file failed, zip file : " << zipFile;
-        emit captureStateChanged(CAPTURE_ERROR, tr("Failed to compress zip file"));
+        emit captureStateChanged(captureConfig.captureType, CAPTURE_ERROR, tr("Failed to compress zip file"));
     }
 
     // delete tmp folder
