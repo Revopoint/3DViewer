@@ -232,16 +232,6 @@
     </message>
     <message>
         <location filename="../viewerwindow.ui"/>
-        <source>Play file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../viewerwindow.ui"/>
-        <source>Auto name when capturuing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../viewerwindow.ui"/>
         <source>On</source>
         <translation type="unfinished"></translation>
     </message>
@@ -258,6 +248,16 @@
     <message>
         <location filename="../viewerwindow.ui"/>
         <source>Views</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>Auto file naming</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>Playback</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -302,7 +302,7 @@
         <location filename="../parasettingswidget.cpp" line="156"/>
         <location filename="../parasettingswidget.cpp" line="189"/>
         <source>Exposure</source>
-        <translation type="unfinished">Exposure(US)</translation>
+        <translation type="unfinished">Exposure(μs)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="127"/>
@@ -310,7 +310,7 @@
         <location filename="../parasettingswidget.cpp" line="189"/>
         <location filename="../parasettingswidget.cpp" line="214"/>
         <source>Gain</source>
-        <translation type="unfinished">Gain(DB)</translation>
+        <translation type="unfinished">Gain(dB)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="648"/>
@@ -324,7 +324,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="880"/>
+        <location filename="../parasettingswidget.cpp" line="883"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -343,13 +343,13 @@
     <message>
         <location filename="../parasettingswidget.cpp" line="118"/>
         <source>Depth Range(mm)</source>
-        <translation type="unfinished">Depth Range(MM)</translation>
+        <translation type="unfinished">Depth Range(mm)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="125"/>
         <location filename="../parasettingswidget.cpp" line="212"/>
         <source>Exposure Time(us)</source>
-        <translation type="unfinished">Exposure Time(US)</translation>
+        <translation type="unfinished">Exposure Time(μs)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="123"/>
@@ -414,7 +414,7 @@
     <message>
         <location filename="../parasettingswidget.cpp" line="221"/>
         <source>White Balance</source>
-        <translation type="unfinished">White Balance(K)</translation>
+        <translation type="unfinished">White Balance(k)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="307"/>
@@ -589,17 +589,17 @@
 <context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="160"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="185"/>
         <source>Start capturing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="186"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="211"/>
         <source>save frame data is empty</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="228"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="253"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -660,22 +660,22 @@
 <context>
     <name>CaptureSettingDialog</name>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="117"/>
+        <location filename="../capturesettingdialog.cpp" line="127"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="281"/>
+        <location filename="../capturesettingdialog.cpp" line="291"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="309"/>
+        <location filename="../capturesettingdialog.cpp" line="319"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="310"/>
+        <location filename="../capturesettingdialog.cpp" line="320"/>
         <source>Capturing, are you sure to stop capture now ?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -744,17 +744,17 @@
 <context>
     <name>IpSettingDialog</name>
     <message>
-        <location filename="../ipsettingdialog.cpp" line="123"/>
+        <location filename="../ipsettingdialog.cpp" line="131"/>
         <source>The IP address has not been modified.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ipsettingdialog.cpp" line="130"/>
+        <location filename="../ipsettingdialog.cpp" line="138"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ipsettingdialog.cpp" line="131"/>
+        <location filename="../ipsettingdialog.cpp" line="139"/>
         <source>The IP address has been modified. Restarting the camera takes effect. Do you want to restart now ?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -769,11 +769,6 @@
     <message>
         <location filename="../cameraplayer.ui"/>
         <source>RGB</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../cameraplayer.ui"/>
-        <source>Point Clopud</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -811,21 +806,26 @@
         <source>Playback</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../cameraplayer.ui"/>
+        <source>Point Cloud</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>cs::CameraCaptureMultiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="557"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="622"/>
         <source>a frame dropped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="656"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="721"/>
         <source>Please wait for the file to be compressed to zip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="668"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="733"/>
         <source>Failed to compress zip file</source>
         <translation type="unfinished"></translation>
     </message>

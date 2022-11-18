@@ -96,8 +96,18 @@ void CaptureSettingDialog::showEvent(QShowEvent* event)
     const bool hasIr = hasIrV.toBool();
     const bool hasDepth = hasDepthV.toBool();
 
+    for (auto checkBox : dataTypeCheckBoxs)
+    {
+        checkBox->setChecked(false);
+    }
+
     ui->rgbCheckBox->setEnabled(hasRgb);
+    ui->rgbCheckBox->setChecked(hasRgb);
+
     ui->depthCheckBox->setEnabled(hasDepth);
+    ui->depthCheckBox->setChecked(hasDepth);
+
+
     ui->irCheckBox->setEnabled(hasIr);
     ui->pointCloudCheckBox->setEnabled(hasDepth);
     ui->captureInfo->setText("");
@@ -113,7 +123,7 @@ void CaptureSettingDialog::onStartCapture()
     qInfo() << "onStartCapture";
 
     QString filters = "Zip file(*.zip)";
-    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+    QString openDir = QString("file:///%1").arg(cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath());
     QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir, filters);
 
     if (url.isValid())

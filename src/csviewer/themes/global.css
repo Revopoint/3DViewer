@@ -693,4 +693,28 @@ QProgressBar::chunk {
     border-radius: 4px;
 }
 
+/* QRadioButton*/
+
+QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+}
+
+QRadioButton::indicator::unchecked {
+    image: url(:/resources/radio_button_unselect.png);
+}
+
+QRadioButton::indicator:unchecked:hover {
+    image: url(:/resources/radio_button_unselect_hover.png);
+}
+
+QRadioButton::indicator::checked {
+    image: url(:/resources/radio_button_select.png);
+}
+
+QRadioButton::indicator:checked:hover {
+    image: url(:/resources/radio_button_select_hover.png);
+}
+
+
 

@@ -273,6 +273,11 @@ void CSApplication::startCapture(CameraCaptureConfig config, bool autoName)
     cameraCaptureTool->startCapture(config, autoName);
 }
 
+void CSApplication::setCurOutputData(const CameraCaptureConfig& config)
+{
+    cameraCaptureTool->setCurOutputData(config);
+}
+
 void CSApplication::stopCapture()
 {
     cameraCaptureTool->stopCapture();

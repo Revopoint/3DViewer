@@ -119,7 +119,7 @@ CameraPlayerDialog::~CameraPlayerDialog()
 void CameraPlayerDialog::onLoadFile()
 {
     qInfo() << "click load file";
-    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+    QString openDir = QString("file:///%1").arg(cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath());
 
     QString filters = "Zip file(*.zip)";
     QUrl url = QFileDialog::getOpenFileUrl(this, tr("Load captured file"), openDir, filters);
@@ -296,7 +296,7 @@ void CameraPlayerDialog::onShowTextureUpdated(bool texture)
 
 void CameraPlayerDialog::onClickedSave()
 {
-    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+    QString openDir = QString("file:///%1").arg(cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath());
 
     qInfo() << "click capture single";
     QUrl url = QFileDialog::getSaveFileUrl(this, tr("Save current frame"), openDir);

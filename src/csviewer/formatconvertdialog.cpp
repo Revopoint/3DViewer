@@ -88,7 +88,7 @@ FormatConvertDialog::~FormatConvertDialog()
 void FormatConvertDialog::onClickedBrowseSource()
 {
     qInfo() << "click select source file";
-    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+    QString openDir = QString("file:///%1").arg(cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath());
 
     QString filters = "Zip file(*.zip)";
     QUrl url = QFileDialog::getOpenFileUrl(this, tr("Select source file"), openDir, filters);
@@ -120,7 +120,7 @@ void FormatConvertDialog::onClickedBrowseSource()
 void FormatConvertDialog::onClickedBrowseOutputDirectory()
 {
     qInfo() << "click select  output directory";
-    QString openDir = cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath();
+    QString openDir = QString("file:///%1").arg(cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath());
 
     QUrl url = QFileDialog::getExistingDirectoryUrl(this, tr("Select source file"), openDir);
 

@@ -863,6 +863,9 @@ void ParaSettingsWidget::onClickCaptureSingle()
     bool autoName = config->getAutoNameWhenCapturing();
     QString openDir = config->getDefaultSavePath();
 
+    // set current output data
+    cs::CSApplication::getInstance()->setCurOutputData(captureConfig);
+    
     if (autoName)
     {
         QDateTime now = QDateTime::currentDateTime();

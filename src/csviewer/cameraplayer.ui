@@ -85,7 +85,7 @@
          <enum>Qt::ClickFocus</enum>
         </property>
         <property name="text">
-         <string>Point Clopud</string>
+         <string>Point Cloud</string>
         </property>
        </widget>
       </item>
@@ -229,15 +229,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>CSLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>cslineedit.h</header>
-  </customwidget>
-  <customwidget>
    <class>RenderWindow</class>
    <extends>QWidget</extends>
    <header>renderwindow.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CSLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>cslineedit.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

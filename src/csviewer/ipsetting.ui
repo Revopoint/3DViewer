@@ -7,8 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>421</width>
-    <height>182</height>
+    <height>185</height>
    </rect>
+  </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle">
    <string>IP Setting</string>
@@ -32,6 +35,9 @@
       </property>
       <item>
        <widget class="QRadioButton" name="manualIPButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="text">
          <string>Manual IP</string>
         </property>
@@ -39,6 +45,9 @@
       </item>
       <item>
        <widget class="QRadioButton" name="autoIPButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="text">
          <string>Auto IP</string>
         </property>
@@ -74,15 +83,12 @@
        </spacer>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox1">
+       <widget class="QLineEdit" name="ipEdit1">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
+        </property>
         <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>255</number>
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -94,12 +100,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox2">
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <widget class="QLineEdit" name="ipEdit2">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
-        <property name="maximum">
-         <number>255</number>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -111,12 +117,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox3">
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <widget class="QLineEdit" name="ipEdit3">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
-        <property name="maximum">
-         <number>255</number>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -128,12 +134,12 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox4">
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <widget class="QLineEdit" name="ipEdit4">
+        <property name="focusPolicy">
+         <enum>Qt::StrongFocus</enum>
         </property>
-        <property name="maximum">
-         <number>255</number>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -171,6 +177,9 @@
       </item>
       <item>
        <widget class="QPushButton" name="applyButton">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="text">
          <string>Apply</string>
         </property>

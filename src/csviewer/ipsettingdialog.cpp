@@ -46,6 +46,7 @@
 
 #include <icscamera.h>
 #include <QMessageBox>
+#include <QIntValidator>
 
 IpSettingDialog::IpSettingDialog(QWidget* parent)
     : QDialog(parent)
@@ -54,6 +55,13 @@ IpSettingDialog::IpSettingDialog(QWidget* parent)
     ui->setupUi(this);
 
     ui->applyButton->setProperty("isCSStyle", true);
+    
+    QIntValidator* intValidator = new QIntValidator(0, 255, this);
+    ui->ipEdit1->setValidator(intValidator);
+    ui->ipEdit2->setValidator(intValidator);
+    ui->ipEdit3->setValidator(intValidator);
+    ui->ipEdit4->setValidator(intValidator);
+
     bool suc = true;
     suc &= (bool)connect(ui->applyButton, &QPushButton::clicked, this, &IpSettingDialog::onApply);
     suc &= (bool)connect(ui->autoIPButton, &QRadioButton::toggled, this, [=](bool checked) 
@@ -90,10 +98,10 @@ void IpSettingDialog::updateIpInfo()
     ui->autoIPButton->setChecked(autoEnable);
     ui->manualIPButton->setChecked(!autoEnable);
 
-    ui->spinBox1->setValue(ip1);
-    ui->spinBox2->setValue(ip2);
-    ui->spinBox3->setValue(ip3);
-    ui->spinBox4->setValue(ip4);
+    ui->ipEdit1->setText(QString::number(ip1));
+    ui->ipEdit2->setText(QString::number(ip2));
+    ui->ipEdit3->setText(QString::number(ip3));
+    ui->ipEdit4->setText(QString::number(ip4));
 
     ui->ipArea->setEnabled(!autoEnable);
 }
@@ -103,10 +111,10 @@ void IpSettingDialog::onApply()
     CameraIpSetting cameraIp;
     cameraIp.autoEnable = ui->autoIPButton->isChecked() ? 1 : 0;
 
-    cameraIp.ipBytes[0] = (ui->spinBox1->value()) & 0xFF;
-    cameraIp.ipBytes[1] = (ui->spinBox2->value()) & 0xFF;
-    cameraIp.ipBytes[2] = (ui->spinBox3->value()) & 0xFF;
-    cameraIp.ipBytes[3] = (ui->spinBox4->value()) & 0xFF;
+    cameraIp.ipBytes[0] = (ui->ipEdit1->text().toInt()) & 0xFF;
+    cameraIp.ipBytes[1] = (ui->ipEdit2->text().toInt()) & 0xFF;
+    cameraIp.ipBytes[2] = (ui->ipEdit3->text().toInt()) & 0xFF;
+    cameraIp.ipBytes[3] = (ui->ipEdit4->text().toInt()) & 0xFF;
 
     // set IP
     auto camera = cs::CSApplication::getInstance()->getCamera();

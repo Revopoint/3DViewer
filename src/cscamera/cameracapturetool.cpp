@@ -89,24 +89,31 @@ void CameraCaptureTool::process(const OutputDataPort& outputDataPort)
 void CameraCaptureTool::startCapture(CameraCaptureConfig config, bool autoNaming)
 {
     QMutexLocker locker(&mutex);
-    if (cameraCapture)
+    if (cameraCapture && cameraCapture->getCaptureType() != CAPTURE_TYPE_SINGLE)
     {
         qInfo() << "captruing, please wait...";
         emit captureStateChanged(config.captureType, CAPTURE_WARNING, tr("captruing, please wait..."));
         return;
     }
 
-    if (config.captureType == CAPTURE_TYPE_MULTIPLE)
+    if(!cameraCapture || (config.captureType != cameraCapture->getCaptureType()))
     {
-        cameraCapture = new CameraCaptureMultiple(config);
-    }
-    else 
-    {
-        cameraCapture = new CameraCaptureSingle(config);
+        if (cameraCapture)
+        {
+            delete cameraCapture;
+        }
+
+        if (config.captureType == CAPTURE_TYPE_MULTIPLE)
+        {
+            cameraCapture = new CameraCaptureMultiple(config);
+        }
+        else 
+        {
+            cameraCapture = new CameraCaptureSingle(config);
+        }
     }
 
     cameraCapture->setCamera(camera);
-    cameraCapture->setOutputData(cachedOutputData);
 
     bool suc = true;
 
@@ -131,12 +138,30 @@ void CameraCaptureTool::stopCapture()
 
     cameraCapture->requestInterruption();
     cameraCapture->wait();
+
+    delete cameraCapture;
     cameraCapture = nullptr;
 }
 
 void CameraCaptureTool::setCamera(std::shared_ptr<ICSCamera>& camera)
 {
     this->camera = camera;
+}
+
+void CameraCaptureTool::setCurOutputData(const CameraCaptureConfig& config)
+{
+    if (config.captureType != CAPTURE_TYPE_SINGLE)
+    {
+        qWarning() << "";
+        return;
+    }
+
+    if (!cameraCapture)
+    {
+        cameraCapture = new CameraCaptureSingle(config);
+    }
+    
+    cameraCapture->setOutputData(cachedOutputData);
 }
 
 CameraCaptureBase::CameraCaptureBase(const CameraCaptureConfig& config, CAPTURE_TYPE captureType)
@@ -441,6 +466,26 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         }
     }
 
+    {
+        // Depth exposure
+        QVariant value;
+        camera->getCameraPara(cs::parameter::PARA_DEPTH_EXPOSURE, value);
+        if (value.isValid())
+        {
+            rootNode["Depth Exposure Time"] = value.toFloat();
+        }
+    }
+
+    {
+        // Depth gain
+        QVariant value;
+        camera->getCameraPara(cs::parameter::PARA_DEPTH_GAIN, value);
+        if (value.isValid())
+        {
+            rootNode["Depth Gain"] = value.toFloat();
+        }
+    }
+
     // RGB intrinsics
     QVariant hasRgbV;
     camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
@@ -472,6 +517,26 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         else
         {
             qWarning() << "get rgb intrinsics failed";
+        }
+
+        {
+            // RGB exposure
+            QVariant value;
+            camera->getCameraPara(cs::parameter::PARA_RGB_EXPOSURE, value);
+            if (value.isValid())
+            {
+                rootNode["RGB Exposure Time"] = value.toFloat();
+            }
+        }
+
+        {
+            // RGB gain
+            QVariant value;
+            camera->getCameraPara(cs::parameter::PARA_RGB_GAIN, value);
+            if (value.isValid())
+            {
+                rootNode["RGB Gain"] = value.toFloat();
+            }
         }
     }
 

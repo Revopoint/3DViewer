@@ -69,6 +69,7 @@ public:
     void start();
     std::shared_ptr<ICSCamera> getCamera() const;
 
+    void setCurOutputData(const CameraCaptureConfig& config);
     void startCapture(CameraCaptureConfig config, bool autoName = false);
     void stopCapture();
 

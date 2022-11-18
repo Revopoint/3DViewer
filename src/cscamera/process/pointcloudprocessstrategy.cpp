@@ -193,6 +193,7 @@ void PointCloudProcessStrategy::generateTexture(const StreamData& rgbData, QImag
         {
             QImage image;
             image.loadFromData(rgbData.data, "JPG");
+            image = image.convertToFormat(QImage::Format_RGB888);
 
             texImage = image;
         }

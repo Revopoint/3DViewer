@@ -166,6 +166,7 @@ public:
     
     void startCapture(CameraCaptureConfig config, bool autoNaming = false);
     void setCamera(std::shared_ptr<ICSCamera>& camera);
+    void setCurOutputData(const CameraCaptureConfig& config);
 public slots:
     void stopCapture();
 signals:
