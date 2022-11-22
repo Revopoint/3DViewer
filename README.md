@@ -34,7 +34,7 @@ Dependent environment:
 
        ```
        cd /D D:\3DViewer-git
-       git clone --recursive https://github.com/Revopoint/3DViewer.git
+       git clone https://github.com/Revopoint/3DViewer.git
        ```
 
 3. Create a new Visual Studio project by CMake (take QT 5.10.1 + Visual Studio 2015 as an example).
@@ -64,7 +64,7 @@ Dependent environment:
    ```
    mkdir ~/3DViewer-git
    cd ~/3DViewer-git
-   git clone --recursive https://github.com/Revopoint/3DViewer.git
+   git clone https://github.com/Revopoint/3DViewer.git
    ```
 
 3. Create a new build directory in the code root directory, enter the directory and execute CMake command.  ***-DQt5_ Dir =‘……’*** points to Qt5Config.cmake storage location.
@@ -113,7 +113,7 @@ Dependent environment:
    ```
    mkdir ~/3DViewer-git
    cd ~/3DViewer-git
-   git clone --recursive https://github.com/Revopoint/3DViewer.git
+   git clone https://github.com/Revopoint/3DViewer.git
    ```
 
 3. Create a new build directory in the code root directory, enter the directory and execute CMake command.  ***-DQt5_ Dir =‘……’*** points to the storage location of ***Qt5config.cmake***.

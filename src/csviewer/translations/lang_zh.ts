@@ -397,34 +397,34 @@
         <translation type="obsolete">HDR级数：</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="156"/>
-        <location filename="../parasettingswidget.cpp" line="189"/>
+        <location filename="../parasettingswidget.cpp" line="160"/>
+        <location filename="../parasettingswidget.cpp" line="193"/>
         <source>Number</source>
         <translation type="unfinished">编号</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="156"/>
-        <location filename="../parasettingswidget.cpp" line="189"/>
+        <location filename="../parasettingswidget.cpp" line="160"/>
+        <location filename="../parasettingswidget.cpp" line="193"/>
         <source>Exposure</source>
         <translation type="unfinished">曝光时间(μs)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="127"/>
-        <location filename="../parasettingswidget.cpp" line="156"/>
-        <location filename="../parasettingswidget.cpp" line="189"/>
-        <location filename="../parasettingswidget.cpp" line="214"/>
+        <location filename="../parasettingswidget.cpp" line="131"/>
+        <location filename="../parasettingswidget.cpp" line="160"/>
+        <location filename="../parasettingswidget.cpp" line="193"/>
+        <location filename="../parasettingswidget.cpp" line="218"/>
         <source>Gain</source>
         <translation type="unfinished">增益(dB)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="111"/>
-        <location filename="../parasettingswidget.cpp" line="203"/>
+        <location filename="../parasettingswidget.cpp" line="207"/>
         <source>Stream Format</source>
         <translation type="unfinished">格式</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="113"/>
-        <location filename="../parasettingswidget.cpp" line="205"/>
+        <location filename="../parasettingswidget.cpp" line="209"/>
         <source>Resolution</source>
         <translation type="unfinished">分辨率</translation>
     </message>
@@ -434,88 +434,111 @@
         <translation type="unfinished">深度范围(mm)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="125"/>
-        <location filename="../parasettingswidget.cpp" line="212"/>
+        <location filename="../parasettingswidget.cpp" line="124"/>
+        <source>Speed First: The frame rate of this mode is fast, and the image quality may deteriorate.
+Quality First: This mode has good image quality and may reduce the frame rate.
+Foreground: This mode gives priority to adjusting the image quality of closer objects,
+and the image quality of objects farther away may become worse.</source>
+        <translation type="unfinished">&lt;br&gt;&lt;b&gt;速度优先：&lt;/b&gt;此种模式帧率较快，图像质量有可能变差；&lt;br&gt;
+&lt;b&gt;质量优先：&lt;/b&gt;此种模式图像质量较好，帧率有可能降低；&lt;br&gt;
+&lt;b&gt;前景优先：&lt;/b&gt;此种模式优先调节较近物体的图像质量，较远物体的图像质量可能变差。&lt;br&gt;</translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="129"/>
+        <location filename="../parasettingswidget.cpp" line="216"/>
         <source>Exposure Time(us)</source>
         <translation type="unfinished">曝光时间(μs)</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="123"/>
-        <location filename="../parasettingswidget.cpp" line="210"/>
+        <location filename="../parasettingswidget.cpp" line="214"/>
         <source>Auto Exposure</source>
         <translation type="unfinished">自动曝光</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="132"/>
+        <source>Speed First: The frame rate of this mode is fast, and the image quality may deteriorate.
+
+Quality First: This mode has good image quality and may reduce the frame rate.
+
+Foreground: This mode gives priority to adjusting the image quality of closer objects,
+and the image quality of objects farther away may become worse.</source>
+        <translation type="obsolete">速度优先：此种模式帧率较快，图像质量有可能变差；
+
+质量优先：此种模式图像质量较好，帧率有可能降低；
+
+前景优先：此种模式优先调节较近物体的图像质量，较远物体的图像质量可能变差。</translation>
+    </message>
+    <message>
+        <location filename="../parasettingswidget.cpp" line="136"/>
         <source>Threshold(Gray Level)</source>
         <translation type="unfinished">阈值(Gray Level)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="137"/>
+        <location filename="../parasettingswidget.cpp" line="141"/>
         <source>Filter Type</source>
         <translation type="unfinished">过滤器类型</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="139"/>
+        <location filename="../parasettingswidget.cpp" line="143"/>
         <source>Filter Level</source>
         <translation type="unfinished">过滤器等级</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="144"/>
+        <location filename="../parasettingswidget.cpp" line="148"/>
         <source>Fill Hole</source>
         <translation type="unfinished">补洞</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="149"/>
+        <location filename="../parasettingswidget.cpp" line="153"/>
         <source>ROI</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="154"/>
-        <location filename="../parasettingswidget.cpp" line="187"/>
+        <location filename="../parasettingswidget.cpp" line="158"/>
+        <location filename="../parasettingswidget.cpp" line="191"/>
         <source>HDR Mode</source>
         <translation type="unfinished">HDR模式</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="155"/>
-        <location filename="../parasettingswidget.cpp" line="188"/>
+        <location filename="../parasettingswidget.cpp" line="159"/>
+        <location filename="../parasettingswidget.cpp" line="192"/>
         <source>HDR Level</source>
         <translation type="unfinished">HDR等级</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="171"/>
-        <location filename="../parasettingswidget.cpp" line="805"/>
+        <location filename="../parasettingswidget.cpp" line="175"/>
+        <location filename="../parasettingswidget.cpp" line="809"/>
         <source>Refresh</source>
         <translation type="unfinished">刷新</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="172"/>
-        <location filename="../parasettingswidget.cpp" line="806"/>
+        <location filename="../parasettingswidget.cpp" line="176"/>
+        <location filename="../parasettingswidget.cpp" line="810"/>
         <source>OK</source>
         <translation type="unfinished">确定</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="219"/>
+        <location filename="../parasettingswidget.cpp" line="223"/>
         <source>Auto White Balance</source>
         <translation type="unfinished">自动白平衡</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="221"/>
+        <location filename="../parasettingswidget.cpp" line="225"/>
         <source>White Balance</source>
         <translation type="unfinished">白平衡(k)</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="307"/>
+        <location filename="../parasettingswidget.cpp" line="311"/>
         <source>Parameter Settings</source>
         <translation type="unfinished">参数设置</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="376"/>
+        <location filename="../parasettingswidget.cpp" line="380"/>
         <source>Entered single shot mode! You can click the button to get the next frame.</source>
         <translation type="unfinished">已经进入单次触发模式！点击该按钮获取下一帧数据。</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="648"/>
+        <location filename="../parasettingswidget.cpp" line="652"/>
         <source>Set ROI </source>
         <translation type="unfinished">设置ROI </translation>
     </message>
@@ -524,32 +547,32 @@
         <translation type="obsolete">使用鼠标在深度图中框选ROI区域，然后点击“确定”按钮</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="800"/>
+        <location filename="../parasettingswidget.cpp" line="804"/>
         <source>Capture single frame</source>
         <translation type="unfinished">保存单帧</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="801"/>
+        <location filename="../parasettingswidget.cpp" line="805"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished">保存多帧</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="802"/>
+        <location filename="../parasettingswidget.cpp" line="806"/>
         <source>Single Shot</source>
         <translation type="unfinished">单次触发</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="803"/>
+        <location filename="../parasettingswidget.cpp" line="807"/>
         <source>Stop preview</source>
         <translation type="unfinished">停止预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="813"/>
+        <location filename="../parasettingswidget.cpp" line="817"/>
         <source>Pause preview</source>
         <translation type="unfinished">暂停预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="883"/>
+        <location filename="../parasettingswidget.cpp" line="887"/>
         <source>Capture frame data</source>
         <translation type="unfinished">保存帧数据</translation>
     </message>
@@ -566,8 +589,8 @@
         <translation type="obsolete">白平衡：</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="799"/>
-        <location filename="../parasettingswidget.cpp" line="813"/>
+        <location filename="../parasettingswidget.cpp" line="803"/>
+        <location filename="../parasettingswidget.cpp" line="817"/>
         <source>Start preview</source>
         <translation type="unfinished">启动预览</translation>
     </message>
@@ -602,14 +625,22 @@
         <translation type="unfinished">关闭</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cscamera.cpp" line="85"/>
         <source>Fix Frame Rate</source>
-        <translation type="unfinished">固定帧率</translation>
+        <translation type="obsolete">固定帧率</translation>
+    </message>
+    <message>
+        <source>High Quality</source>
+        <translation type="obsolete">高质量</translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/cscamera.cpp" line="85"/>
+        <source>Speed First</source>
+        <translation type="unfinished">速度优先</translation>
     </message>
     <message>
         <location filename="../../cscamera/cscamera.cpp" line="86"/>
-        <source>High Quality</source>
-        <translation type="unfinished">高质量</translation>
+        <source>Quality First</source>
+        <translation type="unfinished">质量优先</translation>
     </message>
     <message>
         <location filename="../../cscamera/cscamera.cpp" line="87"/>
@@ -748,17 +779,17 @@
 <context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="185"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="189"/>
         <source>Start capturing</source>
         <translation type="unfinished">开始保存</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="211"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="215"/>
         <source>save frame data is empty</source>
         <translation type="unfinished">保存数据为空</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="253"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="257"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished">保存完毕，已保存%1帧（丢失%2帧）</translation>
     </message>
@@ -981,17 +1012,17 @@
 <context>
     <name>cs::CameraCaptureMultiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="622"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="631"/>
         <source>a frame dropped</source>
         <translation type="unfinished">丢失一帧数据</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="721"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="730"/>
         <source>Please wait for the file to be compressed to zip</source>
         <translation type="unfinished">正打包为ZIP，请稍等...</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="733"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="742"/>
         <source>Failed to compress zip file</source>
         <translation type="unfinished">打包为ZIP失败</translation>
     </message>

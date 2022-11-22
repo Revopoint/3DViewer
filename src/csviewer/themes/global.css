@@ -277,6 +277,19 @@ QPushButton#frameIncrease:hover, QPushButton#frameDecrease::hover {
     color: rgb(0, 169, 255);
 }
 
+QPushButton#tipsButton {
+    width: 22px;
+    height: 22px;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(:/resources/info.png);
+    margin-left: 10px;
+}
+
+QPushButton#tipsButton:hover {
+    background-image: url(:/resources/info_hover.png);
+}
+
 QWidget#RoiButtonArea {
     border-radius: 3px;
     background-color: #666666;

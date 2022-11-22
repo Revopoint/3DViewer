@@ -120,7 +120,11 @@ void ParaSettingsWidget::initDepthPara()
     addDepthDividLine();
 
     // auto exposure
-    addDepthParaWidget(new CSComboBox(PARA_DEPTH_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure"), this));
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure"), this, 
+        QT_TR_NOOP("Speed First: The frame rate of this mode is fast, and the image quality may deteriorate.\n"
+        "Quality First: This mode has good image quality and may reduce the frame rate.\n"
+        "Foreground: This mode gives priority to adjusting the image quality of closer objects,\n"
+        "and the image quality of objects farther away may become worse.")));
     // exposure
     addDepthParaWidget(new CSSlider(PARA_DEPTH_EXPOSURE, QT_TR_NOOP("Exposure Time(us)"), this));
     // gain

@@ -41,16 +41,18 @@
 ******************************************************************************/
 
 #include "cswidgets/cscombobox.h"
-#include <QFormLayout>
+
 #include <QListView>
 #include <QHBoxLayout>
+#include <QPushButton>
 #include <QDebug>
 
-CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent)
+CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent, const char* tips)
     : CSParaWidget(paraId, title, parent)
     , comboBox(new CustomComboBox(this))
     , titleLabel(new QLabel(this))
     , lastIndex(-1)
+    , tips(tips)
 {
     //setAttribute(Qt::WA_StyledBackground);
     setObjectName("CSComboBox");
@@ -61,6 +63,15 @@ CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent)
     titleLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     layout->addWidget(titleLabel);
     layout->addWidget(comboBox);
+
+    // add tips button
+    if (strlen(tips) > 0)
+    {
+        tipsButton = new QPushButton(this);
+        tipsButton->setObjectName("tipsButton");
+        layout->addWidget(tipsButton);
+    }
+
     layout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -130,5 +141,10 @@ void CSComboBox::retranslate(const char* context)
     if (strlen(paraName) > 0)
     {       
         titleLabel->setText(QApplication::translate(context, paraName));
+    }
+
+    if(tipsButton)
+    {
+        tipsButton->setToolTip(QApplication::translate(context, tips));
     }
 }

@@ -87,6 +87,7 @@ public:
     void saveFinished();
 
     void setCamera(std::shared_ptr<ICSCamera>& camera);
+    void setCameraCaptureConfig(const CameraCaptureConfig& config);
 signals:
     void captureStateChanged(int captureType, int state, QString message);
     void captureNumberUpdated(int, int);

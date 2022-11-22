@@ -82,8 +82,8 @@ static const QMap<int, const char*> STREAM_FORMAT_MAP =
 const QMap<int, const char*> CSCamera::AUTO_EXPOSURE_MODE_MAP =
 {
     { AUTO_EXPOSURE_MODE_CLOSE,             QT_TR_NOOP("Close")},
-    { AUTO_EXPOSURE_MODE_FIX_FRAMETIME,     QT_TR_NOOP("Fix Frame Rate")},
-    { AUTO_EXPOSURE_MODE_HIGH_QUALITY,      QT_TR_NOOP("High Quality")},
+    { AUTO_EXPOSURE_MODE_FIX_FRAMETIME,     QT_TR_NOOP("Speed First")},
+    { AUTO_EXPOSURE_MODE_HIGH_QUALITY,      QT_TR_NOOP("Quality First")},
     { AUTO_EXPOSURE_MODE_FORE_GROUND,       QT_TR_NOOP("Foreground")},
 };
 

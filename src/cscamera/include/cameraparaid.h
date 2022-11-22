@@ -60,7 +60,7 @@ namespace cs{
             PARA_TRIGGER_MODE,
             PARA_CAMERA_IP,
 
-            //depth
+            // depth
             PARA_DEPTH_STREAM_FORMAT,
             PARA_DEPTH_RESOLUTION,
             PARA_DEPTH_RANGE,

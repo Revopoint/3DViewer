@@ -112,6 +112,10 @@ void CameraCaptureTool::startCapture(CameraCaptureConfig config, bool autoNaming
             cameraCapture = new CameraCaptureSingle(config);
         }
     }
+    else 
+    {
+        cameraCapture->setCameraCaptureConfig(config);
+    }
 
     cameraCapture->setCamera(camera);
 
@@ -265,6 +269,11 @@ void CameraCaptureBase::saveFinished()
 void CameraCaptureBase::setCamera(std::shared_ptr<ICSCamera>& camera)
 {
     this->camera = camera;
+}
+
+void CameraCaptureBase::setCameraCaptureConfig(const CameraCaptureConfig& config)
+{
+    captureConfig = config;
 }
 
 void CameraCaptureBase::setOutputData(const OutputDataPort& outputDataPort)

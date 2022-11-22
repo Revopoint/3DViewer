@@ -64,6 +64,8 @@
         <file>resources/radio_button_select_hover.png</file>
         <file>resources/radio_button_unselect.png</file>
         <file>resources/radio_button_unselect_hover.png</file>
+        <file>resources/info.png</file>
+        <file>resources/info_hover.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>cameralist.ui</file>
