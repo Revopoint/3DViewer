@@ -326,7 +326,7 @@ public:
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE getPropertyExtension(PROPERTY_TYPE_EXTENSION propertyType, PropertyExtension &value) = 0;
-    
+
 	/**
 	* @~chinese
 	* @brief      获取指定类型数据流的内参

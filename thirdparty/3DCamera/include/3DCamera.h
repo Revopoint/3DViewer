@@ -17,7 +17,7 @@ extern "C" {
 #define LIB_3DCAMERA_MINOR_VERSION 2
 #endif	
 #ifndef	LIB_3DCAMERA_PATCH_VERSION
-#define LIB_3DCAMERA_PATCH_VERSION 9
+#define LIB_3DCAMERA_PATCH_VERSION 14
 #endif
 		
 #ifdef __cplusplus
