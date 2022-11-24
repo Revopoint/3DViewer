@@ -738,17 +738,28 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>RenderWidget3D</name>
     <message>
-        <location filename="../renderwidget3d.cpp" line="412"/>
-        <location filename="../renderwidget3d.cpp" line="496"/>
+        <location filename="../renderwidget3d.cpp" line="432"/>
+        <location filename="../renderwidget3d.cpp" line="565"/>
         <source>Home</source>
         <translation type="unfinished">归位</translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="417"/>
-        <location filename="../renderwidget3d.cpp" line="451"/>
-        <location filename="../renderwidget3d.cpp" line="493"/>
+        <location filename="../renderwidget3d.cpp" line="437"/>
+        <location filename="../renderwidget3d.cpp" line="507"/>
+        <location filename="../renderwidget3d.cpp" line="550"/>
         <source>Texture on</source>
         <translation type="unfinished">打开纹理</translation>
+    </message>
+    <message>
+        <location filename="../renderwidget3d.cpp" line="457"/>
+        <location filename="../renderwidget3d.cpp" line="557"/>
+        <source>Show trackball</source>
+        <translation type="unfinished">显示轨迹球</translation>
+    </message>
+    <message>
+        <location filename="../renderwidget3d.cpp" line="561"/>
+        <source>Hide trackball</source>
+        <translation type="unfinished">隐藏轨迹球</translation>
     </message>
     <message>
         <source>Save</source>
@@ -759,8 +770,8 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="obsolete">导出点云</translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="447"/>
-        <location filename="../renderwidget3d.cpp" line="489"/>
+        <location filename="../renderwidget3d.cpp" line="503"/>
+        <location filename="../renderwidget3d.cpp" line="546"/>
         <source>Texture off</source>
         <translation type="unfinished">关闭纹理</translation>
     </message>

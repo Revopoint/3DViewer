@@ -177,6 +177,34 @@ private:
     CSROIWidget* roiWidget;
 };
 
+typedef enum Axis
+{
+    X,
+    Y,
+    Z,
+    COUNT
+} Axis;
+
+class CSCustomCamera : public osg::Camera
+{
+public:
+    CSCustomCamera();
+    CSCustomCamera(CSCustomCamera const& copy, osg::CopyOp copyOp = osg::CopyOp::SHALLOW_COPY);
+    virtual ~CSCustomCamera();
+    META_Node(osg, CSCustomCamera);
+    inline void setMainCamera(Camera* camera) { mainCamera = camera; }
+    virtual void traverse(osg::NodeVisitor& nv);
+
+    void setOrthoProjection(bool isOrtho);
+    void setTran(osg::Vec3 tran);
+private:
+    void initCamera();
+protected:
+    osg::observer_ptr<Camera> mainCamera;
+    bool isOrthoProjection = false;
+    osg::Vec3 translate;
+};
+
 class RenderWidget3D : public RenderWidget
 {
     Q_OBJECT
@@ -201,6 +229,8 @@ private:
     void updateButtonArea();
     void initButtons();
     osg::ref_ptr<osg::MatrixTransform> makeCoordinate();
+    osg::ref_ptr<osg::MatrixTransform> makeTrackball();
+    osg::ref_ptr<osg::MatrixTransform> makeClock(int axis);
 signals:
     void show3DTextureChanged(bool texture);
 private:
@@ -209,11 +239,13 @@ private:
     osg::ref_ptr<osg::MatrixTransform> sceneNode;
     osg::ref_ptr<osg::Material> material;
     osg::ref_ptr<osg::Geometry> geom;
+    osg::ref_ptr<CSCustomCamera> trackballCamera;
 
     QPushButton* homeButton;
     QPushButton* textureButton;
     QPushButton* exitButton;
     QPushButton* fullScreenBtn;
+    QPushButton* trackballButton;
 
     QLabel* titlLabel;
     QWidget* topItem;

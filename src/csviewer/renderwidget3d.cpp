@@ -57,68 +57,75 @@
 #include <osgText/Text>
 #include <osg/Camera>
 #include <osg/Referenced>
+#include <osg/LineWidth>
 
 #include <osg/ShapeDrawable>
 
 #define AXIS_LEN  40
 #define AXIS_RADIUS 3
 
-typedef enum Axis
+CSCustomCamera::CSCustomCamera()
 {
-    X,
-    Y,
-    Z,
-    COUNT
-} Axis;
-
-class CSAxis : public osg::Camera
-{
-public:
-    CSAxis();
-    CSAxis(CSAxis const& copy, osg::CopyOp copyOp = osg::CopyOp::SHALLOW_COPY);
-    virtual ~CSAxis();
-    META_Node(osg, CSAxis);
-    inline void setMainCamera(Camera* camera) { mainCamera = camera; }
-    virtual void traverse(osg::NodeVisitor& nv);
-protected:
-    osg::observer_ptr<Camera> mainCamera;
-};
-
-CSAxis::CSAxis()
-{
+    initCamera();
 }
 
-CSAxis::CSAxis(CSAxis const& copy, osg::CopyOp copyOp)
+CSCustomCamera::CSCustomCamera(CSCustomCamera const& copy, osg::CopyOp copyOp)
     : Camera(copy, copyOp)
     , mainCamera(copy.mainCamera)
 {
+    initCamera();
 }
 
-CSAxis::~CSAxis()
+CSCustomCamera::~CSCustomCamera()
 {
 }
 
-void CSAxis::traverse(osg::NodeVisitor& nv)
+void CSCustomCamera::setOrthoProjection(bool isOrtho)
+{
+    isOrthoProjection = isOrtho;
+}
+
+void CSCustomCamera::setTran(osg::Vec3 tran)
+{
+    translate = tran;
+}
+
+void CSCustomCamera::traverse(osg::NodeVisitor& nv)
 {
    osg::Viewport* viewPort =  mainCamera->getViewport();
-   const int halfWidth = viewPort->width() / 2;
-   const int halfHeight = viewPort->width() / 2;
+   const int width = viewPort->width();
+   const int height = viewPort->height();
 
-   const int space = 20;
-   this->setProjectionMatrixAsOrtho(-halfWidth, halfWidth, -halfHeight, halfHeight, -200.0, 200.0);
-   setViewport(0, 0, halfWidth * 2, halfHeight * 2);
+   if (isOrthoProjection)
+   {
+       setProjectionMatrixAsOrtho(-width / 2, width / 2, -height / 2, height / 2, -1000.0, 1000.0);
+       const int space = 20;      
+       translate = osg::Vec3(width/2 - AXIS_LEN - space, -height/2 + AXIS_LEN + space, -AXIS_LEN);
+   }
+   else 
+   {
+       setProjectionMatrixAsPerspective(30.0f, static_cast<double>(viewPort->width()) / static_cast<double>(viewPort->height()), 1.0f, 10000.0f);
+   }
 
-   osg::Vec3 trans(halfWidth- AXIS_LEN - space, -halfHeight + AXIS_LEN + space, -AXIS_LEN);
+   setViewport(0, 0, width, height);
 
     if (mainCamera.valid() && nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
     {
         osg::Matrix matrix = mainCamera->getViewMatrix();
-        matrix.setTrans(trans);
+        matrix.setTrans(translate);
 
         this->setViewMatrix(matrix);
     }
 
     osg::Camera::traverse(nv);
+}
+
+void CSCustomCamera::initCamera()
+{
+    setRenderOrder(osg::Camera::POST_RENDER);
+    setClearMask(GL_DEPTH_BUFFER_BIT);
+    setAllowEventFocus(false);
+    setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 }
 
 RenderWidget3D::RenderWidget3D(int renderId, QWidget* parent)
@@ -170,6 +177,7 @@ void RenderWidget3D::initWindow()
     camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     camera->setComputeNearFarMode(osg::Camera::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
     camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(osgQOpenGLWidgetPtr->width()) / static_cast<double>(osgQOpenGLWidgetPtr->height()), 1.0f, 10000.0f);
+
     //camera->setViewport(0, 0, width(), height());
 
     pViewer->setKeyEventSetsDone(0);
@@ -201,9 +209,9 @@ void RenderWidget3D::initWindow()
 
     osgGA::TrackballManipulator* manipulator = new osgGA::TrackballManipulator();
     pViewer->setCameraManipulator(manipulator);
-    
+
     manipulator->setNode(sceneNode);
-    manipulator->setTrackballSize(0.5);
+    manipulator->setTrackballSize(1000);
     manipulator->setAllowThrow(false);
 
     //rotate show
@@ -220,23 +228,35 @@ void RenderWidget3D::initWindow()
 
     initNode();
 
-    connect(homeButton, &QPushButton::clicked, this, [=]() {
+    connect(homeButton, &QPushButton::clicked, this, [=]() 
+        {
             pViewer->home();
         });
 
     osg::ref_ptr<osg::MatrixTransform> axis = makeCoordinate();
 
-    osg::ref_ptr<CSAxis> csAxes = new CSAxis;
+    osg::ref_ptr<CSCustomCamera> csAxes = new CSCustomCamera;
     csAxes->addChild(axis);
     csAxes->setMainCamera(pViewer->getCamera());
-    csAxes->setRenderOrder(osg::Camera::POST_RENDER);
-    csAxes->setClearMask(GL_DEPTH_BUFFER_BIT);
-    csAxes->setAllowEventFocus(false);
-    csAxes->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-    
-    //coordAxis->setMatrix(matrix);
+    csAxes->setOrthoProjection(true);
 
     rootNode->addChild(csAxes);
+
+    // make trackball
+    // set line property
+    osg::ref_ptr<osg::LineWidth> lineSize = new osg::LineWidth;
+    lineSize->setWidth(2.0);
+    osg::ref_ptr<osg::StateSet> stateSet = rootNode->getOrCreateStateSet();
+    stateSet->setAttributeAndModes(lineSize, osg::StateAttribute::ON);
+
+    osg::ref_ptr<osg::MatrixTransform> trackball = makeTrackball();
+    trackballCamera = new CSCustomCamera;
+    trackballCamera->addChild(trackball);
+    trackballCamera->setMainCamera(pViewer->getCamera());
+    trackballCamera->setOrthoProjection(false);
+    trackballCamera->setTran(osg::Vec3(0, 0, -500));
+
+    rootNode->addChild(trackballCamera);
 
     osgQOpenGLWidgetPtr->mutex()->writeLock();
     isReady = true;
@@ -429,12 +449,51 @@ void RenderWidget3D::initButtons()
             emit renderExit(renderId);
         });
 
+    // trackball 
+    trackballButton = new QPushButton(this);
+    trackballButton->setObjectName("TrackballButton");
+    trackballButton->setCheckable(true);
+    trackballButton->setChecked(true);
+    trackballButton->setToolTip(tr("Hide trackball"));
+
+    QIcon icon3;
+    icon3.addFile(QStringLiteral(":/resources/trackball_off.png"), QSize(), QIcon::Normal, QIcon::Off);
+    icon3.addFile(QStringLiteral(":/resources/trackball_on.png"), QSize(), QIcon::Active, QIcon::On);
+    icon3.addFile(QStringLiteral(":/resources/trackball_on.png"), QSize(), QIcon::Selected, QIcon::On);
+
+    trackballButton->setIconSize(QSize(28, 28));
+    trackballButton->setIcon(icon3);
+    connect(trackballButton, &QPushButton::toggled, this,
+        [=](bool checked)
+        {
+            if (!checked)
+            {
+                if (trackballCamera.valid())
+                {
+                    rootNode->removeChild(trackballCamera);
+                }
+                trackballButton->setToolTip(tr("Show trackball"));
+            }
+            else
+            {
+                if (trackballCamera.valid())
+                {
+                    rootNode->addChild(trackballCamera);
+                }
+                trackballButton->setToolTip(tr("Hide trackball"));
+            }
+
+            onRenderDataUpdated(lastPointCloud, lastTextureImage);
+        });
+    
+
     QHBoxLayout* layout = new QHBoxLayout(topItem);
 
     titlLabel = new QLabel("Point Cloud", topItem);
     layout->addWidget(titlLabel);
     layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
     layout->addWidget(textureButton);
+    layout->addWidget(trackballButton);
     layout->addWidget(homeButton);
     layout->addWidget(exitButton);
 
@@ -455,6 +514,7 @@ void RenderWidget3D::initButtons()
             emit show3DTextureChanged(toggled);
         });
 
+    // bottom item
     layout = new QHBoxLayout(bottomItem);
     layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
     layout->setContentsMargins(0, 0, 15, 10);
@@ -491,6 +551,18 @@ void RenderWidget3D::onTranslate()
     else
     {
         textureButton->setToolTip(tr("Texture on"));
+    }
+
+    if (trackballButton)
+    {
+        if (!trackballButton->isChecked())
+        {
+            trackballButton->setToolTip(tr("Show trackball"));
+        }
+        else 
+        {
+            trackballButton->setToolTip(tr("Hide trackball"));
+        }
     }
 
     homeButton->setToolTip(tr("Home"));
@@ -573,6 +645,66 @@ osg::ref_ptr<osg::MatrixTransform> RenderWidget3D::makeCoordinate()
 
         group->addChild(axisTransform.get());
     }
+
+    return group;
+}
+
+osg::ref_ptr<osg::MatrixTransform> RenderWidget3D::makeClock(int axis)
+{
+    osg::ref_ptr<osg::MatrixTransform> root = new osg::MatrixTransform();
+    osg::ref_ptr<osg::Geometry> clockGeometry = new osg::Geometry;
+    root->addChild(clockGeometry);
+
+    osg::ref_ptr<osg::Vec3Array> allPoints = new osg::Vec3Array;
+    osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array;
+
+    osg::Matrix matrix;
+    osg::Vec4f color;
+
+    switch (axis)
+    {
+    case X:
+        matrix.setRotate(osg::Quat(-osg::PI_2, osg::Z_AXIS));
+        color = osg::Vec4f(1.0, 0, 0, 1.0);
+        break;
+    case Y:
+        color = osg::Vec4f(0.0, 1.0, 0, 1.0);
+        break;
+    case Z:
+        color = osg::Vec4f(0.0, 0, 1.0, 1.0);
+        matrix.setRotate(osg::Quat(-osg::PI_2, osg::X_AXIS));
+        break;
+    default:
+        break;
+    }
+
+    for (double i = 0.0; i < 6.28; i += 0.02) {
+        colors->push_back(color);
+        allPoints->push_back(osg::Vec3(50 * sin(i), -0.0, 50 * cos(i)));
+    }
+
+    clockGeometry->setVertexArray(allPoints);
+    clockGeometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::LINE_LOOP, 0, allPoints->size()));
+
+    clockGeometry->setColorArray(colors);
+    clockGeometry->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+    
+    root->setMatrix(matrix);
+
+    return root;
+}
+
+osg::ref_ptr<osg::MatrixTransform> RenderWidget3D::makeTrackball()
+{
+    osg::ref_ptr<osg::MatrixTransform> group = new osg::MatrixTransform();
+
+    osg::ref_ptr<osg::MatrixTransform>  geo1 = makeClock(X);
+    osg::ref_ptr<osg::MatrixTransform>  geo2 = makeClock(Y);
+    osg::ref_ptr<osg::MatrixTransform>  geo3 = makeClock(Z);
+
+    group->addChild(geo1);
+    group->addChild(geo2);
+    group->addChild(geo3);
 
     return group;
 }
