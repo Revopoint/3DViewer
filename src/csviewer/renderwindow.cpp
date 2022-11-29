@@ -426,3 +426,14 @@ void RenderWindow::setShowTextureEnable(bool enable)
 {
     showTextureEnable = enable;
 }
+
+void RenderWindow::onTranslate()
+{
+    for (auto widget : renderWidgets.values())
+    {
+        if (widget)
+        {
+            widget->onTranslate();
+        }
+    }
+}

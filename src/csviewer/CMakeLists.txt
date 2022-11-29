@@ -123,6 +123,8 @@ add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/themes "${CP_RES_DIR}/themes/"
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CP_RES_DIR}/translations/"
     COMMAND ${CMAKE_COMMAND} -E copy ${QM_FILES} "${CP_RES_DIR}/translations/"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CP_RES_DIR}/document/"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/../document/manual "${CP_RES_DIR}/document/manual"
 )
 
 if(WIN32)

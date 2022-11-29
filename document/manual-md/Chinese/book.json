@@ -1,0 +1,21 @@
+{
+    "plugins": [ 
+        "expandable-chapters",
+        "-sharing",
+        "back-to-top-button"
+    ],
+    
+    "pluginsConfig": {
+    },
+   
+    "links": {
+
+    },
+    "title": "3DViewer",
+    "author": "Revopoint",
+    "description": "3DViewer user manual",
+    "language": "zh-hans",
+    "structure": {
+        "readme": "README.md"
+    }
+}

@@ -6,3 +6,7 @@ vs2015*
 *.aps
 build*
 *.user
+document/manual-md/English/_book
+document/manual-md/Chinese/node_modules
+document/manual-md/Chinese/_book
+document/manual-md/English/node_modules

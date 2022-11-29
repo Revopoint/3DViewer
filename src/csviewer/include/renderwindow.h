@@ -60,6 +60,7 @@ public:
     void onWindowLayoutUpdated();
     void hideRenderFps();
     void setShowTextureEnable(bool enable);
+    void onTranslate();
 signals:
     void roiRectFUpdated(QRectF rect);
     void renderExit(int renderId);

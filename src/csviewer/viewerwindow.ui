@@ -112,6 +112,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionManual"/>
     <addaction name="actionGithub"/>
     <addaction name="actionWebSite"/>
     <addaction name="actionOpenLogDir"/>
@@ -263,6 +264,11 @@
    </property>
    <property name="text">
     <string>Tabs</string>
+   </property>
+  </action>
+  <action name="actionManual">
+   <property name="text">
+    <string>Manual</string>
    </property>
   </action>
  </widget>

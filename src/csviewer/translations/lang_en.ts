@@ -76,7 +76,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="356"/>
+        <location filename="../viewerwindow.cpp" line="357"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,83 +85,83 @@
         <translation type="obsolete">Camera List</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="174"/>
-        <location filename="../viewerwindow.cpp" line="410"/>
+        <location filename="../viewerwindow.cpp" line="175"/>
+        <location filename="../viewerwindow.cpp" line="411"/>
         <source>Set default save path </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="244"/>
+        <location filename="../viewerwindow.cpp" line="245"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="247"/>
+        <location filename="../viewerwindow.cpp" line="248"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="250"/>
+        <location filename="../viewerwindow.cpp" line="251"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="253"/>
+        <location filename="../viewerwindow.cpp" line="254"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="256"/>
+        <location filename="../viewerwindow.cpp" line="257"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="259"/>
+        <location filename="../viewerwindow.cpp" line="260"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="262"/>
+        <location filename="../viewerwindow.cpp" line="263"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="265"/>
+        <location filename="../viewerwindow.cpp" line="266"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="268"/>
+        <location filename="../viewerwindow.cpp" line="269"/>
         <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="271"/>
+        <location filename="../viewerwindow.cpp" line="272"/>
         <source>Preview has been paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="274"/>
+        <location filename="../viewerwindow.cpp" line="275"/>
         <source>Restarting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="277"/>
+        <location filename="../viewerwindow.cpp" line="278"/>
         <source>Stopping preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="280"/>
+        <location filename="../viewerwindow.cpp" line="281"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="350"/>
+        <location filename="../viewerwindow.cpp" line="351"/>
         <source>Set default save path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="431"/>
+        <location filename="../viewerwindow.cpp" line="434"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -258,6 +258,11 @@
     <message>
         <location filename="../viewerwindow.ui"/>
         <source>Playback</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>Manual</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -592,32 +597,34 @@ and the image quality of objects farther away may become worse.</translation>
     <name>RenderWidget3D</name>
     <message>
         <location filename="../renderwidget3d.cpp" line="432"/>
-        <location filename="../renderwidget3d.cpp" line="565"/>
+        <location filename="../renderwidget3d.cpp" line="568"/>
         <source>Home</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../renderwidget3d.cpp" line="437"/>
-        <location filename="../renderwidget3d.cpp" line="507"/>
-        <location filename="../renderwidget3d.cpp" line="550"/>
+        <location filename="../renderwidget3d.cpp" line="510"/>
+        <location filename="../renderwidget3d.cpp" line="553"/>
         <source>Texture on</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../renderwidget3d.cpp" line="475"/>
+        <location filename="../renderwidget3d.cpp" line="560"/>
+        <source>Show track ball</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../renderwidget3d.cpp" line="457"/>
-        <location filename="../renderwidget3d.cpp" line="557"/>
-        <source>Show trackball</source>
+        <location filename="../renderwidget3d.cpp" line="483"/>
+        <location filename="../renderwidget3d.cpp" line="564"/>
+        <source>Hide track ball</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../renderwidget3d.cpp" line="503"/>
-        <location filename="../renderwidget3d.cpp" line="546"/>
+        <location filename="../renderwidget3d.cpp" line="506"/>
+        <location filename="../renderwidget3d.cpp" line="549"/>
         <source>Texture off</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../renderwidget3d.cpp" line="561"/>
-        <source>Hide trackball</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

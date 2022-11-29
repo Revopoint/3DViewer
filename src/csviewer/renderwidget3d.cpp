@@ -454,7 +454,7 @@ void RenderWidget3D::initButtons()
     trackballButton->setObjectName("TrackballButton");
     trackballButton->setCheckable(true);
     trackballButton->setChecked(true);
-    trackballButton->setToolTip(tr("Hide trackball"));
+    trackballButton->setToolTip(tr("Hide track ball"));
 
     QIcon icon3;
     icon3.addFile(QStringLiteral(":/resources/trackball_off.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -472,7 +472,7 @@ void RenderWidget3D::initButtons()
                 {
                     rootNode->removeChild(trackballCamera);
                 }
-                trackballButton->setToolTip(tr("Show trackball"));
+                trackballButton->setToolTip(tr("Show track ball"));
             }
             else
             {
@@ -480,7 +480,7 @@ void RenderWidget3D::initButtons()
                 {
                     rootNode->addChild(trackballCamera);
                 }
-                trackballButton->setToolTip(tr("Hide trackball"));
+                trackballButton->setToolTip(tr("Hide track ball"));
             }
 
             onRenderDataUpdated(lastPointCloud, lastTextureImage);
@@ -557,11 +557,11 @@ void RenderWidget3D::onTranslate()
     {
         if (!trackballButton->isChecked())
         {
-            trackballButton->setToolTip(tr("Show trackball"));
+            trackballButton->setToolTip(tr("Show track ball"));
         }
         else 
         {
-            trackballButton->setToolTip(tr("Hide trackball"));
+            trackballButton->setToolTip(tr("Hide track ball"));
         }
     }
 

@@ -114,6 +114,7 @@ private slots:
     void onTriggeredIpSetting();
     void onTriggeredLoadFile();
     void onTriggeredFormatConvert();
+    void onTriggeredManual();
 
     void onAppExit();
 private slots:

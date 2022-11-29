@@ -75,6 +75,7 @@ public:
         return renderId; 
     }
     virtual void setShowFullScreen(bool value) {}
+    virtual void onTranslate() {}
 signals:
     void renderExit(int renderId);
     void fullScreenUpdated(int renderID, bool value);
@@ -99,7 +100,7 @@ public:
 
     void hideRenderFps();
     void setShowFullScreen(bool value) override;
-    void onTranslate();
+    void onTranslate() override;
 public slots:
     void onRenderDataUpdated(OutputData2D outputData);
 protected:
@@ -212,7 +213,7 @@ public:
     RenderWidget3D(int renderId, QWidget* parent = nullptr);
     ~RenderWidget3D();
 
-    void onTranslate();
+    void onTranslate() override;
     void setTextureEnable(bool enable);
     void setShowFullScreen(bool value) override;
 public slots:

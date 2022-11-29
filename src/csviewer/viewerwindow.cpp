@@ -150,6 +150,7 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
     suc &= (bool)connect(ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
     suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
+    suc &= (bool)connect(ui->actionManual,            &QAction::triggered,   this, &ViewerWindow::onTriggeredManual);
 
     suc &= (bool)connect(ui->actionTile,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTile);
     suc &= (bool)connect(ui->actionTabs,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTabs);
@@ -424,6 +425,8 @@ void ViewerWindow::onTranslate()
     {
         cameraPlayerDialog->onTranslate();
     }
+
+    ui->renderWindow->onTranslate();
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
@@ -637,4 +640,20 @@ void ViewerWindow::onAutoNameMenuTriggered(QAction* action)
 
     auto config = cs::CSApplication::getInstance()->getAppConfig();
     config->setAutoNameWhenCapturing(autoName);
+}
+
+// If the current language is Chinese, open the Chinese manual or English manual
+void ViewerWindow::onTriggeredManual()
+{
+    QString manualPath = QString("%1/document/manual").arg(APP_PATH);
+    if (language == LANGUAGE_ZH)
+    {
+        manualPath += "/Chinese/index.html";
+    }
+    else 
+    {
+        manualPath += "/English/index.html";
+    }
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(manualPath));
 }
