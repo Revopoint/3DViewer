@@ -56,10 +56,11 @@ namespace cs{
             PARA_HAS_DEPTH = 0,
             PARA_HAS_RGB,
             PARA_EXTRINSICS,
-            PARA_DEPTH_HAS_LR,
+            PARA_DEPTH_HAS_IR,
             PARA_TRIGGER_MODE,
+            PARA_CAMERA_IP,
 
-            //depth
+            // depth
             PARA_DEPTH_STREAM_FORMAT,
             PARA_DEPTH_RESOLUTION,
             PARA_DEPTH_RANGE,

@@ -45,6 +45,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QtMath>
+#include <QPainterPath>
 
 CSProgressBar::CSProgressBar(QWidget* parent)
     : QDialog(parent)
@@ -87,10 +88,10 @@ void CSProgressBar::paintEvent(QPaintEvent* ev)
     minWidth = qMin(rec.width(), rec.height()) / 2;
 
     QConicalGradient gradient(rec.center(), startAngle);
-    gradient.setColorAt(0, QColor(90, 112, 169));
+    gradient.setColorAt(0, QColor(0, 169, 255));
     gradient.setColorAt(0.4, Qt::white);
     gradient.setColorAt(0.6, Qt::white);
-    gradient.setColorAt(1, QColor(90, 112, 169));
+    gradient.setColorAt(1, QColor(0, 169, 255));
 
     QPainterPath path;
     path.addEllipse(rec.center(), minWidth, minWidth);

@@ -53,9 +53,13 @@
 #include <algorithm>
 #include <3DCamera.hpp>
 
-static CSRange DEPTH_RANGE_LIMIT = { 0, 65535 };
+static CSRange DEPTH_RANGE_LIMIT = { 0, 10000 };
 static CSRange CAMERA_HDR_LEVEL_RANGE = { 2,8 };
 #define HDR_SCALE_DEFAULT  5
+
+#ifdef _DEBUG
+    #define _CS_DEBUG_
+#endif
 
 using namespace cs;
 using namespace cs::parameter;
@@ -78,8 +82,8 @@ static const QMap<int, const char*> STREAM_FORMAT_MAP =
 const QMap<int, const char*> CSCamera::AUTO_EXPOSURE_MODE_MAP =
 {
     { AUTO_EXPOSURE_MODE_CLOSE,             QT_TR_NOOP("Close")},
-    { AUTO_EXPOSURE_MODE_FIX_FRAMETIME,     QT_TR_NOOP("Fix Frame Rate")},
-    { AUTO_EXPOSURE_MODE_HIGH_QUALITY,      QT_TR_NOOP("High Quality")},
+    { AUTO_EXPOSURE_MODE_FIX_FRAMETIME,     QT_TR_NOOP("Speed First")},
+    { AUTO_EXPOSURE_MODE_HIGH_QUALITY,      QT_TR_NOOP("Quality First")},
     { AUTO_EXPOSURE_MODE_FORE_GROUND,       QT_TR_NOOP("Foreground")},
 };
 
@@ -129,7 +133,8 @@ static const QMap<CAMERA_PARA_ID, int> CAMERA_EXTENSION_PROPERTY_MAP =
     { PARA_DEPTH_SCALE,            PROPERTY_EXT_DEPTH_SCALE },  
     { PARA_DEPTH_ROI,              PROPERTY_EXT_DEPTH_ROI },
     { PARA_DEPTH_RANGE,            PROPERTY_EXT_DEPTH_RANGE },
-    { PARA_TRIGGER_MODE,           PROPERTY_EXT_TRIGGER_MODE }
+    { PARA_TRIGGER_MODE,           PROPERTY_EXT_TRIGGER_MODE },
+    { PARA_CAMERA_IP,              PROPERTY_EXT_CAMERA_IP }
 };
 
 static const QList<CAMERA_PARA_ID> CAMERA_OPTION_PARA_LIST =
@@ -163,7 +168,8 @@ static const QMap<CAMERA_PARA_ID, QVariant> CAMERA_DEFAULT_PARA_VALUE =
 {
     { PARA_DEPTH_RANGE,          QVariant::fromValue(QPair<float, float>({ 50.0f, 2000.0f })) },
     { PARA_DEPTH_GAIN,           1.0f },
-    { PARA_DEPTH_EXPOSURE,       7000.0f }
+    { PARA_DEPTH_EXPOSURE,       7000.0f },
+    { PARA_TRIGGER_MODE,         (int)TRIGGER_MODE_OFF}
 };
 
 int CSCamera::setCameraChangeCallback(CameraChangeCallback callback, void* userData)
@@ -192,8 +198,7 @@ static void depthCallback(cs::IFramePtr frame, void* usrData)
     CSCamera* camera = (CSCamera*)usrData;
 
     FrameData frameData;
-    frameData.frameDataType = TYPE_DEPTH;
-    camera->onProcessFrame(frame, frameData);
+    camera->onProcessFrame(TYPE_DEPTH, frame, frameData);
    
     emit camera->framedDataUpdated(frameData);
 }
@@ -203,8 +208,7 @@ static void rgbCallback(cs::IFramePtr frame, void* usrData)
     CSCamera* camera = (CSCamera*)usrData;
 
     FrameData frameData;
-    frameData.frameDataType = TYPE_RGB;
-    camera->onProcessFrame(frame, frameData);
+    camera->onProcessFrame(TYPE_RGB, frame, frameData);
     emit camera->framedDataUpdated(frameData);
 }
 
@@ -246,6 +250,7 @@ CSCamera::CSCamera()
     , cachedDepthExposure(0)
     , cachedDepthGain(0)
     , triggerMode(TRIGGER_MODE_OFF)
+    , depthScale(0.1)
 {
     manualHdrSetting.count = 0;
 }
@@ -278,7 +283,6 @@ bool CSCamera::startStream()
 
     qInfo() << "begin start stream";
     setCameraState(CAMERA_STARTING_STREAM);
-
     bool result = true;
     if (isDepthStreamSup)
     {
@@ -328,9 +332,7 @@ void CSCamera::onStreamStarted()
     // get depth scale
     PropertyExtension propExt;
     ERROR_CODE ret = cameraPtr->getPropertyExtension(PROPERTY_EXT_DEPTH_SCALE, propExt);
-
-    DEPTH_RANGE_LIMIT.min = 20;
-    DEPTH_RANGE_LIMIT.max = 65535 * propExt.depthScale;
+    depthScale = propExt.depthScale;
 }
 
 bool CSCamera::stopStream()
@@ -792,41 +794,35 @@ void CSCamera::onGetFrame(int timeout)
         //cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
         //cameraPtr->getFrame(STREAM_TYPE_RGB, rgbFrame, timeout);
 
-        frameData.frameDataType = TYPE_UNKNOW;
-
-        if (onProcessFrame(depthFrame, frameData))
-        {
-            frameData.frameDataType = (FRAME_DATA_TYPE)(frameData.frameDataType | TYPE_DEPTH);
-        }
-
-        if (onProcessFrame(rgbFrame, frameData))
-        {
-            frameData.frameDataType = (FRAME_DATA_TYPE)(frameData.frameDataType | TYPE_RGB);
-        }
+        onProcessFrame(TYPE_DEPTH, depthFrame, frameData);
+        onProcessFrame(TYPE_RGB, rgbFrame, frameData);
     }
     else
     {
         IFramePtr depthFrame;
         cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
-
-        frameData.frameDataType = TYPE_DEPTH;
-        onProcessFrame(depthFrame, frameData);
+        onProcessFrame(TYPE_DEPTH, depthFrame, frameData);
     }
 
     if (frameData.data.size() > 0)
     {
+        frameData.rgbIntrinsics = rgbIntrinsics;
+        frameData.depthIntrinsics = depthIntrinsics;
+        frameData.extrinsics = extrinsics;
+        frameData.depthScale = depthScale;
+
         emit framedDataUpdated(frameData);
     }
 }
 
-bool CSCamera::onProcessFrame(const IFramePtr& frame, FrameData& frameData)
+bool CSCamera::onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, FrameData& frameData)
 {
     if (!frame || frame->empty())
     {
         return false;
     }
 
-    StreamDataInfo streamDataInfo = { frame->getFormat(),frame->getWidth(), frame->getHeight() };
+    StreamDataInfo streamDataInfo = { streamDataType, frame->getFormat(),frame->getWidth(), frame->getHeight(), frame->getTimeStamp()};
     const int dataSize = frame->getSize();
 
     //copy data
@@ -922,19 +918,16 @@ void CSCamera::getUserParaPrivate(CAMERA_PARA_ID paraId, QVariant& value)
         value = (int)rgbFormat;
         break;
     case PARA_RGB_RESOLUTION:
-        value = depthResolution;
+        value = rgbResolution;
         break;
     case PARA_HAS_RGB:
         value = isRgbStreamSup;
         break;
-    case PARA_DEPTH_HAS_LR:
+    case PARA_DEPTH_HAS_IR:
         value = hasIrStream;
         break;
     case PARA_HAS_DEPTH:
         value = hasDepthStream;
-        break;
-    case PARA_DEPTH_ROI:
-        value = roiRectF;
         break;
     case PARA_DEPTH_INTRINSICS:
         value = QVariant::fromValue(depthIntrinsics);
@@ -1054,8 +1047,8 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
     switch (paraId)
     {
     case PARA_DEPTH_AUTO_EXPOSURE:
-        onParaUpdatedDelay(PARA_DEPTH_GAIN, 3000);
-        onParaUpdatedDelay(PARA_DEPTH_EXPOSURE, 3000);
+        //onParaUpdatedDelay(PARA_DEPTH_GAIN, 3000);
+        //onParaUpdatedDelay(PARA_DEPTH_EXPOSURE, 3000);
         break;
     case PARA_DEPTH_FILTER_TYPE:
         emit cameraParaRangeUpdated(PARA_DEPTH_FILTER);
@@ -1086,11 +1079,11 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
         } 
         break;
     case PARA_RGB_AUTO_EXPOSURE:
-        onParaUpdatedDelay(PARA_RGB_EXPOSURE, 3000);
-        onParaUpdatedDelay(PARA_RGB_GAIN, 3000);
+        //onParaUpdatedDelay(PARA_RGB_EXPOSURE, 3000);
+        //onParaUpdatedDelay(PARA_RGB_GAIN, 3000);
         break;
     case PARA_RGB_AUTO_WHITE_BALANCE:
-        onParaUpdatedDelay(PARA_RGB_WHITE_BALANCE, 3000);
+        //onParaUpdatedDelay(PARA_RGB_WHITE_BALANCE, 3000);
         break;
     case PARA_TRIGGER_MODE:
         onTriggerModeChanged(value.toInt() == TRIGGER_MODE_SOFTWAER);
@@ -1167,6 +1160,10 @@ void CSCamera::getCameraParaItems(CAMERA_PARA_ID paraId, QList<QPair<QString, QV
     case PARA_DEPTH_HDR_LEVEL:
         getHdrLevels(list);
         break;
+    case PARA_DEPTH_GAIN:
+    case PARA_RGB_GAIN:
+        getGains(paraId, list);
+        break;
     default:
         break;
     }
@@ -1174,6 +1171,12 @@ void CSCamera::getCameraParaItems(CAMERA_PARA_ID paraId, QList<QPair<QString, QV
 
 void CSCamera::getPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& value)
 {
+    if (getCameraState() != CAMERA_STARTED_STREAM)
+    {
+        qWarning() << "get property failed, stream not started.";
+        return;
+    }
+
     float v = 0;
 
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
@@ -1186,27 +1189,37 @@ void CSCamera::getPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& value)
         Q_ASSERT(false);
     }
 
+    if (paraId == PARA_RGB_EXPOSURE)
+    {
+        correctExposureValue(v);
+    }
+
     value = v;
 
-#ifdef  _DEBUG
+#ifdef  _CS_DEBUG_
     qDebug() << "getPropertyPrivate, paraId : " << metaEnum.valueToKey(paraId) << ", v  = " << v;
 #endif
 }
 
 void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
 {
-#ifdef  _DEBUG
+#ifdef  _CS_DEBUG_
     qDebug() << "setPropertyPrivate, paraId : " << metaEnum.valueToKey(paraId) << ", value  = " << value.toFloat();
 #endif
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
     PROPERTY_TYPE propertyType = (PROPERTY_TYPE)CAMERA_PROPERTY_MAP[paraId].id;
 
-    const float valueF = value.toFloat();
+    float valueF = value.toFloat();
 
     // set frame time before set depth exposure
     if (paraId == PARA_DEPTH_EXPOSURE)
     {
         updateFrametime(valueF);
+    }
+
+    if (paraId == PARA_RGB_EXPOSURE)
+    {
+        convertExposureValue(valueF);
     }
 
     ERROR_CODE ret = cameraPtr->setProperty(streamType, propertyType, valueF);
@@ -1232,6 +1245,11 @@ void CSCamera::getPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVa
         qWarning() << "get camera property range failed, paraId:" << paraId << ",ret:" << ret;
         Q_ASSERT(false);
         return;
+    }
+
+    if (paraId == PARA_RGB_EXPOSURE)
+    {
+        correctExposureRange(minf, maxf, stepf);
     }
 
     min = minf;
@@ -1297,14 +1315,24 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
     case PROPERTY_EXT_DEPTH_SCALE:
         value = propExt.depthScale;
         break;  
-    case PROPERTY_EXT_DEPTH_ROI:
-        value = roiRectF;
+    case PROPERTY_EXT_DEPTH_ROI: 
+    {
+        QRectF roiRect;
+        roiRect.setLeft(propExt.depthRoi.left * 1.0 / 100);
+        roiRect.setTop(propExt.depthRoi.top * 1.0 / 100);
+        roiRect.setRight(propExt.depthRoi.right * 1.0 / 100);
+        roiRect.setBottom(propExt.depthRoi.bottom * 1.0 / 100);
+        value = roiRect;
         break;
+    }
     case PROPERTY_EXT_DEPTH_RANGE:
-        value = QVariant::fromValue(QPair<float, float>{ (float)propExt.depthRange.min, (float)propExt.depthRange.max });
+        value = QVariant::fromValue(QPair<float, float>{ (float)propExt.depthRange.min, (float)propExt.depthRange.max});
         break;
     case PROPERTY_EXT_TRIGGER_MODE:
         value = (int)propExt.triggerMode;
+        break;
+    case PROPERTY_EXT_CAMERA_IP:
+        value = QVariant::fromValue(propExt.cameraIp);
         break;
     default:
         Q_ASSERT(false);
@@ -1315,7 +1343,7 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
 void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
 {
     PROPERTY_TYPE_EXTENSION type = (PROPERTY_TYPE_EXTENSION)CAMERA_EXTENSION_PROPERTY_MAP[paraId];
-    
+
     PropertyExtension propExt;
     switch (type)
     {
@@ -1326,52 +1354,54 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
         propExt.algorithmContrast = value.toInt();
         break;
     case PROPERTY_EXT_HDR_MODE:
+    {
+        // cached exposure and gain
+        if (hdrMode == HDR_MODE_CLOSE && value.toInt() != HDR_MODE_CLOSE)
         {
-            // cached exposure and gain
-            if (hdrMode == HDR_MODE_CLOSE && value.toInt() != HDR_MODE_CLOSE)
-            {
-                QVariant tmp;
-                getCameraPara(PARA_DEPTH_EXPOSURE, tmp);
-                cachedDepthExposure = qRound(tmp.toFloat());
+            QVariant tmp;
+            getCameraPara(PARA_DEPTH_EXPOSURE, tmp);
+            cachedDepthExposure = qRound(tmp.toFloat());
 
-                getCameraPara(PARA_DEPTH_GAIN, tmp);
-                cachedDepthGain = qRound(tmp.toFloat());
-            }
-            // update HDR mode
-            hdrMode = (CAMERA_HDR_MODE)value.toInt();
-            int autoHdrMode = getAutoHdrMode(hdrMode);
-            propExt.hdrMode = (HDR_MODE)autoHdrMode;
-            break;
+            getCameraPara(PARA_DEPTH_GAIN, tmp);
+            cachedDepthGain = qRound(tmp.toFloat());
         }
-    case PROPERTY_EXT_HDR_EXPOSURE:
-        propExt.hdrExposureSetting = value.value<HdrExposureSetting>();   
+        // update HDR mode
+        hdrMode = (CAMERA_HDR_MODE)value.toInt();
+        int autoHdrMode = getAutoHdrMode(hdrMode);
+        propExt.hdrMode = (HDR_MODE)autoHdrMode;
         break;
-    case PROPERTY_EXT_HDR_SCALE_SETTING: 
-        {
-            HdrScaleSetting settings;
-            setHdrTimes(settings, value.toInt());
-            propExt.hdrScaleSetting = settings;
-            break;
-        }
+    }
+    case PROPERTY_EXT_HDR_EXPOSURE:
+        propExt.hdrExposureSetting = value.value<HdrExposureSetting>();
+        break;
+    case PROPERTY_EXT_HDR_SCALE_SETTING:
+    {
+        HdrScaleSetting settings;
+        setHdrTimes(settings, value.toInt());
+        propExt.hdrScaleSetting = settings;
+        break;
+    }
     case PROPERTY_EXT_DEPTH_ROI:
-        {
-            QRectF roiRect = value.toRectF();
-            propExt.depthRoi.top    = roiRect.top() * 100;
-            propExt.depthRoi.left   = roiRect.left() * 100;
-            propExt.depthRoi.right  = roiRect.right() * 100;
-            propExt.depthRoi.bottom = roiRect.bottom() * 100;
-            roiRectF = roiRect;
-            break;
-        }
+    {
+        QRectF roiRect = value.toRectF();
+        propExt.depthRoi.top = roiRect.top() * 100;
+        propExt.depthRoi.left = roiRect.left() * 100;
+        propExt.depthRoi.right = roiRect.right() * 100;
+        propExt.depthRoi.bottom = roiRect.bottom() * 100;
+        break;
+    }
     case PROPERTY_EXT_DEPTH_RANGE:
-        {
-            auto range = value.value<QPair<float, float>>();
-            propExt.depthRange.min = qRound(range.first);
-            propExt.depthRange.max = qRound(range.second);
-            break;
-        }
+    {
+        auto range = value.value<QPair<float, float>>();
+        propExt.depthRange.min = qRound(range.first);
+        propExt.depthRange.max = qRound(range.second);
+        break;
+    }
     case PROPERTY_EXT_TRIGGER_MODE:
         propExt.triggerMode = (TRIGGER_MODE)value.toInt();;
+        break;
+    case PROPERTY_EXT_CAMERA_IP:
+        propExt.cameraIp = value.value<CameraIpSetting>();
         break;
     default:
         Q_ASSERT(false);
@@ -1402,6 +1432,11 @@ void CSCamera::getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant&
     case PROPERTY_EXT_DEPTH_RANGE:
         min = DEPTH_RANGE_LIMIT.min;
         max = DEPTH_RANGE_LIMIT.max;
+        step = 1;
+        break;
+    case PROPERTY_EXT_HDR_SCALE_SETTING:
+        min = CAMERA_HDR_LEVEL_RANGE.min;
+        max = CAMERA_HDR_LEVEL_RANGE.max;
         step = 1;
         break;
     default:
@@ -1497,6 +1532,56 @@ void CSCamera::getHdrLevels(QList<QPair<QString, QVariant>>& list) const
     {
         list.push_back({ QString::number(i), i });
     }
+}
+
+void CSCamera::getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& list)
+{
+    QVariant min, max, step;
+    getCameraParaRange(paraId, min, max, step);
+
+    int minV = min.toInt();
+    int maxV = max.toInt();
+
+    for (int i = minV; i <= maxV; i++)
+    {
+        list.push_back({ QString::number(i), i });
+    }
+}
+
+void CSCamera::correctExposureRange(float& min, float& max, float& step)
+{
+#ifdef WIN32
+    if (cameraInfo.connectType == CONNECT_TYPE_USB)
+    {
+        rgbExposureMin = min;
+        float d = max - min;
+        min = 1;
+        max = 30000;
+
+        rgbExposureStep = max / d;
+        step = rgbExposureStep;
+    }
+#endif
+}
+
+void CSCamera::correctExposureValue(float& value)
+{
+#ifdef WIN32
+    if (cameraInfo.connectType == CONNECT_TYPE_USB)
+    {
+        value = qRound(rgbExposureStep * (value - rgbExposureMin));
+    }
+#endif
+}
+
+void CSCamera::convertExposureValue(float& value)
+{
+#ifdef WIN32
+    if (cameraInfo.connectType == CONNECT_TYPE_USB)
+    {
+        value = (value / rgbExposureStep) + rgbExposureMin;
+    }
+#endif
 }
 
 void CSCamera::setDepthFormat(STREAM_FORMAT format)
@@ -1785,8 +1870,6 @@ void CSCamera::stopStreamThread()
         streamThread->requestInterruption();
         streamThread->wait();
     }
-
-    Q_ASSERT(streamThread->isFinished());
 }
 
 void CSCamera::startStreamThread()

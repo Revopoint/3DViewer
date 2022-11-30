@@ -1,0 +1,11 @@
+prefix=D:/Program Files/QuaZip
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: QuaZip-Qt5
+Description: Minizip wrapper library for Qt 5.x
+Version: 1.3
+Libs: -lquazip1-qt5
+Cflags: -I${includedir}/QuaZip-Qt5-1.3 -I${includedir}/QuaZip-Qt5-1.3/quazip
+Requires: zlib, Qt5Core

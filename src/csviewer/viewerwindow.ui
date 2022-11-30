@@ -6,45 +6,30 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1077</width>
-    <height>799</height>
+    <width>1056</width>
+    <height>725</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <property name="spacing">
-     <number>0</number>
-    </property>
+   <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,3">
     <property name="leftMargin">
      <number>0</number>
     </property>
     <property name="topMargin">
-     <number>0</number>
+     <number>6</number>
     </property>
     <property name="rightMargin">
      <number>0</number>
     </property>
     <property name="bottomMargin">
-     <number>10</number>
+     <number>6</number>
     </property>
     <item>
-     <widget class="QFrame" name="CameraControlWidget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
+     <widget class="QWidget" name="CameraControlWidget" native="true">
       <property name="minimumSize">
        <size>
-        <width>352</width>
+        <width>420</width>
         <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>352</width>
-        <height>16777215</height>
        </size>
       </property>
       <property name="baseSize">
@@ -53,15 +38,9 @@
         <height>0</height>
        </size>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::StyledPanel</enum>
-      </property>
-      <property name="frameShadow">
-       <enum>QFrame::Raised</enum>
-      </property>
-      <layout class="QVBoxLayout" name="verticalLayout">
+      <layout class="QVBoxLayout" name="verticalLayout" stretch="1,3">
        <property name="spacing">
-        <number>0</number>
+        <number>6</number>
        </property>
        <property name="leftMargin">
         <number>0</number>
@@ -76,104 +55,23 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QStackedWidget" name="stackedWidget">
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="ParaSettingsWidget" name="paraSettingWidget">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-         </widget>
-         <widget class="CameraListWidget" name="cameraListWidget"/>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="modeSwitchButton">
+        <widget class="CameraListWidget" name="cameraListWidget" native="true">
          <property name="sizePolicy">
-          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="maximumSize">
-          <size>
-           <width>16777215</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Parameter Settings</string>
-         </property>
-         <property name="icon">
-          <iconset resource="3dviewer.qrc">
-           <normaloff>:/resources/double_arrow_up.png</normaloff>:/resources/double_arrow_up.png</iconset>
-         </property>
-         <property name="iconSize">
-          <size>
-           <width>32</width>
-           <height>32</height>
-          </size>
-         </property>
         </widget>
+       </item>
+       <item>
+        <widget class="ParaSettingsWidget" name="paraSettingWidget" native="true"/>
        </item>
       </layout>
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="renderWidget" native="true">
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QTabWidget" name="tabWidget">
-         <property name="autoFillBackground">
-          <bool>true</bool>
-         </property>
-         <property name="currentIndex">
-          <number>0</number>
-         </property>
-         <widget class="QWidget" name="display2d">
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-          <attribute name="title">
-           <string>2D</string>
-          </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
-           <item>
-            <layout class="QHBoxLayout" name="render2dTopLayout"/>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="render2dBottomLayout"/>
-           </item>
-          </layout>
-         </widget>
-         <widget class="RenderWidget3D" name="renderWidget3D">
-          <property name="autoFillBackground">
-           <bool>true</bool>
-          </property>
-          <attribute name="title">
-           <string>3D</string>
-          </attribute>
-         </widget>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+     <widget class="RenderWindow" name="renderWindow" native="true"/>
     </item>
    </layout>
   </widget>
@@ -182,7 +80,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1077</width>
+     <width>1056</width>
      <height>23</height>
     </rect>
    </property>
@@ -190,6 +88,17 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuAutoNameWhenCapturuing">
+     <property name="title">
+      <string>Auto file naming</string>
+     </property>
+     <addaction name="actionOn"/>
+     <addaction name="actionOff"/>
+    </widget>
+    <addaction name="actionsetDefaultSaveDir"/>
+    <addaction name="menuAutoNameWhenCapturuing"/>
+    <addaction name="actionplayFile"/>
+    <addaction name="actionConvertDepth2PC"/>
     <addaction name="actionExit"/>
    </widget>
    <widget class="QMenu" name="menuLanguage">
@@ -203,6 +112,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionManual"/>
     <addaction name="actionGithub"/>
     <addaction name="actionWebSite"/>
     <addaction name="actionOpenLogDir"/>
@@ -216,10 +126,34 @@
     </property>
     <addaction name="actionRestartCamera"/>
     <addaction name="actionInfomation"/>
+    <addaction name="actionIpSetting"/>
+   </widget>
+   <widget class="QMenu" name="menuWindows">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string>Windows</string>
+    </property>
+    <widget class="CSMenu" name="menuLayout">
+     <property name="title">
+      <string>Layout</string>
+     </property>
+     <addaction name="actionTile"/>
+     <addaction name="actionTabs"/>
+    </widget>
+    <widget class="CSMenu" name="menuViews">
+     <property name="title">
+      <string>Views</string>
+     </property>
+    </widget>
+    <addaction name="menuLayout"/>
+    <addaction name="menuViews"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCamera"/>
    <addaction name="menuLanguage"/>
+   <addaction name="menuWindows"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
@@ -250,14 +184,6 @@
     <string>English</string>
    </property>
   </action>
-  <action name="actionGithub">
-   <property name="text">
-    <string>Github</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+I</string>
-   </property>
-  </action>
   <action name="actionWebSite">
    <property name="text">
     <string>Web Site</string>
@@ -284,8 +210,75 @@
     <string>Ctrl+L</string>
    </property>
   </action>
+  <action name="actionsetDefaultSaveDir"/>
+  <action name="actionGithub">
+   <property name="text">
+    <string>Github</string>
+   </property>
+  </action>
+  <action name="actionIpSetting">
+   <property name="text">
+    <string>IP setting</string>
+   </property>
+  </action>
+  <action name="actionplayFile">
+   <property name="text">
+    <string>Playback</string>
+   </property>
+  </action>
+  <action name="actionConvertDepth2PC">
+   <property name="text">
+    <string>Convert depth data to point cloud</string>
+   </property>
+  </action>
+  <action name="actionOn">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>On</string>
+   </property>
+  </action>
+  <action name="actionOff">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Off</string>
+   </property>
+  </action>
+  <action name="actionTile">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tile</string>
+   </property>
+  </action>
+  <action name="actionTabs">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Tabs</string>
+   </property>
+  </action>
+  <action name="actionManual">
+   <property name="text">
+    <string>Manual</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>RenderWindow</class>
+   <extends>QWidget</extends>
+   <header>renderwindow.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>CameraListWidget</class>
    <extends>QWidget</extends>
@@ -299,14 +292,11 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>RenderWidget3D</class>
-   <extends>QWidget</extends>
-   <header>renderwidget3d.h</header>
-   <container>1</container>
+   <class>CSMenu</class>
+   <extends>QMenu</extends>
+   <header>csmenu.h</header>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="3dviewer.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>

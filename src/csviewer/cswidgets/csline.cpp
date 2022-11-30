@@ -44,6 +44,8 @@
 
 #include <QStyleOption>
 #include <QPainter>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 
 CSLine::CSLine(QWidget* parent)
     : QFrame(parent)
@@ -63,13 +65,20 @@ void CSLine::paintEvent(QPaintEvent* event)
 }
 
 CSHLine::CSHLine(QWidget* parent)
-    : CSLine(parent)
+    : QWidget(parent)
+    , line(new CSLine(this))
 {
-    setFrameShape(QFrame::HLine);
+    line->setFrameShape(QFrame::HLine);
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->addWidget(line);
+    layout->setContentsMargins(0, 15, 0, 15);
 }
 
 CSVLine::CSVLine(QWidget* parent)
-    : CSLine(parent)
+    : QWidget(parent)
 {
-    setFrameShape(QFrame::VLine);
+    line->setFrameShape(QFrame::VLine);
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->addWidget(line);
+    layout->setContentsMargins(15, 0, 15, 0);
 }

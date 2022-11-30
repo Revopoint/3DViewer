@@ -45,19 +45,21 @@
 
 #include <QObject>
 #include "processstrategy.h"
+#include "cscameraapi.h"
 
 namespace cs
 {
 
-class RgbProcessStrategy : public ProcessStrategy
+class CS_CAMERA_EXPORT RgbProcessStrategy : public ProcessStrategy
 {
     Q_OBJECT
 public:
-    void doProcess(const FrameData& frameData) override;
+    RgbProcessStrategy();
+    void doProcess(const FrameData& frameData, OutputDataPort& outputDataPort) override;
 
 private:
-    void onProcessRGB8(const StreamData& frameData);
-    void onProcessMJPG(const StreamData& frameData);
+    OutputData2D onProcessRGB8(const StreamData& frameData);
+    OutputData2D onProcessMJPG(const StreamData& frameData);
 };
 
 }

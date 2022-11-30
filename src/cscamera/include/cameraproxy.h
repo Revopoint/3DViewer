@@ -55,10 +55,6 @@ namespace cs {
 class CS_CAMERA_EXPORT CameraProxy : public ICSCamera
 {
     Q_OBJECT
-    Q_PROPERTY(bool showDepthCoord READ getShowDepthCoord WRITE setShowDepthCoord NOTIFY showDepthCoordChanged)
-    Q_PROPERTY(QPointF showDepthCoordPos READ getShowDepthCoordPos WRITE setShowDepthCoordPos NOTIFY showDepthCoordPosChanged)
-    Q_PROPERTY(bool showRender3D READ getShowRender3D WRITE setShowRender3D NOTIFY showRender3DChanged)
-    Q_PROPERTY(bool show3DWithTexture READ getShow3DWithTexture WRITE setShow3DWithTexture NOTIFY show3DWithTextureChanged)
 public:
     CameraProxy();
     ~CameraProxy();
@@ -84,26 +80,9 @@ public:
     CSCameraInfo getCameraInfo() const override;
     int getCameraState() const override;
 
-    bool getShowDepthCoord() const;
-    void setShowDepthCoord(bool show);
-    QPointF getShowDepthCoordPos() const;
-    void setShowDepthCoordPos(QPointF pos);
-    bool getShowRender3D() const;
-    void setShowRender3D(bool show);
-    bool getShow3DWithTexture() const;
-    void setShow3DWithTexture(bool with);
-signals:
-    void showDepthCoordChanged(bool show);
-    void showDepthCoordPosChanged(QPointF pos);
-    void showRender3DChanged(bool show);
-    void show3DWithTextureChanged(bool with);
 private:
     ICSCamera* csCamera = nullptr;
     mutable QReadWriteLock lock;
-    bool showDepthCoord;
-    QPointF showDepthCoordPos;
-    bool showRender3D;
-    bool show3DWithTexture;
 };
 }
 

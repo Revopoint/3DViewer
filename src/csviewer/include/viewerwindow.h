@@ -45,6 +45,7 @@
 
 #include <QMainWindow>
 #include <QMap>
+#include <QVector>
 #include <cstypes.h>
 #include <hpp/Processing.hpp>
 
@@ -54,23 +55,25 @@ namespace Ui {
 }
 QT_END_NAMESPACE
 
+namespace cs {
+    class ProcessStrategy;
+}
+
 class RenderWidget2D;
 class QFileDialog;
 class QTranslator;
 class CameraInfoDialog;
 class CSProgressBar;
 class CSMessageBox;
+class CSAction;
+class IpSettingDialog;
+class CameraPlayerDialog;
+class FormatConvertDialog;
+
 class ViewerWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    enum STACK_WIDGET_PAGE_ID
-    {
-        PARASETTING_PAGE = 0,
-        CAMERALIST_PAGE = 1,
-        PAGE_COUNT
-    };
-
     enum RENDER_PAGE_ID
     {
         RENDER_PAGE_2D = 0,
@@ -88,53 +91,73 @@ public:
     ViewerWindow(QWidget* parent = nullptr);
     ~ViewerWindow();
 private slots:
-    void onClickedModeSwitchButton();
-    void onPageChanged(int idx);
     void onRenderPageChanged(int idx);
     void onCameraStateChanged(int state);
-    void onOutput2DUpdated(OutputData2D outputData);
-    void onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image);
-    void onRoiEditStateChanged(bool edit);
+
+    void onRoiEditStateChanged(bool edit, QRectF rect);
     void onRoiRectFUpdated(QRectF rect);
-    void onShowCoordChanged(bool show, QPointF pos);
-    void onShow3DTextureChanged(bool texture);
     void onShowStatusBarMessage(QString msg, int timeout);
-    void onClickedExport(int cameraType);
-    void onExportFinished(bool success);
+
+    // capture frame data
+    void onCaptureStateChanged(int captureType, int state, QString message);
+
+    // start the stream
+    void onCameraStreamStarted();
 private slots:
     // menu
     void onUpdateLanguage(QAction* action);
     void onTriggeredAbout(QAction* action);
     void onTriggeredRestartCamera();
-    void onExportPointCloud();
     void onTriggeredInformation();
     void onTriggeredLogDir();
+    void onTriggeredDefaultSavePath();
+    void onTriggeredIpSetting();
+    void onTriggeredLoadFile();
+    void onTriggeredFormatConvert();
+    void onTriggeredManual();
+
     void onAppExit();
 private slots:
     void onTranslate();
     void onRemovedCurrentCamera(QString serial);
     void onConfirmCameraRemoved();
-    void onRenderInitialized();
     void onAboutToQuit();
+    void onRenderWindowUpdated();
+    void onWindowsMenuTriggered(QAction* action);
+    void onTriggeredWindowsTile();
+    void onTriggeredWindowsTabs();
+    void onAutoNameMenuTriggered(QAction* action);
+
+    void onRenderExit(int renderId);
+    void onWindowLayoutChanged();
 signals:
     void translateSignal(); 
-    void renderInitialized();
+    void show3DUpdated(bool show);
+    void renderWindowUpdated(QVector<int> windows);
+    void windowLayoutModeUpdated(int mode);
+    void windowLayoutChanged(QVector<int> windows);
 private:
     void initWindow();
     void initConnections();
-    void initRenderWidgets();
-    void destoryRender2dWidgets();
-    void initRenderConnections();
     void onLanguageChanged();
     void updateStatusBar(int state);
+    void updateWindowActions();
+    void destoryRenderWindows();
 private:
     Ui::ViewerWindow* ui;
-    QMap<int, RenderWidget2D*> render2dWidgets;
     CS_LANGUAGE language;
     QTranslator* translator;
 
     CameraInfoDialog* cameraInfoDialog;
     CSProgressBar* circleProgressBar;
     CSMessageBox* globalMessageBox;
+
+    QVector<CSAction*> windowActions;
+    WINDOWLAYOUT_MODE renderLayoutMode = LAYOUT_TILE;
+
+    // set ip dialog
+    IpSettingDialog* ipSettingDialog = nullptr;
+    CameraPlayerDialog* cameraPlayerDialog = nullptr;
+    FormatConvertDialog* formatConvertDialog = nullptr;
 };
 #endif // _CS_VIEWERWINDOW_H

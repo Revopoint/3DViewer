@@ -64,6 +64,7 @@ class CSSlider : public CSParaWidget
 {
     Q_OBJECT
 public:
+    CSSlider(QWidget* parent = nullptr);
     CSSlider(int paraId, const char* title = "", QWidget* parent = nullptr);
     ~CSSlider();
     void setParaRange(const QVariant& min, const QVariant& max, const QVariant& step) override;

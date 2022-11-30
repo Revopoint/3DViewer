@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15" CACHE STRING "Minimum OS X deployment version")
+
 project(3DViewer VERSION 1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -60,6 +62,21 @@ set(CAMERA_SDK_LIB ${THIRDPARTY_DIR}/3DCamera/${PLATFORM}/${PLATFORM_BITS})
 set(OSG_LIB ${THIRDPARTY_DIR}/osg3.6.5/${PLATFORM}/lib)
 set(OSG_INC ${THIRDPARTY_DIR}/osg3.6.5/${PLATFORM}/include)
 set(OSG_BIN ${THIRDPARTY_DIR}/osg3.6.5/${PLATFORM}/bin)
+
+## yaml-cpp
+set(YAML_CPP_INC ${THIRDPARTY_DIR}/yaml-cpp0.6.0/include)
+set(YAML_CPP_LIB ${THIRDPARTY_DIR}/yaml-cpp0.6.0/${PLATFORM}/lib)
+set(YAML_CPP_BIN ${THIRDPARTY_DIR}/yaml-cpp0.6.0/${PLATFORM}/bin)
+
+## libpng
+set(LIBPNG_CPP_INC ${THIRDPARTY_DIR}/libpng/include)
+set(LIBPNG_CPP_LIB ${THIRDPARTY_DIR}/libpng/${PLATFORM}/lib)
+set(LIBPNG_CPP_BIN ${THIRDPARTY_DIR}/libpng/${PLATFORM}/bin)
+
+## quazip
+set(QUAZIP_CPP_INC ${THIRDPARTY_DIR}/quazip/include/quazip)
+set(QUAZIP_CPP_LIB ${THIRDPARTY_DIR}/quazip/${PLATFORM}/lib)
+set(QUAZIP_CPP_BIN ${THIRDPARTY_DIR}/quazip/${PLATFORM}/bin)
 
 add_definitions(-D_UNICODE -DUNICODE)
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)

@@ -65,6 +65,7 @@ CSMessageBox::CSMessageBox(QWidget* parent)
     vLayout->addItem(spacerItem);
     vLayout->addWidget(confirmButton);
 
+    setObjectName("CSMessageBox");
     confirmButton->setProperty("isCSStyle", true);
 
     connect(confirmButton, &QPushButton::clicked, [=]() 

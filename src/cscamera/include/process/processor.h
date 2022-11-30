@@ -43,52 +43,42 @@
 #ifndef _CS_PROCESSOR_H
 #define _CS_PROCESSOR_H
 #include <QObject>
-#include <QImage>
-#include <QMap>
+#include <QVector>
+#include <QMutex>
 #include <memory>
 
 #include "cscameraapi.h"
 #include "cstypes.h"
-#include <hpp/Processing.hpp>
+#include "outputdataport.h"
 
 namespace cs
 {
-
-enum PROCESS_STRA_TYPE
-{
-    STRATEGY_DEPTH,
-    STRATEGY_RGB,
-    STRATEGY_CLOUD_POINT
-};
-
 class ProcessStrategy;
-class ICSCamera;
+
 class CS_CAMERA_EXPORT Processor: public QObject
 {
     Q_OBJECT
 public:
+    class ProcessEndListener : public QObject
+    {
+    public:
+        virtual void process(const OutputDataPort& outputDataPort) = 0;
+    };
+
     Processor();
     ~Processor();
 
-    void setCamera(std::shared_ptr<ICSCamera> cameraPtr);
     void process(const FrameData& frameData);
-public slots:
-    void onShowDepthCoordChanged(bool show);
-    void onShowDepthCoordPosChanged(QPointF pos);
-    void onShowRender3DChanged(bool show);
-    void onCameraParaUpdated(int paraId);
-    void onShow3DWithTextureChanged(bool withTexture);
-signals:
-    void output2DUpdated(OutputData2D outputData, StreamData streamData = StreamData());
-    void output3DUpdated(cs::Pointcloud pointCloud, const QImage& image, StreamData streamData = StreamData());
+
+    void addProcessStrategy(ProcessStrategy* strategy);
+    void removeProcessStrategy(ProcessStrategy* strategy);
+
+    void addProcessEndLisener(ProcessEndListener* listener);
+    void removeProcessEndLisener(ProcessEndListener* listener);
 private:
-    void initialize();
-    void onProcessPairFrame(const FrameData& frameData);
-    void onProcessDepthFrame(const FrameData& frameData);
-private:
-    QMap<PROCESS_STRA_TYPE, ProcessStrategy*> processStrategyMap; 
-    bool calcPointCloud;
-    
+    QVector<ProcessStrategy*> processStrategys; 
+    QMutex mutex;
+    QVector<ProcessEndListener*> processEndLiseners;
 };
 }
 

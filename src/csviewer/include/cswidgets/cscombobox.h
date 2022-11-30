@@ -54,11 +54,12 @@ public:
     void wheelEvent(QWheelEvent* e) override {}
 };
 
+class QPushButton;
 class CSComboBox : public CSParaWidget
 {
     Q_OBJECT
 public:
-    CSComboBox(int paraId, const char* title = "", QWidget* parent = nullptr, Qt::Orientation orientation = Qt::Horizontal);
+    CSComboBox(int paraId, const char* title = "", QWidget* parent = nullptr, const char* tips = "");
     ~CSComboBox();
     void setItems(const QList<QPair<QString, QVariant>>&) override;
     void setValue(const QVariant& value) override;
@@ -69,8 +70,10 @@ private slots:
 private:
     CustomComboBox* comboBox;
     QLabel* titleLabel;
-    Qt::Orientation orientation;
     int lastIndex;
+
+    QPushButton* tipsButton = nullptr;
+    const char* tips;
 };
 
 #endif // _CS_CSCOMBOBOX_H

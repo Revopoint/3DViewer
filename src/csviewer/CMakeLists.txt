@@ -17,12 +17,14 @@ if(WIN32)
         optimized osgGA debug osgGAd
         optimized osgDB debug osgDBd
         optimized OpenThreads debug OpenThreadsd
+        optimized osgText debug osgTextd         
     )
 else(WIN32)
     set(OSG_LIBRARY 
         osg
         osgGA
         osgViewer
+        osgText
         osgQOpenGL
         OpenThreads
     )
@@ -121,6 +123,8 @@ add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/themes "${CP_RES_DIR}/themes/"
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CP_RES_DIR}/translations/"
     COMMAND ${CMAKE_COMMAND} -E copy ${QM_FILES} "${CP_RES_DIR}/translations/"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CP_RES_DIR}/document/"
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/../document/manual "${CP_RES_DIR}/document/manual"
 )
 
 if(WIN32)
@@ -150,7 +154,7 @@ endif()
 
 if (MSVC)
     set_target_properties(${TARGET_NAME} PROPERTIES VS_GLOBAL_LocalDebuggerEnvironment
-        "PATH=${_qt5Core_install_prefix}/bin;${CAMERA_SDK_LIB};${OSG_BIN};$(PATH)")
+        "PATH=${_qt5Core_install_prefix}/bin;${CAMERA_SDK_LIB};${YAML_CPP_BIN};${OSG_BIN};${LIBPNG_CPP_BIN};${QUAZIP_CPP_BIN};$(PATH)")
 
     set_target_properties(${TARGET_NAME} PROPERTIES
     LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")

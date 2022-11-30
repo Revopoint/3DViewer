@@ -52,6 +52,11 @@
 #include <QTime>
 #include <QThread>
 #include <QDialog>
+#include <QFileDialog>
+#include <QSpacerItem>
+#include <QDir>
+#include <QDesktopServices>
+
 #include <cameraproxy.h>
 #include <icscamera.h>
 #include <cameraparaid.h>
@@ -64,8 +69,12 @@
 #include "cswidgets/csspinbox.h"
 #include "cswidgets/csswitchbutton.h"
 #include "cswidgets/cstablewidget.h"
+#include "cswidgets/csroieditwidget.h"
 
 #include "hdrsettingsdialog.h"
+#include "capturesettingdialog.h"
+#include "appconfig.h"
+#include "csimagebutton.h"
 
 #define HDR_TABLE_COLS 3
 using namespace cs::parameter;
@@ -74,68 +83,113 @@ ParaSettingsWidget::ParaSettingsWidget(QWidget* parent)
     : QWidget(parent)
     , ui(new Ui::ParameterSettingsWidget)
     , cameraPtr(cs::CSApplication::getInstance()->getCamera())
-    , roiRectF(0,0,0,0)
+    , captureSettingDialog(new CaptureSettingDialog)
+    , paraMonitorThread(new ParaMonitorThread())
 {
+    setAttribute(Qt::WA_StyledBackground, true);
     ui->setupUi(this);
     initWidget();
     initConnections();
+
+    captureConfig.captureType = CAPTURE_TYPE_SINGLE;
+    captureConfig.captureNumber = 1;
+    captureConfig.captureDataTypes = { CAMERA_DATA_L, CAMERA_DATA_R, CAMERA_DATA_DEPTH, CAMERA_DATA_RGB, CAMERA_DATA_POINT_CLOUD };
+    captureConfig.saveFormat = QString("images");
 }
 
 ParaSettingsWidget::~ParaSettingsWidget()
 {
+    stopParaMonitor();
+
     delete ui;
-    delete hdrSettingsDialog;
+    delete captureSettingDialog;
 }
 
 void ParaSettingsWidget::initDepthPara()
 {
     // stream format
-    addDepthParaWidget(new CSComboBox(PARA_DEPTH_STREAM_FORMAT, QT_TR_NOOP("Stream Format:"), this));
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_STREAM_FORMAT, QT_TR_NOOP("Stream Format"), this));
     // resolution
-    addDepthParaWidget(new CSComboBox(PARA_DEPTH_RESOLUTION, QT_TR_NOOP("Resolution:"), this));
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_RESOLUTION, QT_TR_NOOP("Resolution"), this));
     // line
     addDepthDividLine();
        
     // depth range
-    addDepthParaWidget(new CSRangeEdit(PARA_DEPTH_RANGE, QT_TR_NOOP("Depth Range:"), this));
+    addDepthParaWidget(new CSRangeEdit(PARA_DEPTH_RANGE, QT_TR_NOOP("Depth Range(mm)"), this));
     // line
     addDepthDividLine();
 
-    // exposure
-    addDepthParaWidget(new CSSlider(PARA_DEPTH_EXPOSURE, QT_TR_NOOP("Exposure Time(us):"), this));
-    // gain
-    addDepthParaWidget(new CSSpinBox(PARA_DEPTH_GAIN, QT_TR_NOOP("Gain:"), this));
     // auto exposure
-    addDepthParaWidget(new CSComboBox(PARA_DEPTH_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure:"), this));
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure"), this, 
+        QT_TR_NOOP("Speed First: The frame rate of this mode is fast, and the image quality may deteriorate.\n"
+        "Quality First: This mode has good image quality and may reduce the frame rate.\n"
+        "Foreground: This mode gives priority to adjusting the image quality of closer objects,\n"
+        "and the image quality of objects farther away may become worse.")));
+    // exposure
+    addDepthParaWidget(new CSSlider(PARA_DEPTH_EXPOSURE, QT_TR_NOOP("Exposure Time(us)"), this));
+    // gain
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_GAIN, QT_TR_NOOP("Gain"), this));
     // line
     addDepthDividLine();
 
     // Threshold
-    addDepthParaWidget(new CSSlider(PARA_DEPTH_THRESHOLD, QT_TR_NOOP("Threshold:"), this));
+    addDepthParaWidget(new CSSlider(PARA_DEPTH_THRESHOLD, QT_TR_NOOP("Threshold(Gray Level)"), this));
     // line
     addDepthDividLine();
 
     // filter type
-    addDepthParaWidget(new CSComboBox(PARA_DEPTH_FILTER_TYPE, QT_TR_NOOP("Filter:"), this, Qt::Vertical));
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_FILTER_TYPE, QT_TR_NOOP("Filter Type")));
     // filter
-    addDepthParaWidget(new CSSlider(PARA_DEPTH_FILTER, "", this));
+    addDepthParaWidget(new CSSlider(PARA_DEPTH_FILTER, QT_TR_NOOP("Filter Level"), this));
     // line
     addDepthDividLine();
 
     // fill hole
-    addDepthParaWidget(new CSSwitchButton(PARA_DEPTH_FILL_HOLE, QT_TR_NOOP("Fill Hole:"), this));
+    addDepthParaWidget(new CSSwitchButton(PARA_DEPTH_FILL_HOLE, QT_TR_NOOP("Fill Hole"), this));
+    // line
+    addDepthDividLine();
+
+    // ROI
+    addDepthParaWidget(new CSRoiEditWidget(PARA_DEPTH_ROI, QT_TR_NOOP("ROI"), this));
     // line
     addDepthDividLine();
 
     // HDR settings
-    initHDRParaWidgets();
+    addDepthParaWidget(new CSComboBox(PARA_DEPTH_HDR_MODE, QT_TR_NOOP("HDR Mode"), this));
+    addDepthParaWidget(new CSSlider(PARA_DEPTH_HDR_LEVEL, QT_TR_NOOP("HDR Level"), this));
+    addDepthParaWidget(new CSTableWidget(PARA_DEPTH_HDR_SETTINGS, HDR_TABLE_COLS, { QT_TR_NOOP("Number"), QT_TR_NOOP("Exposure"), QT_TR_NOOP("Gain")}));
+    addHdrButtons();
+
+    hdrButtonArea->setVisible(false);
+    paraWidgets[PARA_DEPTH_HDR_SETTINGS]->setVisible(false);
+}
+
+void ParaSettingsWidget::addHdrButtons()
+{
+    hdrButtonArea = new QWidget(this);
+    QHBoxLayout* layout = new QHBoxLayout(hdrButtonArea);
+    layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    layout->setContentsMargins(0, 0, 20, 0);
+    layout->setSpacing(10);
+
+    hdrRefreshButton = new QPushButton(tr("Refresh"), hdrButtonArea);
+    hdrConfirmButton = new QPushButton(tr("OK"), hdrButtonArea);
+    hdrRefreshButton->setProperty("isCSStyle", true);
+    hdrConfirmButton->setProperty("isCSStyle", true);
+
+    layout->addWidget(hdrRefreshButton);
+    layout->addWidget(hdrConfirmButton);
+
+    ui->depthParaLayout->addWidget(hdrButtonArea);
+    connect(hdrRefreshButton, &QPushButton::clicked, this, &ParaSettingsWidget::onRefreshHdrSetting);
+    connect(hdrConfirmButton, &QPushButton::clicked, this, &ParaSettingsWidget::onUpdateHdrSetting);
 }
 
 void ParaSettingsWidget::initHDRParaWidgets()
 {
     CSParaWidget* widgtes[] = {
-        new CSComboBox(PARA_DEPTH_HDR_MODE, QT_TR_NOOP("HDR Mode:")),
-        new CSComboBox(PARA_DEPTH_HDR_LEVEL, QT_TR_NOOP("HDR Level:")),
+        new CSComboBox(PARA_DEPTH_HDR_MODE, QT_TR_NOOP("HDR Mode")),
+        new CSComboBox(PARA_DEPTH_HDR_LEVEL, QT_TR_NOOP("HDR Level")),
         new CSTableWidget(PARA_DEPTH_HDR_SETTINGS, HDR_TABLE_COLS, { QT_TR_NOOP("Number"), QT_TR_NOOP("Exposure"), QT_TR_NOOP("Gain")})
     };
 
@@ -145,32 +199,30 @@ void ParaSettingsWidget::initHDRParaWidgets()
         Q_ASSERT(!paraWidgets.contains(paraId));
         paraWidgets[paraId] = widget;
     }
-
-    hdrSettingsDialog = new HDRSettingsDialog(paraWidgets[PARA_DEPTH_HDR_MODE], paraWidgets[PARA_DEPTH_HDR_LEVEL], paraWidgets[PARA_DEPTH_HDR_SETTINGS]);
 }
 
 void ParaSettingsWidget::initRgbPara()
 {
     // stream format
-    addRgbParaWidget(new CSComboBox(PARA_RGB_STREAM_FORMAT, QT_TR_NOOP("Stream Format:"), this));
+    addRgbParaWidget(new CSComboBox(PARA_RGB_STREAM_FORMAT, QT_TR_NOOP("Stream Format"), this));
     // resolution
-    addRgbParaWidget(new CSComboBox(PARA_RGB_RESOLUTION, QT_TR_NOOP("Resolution:"), this));
+    addRgbParaWidget(new CSComboBox(PARA_RGB_RESOLUTION, QT_TR_NOOP("Resolution"), this));
     // line
     addRgbDividLine();
 
     // auto exposure
-    addRgbParaWidget(new CSSwitchButton(PARA_RGB_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure:"), this));
+    addRgbParaWidget(new CSSwitchButton(PARA_RGB_AUTO_EXPOSURE, QT_TR_NOOP("Auto Exposure"), this));
     // exposure
-    addRgbParaWidget(new CSSlider(PARA_RGB_EXPOSURE, QT_TR_NOOP("Exposure Time(us):"), this));
+    addRgbParaWidget(new CSSlider(PARA_RGB_EXPOSURE, QT_TR_NOOP("Exposure Time(us)"), this));
     // gain
-    addRgbParaWidget(new CSSpinBox(PARA_RGB_GAIN, QT_TR_NOOP("Gain:"), this));
+    addRgbParaWidget(new CSComboBox(PARA_RGB_GAIN, QT_TR_NOOP("Gain"), this));
     // line
     addRgbDividLine();
  
     // auto white balance
-    addRgbParaWidget(new CSSwitchButton(PARA_RGB_AUTO_WHITE_BALANCE, QT_TR_NOOP("Auto White Balance:"), this));
+    addRgbParaWidget(new CSSwitchButton(PARA_RGB_AUTO_WHITE_BALANCE, QT_TR_NOOP("Auto White Balance"), this));
     // white balance
-    addRgbParaWidget(new CSSlider(PARA_RGB_WHITE_BALANCE, QT_TR_NOOP("White Balance:"), this));
+    addRgbParaWidget(new CSSlider(PARA_RGB_WHITE_BALANCE, QT_TR_NOOP("White Balance"), this));
     // line
     addRgbDividLine();
 }
@@ -187,10 +239,13 @@ void ParaSettingsWidget::initParaConnections()
         suc &= (bool)connect(widget, &CSParaWidget::valueChanged, this, &ParaSettingsWidget::onParaValueChanged);
         Q_ASSERT(suc);
     }
-
-    suc &= (bool)connect(hdrSettingsDialog, &HDRSettingsDialog::refreshHdrSetting, this, &ParaSettingsWidget::onRefreshHdrSetting);
-    suc &= (bool)connect(hdrSettingsDialog, &HDRSettingsDialog::updateHdrSetting, this, &ParaSettingsWidget::onUpdateHdrSetting);
-    suc &= (bool)connect(this, &ParaSettingsWidget::hdrModeChanged, hdrSettingsDialog, &HDRSettingsDialog::onHdrModeChanged);
+    // roi
+    CSRoiEditWidget* roiWidget = qobject_cast<CSRoiEditWidget*>(paraWidgets[PARA_DEPTH_ROI]);
+    if (roiWidget)
+    {
+        suc &= (bool)connect(roiWidget, &CSRoiEditWidget::clickedFullScreen, this, &ParaSettingsWidget::onClickFullScreenButton);
+        suc &= (bool)connect(roiWidget, &CSRoiEditWidget::clickedEditRoi,    this, &ParaSettingsWidget::onClickRoiEditButton);
+    }
 
     Q_ASSERT(suc);
 }
@@ -198,27 +253,24 @@ void ParaSettingsWidget::initParaConnections()
 void ParaSettingsWidget::initWidget()
 {
     ui->depthCameraButton->setProperty("isCameraButton", true);
-    ui->rgbCameraButton->setProperty("isCameraButton", true);
-    ui->depthCameraButton->setChecked(true);
-
+    ui->rgbCameraButton->setProperty("isCameraButton", true);  
     ui->stackedWidget->setCurrentIndex(PAGE_DEPTH_CAMERA);
 
-    ui->depthCameraButton->setChecked(true);
-    ui->hdrSettingBtn->setProperty("isCSStyle", true);
-    ui->roiEditBtn->setProperty("isCSStyle", true);
-    ui->iconLabel->setPixmap(QPixmap::fromImage(QImage(":/resources/settings.png")));
-
     // control button
-    ui->previewButton->setCheckable(true);
     ui->previewButton->setEnabled(false);
-    ui->restartCameraButton->setEnabled(false);
-    ui->disconnectCameraButton->setEnabled(false);
-    ui->singleShotCheckBox->setEnabled(false);
-    ui->singleShotButton->setEnabled(ui->singleShotCheckBox->isChecked());
+    ui->captureSingleButton->setEnabled(false);
+    ui->captureMultipleButton->setEnabled(false);
+    ui->singleShotButton->setEnabled(false);
+    ui->stopPreviewButton->setEnabled(false);
+
+    initTopButton();
 
     //parameter widget
     initDepthPara();
     initRgbPara();
+
+    ui->depthCameraButton->setChecked(true);
+    ui->scrollArea->setEnabled(false);
 }
 
 void ParaSettingsWidget::initConnections()
@@ -228,28 +280,61 @@ void ParaSettingsWidget::initConnections()
     suc &= (bool)connect(ui->depthCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickDepthButton);
     suc &= (bool)connect(ui->rgbCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickRgbButton);
     suc &= (bool)connect(ui->stackedWidget, &QStackedWidget::currentChanged, this, &ParaSettingsWidget::onPageChanged);
-    suc &= (bool)connect(ui->hdrSettingBtn, &QPushButton::clicked, this, &ParaSettingsWidget::onClickHdrButton);
-    suc &= (bool)connect(ui->roiEditBtn, &QPushButton::toggled, this, &ParaSettingsWidget::onClickRoiEditButton);
-    suc &= (bool)connect(ui->closeButton, &QPushButton::clicked, this, &ParaSettingsWidget::clickedCloseButton);
 
     suc &= (bool)connect(ui->previewButton, &QPushButton::clicked, this, &ParaSettingsWidget::onPreviewStateChanged);
     suc &= (bool)connect(ui->previewButton, &QPushButton::toggled, this, &ParaSettingsWidget::onPreviewButtonToggled);
+    suc &= (bool)connect(ui->stopPreviewButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickedStopStream);
     
-    suc &= (bool)connect(ui->restartCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickedRestartCamera);
-    suc &= (bool)connect(ui->disconnectCameraButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickedDisconnCamera);
+    suc &= (bool)connect(ui->captureSingleButton,    &QPushButton::clicked,  this, &ParaSettingsWidget::onClickCaptureSingle);
+    suc &= (bool)connect(ui->captureMultipleButton, &QPushButton::clicked,  this, &ParaSettingsWidget::onClickCaptureMultiple);
+
     suc &= (bool)connect(ui->singleShotButton, &QPushButton::clicked, this, &ParaSettingsWidget::onClickSingleShot);
-    
-    suc &= (bool)connect(ui->singleShotCheckBox, &QCheckBox::toggled, this, &ParaSettingsWidget::onSingleShotChanged);
 
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app, &cs::CSApplication::cameraStateChanged, this, &ParaSettingsWidget::onCameraStateChanged);
+    suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged, this, &ParaSettingsWidget::onCaptureStateChanged);
     suc &= (bool)connect(this, &ParaSettingsWidget::translateSignal, this, &ParaSettingsWidget::onTranslate);
-    suc &= (bool)connect(this, &ParaSettingsWidget::translateSignal, hdrSettingsDialog, &HDRSettingsDialog::onTranslate);
 
     Q_ASSERT(suc);
 
     // connections
     initParaConnections();
+}
+
+void ParaSettingsWidget::initTopButton()
+{
+    QIcon icon;
+    QSize size(10, 10);
+
+    icon.addFile(QStringLiteral(":/resources/double_arrow_down.png"), size, QIcon::Normal, QIcon::Off);
+    icon.addFile(QStringLiteral(":/resources/double_arrow_left.png"), size, QIcon::Selected, QIcon::On);
+    topItemButton = new CSTextImageButton(icon, QT_TR_NOOP("Parameter Settings"), Qt::LeftToRight, ui->cameraTopItem);
+
+    auto* layout = ui->cameraTopItem->layout();
+    if (layout)
+    {
+        layout->addWidget(topItemButton);
+    }
+
+    connect(topItemButton, &CSTextImageButton::toggled, [=](bool checked)
+        {
+            if (checked)
+            {
+                ui->scrollArea->hide();
+                ui->cameraButtonArea->hide();
+                verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
+
+                int idx = ui->verticalLayout->indexOf(ui->bottomControlArea);
+                ui->verticalLayout->insertItem(idx, verticalSpacer);
+            }
+            else
+            {
+                ui->verticalLayout->removeItem(verticalSpacer);
+                verticalSpacer = nullptr;
+                ui->scrollArea->show();
+                ui->cameraButtonArea->show();
+            }
+        });
 }
 
 void ParaSettingsWidget::onClickDepthButton()
@@ -277,45 +362,46 @@ void ParaSettingsWidget::onClickRgbButton()
     }
 }
 
-void ParaSettingsWidget::onClickHdrButton()
-{
-    hdrSettingsDialog->show();
-}
-
-void ParaSettingsWidget::onSingleShotChanged(bool checked)
-{
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    ui->singleShotButton->setEnabled(checked);
-    
-    const int  triggerMode = checked ? TRIGGER_MODE_SOFTWAER : TRIGGER_MODE_OFF;
-    camera->setCameraPara(PARA_TRIGGER_MODE, triggerMode);
-    
-    ui->roiEditWidget->setEnabled(!checked);
-}
-
 void ParaSettingsWidget::onClickSingleShot()
 {
     auto camera = cs::CSApplication::getInstance()->getCamera();
-    camera->softTrigger();
+
+    //QVariant value;
+    //camera->getCameraPara(PARA_TRIGGER_MODE, value);
+    //if (value.toInt() == TRIGGER_MODE_OFF)
+    if(!isSingleShotMode)
+    {
+        const int triggerMode = TRIGGER_MODE_SOFTWAER;
+        camera->setCameraPara(PARA_TRIGGER_MODE, triggerMode);
+
+        ui->previewButton->setChecked(false);
+        ui->captureMultipleButton->setEnabled(false);
+        isSingleShotMode = true;
+        emit showMessage(tr("Entered single shot mode! You can click the button to get the next frame."), 5000);
+    }
+    else
+    {
+        camera->softTrigger();
+    }
 }
 
-void ParaSettingsWidget::onClickRoiEditButton(bool checked)
+void ParaSettingsWidget::onClickRoiEditButton()
 {
-    if (checked)
-    {
-        ui->roiEditBtn->setText(tr("Confirm"));
-        emit showMessage(tr("Use the mouse to select the ROI area in the depth image, and then click the \"Confirm\" button"), 10000);
-    }
-    else 
-    {
-        ui->roiEditBtn->setText(tr("Edit ROI")); 
-        emit showMessage("");
+    QVariant value;
+    cameraPtr->getCameraPara(PARA_DEPTH_ROI, value);
+    QRectF rect = value.toRectF();
 
-        //set parameter
-        cameraPtr->setCameraPara(PARA_DEPTH_ROI, roiRectF);
-    }
-    roiRectF = QRectF(0, 0, 0, 0);
-    emit roiStateChanged(checked);
+    emit roiStateChanged(true, rect);
+}
+
+void ParaSettingsWidget::onClickFullScreenButton()
+{
+    QRectF rect(0.0, 0.0, 1.0,1.0);
+    QVariant value = QVariant::fromValue<QRectF>(rect);
+
+    cameraPtr->setCameraPara(PARA_DEPTH_ROI, value);
+
+    emit roiStateChanged(true, rect);
 }
 
 void ParaSettingsWidget::onPageChanged(int idx)
@@ -347,24 +433,30 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
     case CAMERA_STARTED_STREAM:
         onUpdatedCameraParas();
         ui->previewButton->setChecked(true);
+        isSingleShotMode = false;
+
+        startParaMonitor();
         break;
     case CAMERA_CONNECTED:
         {
-            setEnabled(true);
+            ui->cameraButtonArea->setEnabled(true);
+            ui->scrollArea->setEnabled(true);
             onUpdatedCameraParas();
-            ui->previewButton->setChecked(false);
+            
             break;
         }
     case CAMERA_DISCONNECTED:
     case CAMERA_DISCONNECTFAILED:
     case CAMERA_CONNECTFAILED:
-        setEnabled(false);
+        ui->cameraButtonArea->setEnabled(false);
+        ui->scrollArea->setEnabled(false);
+        stopParaMonitor();
         break;
     default:    
+        stopParaMonitor();
         ui->previewButton->setChecked(false);
         break;
     }
-
 }
 
 void ParaSettingsWidget::updateControlButtonState(int cameraState)
@@ -373,18 +465,13 @@ void ParaSettingsWidget::updateControlButtonState(int cameraState)
         || cameraState == CAMERA_STOPPED_STREAM);
 
     ui->previewButton->setEnabled(enable);
-    ui->restartCameraButton->setEnabled(enable);
-    ui->disconnectCameraButton->setEnabled(enable);
 
     enable = (cameraState == CAMERA_STARTED_STREAM);
+    ui->captureSingleButton->setEnabled(enable);
+    ui->captureMultipleButton->setEnabled(enable);
+    ui->singleShotButton->setEnabled(enable);
 
-    if (cameraState == CAMERA_CONNECTED)
-    {
-        ui->singleShotCheckBox->setChecked(false);
-    }
-
-    ui->singleShotCheckBox->setEnabled(enable);
-    ui->singleShotButton->setEnabled(enable && ui->singleShotCheckBox->isChecked());
+    ui->stopPreviewButton->setEnabled((cameraState == CAMERA_STARTED_STREAM) || (cameraState == CAMERA_PAUSED_STREAM));
 }
 
 void ParaSettingsWidget::updateWidgetsState(int cameraState)
@@ -401,6 +488,7 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
     QVariant hasRgbV;
     cameraPtr->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
     bool hasRgb = hasRgbV.toBool(); 
+
     ui->rgbCameraButton->setEnabled(hasRgb);
     ui->rgbParaWidget->setEnabled(hasRgb);
 
@@ -415,12 +503,14 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
         widget->setEnabled(enable);
     }
 
-    // ROI
-    ui->roiEditBtn->setEnabled(cameraState == CAMERA_STARTED_STREAM);
-    ui->roiLabel->setEnabled(ui->roiEditBtn->isEnabled());
+    if (cameraState == CAMERA_STARTED_STREAM)
+    {
+        QVariant hasDepthV;
+        cameraPtr->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
+        bool hasDepth = hasDepthV.toBool();
 
-    // HDR
-    ui->hdrSettingBtn->setEnabled(cameraState == CAMERA_STARTED_STREAM);
+        paraWidgets[PARA_DEPTH_RANGE]->setEnabled(hasDepth);
+    }
 }
 
 void ParaSettingsWidget::onUpdatedCameraParas()
@@ -475,17 +565,6 @@ void ParaSettingsWidget::updateParaValues()
         widget->setValue(value);
 
         onParaLinkResponse((CAMERA_PARA_ID)widget->getParaId(), value);
-    }
-
-    //ROI
-    if (ui->roiLabel->isEnabled())
-    {
-        QVariant value;
-        cameraPtr->getCameraPara(PARA_DEPTH_ROI, value);
-        if (value != QVariant::Invalid)
-        {
-            onCameraParaUpdated(PARA_DEPTH_ROI, value);
-        }
     }
 }
 
@@ -544,7 +623,7 @@ void ParaSettingsWidget::onParaValueChanged(int paraId, QVariant value)
     cameraPtr->setCameraPara((CAMERA_PARA_ID)paraId, value);
     if (paraId == PARA_DEPTH_HDR_MODE || paraId == PARA_DEPTH_HDR_LEVEL)
     {
-        emit hdrSettingsDialog->progressStateChanged(true);
+
     }
 }
 
@@ -553,26 +632,36 @@ void ParaSettingsWidget::onCameraParaUpdated(int paraId, QVariant value)
 {
     if (paraWidgets.contains(paraId))
     {
+        if (!value.isValid())
+        {
+            return;
+        }
+
         paraWidgets[paraId]->setValue(value);
         onParaLinkResponse(paraId, value);
 
-        if (paraId == PARA_DEPTH_HDR_SETTINGS)
+        if (paraId == PARA_DEPTH_ROI)
         {
-            emit hdrSettingsDialog->progressStateChanged(false);
+            QRectF rect = value.toRectF();
+
+            QString str = QString("[%1, %2, %3, %4]").arg(QString::number(rect.left(), 'f', 3))
+                .arg(QString::number(rect.top(), 'f', 3))
+                .arg(QString::number(rect.right(), 'f', 3))
+                .arg(QString::number(rect.bottom(), 'f', 3));
+
+            emit showMessage(QString(tr("Set ROI ")) + str);
         }
     }
-    else if (paraId == PARA_DEPTH_ROI)
+    else if (paraId == PARA_DEPTH_FRAMETIME || paraId == PARA_CAMERA_IP)
     {
-        QRectF rect = value.toRectF();
-
-        QString str = QString("[%1, %2, %3, %4]").arg(QString::number(rect.left(),   'f', 2))
-                                                 .arg(QString::number(rect.top(),    'f', 2))
-                                                 .arg(QString::number(rect.right(),  'f', 2))
-                                                 .arg(QString::number(rect.bottom(), 'f', 2));
-        ui->roiLabel->setText(str);
+        
     }
-    else if (paraId == PARA_DEPTH_FRAMETIME || paraId == PARA_TRIGGER_MODE)
+    else if (paraId == PARA_TRIGGER_MODE)
     {
+        if (value.toInt() == TRIGGER_MODE_SOFTWAER)
+        {
+           // ui->previewButton->setChecked(false);
+        }
     }
     else 
     {
@@ -617,8 +706,6 @@ void ParaSettingsWidget::onCameraParaItemsUpdated(int paraId)
 
 void ParaSettingsWidget::onParaLinkResponse(int paraId, QVariant value)
 {
-    CAMERA_PARA_ID cameraParaId = (CAMERA_PARA_ID)paraId;
-
     switch (paraId)
     {
     case PARA_DEPTH_AUTO_EXPOSURE:
@@ -626,18 +713,39 @@ void ParaSettingsWidget::onParaLinkResponse(int paraId, QVariant value)
             bool enable = !(value.toInt() > 0);
             paraWidgets[PARA_DEPTH_GAIN]->setEnabled(enable);
             paraWidgets[PARA_DEPTH_EXPOSURE]->setEnabled(enable);
+
+            paraMonitorThread->setAutoExposureDepth(!enable);
         }
         break;
     case PARA_RGB_AUTO_EXPOSURE:
         paraWidgets[PARA_RGB_EXPOSURE]->setEnabled(!value.toBool());
         paraWidgets[PARA_RGB_GAIN]->setEnabled(!value.toBool());
+
+        paraMonitorThread->setAutoExposureRgb(value.toBool());
         break;
     case PARA_RGB_AUTO_WHITE_BALANCE:
         paraWidgets[PARA_RGB_WHITE_BALANCE]->setEnabled(!value.toBool());
+
+        paraMonitorThread->setAutoWhiteBalance(value.toBool());
+
         break;
-    case PARA_DEPTH_HDR_MODE:
-        emit hdrModeChanged(value.toInt());
+    case PARA_DEPTH_HDR_MODE: {
+        bool isClosed = (value.toInt() == HDR_MODE_CLOSE);
+        hdrButtonArea->setVisible(!isClosed);
+
+        paraWidgets[PARA_DEPTH_HDR_SETTINGS]->setVisible(!isClosed); 
+        paraWidgets[PARA_DEPTH_HDR_LEVEL]->setEnabled(!isClosed);
+
+        if (value.toInt() == HDR_MODE_MANUAL)
+        {
+            hdrConfirmButton->setEnabled(true);
+        }
+        else 
+        {
+            hdrConfirmButton->setEnabled(false);
+        }
         break;
+    }
     case PARA_DEPTH_FILTER_TYPE:
         paraWidgets[PARA_DEPTH_FILTER]->setEnabled(!(value.toInt() == FILTER_CLOSE));
         break;
@@ -648,8 +756,6 @@ void ParaSettingsWidget::onParaLinkResponse(int paraId, QVariant value)
 
 void ParaSettingsWidget::onRefreshHdrSetting()
 {
-    emit hdrSettingsDialog->progressStateChanged(true);
-
     CAMERA_PARA_ID paraId = PARA_DEPTH_HDR_MODE;
 
     QVariant value;
@@ -660,8 +766,6 @@ void ParaSettingsWidget::onRefreshHdrSetting()
 
 void ParaSettingsWidget::onUpdateHdrSetting()
 {
-    emit hdrSettingsDialog->progressStateChanged(true);
-
     CAMERA_PARA_ID paraId = PARA_DEPTH_HDR_SETTINGS;
     QVariant value;
     paraWidgets[paraId]->getValue(value);
@@ -670,13 +774,7 @@ void ParaSettingsWidget::onUpdateHdrSetting()
 
 void ParaSettingsWidget::onRoiRectFUpdated(QRectF rect)
 {
-    roiRectF = rect;
-}
-
-void ParaSettingsWidget::onShow3DUpdate(bool show)
-{
-    ui->roiEditBtn->setEnabled(!show);
-    ui->roiLabel->setEnabled(!show);
+    cameraPtr->setCameraPara(PARA_DEPTH_ROI, rect);
 }
 
 void ParaSettingsWidget::onTranslate()
@@ -700,11 +798,18 @@ void ParaSettingsWidget::onTranslate()
         }
     }
 
+    topItemButton->retranslate("ParaSettingsWidget");
     // control button
     ui->previewButton->setToolTip(tr("Start preview"));
-    ui->restartCameraButton->setToolTip(tr("Restart camera"));
-    ui->disconnectCameraButton->setToolTip(tr("Disconnect camera"));
+    ui->captureSingleButton->setToolTip(tr("Capture single frame"));
+    ui->captureMultipleButton->setToolTip(tr("Capture multiple frames"));
     ui->singleShotButton->setToolTip(tr("Single Shot"));
+    ui->stopPreviewButton->setToolTip(tr("Stop preview"));
+
+    hdrRefreshButton->setText(tr("Refresh"));
+    hdrConfirmButton->setText(tr("OK"));
+       
+    captureSettingDialog->onTranslate();
 }
 
 void ParaSettingsWidget::onPreviewButtonToggled(bool toggled)
@@ -719,7 +824,13 @@ void ParaSettingsWidget::onPreviewStateChanged(bool toggled)
     const int value = camera->getCameraState();
     if (toggled)
     {
-        if (value == CAMERA_PAUSED_STREAM)
+        if (isSingleShotMode)
+        {
+            camera->setCameraPara(PARA_TRIGGER_MODE, TRIGGER_MODE_OFF);
+            isSingleShotMode = false;
+            ui->captureMultipleButton->setEnabled(true);
+        }
+        else if (value == CAMERA_PAUSED_STREAM)
         {
             emit cs::CSApplication::getInstance()->resumeStream();
         }
@@ -734,6 +845,12 @@ void ParaSettingsWidget::onPreviewStateChanged(bool toggled)
     }
 }
 
+void ParaSettingsWidget::onClickedStopStream()
+{
+    stopParaMonitor();
+    emit cs::CSApplication::getInstance()->stopStream();
+}
+
 void ParaSettingsWidget::onClickedRestartCamera()
 {
     emit cs::CSApplication::getInstance()->restartCamera();
@@ -742,4 +859,140 @@ void ParaSettingsWidget::onClickedRestartCamera()
 void ParaSettingsWidget::onClickedDisconnCamera()
 {
     emit cs::CSApplication::getInstance()->disconnectCamera();
+}
+
+void ParaSettingsWidget::onClickCaptureSingle()
+{
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    bool autoName = config->getAutoNameWhenCapturing();
+    QString openDir = config->getDefaultSavePath();
+
+    // set current output data
+    cs::CSApplication::getInstance()->setCurOutputData(captureConfig);
+    
+    if (autoName)
+    {
+        QDateTime now = QDateTime::currentDateTime();
+        QString time = now.toString("yyyyMMddHHmmsszzz");
+
+        captureConfig.saveDir = openDir;
+        captureConfig.saveName = time;
+        captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
+
+        cs::CSApplication::getInstance()->startCapture(captureConfig, true);
+    }
+    else 
+    {
+        qInfo() << "click capture single";
+        QUrl url = QFileDialog::getSaveFileUrl(this, tr("Capture frame data"), openDir);
+
+        if (url.isValid())
+        {
+            QFileInfo fileInfo(url.toLocalFile());
+
+            captureConfig.saveDir = fileInfo.absolutePath();
+            captureConfig.saveName = fileInfo.fileName();
+            captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
+
+            cs::CSApplication::getInstance()->startCapture(captureConfig, false);
+        }
+        else
+        {
+            qInfo() << "Cancel capture";
+        }
+    }
+}
+
+void ParaSettingsWidget::onClickCaptureMultiple()
+{
+    qInfo() << "click capture multiple";
+    captureSettingDialog->show();
+}
+
+
+void ParaSettingsWidget::startParaMonitor()
+{
+    paraMonitorThread->start();
+}
+
+void ParaSettingsWidget::stopParaMonitor()
+{
+    paraMonitorThread->requestInterruption();
+    paraMonitorThread->wait();
+}
+
+void ParaSettingsWidget::onCaptureStateChanged(int captureType, int state, QString message)
+{
+    if (captureType != CAPTURE_TYPE_SINGLE)
+    {
+        return;
+    }
+
+    QString dir = QString("file:///%1").arg(captureConfig.saveDir);
+    QDesktopServices::openUrl(QUrl(dir));
+}
+
+ParaMonitorThread::ParaMonitorThread()
+    :cameraPtr(cs::CSApplication::getInstance()->getCamera())
+{
+
+}
+
+void ParaMonitorThread::run()
+{
+    const int interval = 100;
+    int count = 0;
+
+    while (!isInterruptionRequested())
+    {
+        QThread::msleep(interval);
+        if (count >= 30)
+        {
+            if (enableAutoExposureDepth)
+            {
+                QVariant value;
+                cameraPtr->getCameraPara(PARA_DEPTH_EXPOSURE, value);
+                emit cameraPtr->cameraParaUpdated(PARA_DEPTH_EXPOSURE, value);
+
+                cameraPtr->getCameraPara(PARA_DEPTH_GAIN, value);
+                emit cameraPtr->cameraParaUpdated(PARA_DEPTH_GAIN, value);
+            }
+
+            if (enableAutoExposureRgb)
+            {
+                QVariant value;
+                cameraPtr->getCameraPara(PARA_RGB_GAIN, value);
+                emit cameraPtr->cameraParaUpdated(PARA_RGB_GAIN, value);
+
+                cameraPtr->getCameraPara(PARA_RGB_EXPOSURE, value);
+                emit cameraPtr->cameraParaUpdated(PARA_RGB_EXPOSURE, value);
+            }
+
+            if (enableAutoWhiteBalance)
+            {
+                QVariant value;
+                cameraPtr->getCameraPara(PARA_RGB_WHITE_BALANCE, value);
+                emit cameraPtr->cameraParaUpdated(PARA_RGB_WHITE_BALANCE, value);
+            }
+
+            count = 0;
+        }
+
+        count++;
+    }
+}
+
+void ParaMonitorThread::setAutoExposureDepth(bool enable)
+{
+    enableAutoExposureDepth = enable;
+}
+
+void ParaMonitorThread::setAutoExposureRgb(bool enable)
+{
+    enableAutoExposureRgb = enable;
+}
+
+void ParaMonitorThread::setAutoWhiteBalance(bool enable)
+{
+    enableAutoWhiteBalance = enable;
 }

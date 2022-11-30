@@ -47,8 +47,13 @@
 #include <QMap>
 #include <QList>
 #include <QPair>
+#include <QPushButton>
 #include <memory>
 #include <QVariant>
+#include <QTimer>
+#include <QThread>
+
+#include <cstypes.h>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ParameterSettingsWidget; }
@@ -58,6 +63,11 @@ class CSParaWidget;
 QT_END_NAMESPACE
 
 class HDRSettingsDialog;
+class CaptureSettingDialog;
+class QSpacerItem;
+class CSTextImageButton;
+class ParaMonitorThread;
+
 class ParaSettingsWidget : public QWidget
 {
     Q_OBJECT
@@ -75,7 +85,6 @@ public slots:
     void onCameraStateChanged(int state);
     void onUpdatedCameraParas();
     //roi
-    void onShow3DUpdate(bool show);
     void onRoiRectFUpdated(QRectF rect);
 
     // control
@@ -83,14 +92,20 @@ public slots:
     void onPreviewButtonToggled(bool toggled);
     void onClickedRestartCamera();
     void onClickedDisconnCamera();
+    void onClickedStopStream();
+    void onClickSingleShot();
+
+    void onClickCaptureSingle();
+    void onClickCaptureMultiple();
+
+    void onCaptureStateChanged(int captureType, int state, QString message);
 private slots:
     void onClickDepthButton();
     void onClickRgbButton();
-    void onClickHdrButton();
-    void onClickRoiEditButton(bool checked);
+    void onClickRoiEditButton();
+    void onClickFullScreenButton();
+
     void onPageChanged(int idx);
-    void onSingleShotChanged(bool checked);
-    void onClickSingleShot();
 
     // ui changed
     void onParaValueChanged(int paraId, QVariant value);
@@ -106,7 +121,7 @@ private slots:
 
     void onTranslate();
 signals:
-    void roiStateChanged(bool edit);
+    void roiStateChanged(bool edit, QRectF rect);
     void translateSignal();
     void hdrModeChanged(int mode);
     void clickedCloseButton();
@@ -117,12 +132,14 @@ private:
     void initHDRParaWidgets();
     void initParaConnections();
     void initRgbPara();
+    void initTopButton();
 
     void initConnections();
     void addDepthParaWidget(CSParaWidget* widget);
     void addRgbParaWidget(CSParaWidget* widget);
     void addDepthDividLine();
     void addRgbDividLine();
+    void addHdrButtons();
 
     void updateParaRanges();
     void updateParaValues();
@@ -132,15 +149,45 @@ private:
 
     void updateWidgetsState(int cameraState);
     void updateControlButtonState(int cameraState);
+
+    void stopParaMonitor();
+    void startParaMonitor();
 private:
     Ui::ParameterSettingsWidget* ui;
     std::shared_ptr<cs::ICSCamera> cameraPtr;
 
     QMap<int, CSParaWidget*> paraWidgets;
-    HDRSettingsDialog* hdrSettingsDialog;
+    CaptureSettingDialog* captureSettingDialog;
 
-    QRectF roiRectF;
+    QSpacerItem* verticalSpacer = nullptr;
+
+    QPushButton* hdrRefreshButton;
+    QPushButton* hdrConfirmButton;
+    QWidget* hdrButtonArea;
+
+    CSTextImageButton* topItemButton;
+    bool isSingleShotMode = false;
+
+    ParaMonitorThread* paraMonitorThread;
+
+    CameraCaptureConfig captureConfig;
 };
 
+class ParaMonitorThread : public QThread
+{
+    Q_OBJECT
+public:
+    ParaMonitorThread();
+    void run() override;
+
+    void setAutoExposureDepth(bool enable);
+    void setAutoExposureRgb(bool enable);
+    void setAutoWhiteBalance(bool enable);
+private:
+    bool enableAutoExposureDepth = false;
+    bool enableAutoExposureRgb = false;
+    bool enableAutoWhiteBalance = false;
+    std::shared_ptr<cs::ICSCamera> cameraPtr;
+};
 
 #endif //_CS_PARASETTINGSWIDGET_H

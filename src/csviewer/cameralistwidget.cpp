@@ -54,13 +54,19 @@
 #include "icscamera.h"
 #include "cstypes.h"
 
+#include "csimagebutton.h"
+#include "cslistitem.h"
+
 CameraListWidget::CameraListWidget(QWidget* parent)
     : QWidget(parent)
     , ui(new Ui::CameraListWidget)
 {
+    setAttribute(Qt::WA_StyledBackground);
     ui->setupUi(this);
     iniWidget();
     initConnections();
+
+    setObjectName("CameraListWidget");
 }
 
 CameraListWidget::~CameraListWidget()
@@ -68,24 +74,31 @@ CameraListWidget::~CameraListWidget()
     delete ui;
 }
 
-void CameraListWidget::onClickedConnectButton()
+void CameraListWidget::onClickedCameraListItem(bool selected, QString serial, QListWidgetItem* listItem)
 {
-    auto curItem = ui->cameraListWidget->currentItem();
-    if (curItem)
+    if (selected)
     {
-        auto serial = curItem->text();
+        // disconnect camera
+        emit disconnectCamera();
+    }
+    else 
+    {
+        // connect to camera
+
+        // clear last
+        for (int i = 0; i < ui->cameraListWidget->count(); i++)
+        {
+            QListWidgetItem* item = ui->cameraListWidget->item(i);
+            QWidget* itemWidget = ui->cameraListWidget->itemWidget(item);
+            CSListItem* csItem = qobject_cast<CSListItem*>(itemWidget);
+            if (csItem)
+            {
+                csItem->setSelected(false);
+            }
+        }
+
         emit connectCamera(serial);
     }
-}
-
-void CameraListWidget::onDoubleClickedCameraListView(QListWidgetItem* item)
-{
-    onClickedConnectButton();
-}
-
-void CameraListWidget::onCameraListIndexChanged(int index)
-{
-    ui->connectCameraBtn->setEnabled(index >= 0);
 }
 
 bool CameraListWidget::isNetConnect(QString info)
@@ -104,15 +117,7 @@ void CameraListWidget::onCameraListUpdated(const QStringList infoList)
     for (int i = 0; i < size; i++)
     {
         const QString& info = infoList.at(i);  
-        QIcon icon = isNetConnect(info) ? QIcon(":/resources/internet.png") : QIcon(":/resources/usb.png");
-
-        QListWidgetItem* item = new QListWidgetItem(icon, info);
-        item->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-        QColor color = (i % 2 == 1) ? QColor(229, 229, 229) : QColor(213, 213, 213);
-        item->setBackground(color);
-        item->setSelected(true);
-
-        ui->cameraListWidget->addItem(item);
+        addListWidgetItem(info);
 
         if (!curCameraSerial.isEmpty() && info.contains(curCameraSerial))
         {
@@ -120,29 +125,71 @@ void CameraListWidget::onCameraListUpdated(const QStringList infoList)
         }
     }
 
-    const int modelCount = ui->cameraListWidget->count();
-    if (modelCount > 0 && curSelect < 0)
+    if (curSelect >= 0)
     {
-        ui->cameraListWidget->setCurrentRow(0);
+        QListWidgetItem* item = ui->cameraListWidget->item(curSelect);
+        QWidget* itemWidget = ui->cameraListWidget->itemWidget(item);
+        CSListItem* csItem = qobject_cast<CSListItem*>(itemWidget);
+        if (csItem)
+        {
+            csItem->setSelected(true);
+        }
     }
-    else 
-    {
-        ui->cameraListWidget->setCurrentRow(curSelect);
-    }
+}
+
+void  CameraListWidget::addListWidgetItem(const QString& text)
+{
+    QIcon icon = QIcon(":/resources/tick.png");
+    CSListItem* item = new CSListItem(icon, text, QT_TR_NOOP("Disconnect"), QT_TR_NOOP("Connect"),  "CameraListWidget", ui->cameraListWidget);
+    ui->cameraListWidget->addItem(item->getListWidgetItem());
+    ui->cameraListWidget->setItemWidget(item->getListWidgetItem(), item);
+
+    connect(item, &CSListItem::toggled, this, &CameraListWidget::onClickedCameraListItem);
 }
 
 void CameraListWidget::onCameraStateChanged(int state)
 {
     CAMERA_STATE cameraState = (CAMERA_STATE)state;
+    
+    bool selected = false;
     switch (cameraState)
     {
+    case CAMERA_CONNECTED:
+        selected = true;
+        break;
     case CAMERA_DISCONNECTED:
-    case CAMERA_CONNECTFAILED:
     case CAMERA_DISCONNECTFAILED:
+    case CAMERA_CONNECTFAILED:
+        selected = false;
         break;
     default:
-        break;
+        return;
     }
+
+    // update current list widget 
+    auto curCameraSerial = QString(cs::CSApplication::getInstance()->getCamera()->getCameraInfo().cameraInfo.serial);
+    for (int i = 0; i < ui->cameraListWidget->count(); i++)
+    {
+        QListWidgetItem* item = ui->cameraListWidget->item(i);
+        QWidget* itemWidget = ui->cameraListWidget->itemWidget(item);
+        CSListItem* csItem = qobject_cast<CSListItem*>(itemWidget);
+        if (csItem)
+        {
+            if (!curCameraSerial.isEmpty() && csItem->getText().contains(curCameraSerial))
+            {
+                csItem->setSelected(true);
+            }
+            else 
+            {
+                csItem->setSelected(false);
+            }     
+        }
+    }
+}
+
+void CameraListWidget::onCameraListClicked(int rowIndex)
+{
+
 }
 
 void CameraListWidget::initConnections()
@@ -150,29 +197,54 @@ void CameraListWidget::initConnections()
     auto app = cs::CSApplication::getInstance();
 
     bool suc = true;
-    suc &= (bool)connect(ui->connectCameraBtn, &QPushButton::clicked, this, &CameraListWidget::onClickedConnectButton);
     suc &= (bool)connect(app, &cs::CSApplication::cameraListUpdated, this, &CameraListWidget::onCameraListUpdated);
     suc &= (bool)connect(app, &cs::CSApplication::cameraStateChanged, this, &CameraListWidget::onCameraStateChanged);
 
-    suc &= (bool)connect(ui->cameraListWidget, &QListWidget::itemDoubleClicked, this, &CameraListWidget::onDoubleClickedCameraListView);
-    suc &= (bool)connect(ui->cameraListWidget, &QListWidget::currentRowChanged, this, &CameraListWidget::onCameraListIndexChanged);
+    suc &= (bool)connect(this, &CameraListWidget::connectCamera,    app, &cs::CSApplication::connectCamera);
+    suc &= (bool)connect(this, &CameraListWidget::disconnectCamera, app, &cs::CSApplication::disconnectCamera);
 
-    suc &= (bool)connect(this, &CameraListWidget::connectCamera,   app, &cs::CSApplication::connectCamera);
     suc &= (bool)connect(this, &CameraListWidget::translateSignal, this, &CameraListWidget::onTranslate);
-    suc &= (bool)connect(ui->closeButton, &QPushButton::clicked,   this, &CameraListWidget::clickedCloseButton);
+    suc &= (bool)connect(ui->cameraListWidget, &QListWidget::currentRowChanged, this, &CameraListWidget::onCameraListClicked);
 
     Q_ASSERT(suc);
 }
 
 void CameraListWidget::iniWidget()
 {
-    ui->connectCameraBtn->setProperty("isCSStyle", true);
-    ui->cameraListIcon->setPixmap(QPixmap::fromImage(QImage(":/resources/camera_list.png")));
     ui->cameraListWidget->setFocusPolicy(Qt::NoFocus);
-    ui->connectCameraBtn->setEnabled(false);
+    initTopButton();
 }
 
 void CameraListWidget::onTranslate()
 {
     ui->retranslateUi(this);
+    topItemButton->retranslate("CameraListWidget");
+}
+
+void CameraListWidget::initTopButton()
+{
+    QIcon icon;
+    QSize size(10, 10);
+
+    icon.addFile(QStringLiteral(":/resources/double_arrow_down.png"), size, QIcon::Normal, QIcon::Off);
+    icon.addFile(QStringLiteral(":/resources/double_arrow_left.png"), size, QIcon::Selected, QIcon::On);
+    topItemButton = new CSTextImageButton(icon, QT_TR_NOOP("Camera List"), Qt::LeftToRight, ui->topItem);
+
+    auto* layout = ui->topItem->layout();
+    if (layout)
+    {
+        layout->addWidget(topItemButton);
+    }
+
+    connect(topItemButton, &CSTextImageButton::toggled, [=](bool checked)
+        {
+            if (checked)
+            {
+                ui->scrollArea->hide();
+            }
+            else
+            {
+                ui->scrollArea->show();
+            }
+        });
 }

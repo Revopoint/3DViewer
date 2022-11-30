@@ -41,44 +41,45 @@
 ******************************************************************************/
 
 #include "cswidgets/cscombobox.h"
-#include <QFormLayout>
+
 #include <QListView>
-#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include <QDebug>
 
-CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent, Qt::Orientation orientation)
+CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent, const char* tips)
     : CSParaWidget(paraId, title, parent)
     , comboBox(new CustomComboBox(this))
     , titleLabel(new QLabel(this))
     , lastIndex(-1)
+    , tips(tips)
 {
-    if (orientation == Qt::Horizontal)
+    //setAttribute(Qt::WA_StyledBackground);
+    setObjectName("CSComboBox");
+    titleLabel->setObjectName("TitleLabel");
+
+    QHBoxLayout* layout = new QHBoxLayout(this);
+
+    titleLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    layout->addWidget(titleLabel);
+    layout->addWidget(comboBox);
+
+    // add tips button
+    if (strlen(tips) > 0)
     {
-        setObjectName("CSHComboBox");
-
-        QFormLayout* formLayout = new QFormLayout(this);
-        formLayout->setSpacing(0);
-        formLayout->setContentsMargins(15, 0, 15, 0);
-        formLayout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
-
-        titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
-
-        formLayout->setWidget(0, QFormLayout::LabelRole, titleLabel);
-        formLayout->setWidget(0, QFormLayout::FieldRole, comboBox);
-
+        tipsButton = new QPushButton(this);
+        tipsButton->setObjectName("tipsButton");
+        layout->addWidget(tipsButton);
     }
-    else 
-    {
-        setObjectName("CSVComboBox");
-        titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-        QVBoxLayout* layout = new QVBoxLayout(this);
-        layout->addWidget(titleLabel);
-        layout->addWidget(comboBox);
-        layout->setContentsMargins(15, 0, 15, 0);
-    }
+    layout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
 
     QListView* listView = new QListView(this);
+    comboBox->setFocusPolicy(Qt::NoFocus);
+    listView->setFocusPolicy(Qt::NoFocus);
+
     comboBox->setView(listView);
 
     bool suc = true;
@@ -140,5 +141,10 @@ void CSComboBox::retranslate(const char* context)
     if (strlen(paraName) > 0)
     {       
         titleLabel->setText(QApplication::translate(context, paraName));
+    }
+
+    if(tipsButton)
+    {
+        tipsButton->setToolTip(QApplication::translate(context, tips));
     }
 }

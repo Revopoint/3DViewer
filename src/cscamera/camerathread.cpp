@@ -324,6 +324,13 @@ void CameraThread::onStartStream()
     qInfo() << "start stream end";
 }
 
+void CameraThread::onStopStream()
+{
+    qInfo() << "begin stop stream";
+    cameraProxy->stopStream();
+    qInfo() << "start stop end";
+}
+
 void CameraThread::onPausedStream()
 {
     qInfo() << "begin pause stream";

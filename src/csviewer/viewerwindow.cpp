@@ -48,18 +48,22 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QTranslator>
-#include <QDesktopServices>
 #include <QThread>
 
 #include <cstypes.h>
 #include <icscamera.h>
 
 #include "csapplication.h"
-#include "renderwidget2d.h"
+#include "renderwidget.h"
 #include "./app_version.h"
 #include "camerainfodialog.h"
 #include "csprogressbar.h"
 #include "csmessagebox.h"
+#include "appconfig.h"
+#include "csaction.h"
+#include "ipsettingdialog.h"
+#include "cameraplayerdialog.h"
+#include "formatconvertdialog.h"
 
 #define GITHUB_URL "https://github.com/Revopoint/3DViewer"
 #define WEBSITE_URL "https://www.revopoint3d.com/"
@@ -67,7 +71,6 @@
 ViewerWindow::ViewerWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::ViewerWindow)
-    , language(LANGUAGE_EN)
     , translator(new QTranslator(this))
     , cameraInfoDialog(new CameraInfoDialog())
     , circleProgressBar(new CSProgressBar(this))
@@ -75,12 +78,6 @@ ViewerWindow::ViewerWindow(QWidget *parent)
 {
     // init translator
     qApp->installTranslator(translator);
-    QString qmFile = ( language == LANGUAGE_ZH ) ? "lang_zh.qm" : "lang_en.qm";
-    qmFile = QString("%1/translations/%2").arg(QApplication::applicationDirPath()).arg(qmFile);
-    if (!translator->load(QDir::cleanPath(qmFile)))
-    {
-        qDebug() << "load qm failed : " << qmFile;
-    }
 
     // set ui
     ui->setupUi(this);
@@ -89,12 +86,13 @@ ViewerWindow::ViewerWindow(QWidget *parent)
     // set up signal connections
     initConnections();
 
-    render2dWidgets[CAMERA_DATA_L] = nullptr;
-    render2dWidgets[CAMERA_DATA_R] = nullptr;
-    render2dWidgets[CAMERA_DATA_DEPTH] = nullptr;
-    render2dWidgets[CAMERA_DATA_RGB] = nullptr;
+    // set language
+    language = (cs::CSApplication::getInstance()->getAppConfig()->getLanguage() == "zh") ? LANGUAGE_ZH : LANGUAGE_EN;
 
-    emit translateSignal();
+    ui->actionEnglish->setChecked(language == LANGUAGE_EN);
+    ui->actionChinese->setChecked(language == LANGUAGE_ZH);
+
+    onLanguageChanged();
 }
 
 ViewerWindow::~ViewerWindow()
@@ -102,6 +100,15 @@ ViewerWindow::~ViewerWindow()
     qApp->removeTranslator(translator);
     delete ui;
     delete cameraInfoDialog;
+    if (cameraPlayerDialog)
+    {
+        delete cameraPlayerDialog;
+    }
+
+    if (formatConvertDialog)
+    {
+        delete formatConvertDialog;
+    }
 }
 
 void ViewerWindow::initConnections()
@@ -110,26 +117,27 @@ void ViewerWindow::initConnections()
 
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app,  &cs::CSApplication::cameraStateChanged,   this, &ViewerWindow::onCameraStateChanged);
-    suc &= (bool)connect(app,  &cs::CSApplication::output3DUpdated,      this, &ViewerWindow::onOutput3DUpdated);
     suc &= (bool)connect(app,  &cs::CSApplication::removedCurrentCamera, this, &ViewerWindow::onRemovedCurrentCamera);
-    suc &= (bool)connect(app,  &cs::CSApplication::exportFinished,       this, &ViewerWindow::onExportFinished); 
+    suc &= (bool)connect(app,  &cs::CSApplication::captureStateChanged,  this, &ViewerWindow::onCaptureStateChanged);
+
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
- 
-    suc &= (bool)connect(ui->modeSwitchButton,  &QPushButton::clicked,                   this, &ViewerWindow::onClickedModeSwitchButton);
-    suc &= (bool)connect(ui->cameraListWidget,  &CameraListWidget::clickedCloseButton,   this, &ViewerWindow::onClickedModeSwitchButton);
-    suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::clickedCloseButton, this, &ViewerWindow::onClickedModeSwitchButton);
+    suc &= (bool)connect(this, &ViewerWindow::windowLayoutChanged,       app,  &cs::CSApplication::onWindowLayoutChanged, Qt::QueuedConnection);
+
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::showMessage,        this, &ViewerWindow::onShowStatusBarMessage);
 
-    suc &= (bool)connect(ui->stackedWidget,     &QStackedWidget::currentChanged,         this, &ViewerWindow::onPageChanged);
-    suc &= (bool)connect(ui->tabWidget,         &QTabWidget::currentChanged,             this, &ViewerWindow::onRenderPageChanged);
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::roiStateChanged,    this, &ViewerWindow::onRoiEditStateChanged);
-    suc &= (bool)connect(ui->renderWidget3D,    &RenderWidget3D::show3DTextureChanged,   this, &ViewerWindow::onShow3DTextureChanged);
-    suc &= (bool)connect(ui->renderWidget3D,    &RenderWidget3D::exportPointCloud,       this, &ViewerWindow::onExportPointCloud);
 
-    suc &= (bool)connect(this, &ViewerWindow::translateSignal,   this,                   &ViewerWindow::onTranslate,            Qt::QueuedConnection);
-    suc &= (bool)connect(this, &ViewerWindow::renderInitialized, this,                   &ViewerWindow::onRenderInitialized,    Qt::QueuedConnection);
-    suc &= (bool)connect(this, &ViewerWindow::translateSignal,   ui->cameraListWidget,   &CameraListWidget::translateSignal,    Qt::QueuedConnection);
-    suc &= (bool)connect(this, &ViewerWindow::translateSignal,   ui->paraSettingWidget,  &ParaSettingsWidget::translateSignal,  Qt::QueuedConnection);
+    suc &= (bool)connect(this, &ViewerWindow::translateSignal,     this,                   &ViewerWindow::onTranslate,            Qt::QueuedConnection);
+    suc &= (bool)connect(this, &ViewerWindow::translateSignal,     ui->cameraListWidget,   &CameraListWidget::translateSignal,    Qt::QueuedConnection);
+    suc &= (bool)connect(this, &ViewerWindow::translateSignal,     ui->paraSettingWidget,  &ParaSettingsWidget::translateSignal,  Qt::QueuedConnection);
+
+    suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,           ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
+    suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,       ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
+    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated,           ui->renderWindow,   &RenderWindow::onOutput3DUpdated);
+    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated,           ui->renderWindow,   &RenderWindow::onOutput2DUpdated);
+
+    suc &= (bool)connect(ui->renderWindow, &RenderWindow::roiRectFUpdated,   this,               &ViewerWindow::onRoiRectFUpdated);
+    suc &= (bool)connect(ui->renderWindow, &RenderWindow::renderExit,        this,               &ViewerWindow::onRenderExit, Qt::QueuedConnection);
 
     // menu
     suc &= (bool)connect(ui->menuLanguage,            &QMenu::triggered,     this, &ViewerWindow::onUpdateLanguage);
@@ -138,7 +146,18 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionExit,              &QAction::triggered,   this, &ViewerWindow::onAppExit);
     suc &= (bool)connect(ui->actionInfomation,        &QAction::triggered,   this, &ViewerWindow::onTriggeredInformation);
     suc &= (bool)connect(ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
-  
+    suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
+    suc &= (bool)connect(ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
+    suc &= (bool)connect(ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
+    suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
+    suc &= (bool)connect(ui->actionManual,            &QAction::triggered,   this, &ViewerWindow::onTriggeredManual);
+
+    suc &= (bool)connect(ui->actionTile,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTile);
+    suc &= (bool)connect(ui->actionTabs,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTabs);
+
+    suc &= (bool)connect(ui->menuViews,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
+    suc &= (bool)connect(ui->menuAutoNameWhenCapturuing, &QMenu::triggered, this, &ViewerWindow::onAutoNameMenuTriggered);
+
     Q_ASSERT(suc);      
 }
 
@@ -152,63 +171,18 @@ void ViewerWindow::initWindow()
     ui->actionEnglish->setChecked(language == LANGUAGE_EN);
     ui->actionChinese->setChecked(language == LANGUAGE_ZH);
 
-    //set page
-    ui->stackedWidget->setCurrentIndex(CAMERALIST_PAGE);
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
+    ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 
-    //disable 3d tab
-    ui->tabWidget->setTabEnabled(RENDER_PAGE_3D, false);
+    bool autoName = config->getAutoNameWhenCapturing();
+    ui->actionOff->setChecked(!autoName);
+    ui->actionOn->setChecked(autoName);
 }
 
-void ViewerWindow::onClickedModeSwitchButton()
-{
-    const int curIdx = ui->stackedWidget->currentIndex();
-    
-    int idx = curIdx + 1;
-    if (idx >= PAGE_COUNT)
-    {
-        idx = 0;
-    }
-
-    ui->stackedWidget->setCurrentIndex(idx);
-}
-
-void ViewerWindow::onPageChanged(int idx)
-{
-    STACK_WIDGET_PAGE_ID curPage = (STACK_WIDGET_PAGE_ID)idx;
-
-    switch (curPage)
-    {
-    case PARASETTING_PAGE:
-        ui->modeSwitchButton->setText(tr("Camera List"));
-        break;
-    case CAMERALIST_PAGE:
-        ui->modeSwitchButton->setText(tr("Parameter Settings"));
-        emit cs::CSApplication::getInstance()->queryCameras();
-        break;
-    default:
-        qWarning() << "invalid page index.";
-        break;
-    }
-}
-
-// switch 2D/3D
 void ViewerWindow::onRenderPageChanged(int idx)
 {
-    RENDER_PAGE_ID pageId = (RENDER_PAGE_ID)idx;
-    switch (pageId)
-    {
-    case RENDER_PAGE_2D:
-        cs::CSApplication::getInstance()->getCamera()->setProperty("showRender3D", false);
-        break;
-    case RENDER_PAGE_3D:
-        cs::CSApplication::getInstance()->getCamera()->setProperty("showRender3D", true);
-        break;
-    default:
-        qWarning() << "invalid page index.";
-        break;
-    }
-
-    ui->paraSettingWidget->onShow3DUpdate(pageId == RENDER_PAGE_3D);
+    emit show3DUpdated(idx == RENDER_PAGE_3D);
 }
 
 void ViewerWindow::onCameraStateChanged(int state)
@@ -227,30 +201,33 @@ void ViewerWindow::onCameraStateChanged(int state)
     
     case CAMERA_CONNECTED:
     {
-        ui->stackedWidget->setCurrentIndex(PARASETTING_PAGE);
         ui->menuCamera->setEnabled(true);
-        auto camera = cs::CSApplication::getInstance()->getCamera();
-        CSCameraInfo info = camera->getCameraInfo();
+
+        // update camera info dialog
+        CSCameraInfo info = cs::CSApplication::getInstance()->getCamera()->getCameraInfo();
         cameraInfoDialog->updateCameraInfo(info);
+
         circleProgressBar->close();
-        destoryRender2dWidgets();
         break;
     }
     case CAMERA_DISCONNECTED:
     case CAMERA_DISCONNECTFAILED:
-        destoryRender2dWidgets();
     case CAMERA_CONNECTFAILED:
         circleProgressBar->close();
         ui->menuCamera->setEnabled(false);
+        destoryRenderWindows();
         break;
     case CAMERA_STARTED_STREAM:
-        initRenderWidgets();
+        onCameraStreamStarted();
     case CAMERA_STOPPED_STREAM:
         circleProgressBar->close();
         break;
     default:    
         break;
     }
+
+    // update windows state
+    ui->menuWindows->setEnabled(cameraState == CAMERA_STARTED_STREAM);
 
     updateStatusBar(state);
 }
@@ -308,151 +285,9 @@ void ViewerWindow::updateStatusBar(int state)
     }
 }
 
-// render in UI thread
-void ViewerWindow::onOutput2DUpdated(OutputData2D outputData)
+void ViewerWindow::onRoiEditStateChanged(bool edit, QRectF rect)
 {
-    RenderWidget2D* widget = render2dWidgets[outputData.info.cameraDataType];
-    if (widget)
-    {
-        widget->onRenderDataUpdated(outputData);
-    }
-}
-
-void ViewerWindow::onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& image)
-{
-    ui->renderWidget3D->onRenderDataUpdated(pointCloud, image);
-}
-
-void ViewerWindow::destoryRender2dWidgets()
-{
-    disconnect(cs::CSApplication::getInstance(), &cs::CSApplication::output2DUpdated, this, &ViewerWindow::onOutput2DUpdated);
-
-    for (auto key : render2dWidgets.keys())
-    {
-        if (render2dWidgets[key])
-        {
-            ui->render2dTopLayout->removeWidget(render2dWidgets[key]);
-            ui->render2dBottomLayout->removeWidget(render2dWidgets[key]);
-
-            delete render2dWidgets[key];
-            render2dWidgets[key] = nullptr;
-        }
-    }
-}
-
-void ViewerWindow::initRenderConnections()
-{
-    bool suc = true;
-    for (auto key : render2dWidgets.keys())
-    {
-        auto renderWidget = render2dWidgets[key];
-        if (renderWidget)
-        {
-            suc &= (bool)connect(renderWidget, &RenderWidget2D::clickedExport, this, &ViewerWindow::onClickedExport);
-            if (key == CAMERA_DATA_DEPTH)
-            {        
-                suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(renderWidget), &DepthRenderWidget2D::roiRectFUpdated,  this, &ViewerWindow::onRoiRectFUpdated);
-                suc &= (bool)connect(qobject_cast<DepthRenderWidget2D*>(renderWidget), &DepthRenderWidget2D::showCoordChanged, this, &ViewerWindow::onShowCoordChanged);
-            }
-        }
-    }
-
-    suc &= (bool)connect(cs::CSApplication::getInstance(), &cs::CSApplication::output2DUpdated, this, &ViewerWindow::onOutput2DUpdated);
-    Q_ASSERT(suc);
-}
-
-// exec in UI thread
-void ViewerWindow::initRenderWidgets()
-{
-    // remove widget from layout
-    destoryRender2dWidgets();
-
-    // get camera parameter
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    QVariant hasRgbV, hasIrV, hasDepthV;
-    camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
-    camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_LR, hasIrV);
-    camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
-
-    const bool hasRgb = hasRgbV.toBool();
-    const bool hasIr = hasIrV.toBool();
-    const bool hasDepth = hasDepthV.toBool();
-
-    // has ir data
-    if (hasIr)
-    {
-        render2dWidgets[CAMERA_DATA_L] = new RenderWidget2D(CAMERA_DATA_L, this);
-        render2dWidgets[CAMERA_DATA_R] = new RenderWidget2D(CAMERA_DATA_R, this);
-
-        // add to layout
-        ui->render2dTopLayout->addWidget(render2dWidgets[CAMERA_DATA_L]);
-        ui->render2dTopLayout->addWidget(render2dWidgets[CAMERA_DATA_R]);
-    }
-
-    // has depth data
-    if (hasDepth)
-    {
-        render2dWidgets[CAMERA_DATA_DEPTH] = new DepthRenderWidget2D(CAMERA_DATA_DEPTH, this);
-        ui->render2dBottomLayout->addWidget(render2dWidgets[CAMERA_DATA_DEPTH]);
-    }
-
-    // has RGB data 
-    if (hasRgb)
-    {
-        render2dWidgets[CAMERA_DATA_RGB] = new RenderWidget2D(CAMERA_DATA_RGB, this);
-        ui->render2dBottomLayout->addWidget(render2dWidgets[CAMERA_DATA_RGB]);
-    }
-
-    // make connections after render widget initialized
-    emit renderInitialized();
-
-    // update ui state
-    ui->tabWidget->setTabEnabled(RENDER_PAGE_3D, hasDepth);
-    ui->renderWidget3D->setEnabled(hasDepth);
-    // enable texture when has rgb
-    ui->renderWidget3D->setTextureEnable(hasRgb);
-}
-
-void ViewerWindow::onRenderInitialized()
-{
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    // depth resolution
-    QVariant depthRes;
-    camera->getCameraPara(cs::parameter::PARA_DEPTH_RESOLUTION, depthRes);
-    auto depthRatio  = depthRes.toSize().width() * 1.0f / depthRes.toSize().height();
-
-    // set (width/height) ratio
-    if (render2dWidgets[CAMERA_DATA_L])
-    {
-        render2dWidgets[CAMERA_DATA_L]->setWHRatio(depthRatio);
-        render2dWidgets[CAMERA_DATA_R]->setWHRatio(depthRatio);
-    }
-
-    if (render2dWidgets[CAMERA_DATA_DEPTH])
-    {
-        render2dWidgets[CAMERA_DATA_DEPTH]->setWHRatio(depthRatio);
-    }
-
-    if (render2dWidgets[CAMERA_DATA_RGB])
-    {
-        // set (width/height) ratio
-        QVariant rgbRes;
-        camera->getCameraPara(cs::parameter::PARA_RGB_RESOLUTION, rgbRes);
-        auto res = rgbRes.toSize();
-        render2dWidgets[CAMERA_DATA_RGB]->setWHRatio(res.width() * 1.0 / res.height());
-    }
-
-    // set up signal connections
-    initRenderConnections();
-}
-
-void ViewerWindow::onRoiEditStateChanged(bool edit)
-{
-    DepthRenderWidget2D* widget = qobject_cast<DepthRenderWidget2D*>(render2dWidgets[CAMERA_DATA_DEPTH]);;
-    if (widget)
-    {
-        widget->onRoiEditStateChanged(edit);
-    }
+    ui->renderWindow->onRoiEditStateChanged(edit, rect);
 }
 
 void ViewerWindow::onRoiRectFUpdated(QRectF rect)
@@ -460,30 +295,21 @@ void ViewerWindow::onRoiRectFUpdated(QRectF rect)
     ui->paraSettingWidget->onRoiRectFUpdated(rect);
 }
 
-void ViewerWindow::onShowCoordChanged(bool show, QPointF pos)
-{
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    camera->setProperty("showDepthCoord", show);
-    camera->setProperty("showDepthCoordPos", pos);
-}
-
-void ViewerWindow::onShow3DTextureChanged(bool texture)
-{
-    auto camera = cs::CSApplication::getInstance()->getCamera();
-    camera->setProperty("show3DWithTexture", texture);
-}
-
 void ViewerWindow::onUpdateLanguage(QAction* action)
 {
+    auto app = cs::CSApplication::getInstance();
+
     if (action == ui->actionChinese)
     {
         ui->actionEnglish->setChecked(false);
         language = LANGUAGE_ZH;
+        app->getAppConfig()->setLanguage("zh");
     }
     else
     {
         ui->actionChinese->setChecked(false);
         language = LANGUAGE_EN;
+        app->getAppConfig()->setLanguage("en");
     }
 
     onLanguageChanged();
@@ -507,29 +333,6 @@ void ViewerWindow::onTriggeredRestartCamera()
     emit cs::CSApplication::getInstance()->restartCamera();
 }
 
-void ViewerWindow::onExportPointCloud()
-{
-    QString suffix = ".ply";
-    QString filter = QString("Point Cloud(*%1)").arg(suffix);
-    QUrl url =  QFileDialog::getSaveFileUrl(this, tr("Save Point Cloud"), QDir::currentPath(), filter);
-
-    if (url.isValid())
-    {
-        QString localFile = url.toLocalFile();
-        if (!localFile.endsWith(suffix))
-        {
-            localFile += suffix;
-        }
-        cs::CSApplication::getInstance()->onExportPointCloud(localFile);
-        //show progress bar
-        circleProgressBar->open();
-    }
-    else 
-    {
-        qInfo() << "Cancel saving the model";
-    }
-}
-
 void ViewerWindow::onTriggeredInformation()
 {
     cameraInfoDialog->show();
@@ -538,6 +341,28 @@ void ViewerWindow::onTriggeredInformation()
 void ViewerWindow::onTriggeredLogDir()
 {
     QDesktopServices::openUrl(QUrl::fromLocalFile(LOG_ROOT_DIR));
+}
+
+void ViewerWindow::onTriggeredDefaultSavePath()
+{
+    qInfo() << "trigger default save path";
+
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    QString dirPath = QFileDialog::getExistingDirectory(this, tr("Set default save path"), config->getDefaultSavePath());
+
+    if (!dirPath.isEmpty())
+    {
+        config->setDefaultSavePath(dirPath);
+
+        QString defaultSavePath = tr("Set default save path (") + dirPath + ")";
+        ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+        
+        onShowStatusBarMessage(defaultSavePath, 3000);
+    }
+    else
+    {
+        qInfo() << "Cancel set default save path";
+    }
 }
 
 void ViewerWindow::onAppExit()
@@ -581,15 +406,27 @@ void ViewerWindow::onTranslate()
     ui->retranslateUi(this);
     cameraInfoDialog->onTranslate();
     globalMessageBox->retranslate();
-    ui->renderWidget3D->onTranslate();
 
-    for (auto widget : render2dWidgets)
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
+    ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+
+    if (ipSettingDialog)
     {
-        if (widget)
-        {
-            widget->onTranslate();
-        }
+        ipSettingDialog->onTranslate();
     }
+
+    if (formatConvertDialog)
+    {
+        formatConvertDialog->onTranslate();
+    }
+
+    if (cameraPlayerDialog)
+    {
+        cameraPlayerDialog->onTranslate();
+    }
+
+    ui->renderWindow->onTranslate();
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
@@ -603,7 +440,6 @@ void ViewerWindow::onRemovedCurrentCamera(QString serial)
 void ViewerWindow::onConfirmCameraRemoved()
 {
     disconnect(globalMessageBox, &CSMessageBox::accepted, this, &ViewerWindow::onConfirmCameraRemoved);
-    ui->stackedWidget->setCurrentIndex(CAMERALIST_PAGE);
 }
 
 void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
@@ -618,37 +454,206 @@ void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
     }
 }
 
-void ViewerWindow::onClickedExport(int cameraType)
+void ViewerWindow::onCaptureStateChanged(int captureType, int state, QString message)
 {
-    QUrl url = QFileDialog::getSaveFileUrl(this, tr("Export stream data"), QDir::currentPath(), "");
-    if (url.isValid())
+    onShowStatusBarMessage(message, 5000);
+}
+
+void ViewerWindow::onCameraStreamStarted()
+{
+    // get camera parameter
+    auto camera = cs::CSApplication::getInstance()->getCamera();
+
+    QVariant hasRgbV, hasIrV, hasDepthV;
+    camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+    camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_IR, hasIrV);
+    camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
+
+    for (auto action : windowActions)
     {
-        QString localFile = url.toLocalFile();
-        if (cameraType == CAMERA_DATA_RGB)
-        {
-            cs::CSApplication::getInstance()->onExportRgbData(localFile);
-        }
-        else 
-        {
-            cs::CSApplication::getInstance()->onExportDepthData(localFile);
-        }
-        circleProgressBar->open();
+        ui->menuWindows->removeAction(action);
+        delete action;
     }
-    else
+    windowActions.clear();
+
+    if (hasIrV.toBool())
     {
-        qInfo() << "Cancel exporting stream data";
+        windowActions.push_back(new CSAction(CAMERA_DATA_L, "IR(L)"));
+        windowActions.push_back(new CSAction(CAMERA_DATA_R, "IR(R)"));
+    }
+
+    if (hasDepthV.toBool())
+    {
+        windowActions.push_back(new CSAction(CAMERA_DATA_DEPTH, "Depth"));
+        windowActions.push_back(new CSAction(CAMERA_DATA_POINT_CLOUD, "Point Cloud"));
+    }
+
+    if (hasRgbV.toBool())
+    {
+        windowActions.push_back( new CSAction(CAMERA_DATA_RGB, "RGB"));
+    }
+
+    ui->renderWindow->setShowTextureEnable(hasRgbV.toBool());
+
+    updateWindowActions();
+    onRenderWindowUpdated();
+}
+
+void ViewerWindow::onWindowsMenuTriggered(QAction* action)
+{
+    if (action)
+    {
+        onRenderWindowUpdated();
     }
 }
 
-void ViewerWindow::onExportFinished(bool success)
+void ViewerWindow::onRenderWindowUpdated()
 {
-    circleProgressBar->close();
-    if (success)
+    QVector<int> windows;
+    for (auto action : windowActions)
     {
-        onShowStatusBarMessage(tr("Export successfully"), 5000);
+        if (action->isChecked())
+        {
+            windows.push_back(action->getType());
+        }
     }
-    else
+
+    // notify to render window
+    emit renderWindowUpdated(windows);
+    onWindowLayoutChanged();
+}
+
+void ViewerWindow::onTriggeredWindowsTile()
+{
+    renderLayoutMode = LAYOUT_TILE;
+    ui->actionTabs->setChecked(false);
+
+    emit windowLayoutModeUpdated(LAYOUT_TILE);
+    onWindowLayoutChanged();
+}
+
+void ViewerWindow::onTriggeredWindowsTabs()
+{
+    renderLayoutMode = LAYOUT_TAB;
+    ui->actionTile->setChecked(false);
+
+    emit windowLayoutModeUpdated(LAYOUT_TAB);
+    onWindowLayoutChanged();
+}
+
+void ViewerWindow::onWindowLayoutChanged()
+{
+    QVector<int> windows;
+    for (auto action : windowActions)
     {
-        onShowStatusBarMessage(tr("Export failed"), 5000);
+        if (action->isChecked())
+        {
+            windows.push_back(action->getType());
+        }
     }
+
+    emit windowLayoutChanged(windows);
+}
+
+void ViewerWindow::updateWindowActions()
+{
+    for (auto action : windowActions)
+    {
+        ui->menuViews->addAction(action);
+
+        action->setCheckable(true);
+        action->setChecked(true);
+    }
+}
+
+void ViewerWindow::onRenderExit(int renderId)
+{
+    for (auto action : windowActions) 
+    {
+        if (action->getType() == renderId)
+        {
+            action->setChecked(false);
+            onRenderWindowUpdated();
+            break;
+        }
+    }
+}
+
+void ViewerWindow::destoryRenderWindows()
+{
+    for (auto action : windowActions)
+    {
+        ui->menuWindows->removeAction(action);
+        delete action;
+    }
+    windowActions.clear();
+    onRenderWindowUpdated();
+}
+
+void ViewerWindow::onTriggeredIpSetting()
+{
+    if (!ipSettingDialog) {
+        ipSettingDialog = new IpSettingDialog(this);
+        connect(ipSettingDialog, &IpSettingDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage);
+    }
+
+    ipSettingDialog->show();
+}
+
+void ViewerWindow::onTriggeredLoadFile()
+{
+    if (!cameraPlayerDialog)
+    {
+        cameraPlayerDialog = new CameraPlayerDialog();
+        connect(cameraPlayerDialog, &CameraPlayerDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
+    }
+
+    cameraPlayerDialog->onLoadFile();
+}
+
+void ViewerWindow::onTriggeredFormatConvert()
+{
+    if (!formatConvertDialog)
+    {
+        formatConvertDialog = new FormatConvertDialog();
+        connect(formatConvertDialog, &FormatConvertDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
+    }
+
+    formatConvertDialog->show();
+}
+
+void ViewerWindow::onAutoNameMenuTriggered(QAction* action)
+{
+    bool autoName = false;
+    if (action == ui->actionOff)
+    {
+        bool isChekcked = ui->actionOff->isChecked();
+        ui->actionOn->setChecked(!isChekcked);
+        autoName = !isChekcked;
+    }
+    else 
+    {
+        bool isChekcked = ui->actionOn->isChecked();
+        ui->actionOff->setChecked(!isChekcked);
+        autoName = isChekcked;
+    }
+
+    auto config = cs::CSApplication::getInstance()->getAppConfig();
+    config->setAutoNameWhenCapturing(autoName);
+}
+
+// If the current language is Chinese, open the Chinese manual or English manual
+void ViewerWindow::onTriggeredManual()
+{
+    QString manualPath = QString("%1/document/manual").arg(APP_PATH);
+    if (language == LANGUAGE_ZH)
+    {
+        manualPath += "/Chinese/index.html";
+    }
+    else 
+    {
+        manualPath += "/English/index.html";
+    }
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(manualPath));
 }

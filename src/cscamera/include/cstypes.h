@@ -68,19 +68,20 @@ enum CAMERA_STATE
     CAMERA_RESTARTING_CAMERA
 };
 
-enum FRAME_DATA_TYPE
+enum STREAM_DATA_TYPE
 {
     TYPE_UNKNOW            = 0,
     TYPE_DEPTH             = (1 << 0),
     TYPE_RGB               = (1 << 1),
-    TYPE_DEPTH_RGB         = (TYPE_DEPTH | TYPE_RGB)
 };
 
 struct StreamDataInfo 
 { 
+    STREAM_DATA_TYPE streamDataType;
     STREAM_FORMAT format;
     int width;
     int height;
+    double timeStamp;
 }; 
 
 struct StreamData
@@ -91,25 +92,31 @@ struct StreamData
  
 struct FrameData
 { 
-    FRAME_DATA_TYPE frameDataType;
-    QVector<StreamData> data; 
+    Intrinsics rgbIntrinsics;
+    Intrinsics depthIntrinsics;
+    Extrinsics extrinsics;
+    float depthScale;
+
+    QVector<StreamData> data;
 };
 
 Q_DECLARE_METATYPE(FrameData);
 
 enum CS_CAMERA_DATA_TYPE
 {
-    CAMERA_DATA_L = (1 << 0),
-    CAMERA_DATA_R = (1 << 1),
-    CAMERA_DATA_DEPTH = (1 << 2),
-    CAMERA_DATA_RGB = (1 << 3)
+    CAMERA_DATA_UNKNOW     = 0,
+    CAMERA_DATA_L          = (1 << 0),
+    CAMERA_DATA_R          = (1 << 1),
+    CAMERA_DATA_DEPTH      = (1 << 2),
+    CAMERA_DATA_RGB        = (1 << 3),
+    CAMERA_DATA_POINT_CLOUD = (1 << 4)
 };
 
 struct OutputInfo2D
 {
-    int cameraDataType;
-    QVector3D vertex;
-    float depthScale;
+    int cameraDataType = CAMERA_DATA_UNKNOW;
+    QVector3D vertex = { 1.0f, 1.0f, 1.0f };
+    float depthScale = 0.0f;
 };
 
 struct OutputData2D
@@ -124,6 +131,7 @@ Q_DECLARE_METATYPE(Extrinsics)
 Q_DECLARE_METATYPE(Intrinsics)
 Q_DECLARE_METATYPE(HdrExposureParam)
 Q_DECLARE_METATYPE(HdrExposureSetting)
+Q_DECLARE_METATYPE(CameraIpSetting)
 
 enum FILTER_TYPE
 {
@@ -161,6 +169,28 @@ struct CSCameraInfo
     int connectType;
     CameraInfo cameraInfo;
     QString sdkVersion;
+};
+
+enum CAMERA_CAPTURE_TYPE
+{
+    CAPTURE_TYPE_SINGLE,
+    CAPTURE_TYPE_MULTIPLE
+};
+struct CameraCaptureConfig
+{
+    CAMERA_CAPTURE_TYPE captureType;
+    int captureNumber = 1;
+    QVector<CS_CAMERA_DATA_TYPE> captureDataTypes;
+    bool savePointCloudWithTexture = false;
+    QString saveFormat;
+    QString saveDir;
+    QString saveName;
+};
+
+enum WINDOWLAYOUT_MODE
+{
+    LAYOUT_TILE,
+    LAYOUT_TAB
 };
 
 #endif // _CS_TYPES_H

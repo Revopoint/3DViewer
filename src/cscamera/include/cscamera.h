@@ -90,7 +90,7 @@ public:
     bool softTrigger() override;
 
     void onGetFrame(int timeout = GET_FRAME_TIME_OUT);
-    bool onProcessFrame(const IFramePtr& frame, FrameData& frameData);
+    bool onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, FrameData& frameData);
     void setCameraThread(QThread*  thread);
 
     CSCameraInfo getCameraInfo() const override;
@@ -114,6 +114,7 @@ private:
     void getFilterTypes(QList<QPair<QString, QVariant>>&) const;
     void getHdrModes(QList<QPair<QString, QVariant>>&) const;
     void getHdrLevels(QList<QPair<QString, QVariant>>&) const;
+    void getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>&);
 
     void setDepthFormat(STREAM_FORMAT format);
     void setDepthResolution(QSize res);
@@ -153,6 +154,10 @@ private:
     void setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value);
     void getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step);
 
+private:
+    void correctExposureRange(float& min, float& max, float& step);
+    void correctExposureValue(float& value);
+    void convertExposureValue(float& value);
 private:
     class StreamThread : public QThread
     {
@@ -198,18 +203,19 @@ private:
     int cachedDepthExposure;
     int cachedDepthGain;
 
-    //roi
-    QRectF roiRectF;
-
     Intrinsics depthIntrinsics;
     Intrinsics rgbIntrinsics;
     Extrinsics extrinsics;
+    float depthScale;
 
     StreamThread* streamThread;
     friend StreamThread;
 
     QThread* cameraThread;
     mutable QReadWriteLock lock;
+
+    float rgbExposureStep = 1;
+    float rgbExposureMin = 0;
 };
 }
 

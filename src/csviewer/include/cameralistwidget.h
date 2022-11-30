@@ -52,6 +52,7 @@ QT_END_NAMESPACE
 
 class QStandardItemModel;
 class QListWidgetItem;
+class CSTextImageButton;
 class CameraListWidget : public QWidget
 {
     Q_OBJECT
@@ -61,20 +62,23 @@ public:
 public slots:
     void onCameraListUpdated(const QStringList infoList);
     void onCameraStateChanged(int state);
+    void onCameraListClicked(int rowIndex);
+
 private slots:
-    void onClickedConnectButton(); 
-    void onDoubleClickedCameraListView(QListWidgetItem* item);
-    void onCameraListIndexChanged(int index);
+    void onClickedCameraListItem(bool selected, QString text, QListWidgetItem* listItem);
 signals:
     void connectCamera(QString serial);
+    void disconnectCamera();
     void translateSignal();
-    void clickedCloseButton();
 private:
     void iniWidget();
+    void initTopButton();
     void initConnections();
     void onTranslate();
-    bool isNetConnect(QString uuid);
+    bool isNetConnect(QString info);
+    void addListWidgetItem(const QString& text);
 private:
     Ui::CameraListWidget* ui;
+    CSTextImageButton* topItemButton;
 };
 #endif // _CS_CAMERALISTWIDGET_H

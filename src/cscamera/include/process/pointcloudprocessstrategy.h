@@ -46,22 +46,25 @@
 #include <QObject>
 #include "processstrategy.h"
 #include "depthprocessstrategy.h"
-#include "rgbprocessstrategy.h"
+#include "cscameraapi.h"
 
 namespace cs
 {
 
-class PointCloudProcessStrategy : public DepthProcessStrategy
+class CS_CAMERA_EXPORT PointCloudProcessStrategy : public DepthProcessStrategy
 {
     Q_OBJECT
     Q_PROPERTY(bool withTexture READ getWithTexture WRITE setWithTexture)
 public:
     PointCloudProcessStrategy();
-    void doProcess(const FrameData& frameData) override;
+    void doProcess(const FrameData& frameData, OutputDataPort& outputDataPort) override;
     void onLoadCameraPara() override;
 
     bool getWithTexture() const;
     void setWithTexture(bool with);
+private:
+    void generatePointCloud(const StreamData& depthData, Pointcloud& pc);
+    void generateTexture(const StreamData& rgbData, QImage& texImage);
 private:
     Intrinsics rgbIntrinsics;
     Extrinsics extrinsics;

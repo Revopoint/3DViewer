@@ -55,9 +55,15 @@
 using namespace cs;
 
 DepthProcessStrategy::DepthProcessStrategy()
-    : ProcessStrategy()
+    : DepthProcessStrategy(STRATEGY_DEPTH)
+{
+
+}
+
+DepthProcessStrategy::DepthProcessStrategy(PROCESS_STRA_TYPE type)
+    : ProcessStrategy(type)
     , calcDepthCoord(false)
-    , depthCoordCalcPos(QPointF (-1.0f, -1.0f))
+    , depthCoordCalcPos(QPointF(-1.0f, -1.0f))
     , fillHole(false)
     , filterValue(0)
     , filterType(0)
@@ -65,37 +71,42 @@ DepthProcessStrategy::DepthProcessStrategy()
 
 }
 
-void DepthProcessStrategy::doProcess(const FrameData& frameData)
+void DepthProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort& outputDataPort)
 {
     const auto& streamDatas = frameData.data;
 
     for (const auto& data : streamDatas)
     {
         STREAM_FORMAT format = data.dataInfo.format;
+        QVector<OutputData2D> outputData2Ds;
+
         switch (format)
         {
         case STREAM_FORMAT_Z16:
-            onProcessZ16(data);
+            outputData2Ds = onProcessZ16(data);
             break;
         case STREAM_FORMAT_Z16Y8Y8:
-            onProcessZ16Y8Y8(data);
+            outputData2Ds = onProcessZ16Y8Y8(data);
             break;
         case STREAM_FORMAT_PAIR:
-            onProcessPAIR(data);
+            outputData2Ds = onProcessPAIR(data);
             break;
         default:
             break;
         }
-    }
+
+        outputDataPort.addOutputData2D(outputData2Ds);
+    } 
 }
 
-void DepthProcessStrategy::processDepthData(const ushort* dataPtr, int length, int width, int height, OutputData2D& outputData)
+OutputData2D DepthProcessStrategy::processDepthData(const ushort* dataPtr, int length, int width, int height)
 {
     QByteArray output;
     QImage image;
 
     onProcessDepthData(dataPtr, length, width, height, output, image);
 
+    OutputData2D outputData;
     outputData.image = image;
 
     // calc point info
@@ -118,6 +129,8 @@ void DepthProcessStrategy::processDepthData(const ushort* dataPtr, int length, i
             outputData.info.depthScale = depthScale;
         }
     }
+
+    return outputData;
 }
 
 void DepthProcessStrategy::onProcessDepthData(const ushort* dataPtr, int length, int width, int height, QByteArray& output, QImage& depthImage)
@@ -203,7 +216,7 @@ void DepthProcessStrategy::timeDomainSmooth(const ushort* dataPtr, int length, i
     }
 }
 
-void DepthProcessStrategy::onProcessLData(const char* dataPtr, int length, int width, int height)
+OutputData2D DepthProcessStrategy::onProcessLData(const char* dataPtr, int length, int width, int height)
 {
     QImage imageL = QImage(width, height, QImage::Format_Grayscale8);
     memcpy(imageL.bits(), dataPtr, length);
@@ -212,9 +225,11 @@ void DepthProcessStrategy::onProcessLData(const char* dataPtr, int length, int w
     outputData.image = imageL;
     outputData.info.cameraDataType = CAMERA_DATA_L;
     emit output2DUpdated(outputData);
+
+    return outputData;
 }
 
-void DepthProcessStrategy::onProcessRData(const char* dataPtr, int length, int width, int height)
+OutputData2D DepthProcessStrategy::onProcessRData(const char* dataPtr, int length, int width, int height)
 {
     QImage imageR = QImage(width, height, QImage::Format_Grayscale8);
     memcpy(imageR.bits(), dataPtr, length);
@@ -223,22 +238,28 @@ void DepthProcessStrategy::onProcessRData(const char* dataPtr, int length, int w
     outputData.image = imageR;
     outputData.info.cameraDataType = CAMERA_DATA_R;
     emit output2DUpdated(outputData);
+    
+    return outputData;
 }
 
-void DepthProcessStrategy::onProcessZ16(const StreamData& streamData)
+QVector<OutputData2D> DepthProcessStrategy::onProcessZ16(const StreamData& streamData)
 {
     const int& width = streamData.dataInfo.width;
     const int& height = streamData.dataInfo.height;
     Q_ASSERT(streamData.data.size() == width * height * sizeof(ushort));
 
-    OutputData2D outputData;
+    OutputData2D outputData = processDepthData((const ushort*)streamData.data.data(), width * height, width, height);
     outputData.info.cameraDataType = CAMERA_DATA_DEPTH;
-    processDepthData((const ushort*)streamData.data.data(), width * height, width, height, outputData);
 
-    emit output2DUpdated(outputData, streamData);
+    emit output2DUpdated(outputData);
+
+    QVector<OutputData2D> outputDatas;
+    outputDatas.push_back(outputData);
+
+    return outputDatas;
 }
 
-void DepthProcessStrategy::onProcessZ16Y8Y8(const StreamData& streamData)
+QVector<OutputData2D> DepthProcessStrategy::onProcessZ16Y8Y8(const StreamData& streamData)
 {
     const int& width = streamData.dataInfo.width;
     const int& height = streamData.dataInfo.height;
@@ -247,40 +268,48 @@ void DepthProcessStrategy::onProcessZ16Y8Y8(const StreamData& streamData)
 
     Q_ASSERT(dataSize == (width * height * sizeof(ushort) + width * height * 2));
 
+    QVector<OutputData2D> outputDatas;
     //depth
-    OutputData2D outputData;
+    OutputData2D outputData = processDepthData((const ushort*)streamData.data.data() + dataOffset, width * height, width, height);
     outputData.info.cameraDataType = CAMERA_DATA_DEPTH;
-    processDepthData((const ushort*)streamData.data.data() + dataOffset, width * height, width, height, outputData);
+    outputDatas.push_back(outputData);
+
     dataOffset += width * height * sizeof(ushort);
-    emit output2DUpdated(outputData, streamData);
+    emit output2DUpdated(outputData);
 
     //L
-    onProcessLData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    outputData = onProcessLData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    outputDatas.push_back(outputData);
     dataOffset += width * height;
 
     //R
-    onProcessRData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    outputData = onProcessRData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    outputDatas.push_back(outputData);
     dataOffset += width * height;
+
+    return outputDatas;
 }
 
-void DepthProcessStrategy::onProcessPAIR(const StreamData& streamData)
+QVector<OutputData2D> DepthProcessStrategy::onProcessPAIR(const StreamData& streamData)
 {
     const int width = streamData.dataInfo.width;
     const int height = streamData.dataInfo.height;
     Q_ASSERT(streamData.data.size() == width * height * 2);
 
     int dataOffset = 0;
+
+    QVector<OutputData2D> outputDatas;
     //L
-    onProcessLData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    OutputData2D outputData = onProcessLData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    outputDatas.push_back(outputData);
     dataOffset += width * height;
 
     //R
-    onProcessRData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    outputData = onProcessRData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
+    outputDatas.push_back(outputData);
     dataOffset += width * height;
 
-    OutputData2D outputData;
-    outputData.info.cameraDataType = (CAMERA_DATA_L | CAMERA_DATA_R);
-    emit output2DUpdated(outputData, streamData);
+    return outputDatas;
 }
 
 void DepthProcessStrategy::onLoadCameraPara()

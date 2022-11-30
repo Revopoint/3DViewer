@@ -152,10 +152,10 @@ void CSLogger::onLog(int type, QString msg, QString file, QString line, QString 
     //QString ouputMsg = QString("[%1] %2 :  %3  (%4 : %5 : %6)").arg(sType).arg(time).arg(msg).arg(file).arg(line).arg(function);
 #ifdef  _DEBUG
     QString ouputMsg = QString("%2 %1 : %3  (%4 : %5)").arg(sType).arg(time).arg(msg).arg(list.last()).arg(line);
-    printf("%s\n", ouputMsg.toStdString().c_str());
 #else
     QString ouputMsg = QString("%2 %1 : %3").arg(sType).arg(time).arg(msg);
 #endif
+    printf("%s\n", ouputMsg.toStdString().c_str());
     // write to file
     redirect(ouputMsg);
 }
