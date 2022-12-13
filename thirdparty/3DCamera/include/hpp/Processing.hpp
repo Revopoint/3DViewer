@@ -762,7 +762,7 @@ namespace cs
 
 			int size = width * height;
 			// normalize
-#pragma omp parallel for
+#pragma omp parallel for 
 			for (int ui = 0; ui < size; ui++)
 			{
 				float3 p = points[ui];
