@@ -41,6 +41,7 @@
 ******************************************************************************/
 
 #include "cswidgets/cslineedit.h"
+#include <QIntValidator>
 
 CSLineEdit::CSLineEdit(QWidget* parent) 
     : QLineEdit(parent) 
@@ -64,6 +65,16 @@ void CSLineEdit::keyPressEvent(QKeyEvent* event)
 void CSLineEdit::focusOutEvent(QFocusEvent* e)
 {
     QLineEdit::focusOutEvent(e);
+
+    auto validator = qobject_cast<const QIntValidator*>(this->validator());
+    auto tex = this->text();
+
+    int num = 0;
+    if (validator && validator->validate(tex, num) == QIntValidator::Acceptable)
+    {
+        this->setText(QString::number(tex.toInt()));
+    }
+
     emit focusOutSignal();
 }
 

@@ -64,11 +64,11 @@ OutputSaver::~OutputSaver()
 
 void OutputSaver::run()
 {
-    // save point cloud
-    savePointCloud();
-
     // save 2D datas
     saveOutput2D();
+
+    // save point cloud
+    savePointCloud();
 
     cameraCapture->saveFinished();
 }
@@ -384,8 +384,18 @@ void RawOutputSaver::saveOutputDepth(StreamData& streamData)
     case STREAM_FORMAT_Z16:
     case STREAM_FORMAT_Z16Y8Y8:
     {
+        QByteArray saveData;
         QString savePath = getSavePath(CAMERA_DATA_DEPTH);
-        saveDataToFile(savePath, streamData.data);
+        if (streamData.dataInfo.format == STREAM_FORMAT_Z16)
+        {
+            saveData = streamData.data;
+        }
+        else 
+        {
+            saveData = streamData.data.left(streamData.data.size() / 2);
+        }
+
+        saveDataToFile(savePath, saveData);
         break;  
     }
     default:
@@ -418,7 +428,7 @@ void RawOutputSaver::saveOutputIr(StreamData& streamData)
 
             const int offset2 = pair.second * width * height + offset;
 
-            QByteArray data = streamData.data.right(streamData.data.size() - offset2);
+            QByteArray data = streamData.data.mid(offset2, width * height);
             saveDataToFile(savePath, data);
         }
         break;

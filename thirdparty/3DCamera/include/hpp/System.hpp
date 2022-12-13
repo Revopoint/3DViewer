@@ -279,4 +279,5 @@ CS_API void setCheckedCameraInited(bool enable);
 CS_API bool getCheckedCameraInited();
 
 }
+
 #endif

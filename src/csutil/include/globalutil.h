@@ -40,35 +40,23 @@
 * Info:  https://www.revopoint3d.com
 ******************************************************************************/
 
-#ifndef _CS_CSSPINBOX_H
-#define _CS_CSSPINBOX_H
+#ifndef _CS_GLOBAL_UTIL_H
+#define _CS_GLOBAL_UTIL_H
 
-#include "cswidgets/csparawidget.h"
-#include <QSpinBox>
+#include "csutilsapi.h"
+#include <QDebug>
+#include <QTime>
 
-class CustomSpinBox : public QSpinBox
+#define TIME_CHECK_BEGIN(name) QTime name; name.start();
+
+#define TIME_CHECK_END_AND_PRINT_EXTRA(name, extra) \
+    qInfo() << "==Time Check==" << #name << " " << extra<< " spend time : " << name.elapsed() << "ms";
+
+#define TIME_CHECK_END_AND_PRINT(name) TIME_CHECK_END_AND_PRINT_EXTRA(name, "")
+
+class GlobalUtil 
 {
-public:
-    CustomSpinBox(QWidget* parent = nullptr) : QSpinBox(parent) {}
-    void wheelEvent(QWheelEvent* e) override {}
+
 };
 
-class QLabel;
-class CSSpinBox : public CSParaWidget
-{
-    Q_OBJECT
-public:
-    CSSpinBox(int paraId, const char* title = "", QWidget* parent = nullptr);
-    ~CSSpinBox();
-    void setParaRange(const QVariant& min, const QVariant& max, const QVariant& step) override;
-    void setValue(const QVariant& value) override;
-    void retranslate(const char* context) override;
-    void clearValues() override;
-private slots:
-    void onSpinBoxValueChanged(int);
-private:
-    QLabel* titleLabel;
-    CustomSpinBox* spinBox;
-};
-
-#endif //_CS_CSSPINBOX_H
+#endif

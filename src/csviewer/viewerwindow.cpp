@@ -118,7 +118,6 @@ void ViewerWindow::initConnections()
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app,  &cs::CSApplication::cameraStateChanged,   this, &ViewerWindow::onCameraStateChanged);
     suc &= (bool)connect(app,  &cs::CSApplication::removedCurrentCamera, this, &ViewerWindow::onRemovedCurrentCamera);
-    suc &= (bool)connect(app,  &cs::CSApplication::captureStateChanged,  this, &ViewerWindow::onCaptureStateChanged);
 
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutChanged,       app,  &cs::CSApplication::onWindowLayoutChanged, Qt::QueuedConnection);
@@ -391,7 +390,7 @@ void ViewerWindow::onLanguageChanged()
         break;
     }
 
-    qmFile = QString("%1/translations/%2").arg(QApplication::applicationDirPath()).arg(qmFile);      
+    qmFile = QString("%1/translations/%2").arg(QApplication::applicationDirPath()).arg(qmFile);
     if (!translator->load(QDir::cleanPath(qmFile)))
     {
         qDebug() << "load qm failed : " << qmFile;
@@ -452,11 +451,6 @@ void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
     {
         ui->statusBar->showMessage(msg, timeout);
     }
-}
-
-void ViewerWindow::onCaptureStateChanged(int captureType, int state, QString message)
-{
-    onShowStatusBarMessage(message, 5000);
 }
 
 void ViewerWindow::onCameraStreamStarted()

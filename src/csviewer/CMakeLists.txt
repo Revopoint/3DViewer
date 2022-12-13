@@ -89,6 +89,7 @@ target_link_libraries(${TARGET_NAME}
     ${OSG_LIBRARY}
     Qt5::Widgets
     Qt5::OpenGL
+    OpenMP::OpenMP_CXX
     csutil
     cscamera
     )
@@ -150,7 +151,6 @@ else()
         LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR}
     )
 endif()
-
 
 if (MSVC)
     set_target_properties(${TARGET_NAME} PROPERTIES VS_GLOBAL_LocalDebuggerEnvironment

@@ -143,3 +143,8 @@ void CSTableWidget::retranslate(const char* context)
     }
     tableWidget->setHorizontalHeaderLabels(tranHeaders);
 }
+
+void CSTableWidget::clearValues()
+{
+    tableWidget->clear();
+}

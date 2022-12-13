@@ -202,3 +202,9 @@ void CSRangeEdit::onMaxFocusOut()
         emit rangeMaxEdit->editingFinished();
     }
 }
+
+void CSRangeEdit::clearValues()
+{
+    rangeMinEdit->setText("");
+    rangeMaxEdit->setText("");
+}

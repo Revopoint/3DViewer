@@ -218,3 +218,9 @@ void CSSlider::onLinEditFocusOut()
         emit lineEdit->editingFinished();
     }
 }
+
+void CSSlider::clearValues()
+{
+    lineEdit->setText("");
+    slider->setValue(0);
+}

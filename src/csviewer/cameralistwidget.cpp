@@ -177,7 +177,7 @@ void CameraListWidget::onCameraStateChanged(int state)
         {
             if (!curCameraSerial.isEmpty() && csItem->getText().contains(curCameraSerial))
             {
-                csItem->setSelected(true);
+                csItem->setSelected(selected);
             }
             else 
             {

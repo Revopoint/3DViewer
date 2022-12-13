@@ -459,7 +459,7 @@ bool CSCamera::restartCamera()
     }
 
     qInfo() << "CSCamera: restart end, wait connect...";
-
+    
     return true;
 }
 
@@ -496,6 +496,8 @@ bool CSCamera::connectCamera(CameraInfo info)
     }
 
     initDefaultStreamInfo();
+
+
     
     initCameraInfo();
 
@@ -1046,10 +1048,6 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
 {
     switch (paraId)
     {
-    case PARA_DEPTH_AUTO_EXPOSURE:
-        //onParaUpdatedDelay(PARA_DEPTH_GAIN, 3000);
-        //onParaUpdatedDelay(PARA_DEPTH_EXPOSURE, 3000);
-        break;
     case PARA_DEPTH_FILTER_TYPE:
         emit cameraParaRangeUpdated(PARA_DEPTH_FILTER);
         setDepthFilterValue(FILTER_RANGE_MAP[filterType].min);
@@ -1078,16 +1076,20 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
             onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 3000);
         } 
         break;
-    case PARA_RGB_AUTO_EXPOSURE:
-        //onParaUpdatedDelay(PARA_RGB_EXPOSURE, 3000);
-        //onParaUpdatedDelay(PARA_RGB_GAIN, 3000);
-        break;
-    case PARA_RGB_AUTO_WHITE_BALANCE:
-        //onParaUpdatedDelay(PARA_RGB_WHITE_BALANCE, 3000);
-        break;
     case PARA_TRIGGER_MODE:
         onTriggerModeChanged(value.toInt() == TRIGGER_MODE_SOFTWAER);
         break;
+    case PARA_CAMERA_IP:
+    {
+        // update cameraInfo when ip changed
+        QVariant ip;
+        getCameraPara(PARA_CAMERA_IP, ip);
+
+        CameraIpSetting cameraIp = ip.value<CameraIpSetting>();
+        QString ipStr = QString("%1.%2.%3.%4").arg(cameraIp.ipBytes[0]).arg(cameraIp.ipBytes[1]).arg(cameraIp.ipBytes[2]).arg(cameraIp.ipBytes[3]);
+        strncpy(cameraInfo.cameraInfo.uniqueId, ipStr.toStdString().c_str(), sizeof(cameraInfo.cameraInfo.uniqueId));
+        break;
+    }
     default:
         break;
     }
@@ -1332,8 +1334,10 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
         value = (int)propExt.triggerMode;
         break;
     case PROPERTY_EXT_CAMERA_IP:
+    {
         value = QVariant::fromValue(propExt.cameraIp);
         break;
+    }
     default:
         Q_ASSERT(false);
         break;

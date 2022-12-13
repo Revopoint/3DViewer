@@ -88,3 +88,8 @@ void CSSwitchButton::retranslate(const char* context)
         titleLabel->setText(QApplication::translate(context, paraName));
     }
 }
+
+void CSSwitchButton::clearValues()
+{
+    button->setChecked(false);
+}

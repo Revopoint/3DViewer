@@ -55,6 +55,7 @@ public:
     ~CSSwitchButton();
     void setValue(const QVariant& value) override;
     void retranslate(const char* context) override;
+    void clearValues() override;
 
 private slots:
     void onButtonToggled(bool checked);

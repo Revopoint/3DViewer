@@ -98,9 +98,6 @@ private slots:
     void onRoiRectFUpdated(QRectF rect);
     void onShowStatusBarMessage(QString msg, int timeout);
 
-    // capture frame data
-    void onCaptureStateChanged(int captureType, int state, QString message);
-
     // start the stream
     void onCameraStreamStarted();
 private slots:

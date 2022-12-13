@@ -114,6 +114,7 @@ void CaptureSettingDialog::showEvent(QShowEvent* event)
 
     ui->startCaptureButton->setEnabled(true);
     ui->stopCaptureButton->setEnabled(false);
+    ui->statusBarText->setText("");
 
     QDialog::showEvent(event);
 }
@@ -121,6 +122,14 @@ void CaptureSettingDialog::showEvent(QShowEvent* event)
 void CaptureSettingDialog::onStartCapture()
 {
     qInfo() << "onStartCapture";
+
+    if (captureConfig.captureDataTypes.size() <= 0)
+    {
+        qInfo() << "At least one data needs to be selected";
+
+        ui->statusBarText->setText(tr("Capture failed ! At least one data needs to be selected"));
+        return;
+    }
 
     QString filters = "Zip file(*.zip)";
     QString openDir = QString("file:///%1").arg(cs::CSApplication::getInstance()->getAppConfig()->getDefaultSavePath());
@@ -227,7 +236,7 @@ void CaptureSettingDialog::initDialog()
     ui->startCaptureButton->setProperty("isCSStyle", true);
     ui->stopCaptureButton->setProperty("isCSStyle", true);
     
-    QString frameRange = QString("(%1, %2)").arg(minCaptureCount).arg(maxCaptureCount);
+    QString frameRange = QString("[%1 - %2]").arg(minCaptureCount).arg(maxCaptureCount);
     ui->frameNumberRange->setText(frameRange);
 
     intValidator = new QIntValidator(minCaptureCount, maxCaptureCount, this);
@@ -298,6 +307,7 @@ void CaptureSettingDialog::onCaptureStateChanged(int captureType, int state, QSt
     {
         return;
     }
+    ui->statusBarText->setText(message);
 
     if (state == cs::CAPTURE_FINISHED)
     {
@@ -316,10 +326,15 @@ void CaptureSettingDialog::reject()
 {
     if (isCapturing)
     {
-        int button = QMessageBox::question(this, tr("Tips"),
-            QString(tr("Capturing, are you sure to stop capture now ?")),
-            QMessageBox::Yes | QMessageBox::No);
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowTitle(tr("Tips"));
+        msgBox.setText(tr("Capturing, are you sure to stop capture now ?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.button(QMessageBox::Yes)->setText(tr("Yes"));
+        msgBox.button(QMessageBox::No)->setText(tr("No"));
 
+        int button = msgBox.exec();
         if (button == QMessageBox::No)
         {
 

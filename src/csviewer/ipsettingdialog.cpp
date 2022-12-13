@@ -57,10 +57,13 @@ IpSettingDialog::IpSettingDialog(QWidget* parent)
     ui->applyButton->setProperty("isCSStyle", true);
     
     QIntValidator* intValidator = new QIntValidator(0, 255, this);
-    ui->ipEdit1->setValidator(intValidator);
+    QIntValidator* intValidator2 = new QIntValidator(1, 255, this);
+    QIntValidator* intValidator3 = new QIntValidator(0, 254, this);
+
+    ui->ipEdit1->setValidator(intValidator2);
     ui->ipEdit2->setValidator(intValidator);
     ui->ipEdit3->setValidator(intValidator);
-    ui->ipEdit4->setValidator(intValidator);
+    ui->ipEdit4->setValidator(intValidator3);
 
     bool suc = true;
     suc &= (bool)connect(ui->applyButton, &QPushButton::clicked, this, &IpSettingDialog::onApply);
@@ -68,6 +71,14 @@ IpSettingDialog::IpSettingDialog(QWidget* parent)
         {
             ui->ipArea->setEnabled(!checked);
         });
+    
+    QVector<CSLineEdit*> lineEdits = { ui->ipEdit1,  ui->ipEdit2 ,  ui->ipEdit3 ,  ui->ipEdit4 };
+    for (auto lineEdit : lineEdits)
+    {
+        suc &= (bool)connect(lineEdit, &CSLineEdit::focusOutSignal, this, &IpSettingDialog::onLineEditFocusOut);
+    }
+
+    Q_ASSERT(suc);
 }
 
 IpSettingDialog::~IpSettingDialog()
@@ -135,9 +146,15 @@ void IpSettingDialog::onApply()
         value = QVariant::fromValue(cameraIp);
         camera->setCameraPara(cs::parameter::PARA_CAMERA_IP, value);
 
-        int button = QMessageBox::question(this, tr("Tips"),
-            QString(tr("The IP address has been modified. Restarting the camera takes effect. Do you want to restart now ?")),
-            QMessageBox::Yes | QMessageBox::No);
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowTitle(tr("Tips"));
+        msgBox.setText(tr("The IP address has been modified. Restarting the camera takes effect. Do you want to restart now ?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.button(QMessageBox::Yes)->setText(tr("Yes"));
+        msgBox.button(QMessageBox::No)->setText(tr("No"));
+
+        int button = msgBox.exec();
 
         if (button == QMessageBox::No)
         {
@@ -154,4 +171,21 @@ void IpSettingDialog::onApply()
 void IpSettingDialog::onTranslate()
 {
     ui->retranslateUi(this);
+}
+
+void IpSettingDialog::onLineEditFocusOut()
+{
+    QLineEdit* obj = qobject_cast<QLineEdit*>(sender());
+    if (obj)
+    {
+        auto tex = obj->text();
+
+        int num = 0;
+        auto validator = qobject_cast<const QIntValidator*>(obj->validator());
+
+        if (validator && validator->validate(tex, num) != QIntValidator::Acceptable)
+        {
+            obj->setText(QString::number(validator->bottom()));
+        }
+    }
 }

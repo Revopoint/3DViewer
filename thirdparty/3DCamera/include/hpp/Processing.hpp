@@ -95,7 +95,6 @@ namespace cs
 			_normals.clear();
 			float3 *points = (float3 *)malloc(width * height * sizeof(float3));
 			float3 *normals = (float3 *)malloc(width * height * sizeof(float3));
-			float3 *smoothNormal = (float3 *)malloc(width * height * sizeof(float3));
 
 			Intrinsics intrDepth;
 			memcpy(&intrDepth, intrinsicsDepth, sizeof(Intrinsics));
@@ -128,13 +127,10 @@ namespace cs
 
 			calculateNormals(points, normals, width, height);
 
-			smoothNormals(width, height, points, normals, smoothNormal, 2);
-
 			insertPoints(points, normals, width, height, extrinsics, intrinsicsRgb, removeInvalid);
 			
 			free(points);
 			free(normals);
-			free(smoothNormal);
 		}
 
 		/**
@@ -272,7 +268,6 @@ namespace cs
 
 			float3 *points = (float3 *)malloc(width * height * sizeof(float3));
 			float3 *normals = (float3 *)malloc(width * height * sizeof(float3));
-			float3 *smoothNormal = (float3 *)malloc(width * height * sizeof(float3));
 
 			Intrinsics intrDepth;
 			memcpy(&intrDepth, intrinsicsDepth, sizeof(Intrinsics));
@@ -314,13 +309,10 @@ namespace cs
 
 			calculateNormals(points, normals, width, height);
 
-			smoothNormals(width, height, points, normals, smoothNormal, 2);
-
-			insertPoints(points, smoothNormal, width, height, extrinsics, intrinsicsRgb, false);
+			insertPoints(points, normals, width, height, extrinsics, intrinsicsRgb, false);
 
 			free(points);
 			free(normals);
-			free(smoothNormal);
 			return 0;
 		}
 		
@@ -768,6 +760,17 @@ namespace cs
 				}
 			}
 
+			int size = width * height;
+			// normalize
+#pragma omp parallel for
+			for (int ui = 0; ui < size; ui++)
+			{
+				float3 p = points[ui];
+				if (p.z > 0.1) {
+					normals[ui] = normalizeVector(normals[ui]);
+				}
+			}
+
 		}
 
 		float3 normalizeVector(const float3 &vector)
@@ -780,63 +783,6 @@ namespace cs
 				float il = 1 / l;
 				return float3(vector.x * il, vector.y * il, vector.z * il );
 			}
-		}
-
-		int smoothNormals(int width, int height,
-			const float3* points,
-			float3* inNormal,
-			float3* outNormal,
-			int radius)
-		{
-			int size = width * height;
-			// normalize
-			for (size_t ui = 0; ui < size; ui++)
-			{
-				float3 p = points[ui];
-				if (p.z > 0.1) {
-					inNormal[ui] = normalizeVector(inNormal[ui]);
-				}
-			}
-
-			int u = 0, v = 0;
-			int i = 0, j = 0;
-			for (v = 0; v < height; v++) {
-				for (u = 0; u < width; u++) {
-					i = j + u;
-					float3 p = points[i];
-					if (p.z > 0.1) {
-						int dw = 0, tw = 0;
-						float3 sn(0, 0, 0);
-						for (int rv = -radius; rv <= radius; rv++) {
-							for (int ru = -radius; ru <= radius; ru++) {
-								int dv = v + rv;
-								int du = u + ru;
-
-								if (dv < 0) continue;
-								if (du < 0) continue;
-								if (dv >= height) continue;
-								if (du >= width) continue;
-
-								int ii = du + dv*width;
-								float3 tp = points[ii];
-								if (tp.z < 0.1) continue;
-
-								dw = 2 * ((radius + 1 - abs(rv)) + (radius + 1 - abs(ru)));
-								float3 tn = inNormal[ii];
-								sn.x += tn.x * dw;
-								sn.y += tn.y * dw;
-								sn.z += tn.z * dw;
-								tw += dw;
-							}
-						}
-						if (tw > 0) {
-							outNormal[i] = normalizeVector(float3(sn.x / tw, sn.y / tw, sn.z / tw));
-						}
-					}
-				}
-				j += width;
-			}
-			return 0;
 		}
 
 		virtual void insertPoints(float3 *points, float3 *normals, int width, int height, Extrinsics *extrinsics, Intrinsics *intrinsicsRgb, bool removeInvalid)

@@ -109,3 +109,8 @@ void CSSpinBox::retranslate(const char* context)
         titleLabel->setText(QApplication::translate(context, paraName));
     }
 }
+
+void CSSpinBox::clearValues()
+{
+    spinBox->clear();
+}

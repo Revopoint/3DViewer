@@ -55,6 +55,7 @@ public:
     void setValue(const QVariant&) override;
     void getValue(QVariant&) override;
     void retranslate(const char* context) override;
+    void clearValues() override;
 private slots:
 
 private:

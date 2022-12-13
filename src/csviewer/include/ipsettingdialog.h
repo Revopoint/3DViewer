@@ -57,6 +57,8 @@ public:
     ~IpSettingDialog();
     void showEvent(QShowEvent* event) override;
     void onTranslate();
+private slots:
+    void onLineEditFocusOut();
 signals:
     void showMessage(QString msg, int timeout = 0);
 private:

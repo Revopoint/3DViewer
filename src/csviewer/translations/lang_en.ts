@@ -76,7 +76,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="357"/>
+        <location filename="../viewerwindow.cpp" line="356"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,83 +85,83 @@
         <translation type="obsolete">Camera List</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="175"/>
-        <location filename="../viewerwindow.cpp" line="411"/>
+        <location filename="../viewerwindow.cpp" line="174"/>
+        <location filename="../viewerwindow.cpp" line="410"/>
         <source>Set default save path </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="245"/>
+        <location filename="../viewerwindow.cpp" line="244"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="248"/>
+        <location filename="../viewerwindow.cpp" line="247"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="251"/>
+        <location filename="../viewerwindow.cpp" line="250"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="254"/>
+        <location filename="../viewerwindow.cpp" line="253"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="257"/>
+        <location filename="../viewerwindow.cpp" line="256"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="260"/>
+        <location filename="../viewerwindow.cpp" line="259"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="263"/>
+        <location filename="../viewerwindow.cpp" line="262"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="266"/>
+        <location filename="../viewerwindow.cpp" line="265"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="269"/>
+        <location filename="../viewerwindow.cpp" line="268"/>
         <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="272"/>
+        <location filename="../viewerwindow.cpp" line="271"/>
         <source>Preview has been paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="275"/>
+        <location filename="../viewerwindow.cpp" line="274"/>
         <source>Restarting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="278"/>
+        <location filename="../viewerwindow.cpp" line="277"/>
         <source>Stopping preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="281"/>
+        <location filename="../viewerwindow.cpp" line="280"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="351"/>
+        <location filename="../viewerwindow.cpp" line="350"/>
         <source>Set default save path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="434"/>
+        <location filename="../viewerwindow.cpp" line="433"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -328,18 +328,18 @@ and the image quality of objects farther away may become worse.</source>
 &lt;b&gt;Foreground:&lt;/b&gt; This mode gives priority to adjusting the image quality of closer objects,and the image quality of objects farther away may become worse.&lt;br&gt;</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="652"/>
+        <location filename="../parasettingswidget.cpp" line="662"/>
         <source>Set ROI </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="803"/>
-        <location filename="../parasettingswidget.cpp" line="817"/>
+        <location filename="../parasettingswidget.cpp" line="813"/>
+        <location filename="../parasettingswidget.cpp" line="827"/>
         <source>Start preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="887"/>
+        <location filename="../parasettingswidget.cpp" line="897"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
@@ -425,13 +425,13 @@ and the image quality of objects farther away may become worse.</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="175"/>
-        <location filename="../parasettingswidget.cpp" line="809"/>
+        <location filename="../parasettingswidget.cpp" line="819"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="176"/>
-        <location filename="../parasettingswidget.cpp" line="810"/>
+        <location filename="../parasettingswidget.cpp" line="820"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
@@ -456,27 +456,27 @@ and the image quality of objects farther away may become worse.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="804"/>
+        <location filename="../parasettingswidget.cpp" line="814"/>
         <source>Capture single frame</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="805"/>
+        <location filename="../parasettingswidget.cpp" line="815"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="806"/>
+        <location filename="../parasettingswidget.cpp" line="816"/>
         <source>Single Shot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="807"/>
+        <location filename="../parasettingswidget.cpp" line="817"/>
         <source>Stop preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="817"/>
+        <location filename="../parasettingswidget.cpp" line="827"/>
         <source>Pause preview</source>
         <translation type="unfinished"></translation>
     </message>
@@ -702,23 +702,38 @@ and the image quality of objects farther away may become worse.</translation>
 <context>
     <name>CaptureSettingDialog</name>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="127"/>
+        <location filename="../capturesettingdialog.cpp" line="130"/>
+        <source>Capture failed ! At least one data needs to be selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../capturesettingdialog.cpp" line="136"/>
         <source>Capture frame data</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="291"/>
+        <location filename="../capturesettingdialog.cpp" line="300"/>
         <source>Captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="319"/>
+        <location filename="../capturesettingdialog.cpp" line="331"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../capturesettingdialog.cpp" line="320"/>
+        <location filename="../capturesettingdialog.cpp" line="332"/>
         <source>Capturing, are you sure to stop capture now ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../capturesettingdialog.cpp" line="334"/>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../capturesettingdialog.cpp" line="335"/>
+        <source>No</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -786,18 +801,28 @@ and the image quality of objects farther away may become worse.</translation>
 <context>
     <name>IpSettingDialog</name>
     <message>
-        <location filename="../ipsettingdialog.cpp" line="131"/>
+        <location filename="../ipsettingdialog.cpp" line="142"/>
         <source>The IP address has not been modified.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ipsettingdialog.cpp" line="138"/>
+        <location filename="../ipsettingdialog.cpp" line="151"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../ipsettingdialog.cpp" line="139"/>
+        <location filename="../ipsettingdialog.cpp" line="152"/>
         <source>The IP address has been modified. Restarting the camera takes effect. Do you want to restart now ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ipsettingdialog.cpp" line="154"/>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../ipsettingdialog.cpp" line="155"/>
+        <source>No</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -970,14 +995,25 @@ and the image quality of objects farther away may become worse.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatconvertdialog.cpp" line="165"/>
-        <location filename="../formatconvertdialog.cpp" line="182"/>
+        <location filename="../formatconvertdialog.cpp" line="167"/>
+        <location filename="../formatconvertdialog.cpp" line="191"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../formatconvertdialog.cpp" line="183"/>
+        <location filename="../formatconvertdialog.cpp" line="192"/>
         <source>Converting, are you sure to stop now ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvertdialog.cpp" line="170"/>
+        <location filename="../formatconvertdialog.cpp" line="194"/>
+        <source>Yes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../formatconvertdialog.cpp" line="195"/>
+        <source>No</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

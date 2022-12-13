@@ -148,3 +148,8 @@ void CSComboBox::retranslate(const char* context)
         tipsButton->setToolTip(QApplication::translate(context, tips));
     }
 }
+
+void CSComboBox::clearValues()
+{
+    comboBox->clear();
+}

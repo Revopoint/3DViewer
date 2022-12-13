@@ -53,6 +53,7 @@ target_link_libraries(${TARGET_NAME}  PRIVATE
     ${YAMLCPP_LIBRARY}
     ${QUAZIP_LIBRARY}
     csutil
+    OpenMP::OpenMP_CXX
     Qt5::Core
     Qt5::Gui)
 

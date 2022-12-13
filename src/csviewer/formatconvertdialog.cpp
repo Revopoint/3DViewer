@@ -162,7 +162,14 @@ void FormatConvertDialog::onConvertStateChanged(int state, int progress, QString
 
 void FormatConvertDialog::showMessageBox(QString message)
 {
-    QMessageBox::information(this, tr("Tips"), message, QMessageBox::Yes);
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.setWindowTitle(tr("Tips"));
+    msgBox.setText(message);
+    msgBox.setStandardButtons(QMessageBox::Yes);
+    msgBox.button(QMessageBox::Yes)->setText(tr("Yes"));
+
+    msgBox.exec();
 }
 
 void FormatConvertDialog::onShowTextureChanged(bool show)
@@ -179,15 +186,21 @@ void FormatConvertDialog::reject()
 {
     if (formatConverter->getIsConverting())
     {
-        int button = QMessageBox::question(this, tr("Tips"),
-            QString(tr("Converting, are you sure to stop now ?")),
-            QMessageBox::Yes | QMessageBox::No);
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Question);
+        msgBox.setWindowTitle(tr("Tips"));
+        msgBox.setText(tr("Converting, are you sure to stop now ?"));
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.button(QMessageBox::Yes)->setText(tr("Yes"));
+        msgBox.button(QMessageBox::No)->setText(tr("No"));
+        
+        int ret = msgBox.exec();
 
-        if (button == QMessageBox::No)
+        if (ret == QMessageBox::No)
         {
 
         }
-        else if (button == QMessageBox::Yes)
+        else if (ret == QMessageBox::Yes)
         {
             formatConverter->setInterruptConvert(true);
             QDialog::reject();
@@ -213,4 +226,5 @@ void FormatConvertDialog::showEvent(QShowEvent* event)
 {
     ui->lineEditSrc->setText("");
     ui->lineEditOutput->setText("");
+    ui->convertProgress->setValue(0);
 }

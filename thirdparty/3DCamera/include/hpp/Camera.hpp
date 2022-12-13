@@ -430,6 +430,77 @@ public:
     * @return success:return SUCCESS, fail:other error code
     **/
     virtual ERROR_CODE isStreamSupport(STREAM_TYPE streamType, bool& support) = 0;
+
+	/**
+	* @~chinese
+	* @brief          特征点重建
+	* @param[in]      frame		            ：流数据(仅支持：Z16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		：左相机特征点集合, 输出匹配后的特征点集合
+	* @param[in/out]  rightFeaturePoints    ：右相机特征点集合，输出匹配后的特征点集合
+	* @param[out]     reconstructPoints	    ：重建特征点集合
+	* @return         成功:SUCCESS, 失败:其他错误码
+	* @~english
+	* @brief          Feature point reconstruction
+	* @param[in]      frame		            ：stream data(only support: Z16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		：Left camera feature point collection， output the matched feature points
+	* @param[in/out]  rightFeaturePoints    ：Right camera feature point collection, output the matched feature points
+	* @param[out]     reconstructPoints     ：return the reconstruct point collection
+	* @return         success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE featureReconstruct(IFramePtr frame, std::vector<Point2f>& leftFeaturePoints, std::vector<Point2f>& rightFeaturePoints, std::vector<Point3f>& reconstructPoints) = 0;
+
+	/**
+	* @~chinese
+	* @brief          特征点重建
+	* @param[in]      frame		            ：流数据(仅支持：Z16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		：左相机特征点集合, 输出匹配后的特征点集合
+	* @param[in/out]  rightFeaturePoints    ：右相机特征点集合，输出匹配后的特征点集合
+	* @param[in]      confidenceThreshold   ：可信度阈值, 值域：[0,1], 可信度小于confidenceThreshold的匹配特征点会被移除
+	* @param[out]     reconstructPoints	    ：重建特征点集合
+	* @return         成功:SUCCESS, 失败:其他错误码
+	* @~english
+	* @brief          Feature point reconstruction
+	* @param[in]      frame		            ：stream data(only support: Z16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		：Left camera feature point collection， output the matched feature points
+	* @param[in/out]  rightFeaturePoints    ：Right camera feature point collection, output the matched feature points
+	* @param[in]      confidenceThreshold   ：Confidence threshold, value range: [0,1], matching feature points smaller than confidenceThreshold will be removed
+	* @param[out]     reconstructPoints     ：return the reconstruct point collection
+	* @return         success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE featureReconstruct(IFramePtr frame, std::vector<Point2f>& leftFeaturePoints, std::vector<Point2f>& rightFeaturePoints, float confidenceThreshold
+		, std::vector<Point3f>& reconstructPoints) = 0;
+
+	/**
+	* @~chinese
+	* @brief      匹配的特征点重建
+	* @param[in]  frame		                    ：流数据（仅支持：Z16Y8Y8）
+	* @param[in]  matchedLeftFeaturePoints		：匹配的左相机特征点集合
+	* @param[in]  matchedRightFeaturePoints     ：匹配的右相机特征点集合
+	* @param[out] reconstructPoints	            ：重建特征点集合
+	* @return     成功:SUCCESS, 失败:其他错误码
+	* @~english
+	* @brief      Matched feature point reconstruction
+	* @param[in]  frame		                    ：stream data(only support: Z16Y8Y8)
+	* @param[in]  matchedLeftFeaturePoints		：Matched left camera feature point collection
+	* @param[in]  matchedRightFeaturePoints     ：Matched right camera feature point collection
+	* @param[out] reconstructPoints             ：return the reconstruct point collection
+	* @return     success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE matchedFeatureReconstruct(IFramePtr frame, const std::vector<Point2f>& matchedLeftFeaturePoints, const std::vector<Point2f>& matchedRightFeaturePoints
+		, std::vector<Point3f>& reconstructPoints) = 0;
+
+	/**
+	* @~chinese
+	* @brief      获取透视变换矩阵 (Q 矩阵)
+	* @param[out] matrix		：透视变换矩阵
+	* @return     成功:SUCCESS, 失败:其他错误码
+	* @~english
+	* @brief      Get the perspective transformation matrix (Q matrix)
+	* @param[out] matrix		：return the perspective transformation matrix
+	* @return success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE getPerspectiveTransformationMatrix(PerspectiveTransformationMatrix& matrix) = 0;
+
 };
 
 CS_API ICameraPtr getCameraPtr();

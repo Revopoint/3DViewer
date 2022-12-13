@@ -60,6 +60,7 @@ public:
     virtual void getValue(QVariant&) {}
     virtual void retranslate(const char* context) {}
 
+    virtual void clearValues() {}
     int getParaId() const;
 protected:
     void paintEvent(QPaintEvent* event) override;

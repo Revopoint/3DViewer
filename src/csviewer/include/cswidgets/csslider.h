@@ -70,6 +70,7 @@ public:
     void setParaRange(const QVariant& min, const QVariant& max, const QVariant& step) override;
     void setValue(const QVariant& value) override;
     void retranslate(const char* context) override;
+    void clearValues() override;
 
 private slots:
     void onLineEditTextChanged();

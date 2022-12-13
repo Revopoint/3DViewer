@@ -87,7 +87,7 @@
 
    （USB连接相机时，需要先运行代码根目录下 ***scripts/cs_rpc_install.sh*** 脚本）
 
-### 在Linux平台下编译<div id="5"/>
+### 在Linux（Ubuntu）平台下编译<div id="5"/>
 
 1. 安装[Qt5](https://download.qt.io/)、[CMake](https://cmake.org/download/)、[Git](https://git-scm.com/downloads)、g++ （Qt 安装参照 Qt 官网教程）
 

@@ -65,6 +65,7 @@ public:
     void setValue(const QVariant& value) override;
     void getValue(QVariant& value) override;
     void retranslate(const char* context) override;
+    void clearValues() override;
 private slots:
     void onComboBoxIndexChanged(int index);
 private:

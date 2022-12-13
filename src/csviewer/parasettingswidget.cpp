@@ -442,7 +442,7 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
             ui->cameraButtonArea->setEnabled(true);
             ui->scrollArea->setEnabled(true);
             onUpdatedCameraParas();
-            
+            isSingleShotMode = false;
             break;
         }
     case CAMERA_DISCONNECTED:
@@ -450,6 +450,7 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
     case CAMERA_CONNECTFAILED:
         ui->cameraButtonArea->setEnabled(false);
         ui->scrollArea->setEnabled(false);
+        isSingleShotMode = false;
         stopParaMonitor();
         break;
     default:    
@@ -475,8 +476,8 @@ void ParaSettingsWidget::updateControlButtonState(int cameraState)
 }
 
 void ParaSettingsWidget::updateWidgetsState(int cameraState)
-{ 
-    static QList<int> streamTypePara = 
+{
+    static QList<int> streamTypePara =
     {
         PARA_DEPTH_STREAM_FORMAT,
         PARA_DEPTH_RESOLUTION,
@@ -487,7 +488,7 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
     // has rgb or not
     QVariant hasRgbV;
     cameraPtr->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
-    bool hasRgb = hasRgbV.toBool(); 
+    bool hasRgb = hasRgbV.toBool();
 
     ui->rgbCameraButton->setEnabled(hasRgb);
     ui->rgbParaWidget->setEnabled(hasRgb);
@@ -496,7 +497,7 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
     {
         auto paraId = widget->getParaId();
         const bool isStreamTypePara = streamTypePara.contains(paraId);
-        
+
         bool enable = (cameraState == CAMERA_CONNECTED || cameraState == CAMERA_PAUSED_STREAM || cameraState == CAMERA_STOPPED_STREAM) ? isStreamTypePara
             : (cameraState == CAMERA_STARTED_STREAM ? !isStreamTypePara : false);
 
@@ -510,6 +511,15 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
         bool hasDepth = hasDepthV.toBool();
 
         paraWidgets[PARA_DEPTH_RANGE]->setEnabled(hasDepth);
+    }
+
+    if (cameraState == CAMERA_DISCONNECTFAILED || cameraState == CAMERA_DISCONNECTED || cameraState == CAMERA_CONNECTFAILED)
+    {
+        // clear parameter values
+        for (auto widget : paraWidgets)
+        {
+            widget->clearValues();
+        }
     }
 }
 
