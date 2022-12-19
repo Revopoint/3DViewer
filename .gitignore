@@ -14,3 +14,4 @@ document/manual-md/English/node_modules
 /thirdparty/3DCamera/windows/x64/*.exp
 /thirdparty/3DCamera/windows/x64/*.ilk
 /thirdparty/3DCamera/*.bat
+/thirdparty/3DCamera/include/CMakeLists.txt

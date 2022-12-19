@@ -214,8 +214,9 @@ private:
     QThread* cameraThread;
     mutable QReadWriteLock lock;
 
-    float rgbExposureStep = 1;
-    float rgbExposureMin = 0;
+    int rgbExposureStep = 1;
+    int rgbExposureMin = 0;
+    int rgbExposureMax = 0;
 };
 }
 

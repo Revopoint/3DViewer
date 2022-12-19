@@ -84,6 +84,7 @@ private:
     QLabel* minLabel;
     QLabel* maxLabel;
     QIntValidator* intValidator;
+    
     int step;
 };
 #endif // _CS_CSSLIDER_H

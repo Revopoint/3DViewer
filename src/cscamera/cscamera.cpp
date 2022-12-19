@@ -1552,40 +1552,39 @@ void CSCamera::getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& 
     }
 }
 
+#define RGB_EXPOSURE_MAX 30000
+#define RGB_EXPOSURE_MIN 1
+
 void CSCamera::correctExposureRange(float& min, float& max, float& step)
 {
-#ifdef WIN32
     if (cameraInfo.connectType == CONNECT_TYPE_USB)
     {
-        rgbExposureMin = min;
         float d = max - min;
-        min = 1;
-        max = 30000;
+        rgbExposureMin = min;
+        rgbExposureMax = max;
 
-        rgbExposureStep = max / d;
-        step = rgbExposureStep;
+        min = RGB_EXPOSURE_MIN;
+        step = 1;
+
+        rgbExposureStep = (RGB_EXPOSURE_MAX - min) / d;
+        max = min + rgbExposureStep * d;
     }
-#endif
 }
 
 void CSCamera::correctExposureValue(float& value)
 {
-#ifdef WIN32
     if (cameraInfo.connectType == CONNECT_TYPE_USB)
     {
-        value = qRound(rgbExposureStep * (value - rgbExposureMin));
+        value = RGB_EXPOSURE_MIN + qRound(rgbExposureStep * (value - rgbExposureMin));
     }
-#endif
 }
 
 void CSCamera::convertExposureValue(float& value)
 {
-#ifdef WIN32
     if (cameraInfo.connectType == CONNECT_TYPE_USB)
     {
-        value = (value / rgbExposureStep) + rgbExposureMin;
+        value = (value - RGB_EXPOSURE_MIN) / rgbExposureStep + rgbExposureMin;
     }
-#endif
 }
 
 void CSCamera::setDepthFormat(STREAM_FORMAT format)

@@ -113,7 +113,6 @@ void RenderWindow::onWindowLayoutUpdated()
     {
         for (auto widget : renderWidgets.values())
         {
-
             if (widget)
             {
                 bool suc = true;
@@ -269,7 +268,10 @@ void RenderWindow::onOutput2DUpdated(OutputData2D outputData)
     RenderWidget2D* widget = qobject_cast<RenderWidget2D*>(renderWidgets[outputData.info.cameraDataType]);
     if (widget)
     {
-        widget->onRenderDataUpdated(outputData);
+        if (!widget->isHidden())
+        {
+            widget->onRenderDataUpdated(outputData);
+        }
     }
 }
 
@@ -278,7 +280,10 @@ void RenderWindow::onOutput3DUpdated(cs::Pointcloud pointCloud, const QImage& im
     RenderWidget3D* widget = qobject_cast<RenderWidget3D*>(renderWidgets[CAMERA_DATA_POINT_CLOUD]);
     if (widget)
     {
-        widget->onRenderDataUpdated(pointCloud, image);
+        if (!widget->isHidden())
+        {
+            widget->onRenderDataUpdated(pointCloud, image);
+        }
     }
 }
 

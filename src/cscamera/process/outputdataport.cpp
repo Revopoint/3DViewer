@@ -25,7 +25,7 @@ OutputDataPort::~OutputDataPort()
 
 bool OutputDataPort::isEmpty() const
 {
-    return !hasData(CAMERA_DATA_POINT_CLOUD) && outputData2DMap.empty();
+    return !hasData(CAMERA_DATA_POINT_CLOUD) && outputData2DMap.isEmpty();
 }
 
 bool OutputDataPort::hasData(CS_CAMERA_DATA_TYPE dataType) const

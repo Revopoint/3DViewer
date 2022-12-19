@@ -145,58 +145,59 @@ void CSSlider::setParaRange(const QVariant& min, const QVariant& max, const QVar
 {
     minLabel->setText(QString::number(min.toInt()));
     maxLabel->setText(QString::number(max.toInt()));
-
-    slider->setRange(min.toInt(), max.toInt());
-    slider->setPageStep(step.toInt());
     this->step = step.toInt();
+
+    int sliderMin = min.toInt() / this->step;
+    int sliderMax = max.toInt() / this->step;
+
+    slider->setRange(sliderMin, sliderMax);
 }
 
 void CSSlider::setValue(const QVariant& value)
 {
     int intValue = value.toInt();
 
-    const int min = slider->minimum();
-    const int max = slider->maximum();
+    const int min = slider->minimum() * this->step;
+    const int max = slider->maximum() * this->step;
 
     intValue = intValue > max ? max : intValue;
     intValue = intValue < min ? min : intValue;
 
+    int sliderValue = intValue / this->step;
+    sliderValue += (intValue % this->step) > 0 ? 1 : 0;
+
     lineEdit->setText(QString::number(intValue));
-    slider->setValue(intValue);
+    slider->setValue(sliderValue);
 }
 
 void CSSlider::onLineEditTextChanged()
 {
     int value = lineEdit->text().toInt();
-    value = value / step * step;
+    int sliderValue = value / this->step;
 
-    const int min = slider->minimum();
-    const int max = slider->maximum();
+    lineEdit->setText(QString::number(sliderValue * this->step));
+    slider->setValue(sliderValue);
 
-    value = value > max ? max : value;
-    value = value < min ? min : value;
-
-    lineEdit->setText(QString::number(value));
-    slider->setValue(value);
-    emit valueChanged(getParaId(), value);
+    emit valueChanged(getParaId(), sliderValue * this->step);
 }
 
 void CSSlider::onSliderClicked(int value)
 {
-    value = value / step * step;
-
     slider->setValue(value);
-    lineEdit->setText(QString::number(value));
-    emit valueChanged(getParaId(), value);
+
+    int realValue = value * this->step;
+    lineEdit->setText(QString::number(realValue));
+
+    emit valueChanged(getParaId(), realValue);
 }
 
 void CSSlider::onSliderValueChanged()
 {
     int value = slider->value();
-    value = value / step * step;
+    int realValue = value * this->step;
 
-    lineEdit->setText(QString::number(value));
-    emit valueChanged(getParaId(), value);
+    lineEdit->setText(QString::number(realValue));
+    emit valueChanged(getParaId(), realValue);
 }
 
 void CSSlider::retranslate(const char* context)

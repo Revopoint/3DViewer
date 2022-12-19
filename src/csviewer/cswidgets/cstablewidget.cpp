@@ -146,5 +146,5 @@ void CSTableWidget::retranslate(const char* context)
 
 void CSTableWidget::clearValues()
 {
-    tableWidget->clear();
+    tableWidget->clearContents();
 }

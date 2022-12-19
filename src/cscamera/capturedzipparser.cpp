@@ -880,13 +880,16 @@ bool CapturedZipParser::savePointCloud(int frameIndex, bool withTexture, QString
         return false;
     }
 
+    QByteArray pathData = filePath.toLocal8Bit();
+    std::string realPath = pathData.data();
+
     if (withTexture && !texImage.isNull())
     {
-        pc.exportToFile(filePath.toStdString(), texImage.bits(), texImage.width(), texImage.height());
+        pc.exportToFile(realPath, texImage.bits(), texImage.width(), texImage.height());
     }
     else
     {
-        pc.exportToFile(filePath.toStdString(), nullptr, 0, 0);
+        pc.exportToFile(realPath, nullptr, 0, 0);
     }
 
     return true;
