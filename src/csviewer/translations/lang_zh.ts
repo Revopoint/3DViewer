@@ -112,7 +112,7 @@
         <translation type="obsolete">重启相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="356"/>
+        <location filename="../viewerwindow.cpp" line="347"/>
         <source>Set default save path (</source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
@@ -121,78 +121,78 @@
         <translation type="obsolete">相机列表</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="174"/>
-        <location filename="../viewerwindow.cpp" line="410"/>
+        <location filename="../viewerwindow.cpp" line="177"/>
+        <location filename="../viewerwindow.cpp" line="401"/>
         <source>Set default save path </source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="244"/>
+        <location filename="../viewerwindow.cpp" line="247"/>
         <source>Connecting camera</source>
         <translation type="unfinished">正在连接相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="247"/>
+        <location filename="../viewerwindow.cpp" line="250"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished">相机连接成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="250"/>
+        <location filename="../viewerwindow.cpp" line="253"/>
         <source>Camera connection failed</source>
         <translation type="unfinished">相机连接失败</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="253"/>
+        <location filename="../viewerwindow.cpp" line="256"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished">正在断开相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="256"/>
+        <location filename="../viewerwindow.cpp" line="259"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished">相机断开成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="259"/>
+        <location filename="../viewerwindow.cpp" line="262"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished">相机断开失败</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="262"/>
+        <location filename="../viewerwindow.cpp" line="265"/>
         <source>Starting preview</source>
         <translation type="unfinished">正在启动预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="265"/>
+        <location filename="../viewerwindow.cpp" line="268"/>
         <source>Start preview successfully</source>
         <translation type="unfinished">启动预览成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="268"/>
+        <location filename="../viewerwindow.cpp" line="271"/>
         <source>Pausing preview</source>
         <translation type="unfinished">正在暂停预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="271"/>
+        <location filename="../viewerwindow.cpp" line="274"/>
         <source>Preview has been paused</source>
         <translation type="unfinished">已经暂停预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="274"/>
+        <location filename="../viewerwindow.cpp" line="277"/>
         <source>Restarting camera</source>
         <translation type="unfinished">正在重启相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="277"/>
+        <location filename="../viewerwindow.cpp" line="280"/>
         <source>Stopping preview</source>
         <translation type="unfinished">正在停止预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="280"/>
+        <location filename="../viewerwindow.cpp" line="283"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished">已经停止预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="350"/>
+        <location filename="../viewerwindow.cpp" line="341"/>
         <source>Set default save path</source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
@@ -201,7 +201,7 @@
         <translation type="obsolete">保存点云</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="433"/>
+        <location filename="../viewerwindow.cpp" line="424"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished">当前相机已经断开</translation>
     </message>
@@ -332,6 +332,11 @@
         <location filename="../viewerwindow.ui"/>
         <source>Manual</source>
         <translation type="unfinished">使用手册</translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>About</source>
+        <translation type="unfinished">关于</translation>
     </message>
 </context>
 <context>
@@ -1253,6 +1258,32 @@ and the image quality of objects farther away may become worse.</source>
         <location filename="../../cscamera/formatconverter.cpp" line="186"/>
         <source>Conversion completed, %1 successful, %2 failed</source>
         <translation type="unfinished">转换完成，成功%1个，失败%2个</translation>
+    </message>
+</context>
+<context>
+    <name>AboutWidget</name>
+    <message>
+        <location filename="../about.ui"/>
+        <source>About</source>
+        <translation type="unfinished">关于</translation>
+    </message>
+    <message>
+        <location filename="../about.ui"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Introduction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer is an open source application control software used with 3D cameras. It mainly includes functions such as obtaining camera list, connecting specified cameras, setting camera parameters, viewing 2D images and point cloud images acquired in different states, collecting camera data, playback, etc.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Source code is available on &lt;a href=&quot;https://github.com/Revopoint/3DViewer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt;(protected by GPL).&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;简介&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer是一款配合3D相机使用的开源应用控制软件，主要包含获取相机列表、连接指定相机、设置相机各个参数、查看不同状态下获取的2D图像与点云图像、采集相机数据、回放等功能。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;源代码位于 &lt;a href=&quot;https://github.com/Revopoint/3DViewer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt;（受GPL保护）.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../about.ui"/>
+        <source>Close</source>
+        <translation type="unfinished">关闭</translation>
+    </message>
+</context>
+<context>
+    <name>AboutDialog</name>
+    <message>
+        <location filename="../aboutdialog.cpp" line="16"/>
+        <source>Built on %1</source>
+        <translation type="unfinished">构建于 %1</translation>
     </message>
 </context>
 </TS>

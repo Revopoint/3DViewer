@@ -76,7 +76,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="356"/>
+        <location filename="../viewerwindow.cpp" line="347"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -85,83 +85,83 @@
         <translation type="obsolete">Camera List</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="174"/>
-        <location filename="../viewerwindow.cpp" line="410"/>
+        <location filename="../viewerwindow.cpp" line="177"/>
+        <location filename="../viewerwindow.cpp" line="401"/>
         <source>Set default save path </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="244"/>
+        <location filename="../viewerwindow.cpp" line="247"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="247"/>
+        <location filename="../viewerwindow.cpp" line="250"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="250"/>
+        <location filename="../viewerwindow.cpp" line="253"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="253"/>
+        <location filename="../viewerwindow.cpp" line="256"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="256"/>
+        <location filename="../viewerwindow.cpp" line="259"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="259"/>
+        <location filename="../viewerwindow.cpp" line="262"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="262"/>
+        <location filename="../viewerwindow.cpp" line="265"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="265"/>
+        <location filename="../viewerwindow.cpp" line="268"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="268"/>
+        <location filename="../viewerwindow.cpp" line="271"/>
         <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="271"/>
+        <location filename="../viewerwindow.cpp" line="274"/>
         <source>Preview has been paused</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="274"/>
+        <location filename="../viewerwindow.cpp" line="277"/>
         <source>Restarting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="277"/>
+        <location filename="../viewerwindow.cpp" line="280"/>
         <source>Stopping preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="280"/>
+        <location filename="../viewerwindow.cpp" line="283"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="350"/>
+        <location filename="../viewerwindow.cpp" line="341"/>
         <source>Set default save path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="433"/>
+        <location filename="../viewerwindow.cpp" line="424"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
@@ -263,6 +263,11 @@
     <message>
         <location filename="../viewerwindow.ui"/>
         <source>Manual</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.ui"/>
+        <source>About</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1063,6 +1068,32 @@ and the image quality of objects farther away may become worse.</translation>
     <message>
         <location filename="../../cscamera/formatconverter.cpp" line="186"/>
         <source>Conversion completed, %1 successful, %2 failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AboutWidget</name>
+    <message>
+        <location filename="../about.ui"/>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../about.ui"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Introduction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer is an open source application control software used with 3D cameras. It mainly includes functions such as obtaining camera list, connecting specified cameras, setting camera parameters, viewing 2D images and point cloud images acquired in different states, collecting camera data, playback, etc.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Source code is available on &lt;a href=&quot;https://github.com/Revopoint/3DViewer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt;(protected by GPL).&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../about.ui"/>
+        <source>Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>AboutDialog</name>
+    <message>
+        <location filename="../aboutdialog.cpp" line="16"/>
+        <source>Built on %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

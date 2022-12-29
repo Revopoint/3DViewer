@@ -69,6 +69,7 @@ class CSAction;
 class IpSettingDialog;
 class CameraPlayerDialog;
 class FormatConvertDialog;
+class AboutDialog;
 
 class ViewerWindow : public QMainWindow
 {
@@ -103,7 +104,6 @@ private slots:
 private slots:
     // menu
     void onUpdateLanguage(QAction* action);
-    void onTriggeredAbout(QAction* action);
     void onTriggeredRestartCamera();
     void onTriggeredInformation();
     void onTriggeredLogDir();
@@ -112,6 +112,9 @@ private slots:
     void onTriggeredLoadFile();
     void onTriggeredFormatConvert();
     void onTriggeredManual();
+    void onTriggeredAbout();
+    void onTriggeredGithub();
+    void onTriggeredWebsite();
 
     void onAppExit();
 private slots:
@@ -156,5 +159,8 @@ private:
     IpSettingDialog* ipSettingDialog = nullptr;
     CameraPlayerDialog* cameraPlayerDialog = nullptr;
     FormatConvertDialog* formatConvertDialog = nullptr;
+
+    // about dialog
+    AboutDialog* aboutDialog = nullptr;
 };
 #endif // _CS_VIEWERWINDOW_H

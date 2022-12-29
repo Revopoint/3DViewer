@@ -145,7 +145,7 @@ void CSSlider::setParaRange(const QVariant& min, const QVariant& max, const QVar
 {
     minLabel->setText(QString::number(min.toInt()));
     maxLabel->setText(QString::number(max.toInt()));
-    this->step = step.toInt();
+    this->step = step.toInt() > 0 ? step.toInt() : 1;
 
     int sliderMin = min.toInt() / this->step;
     int sliderMax = max.toInt() / this->step;

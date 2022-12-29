@@ -64,6 +64,7 @@
 #include "ipsettingdialog.h"
 #include "cameraplayerdialog.h"
 #include "formatconvertdialog.h"
+#include "aboutdialog.h"
 
 #define GITHUB_URL "https://github.com/Revopoint/3DViewer"
 #define WEBSITE_URL "https://www.revopoint3d.com/"
@@ -140,7 +141,6 @@ void ViewerWindow::initConnections()
 
     // menu
     suc &= (bool)connect(ui->menuLanguage,            &QMenu::triggered,     this, &ViewerWindow::onUpdateLanguage);
-    suc &= (bool)connect(ui->menuAbout,               &QMenu::triggered,     this, &ViewerWindow::onTriggeredAbout);
     suc &= (bool)connect(ui->actionRestartCamera,     &QAction::triggered,   this, &ViewerWindow::onTriggeredRestartCamera);
     suc &= (bool)connect(ui->actionExit,              &QAction::triggered,   this, &ViewerWindow::onAppExit);
     suc &= (bool)connect(ui->actionInfomation,        &QAction::triggered,   this, &ViewerWindow::onTriggeredInformation);
@@ -150,6 +150,9 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
     suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
     suc &= (bool)connect(ui->actionManual,            &QAction::triggered,   this, &ViewerWindow::onTriggeredManual);
+    suc &= (bool)connect(ui->actionGithub,            &QAction::triggered,   this, &ViewerWindow::onTriggeredGithub);
+    suc &= (bool)connect(ui->actionWebSite,           &QAction::triggered,   this, &ViewerWindow::onTriggeredWebsite);
+    suc &= (bool)connect(ui->actionAbout,             &QAction::triggered,   this, &ViewerWindow::onTriggeredAbout);
 
     suc &= (bool)connect(ui->actionTile,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTile);
     suc &= (bool)connect(ui->actionTabs,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTabs);
@@ -315,18 +318,6 @@ void ViewerWindow::onUpdateLanguage(QAction* action)
     action->setChecked(true);
 }
 
-void ViewerWindow::onTriggeredAbout(QAction* action)
-{
-    if (action == ui->actionGithub)
-    {
-        QDesktopServices::openUrl(QUrl(GITHUB_URL));
-    }
-    else if (action == ui->actionWebSite)
-    {
-        QDesktopServices::openUrl(QUrl(WEBSITE_URL));
-    } 
-}
-
 void ViewerWindow::onTriggeredRestartCamera()
 {
     emit cs::CSApplication::getInstance()->restartCamera();
@@ -426,6 +417,11 @@ void ViewerWindow::onTranslate()
     }
 
     ui->renderWindow->onTranslate();
+
+    if (aboutDialog)
+    {
+        aboutDialog->onTranslate();
+    }
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
@@ -650,4 +646,24 @@ void ViewerWindow::onTriggeredManual()
     }
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(manualPath));
+}
+
+void ViewerWindow::onTriggeredAbout()
+{
+    if (!aboutDialog)
+    {
+        aboutDialog = new AboutDialog(this);
+    }
+
+    aboutDialog->show();
+}
+
+void ViewerWindow::onTriggeredGithub()
+{
+    QDesktopServices::openUrl(QUrl(GITHUB_URL));
+}
+
+void ViewerWindow::onTriggeredWebsite()
+{
+    QDesktopServices::openUrl(QUrl(WEBSITE_URL));
 }

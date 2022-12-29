@@ -68,6 +68,7 @@
         <file>resources/info_hover.png</file>
         <file>resources/trackball_on.png</file>
         <file>resources/trackball_off.png</file>
+        <file>resources/logo.png</file>
     </qresource>
     <qresource prefix="/ui">
         <file>cameralist.ui</file>
