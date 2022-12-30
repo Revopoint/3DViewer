@@ -1,44 +1,21 @@
 /*******************************************************************************
-* This file is part of the 3DViewer
-*
-* Copyright 2022-2026 (C) Revopoint3D AS
-* All rights reserved.
-*
-* Revopoint3D Software License, v1.0
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistribution of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistribution in binary form must reproduce the above copyright notice,
-* this list of conditions and the following disclaimer in the documentation
-* and/or other materials provided with the distribution.
-*
-* 3. Neither the name of Revopoint3D AS nor the names of its contributors may be used
-* to endorse or promote products derived from this software without specific
-* prior written permission.
-*
-* 4. This software, with or without modification, must not be used with any
-* other 3D camera than from Revopoint3D AS.
-*
-* 5. Any software provided in binary form under this license must not be
-* reverse engineered, decompiled, modified and/or disassembled.
-*
-* THIS SOFTWARE IS PROVIDED BY REVOPOINT3D AS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-* MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL REVOPOINT3D AS OR CONTRIBUTORS BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* Info:  https://www.revopoint3d.com
-******************************************************************************/
+* This file is part of the 3DViewer                                            *
+*                                                                              *
+* Copyright (C) 2022 Revopoint3D Company Ltd.                                  *
+* All rights reserved.                                                         *
+*                                                                              *
+* This program is free software: you can redistribute it and/or modify         *
+* it under the terms of the GNU General Public License as published by         *
+* the Free Software Foundation, either version 3 of the License, or            *
+* (at your option) any later version.                                          *
+*                                                                              *
+* This program is distributed in the hope that it will be useful,              *
+* but WITHOUT ANY WARRANTY; without even the implied warranty of               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                *
+* GNU General Public License (http://www.gnu.org/licenses/gpl.txt)             *
+* for more details.                                                            *
+*                                                                              *
+********************************************************************************/
 
 #include "viewerwindow.h"
 #include "./ui_viewerwindow.h"
@@ -64,6 +41,7 @@
 #include "ipsettingdialog.h"
 #include "cameraplayerdialog.h"
 #include "formatconvertdialog.h"
+#include "aboutdialog.h"
 
 #define GITHUB_URL "https://github.com/Revopoint/3DViewer"
 #define WEBSITE_URL "https://www.revopoint3d.com/"
@@ -118,7 +96,6 @@ void ViewerWindow::initConnections()
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app,  &cs::CSApplication::cameraStateChanged,   this, &ViewerWindow::onCameraStateChanged);
     suc &= (bool)connect(app,  &cs::CSApplication::removedCurrentCamera, this, &ViewerWindow::onRemovedCurrentCamera);
-    suc &= (bool)connect(app,  &cs::CSApplication::captureStateChanged,  this, &ViewerWindow::onCaptureStateChanged);
 
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutChanged,       app,  &cs::CSApplication::onWindowLayoutChanged, Qt::QueuedConnection);
@@ -141,7 +118,6 @@ void ViewerWindow::initConnections()
 
     // menu
     suc &= (bool)connect(ui->menuLanguage,            &QMenu::triggered,     this, &ViewerWindow::onUpdateLanguage);
-    suc &= (bool)connect(ui->menuAbout,               &QMenu::triggered,     this, &ViewerWindow::onTriggeredAbout);
     suc &= (bool)connect(ui->actionRestartCamera,     &QAction::triggered,   this, &ViewerWindow::onTriggeredRestartCamera);
     suc &= (bool)connect(ui->actionExit,              &QAction::triggered,   this, &ViewerWindow::onAppExit);
     suc &= (bool)connect(ui->actionInfomation,        &QAction::triggered,   this, &ViewerWindow::onTriggeredInformation);
@@ -151,6 +127,9 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
     suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
     suc &= (bool)connect(ui->actionManual,            &QAction::triggered,   this, &ViewerWindow::onTriggeredManual);
+    suc &= (bool)connect(ui->actionGithub,            &QAction::triggered,   this, &ViewerWindow::onTriggeredGithub);
+    suc &= (bool)connect(ui->actionWebSite,           &QAction::triggered,   this, &ViewerWindow::onTriggeredWebsite);
+    suc &= (bool)connect(ui->actionAbout,             &QAction::triggered,   this, &ViewerWindow::onTriggeredAbout);
 
     suc &= (bool)connect(ui->actionTile,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTile);
     suc &= (bool)connect(ui->actionTabs,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTabs);
@@ -316,18 +295,6 @@ void ViewerWindow::onUpdateLanguage(QAction* action)
     action->setChecked(true);
 }
 
-void ViewerWindow::onTriggeredAbout(QAction* action)
-{
-    if (action == ui->actionGithub)
-    {
-        QDesktopServices::openUrl(QUrl(GITHUB_URL));
-    }
-    else if (action == ui->actionWebSite)
-    {
-        QDesktopServices::openUrl(QUrl(WEBSITE_URL));
-    } 
-}
-
 void ViewerWindow::onTriggeredRestartCamera()
 {
     emit cs::CSApplication::getInstance()->restartCamera();
@@ -391,7 +358,7 @@ void ViewerWindow::onLanguageChanged()
         break;
     }
 
-    qmFile = QString("%1/translations/%2").arg(QApplication::applicationDirPath()).arg(qmFile);      
+    qmFile = QString("%1/translations/%2").arg(QApplication::applicationDirPath()).arg(qmFile);
     if (!translator->load(QDir::cleanPath(qmFile)))
     {
         qDebug() << "load qm failed : " << qmFile;
@@ -427,6 +394,11 @@ void ViewerWindow::onTranslate()
     }
 
     ui->renderWindow->onTranslate();
+
+    if (aboutDialog)
+    {
+        aboutDialog->onTranslate();
+    }
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
@@ -452,11 +424,6 @@ void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
     {
         ui->statusBar->showMessage(msg, timeout);
     }
-}
-
-void ViewerWindow::onCaptureStateChanged(int captureType, int state, QString message)
-{
-    onShowStatusBarMessage(message, 5000);
 }
 
 void ViewerWindow::onCameraStreamStarted()
@@ -656,4 +623,24 @@ void ViewerWindow::onTriggeredManual()
     }
 
     QDesktopServices::openUrl(QUrl::fromLocalFile(manualPath));
+}
+
+void ViewerWindow::onTriggeredAbout()
+{
+    if (!aboutDialog)
+    {
+        aboutDialog = new AboutDialog(this);
+    }
+
+    aboutDialog->show();
+}
+
+void ViewerWindow::onTriggeredGithub()
+{
+    QDesktopServices::openUrl(QUrl(GITHUB_URL));
+}
+
+void ViewerWindow::onTriggeredWebsite()
+{
+    QDesktopServices::openUrl(QUrl(WEBSITE_URL));
 }

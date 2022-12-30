@@ -634,6 +634,10 @@ QLabel#captureInfo {
     color: rgb(0, 169, 255);
 }
 
+QLabel#statusBarText {
+    color: rgb(0, 169, 255);
+}
+
 QStatusBar {
     background: rgb(179, 179, 179);
 }

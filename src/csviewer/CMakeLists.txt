@@ -46,6 +46,9 @@ qt5_add_resources(QRC_FILE 3dviewer.qrc)
 #qt5_wrap_cpp(MOC_HDS ${HEADERS})
 
 # others
+string(TIMESTAMP COMPILE_TIME "%Y/%m/%d %H:%M:%S")
+set(APP_BUILD_TIME ${COMPILE_TIME})
+
 set(APP_VERSION_H ${PROJECT_BINARY_DIR}/app_version.h)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/app_version.h.in ${APP_VERSION_H})
 
@@ -89,6 +92,7 @@ target_link_libraries(${TARGET_NAME}
     ${OSG_LIBRARY}
     Qt5::Widgets
     Qt5::OpenGL
+    OpenMP::OpenMP_CXX
     csutil
     cscamera
     )
@@ -150,7 +154,6 @@ else()
         LIBRARY_OUTPUT_DIRECTORY ${LIB_DIR}
     )
 endif()
-
 
 if (MSVC)
     set_target_properties(${TARGET_NAME} PROPERTIES VS_GLOBAL_LocalDebuggerEnvironment

@@ -36,7 +36,8 @@ extern "C" {
 		CAMERA_POP_2 = 10,		    //pop2
 		CAMERA_MINI_NO_RGB,			//mini camera without rgb sensor
 		CAMERA_MINI_NORMAL,			//
-        CAMERA_TRACER_P1            //tracer p1
+        CAMERA_TRACER_P1,            //tracer p1
+		CAMERA_RANGE,				//Range
 	}CameraType;
 
 #define FRAMERATE_ANY 0
@@ -482,17 +483,21 @@ typedef struct WriteReadHidData_tag
 
 /**
 * @~chinese
-* @brief 视差重建点云的矩阵
+* @brief 透视变换矩阵
 * @~english
-* @brief Matrixof parallax reconstruction point cloud.
+* @brief Perspective transformation matrix
 **/
-typedef struct ParallaxReconstructionMat {
-	union
+typedef struct PerspectiveTransformationMatrix 
+{
+	short width;
+	short height;
+	union 
 	{
-		float mat[4][4];
+		float matrix[4][4];
 		float mat_[16];
 	};
-}ParallaxReconstructionMat;
+	
+} PerspectiveTransformationMatrix;
 
 /**
 * @~chinese
@@ -552,6 +557,7 @@ typedef enum PROPERTY_TYPE_EXTENSION
 	PROPERTY_EXT_EXPOSURE_TIME_RGB      = 0x15,	 /**<@~chinese 曝光时间,单位毫秒,仅限RGB流	  @~english exposure time,unit ms.*/
 	PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB = 0x16, /**<@~chinese 曝光时间范围,单位毫秒,仅限RGB流	  @~english exposure time,unit ms.*/
 	PROPERTY_EXT_CPU_TEMPRATRUE			= 0x17,  /**<@~chinese CPU温度,单位摄氏度,	  @~english CPU tempratrue,unit degree Celsius */
+	PROPERTY_EXT_GET_CAMERA_STATE		= 0x18,	 /**<@~chinese 获取相机当前状态,	  @~english Get camera current state */
     
 	PROPERTY_EXT_SET_FAKE_MODE			= 0x904, /**< @~chinese 设置真假分辨率                @~english set fake mode */
 	PROPERTY_EXT_AUTO_EXPOSURE_MODE		= 0x912, /**< @~chinese 深度相机自动曝光模式,参考AUTO_EXPOSURE_MODE         @~english auto exposure mode of depth camera，reference AUTO_EXPOSURE_MODE*/
@@ -627,11 +633,13 @@ typedef union PropertyExtension
 	char acMac[60];								/**< @~chinese 对应PROPERTY_EXT_MAC_ADDRESS	@~english corresponding PROPERTY_EXT_MAC_ADDRESS	*/
 	DepthRoi	depthRoi;						/**< @~chinese 对应PROPERTY_EXT_DEPTH_ROI	@~english corresponding PROPERTY_EXT_DEPTH_ROI	*/
 	WriteReadHidData*	writeReadHidData;		/**< @~chinese 对应PROPERTY_EXT_WRITE_READ_HID	@~english corresponding PROPERTY_EXT_WRITE_READ_HID	*/
-	ParallaxReconstructionMat	reconstructionMat; /**< @~chinese 对应PROPERTY_EXT_GET_RECONSTRUCTIONMAT	@~english corresponding PROPERTY_EXT_GET_RECONSTRUCTIONMAT	*/
+	PerspectiveTransformationMatrix	reconstructionMat; /**< @~chinese 对应PROPERTY_EXT_GET_RECONSTRUCTIONMAT	@~english corresponding PROPERTY_EXT_GET_RECONSTRUCTIONMAT	*/
 
 	unsigned int  uiExposureTime;	            /**< @~chinese 对应PROPERTY_EXT_EXPOSURE_TIME 曝光时间,单位毫秒  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME exposure time,unit ms*/
 	ValueRange objVRange_;						/**< @~chinese 对应PROPERTY_EXT_EXPOSURE_TIME_RANGE 曝光时间范围,单位毫秒  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME_RANGE exposure time range,unit ms*/
 	unsigned int uiTempratrue_;					/**< @~chinese 对应PROPERTY_EXT_CPU_TEMPRATRUE 温度,单位摄氏度  @~english corresponding PROPERTY_EXT_CPU_TEMPRATRUE exposure tempratrue,unit degree Celsius*/
+
+	bool boolCameraState;						/**< @~chinese 对应PROPERTY_EXT_GET_CAMERA_STATE 相机当前连接状态  @~english Camera current connect state*/
 
 	char reservedStr[60];                       /**< @~chinese 预留									    @~english reserved */
     int reserved[15];							/**< @~chinese 预留									    @~english reserved */
@@ -770,9 +778,40 @@ typedef struct Distort
 
 
 
-
 #ifdef __cplusplus
 }
 #endif
+
+namespace cs {
+	/**
+	* @~chinese
+	* @brief 二维点坐标
+	* @~english
+	* @brief 2D point coordinates
+	**/
+#ifndef POINT2F
+#define POINT2F
+	typedef struct Point2f
+	{
+		float x;
+		float y;
+	} Point2f;
+#endif
+	/**
+	* @~chinese
+	* @brief 三维点坐标
+	* @~english
+	* @brief 3D point coordinates
+	**/
+#ifndef POINT3F
+#define POINT3F
+	typedef struct Point3f
+	{
+		float x;
+		float y;
+		float z;
+	} Point3f;
+#endif
+}
 
 #endif

@@ -1,44 +1,21 @@
 /*******************************************************************************
-* This file is part of the 3DViewer
-*
-* Copyright 2022-2026 (C) Revopoint3D AS
-* All rights reserved.
-*
-* Revopoint3D Software License, v1.0
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistribution of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistribution in binary form must reproduce the above copyright notice,
-* this list of conditions and the following disclaimer in the documentation
-* and/or other materials provided with the distribution.
-*
-* 3. Neither the name of Revopoint3D AS nor the names of its contributors may be used
-* to endorse or promote products derived from this software without specific
-* prior written permission.
-*
-* 4. This software, with or without modification, must not be used with any
-* other 3D camera than from Revopoint3D AS.
-*
-* 5. Any software provided in binary form under this license must not be
-* reverse engineered, decompiled, modified and/or disassembled.
-*
-* THIS SOFTWARE IS PROVIDED BY REVOPOINT3D AS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-* MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL REVOPOINT3D AS OR CONTRIBUTORS BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* Info:  https://www.revopoint3d.com
-******************************************************************************/
+* This file is part of the 3DViewer                                            *
+*                                                                              *
+* Copyright (C) 2022 Revopoint3D Company Ltd.                                  *
+* All rights reserved.                                                         *
+*                                                                              *
+* This program is free software: you can redistribute it and/or modify         *
+* it under the terms of the GNU General Public License as published by         *
+* the Free Software Foundation, either version 3 of the License, or            *
+* (at your option) any later version.                                          *
+*                                                                              *
+* This program is distributed in the hope that it will be useful,              *
+* but WITHOUT ANY WARRANTY; without even the implied warranty of               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                *
+* GNU General Public License (http://www.gnu.org/licenses/gpl.txt)             *
+* for more details.                                                            *
+*                                                                              *
+********************************************************************************/
 
 #include "parasettingswidget.h"
 #include "./ui_parametersettings.h"
@@ -442,7 +419,7 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
             ui->cameraButtonArea->setEnabled(true);
             ui->scrollArea->setEnabled(true);
             onUpdatedCameraParas();
-            
+            isSingleShotMode = false;
             break;
         }
     case CAMERA_DISCONNECTED:
@@ -450,6 +427,7 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
     case CAMERA_CONNECTFAILED:
         ui->cameraButtonArea->setEnabled(false);
         ui->scrollArea->setEnabled(false);
+        isSingleShotMode = false;
         stopParaMonitor();
         break;
     default:    
@@ -475,8 +453,8 @@ void ParaSettingsWidget::updateControlButtonState(int cameraState)
 }
 
 void ParaSettingsWidget::updateWidgetsState(int cameraState)
-{ 
-    static QList<int> streamTypePara = 
+{
+    static QList<int> streamTypePara =
     {
         PARA_DEPTH_STREAM_FORMAT,
         PARA_DEPTH_RESOLUTION,
@@ -487,7 +465,7 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
     // has rgb or not
     QVariant hasRgbV;
     cameraPtr->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
-    bool hasRgb = hasRgbV.toBool(); 
+    bool hasRgb = hasRgbV.toBool();
 
     ui->rgbCameraButton->setEnabled(hasRgb);
     ui->rgbParaWidget->setEnabled(hasRgb);
@@ -496,7 +474,7 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
     {
         auto paraId = widget->getParaId();
         const bool isStreamTypePara = streamTypePara.contains(paraId);
-        
+
         bool enable = (cameraState == CAMERA_CONNECTED || cameraState == CAMERA_PAUSED_STREAM || cameraState == CAMERA_STOPPED_STREAM) ? isStreamTypePara
             : (cameraState == CAMERA_STARTED_STREAM ? !isStreamTypePara : false);
 
@@ -510,6 +488,15 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
         bool hasDepth = hasDepthV.toBool();
 
         paraWidgets[PARA_DEPTH_RANGE]->setEnabled(hasDepth);
+    }
+
+    if (cameraState == CAMERA_DISCONNECTFAILED || cameraState == CAMERA_DISCONNECTED || cameraState == CAMERA_CONNECTFAILED)
+    {
+        // clear parameter values
+        for (auto widget : paraWidgets)
+        {
+            widget->clearValues();
+        }
     }
 }
 

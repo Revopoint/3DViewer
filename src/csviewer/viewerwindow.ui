@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1056</width>
-    <height>725</height>
+    <width>1055</width>
+    <height>724</height>
    </rect>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -80,7 +80,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1056</width>
+     <width>1055</width>
      <height>23</height>
     </rect>
    </property>
@@ -108,7 +108,7 @@
     <addaction name="actionChinese"/>
     <addaction name="actionEnglish"/>
    </widget>
-   <widget class="QMenu" name="menuAbout">
+   <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>Help</string>
     </property>
@@ -116,6 +116,7 @@
     <addaction name="actionGithub"/>
     <addaction name="actionWebSite"/>
     <addaction name="actionOpenLogDir"/>
+    <addaction name="actionAbout"/>
    </widget>
    <widget class="QMenu" name="menuCamera">
     <property name="enabled">
@@ -154,7 +155,7 @@
    <addaction name="menuCamera"/>
    <addaction name="menuLanguage"/>
    <addaction name="menuWindows"/>
-   <addaction name="menuAbout"/>
+   <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="actionExit">
@@ -165,7 +166,7 @@
     <string>Ctrl+Q</string>
    </property>
    <property name="shortcutContext">
-    <enum>Qt::WindowShortcut</enum>
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionChinese">
@@ -191,6 +192,9 @@
    <property name="shortcut">
     <string>Ctrl+W</string>
    </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
+   </property>
   </action>
   <action name="actionInfomation">
    <property name="text">
@@ -208,6 +212,9 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+L</string>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::ApplicationShortcut</enum>
    </property>
   </action>
   <action name="actionsetDefaultSaveDir"/>
@@ -269,6 +276,11 @@
   <action name="actionManual">
    <property name="text">
     <string>Manual</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
    </property>
   </action>
  </widget>

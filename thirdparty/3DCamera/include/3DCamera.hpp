@@ -23,6 +23,6 @@
 
 #define SDK_VERSION_MAJOR               3
 #define SDK_VERSION_MINOR               2
-#define SDK_VERSION_MICRO               14
+#define SDK_VERSION_MICRO               16
 
 #endif 

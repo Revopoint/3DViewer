@@ -36,6 +36,9 @@ set(LUPDATE ${_qt5_linguisttools_install_prefix}/bin/lupdate)
 set(LUPDATE_OPTIONS -locations absolute -no-ui-lines -no-sort)
 set(LRELEASE ${_qt5_linguisttools_install_prefix}/bin/lrelease)
 
+# OpenMP
+find_package(OpenMP REQUIRED)
+
 ## thirdparty
 set(THIRDPARTY_DIR ${PROJECT_SOURCE_DIR}/../thirdparty)
 

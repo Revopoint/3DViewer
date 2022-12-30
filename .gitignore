@@ -10,3 +10,8 @@ document/manual-md/English/_book
 document/manual-md/Chinese/node_modules
 document/manual-md/Chinese/_book
 document/manual-md/English/node_modules
+/thirdparty/3DCamera/windows/x64/*.pdb
+/thirdparty/3DCamera/windows/x64/*.exp
+/thirdparty/3DCamera/windows/x64/*.ilk
+/thirdparty/3DCamera/*.bat
+/thirdparty/3DCamera/include/CMakeLists.txt

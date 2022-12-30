@@ -5,6 +5,7 @@
 
 #cmakedefine APP_VERSION "${APP_VERSION}"
 #cmakedefine APP_NAME "${APP_NAME}"
+#cmakedefine APP_BUILD_TIME "${APP_BUILD_TIME}"
 
 #define LOG_DIR "Logs"
 #define APP_PATH QApplication::applicationDirPath()

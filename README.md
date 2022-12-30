@@ -86,7 +86,7 @@ Dependent environment:
    (When connecting the camera via USB, you need to run the ***scripts/cs_rpc_install.sh*** script under the code root directory first.)
    
 
-### Compile on Linux platform
+### Compile on Linux（Ubuntu） platform
 
 1. Installation  [Qt5](https://download.qt.io/)、[CMake](https://cmake.org/download/)、[Git](https://git-scm.com/downloads)、g++ (take Qt 5.10.1 as an example).
 

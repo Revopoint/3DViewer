@@ -29,6 +29,9 @@
    </item>
    <item>
     <widget class="QWidget" name="widget" native="true">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="leftMargin">
        <number>9</number>
@@ -83,7 +86,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLineEdit" name="ipEdit1">
+       <widget class="CSLineEdit" name="ipEdit1">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -100,7 +103,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="ipEdit2">
+       <widget class="CSLineEdit" name="ipEdit2">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -117,7 +120,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="ipEdit3">
+       <widget class="CSLineEdit" name="ipEdit3">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -134,7 +137,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLineEdit" name="ipEdit4">
+       <widget class="CSLineEdit" name="ipEdit4">
         <property name="focusPolicy">
          <enum>Qt::StrongFocus</enum>
         </property>
@@ -161,6 +164,9 @@
    </item>
    <item>
     <widget class="QWidget" name="widget_2" native="true">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <spacer name="horizontalSpacer_3">
@@ -216,6 +222,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CSLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header location="global">cslineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

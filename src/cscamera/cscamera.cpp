@@ -1,44 +1,21 @@
 /*******************************************************************************
-* This file is part of the 3DViewer
-*
-* Copyright 2022-2026 (C) Revopoint3D AS
-* All rights reserved.
-*
-* Revopoint3D Software License, v1.0
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions are met:
-*
-* 1. Redistribution of source code must retain the above copyright notice,
-* this list of conditions and the following disclaimer.
-*
-* 2. Redistribution in binary form must reproduce the above copyright notice,
-* this list of conditions and the following disclaimer in the documentation
-* and/or other materials provided with the distribution.
-*
-* 3. Neither the name of Revopoint3D AS nor the names of its contributors may be used
-* to endorse or promote products derived from this software without specific
-* prior written permission.
-*
-* 4. This software, with or without modification, must not be used with any
-* other 3D camera than from Revopoint3D AS.
-*
-* 5. Any software provided in binary form under this license must not be
-* reverse engineered, decompiled, modified and/or disassembled.
-*
-* THIS SOFTWARE IS PROVIDED BY REVOPOINT3D AS "AS IS" AND ANY EXPRESS OR IMPLIED
-* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-* MERCHANTABILITY, NONINFRINGEMENT, AND FITNESS FOR A PARTICULAR PURPOSE ARE
-* DISCLAIMED. IN NO EVENT SHALL REVOPOINT3D AS OR CONTRIBUTORS BE LIABLE FOR ANY
-* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*
-* Info:  https://www.revopoint3d.com
-******************************************************************************/
+* This file is part of the 3DViewer                                            *
+*                                                                              *
+* Copyright (C) 2022 Revopoint3D Company Ltd.                                  *
+* All rights reserved.                                                         *
+*                                                                              *
+* This program is free software: you can redistribute it and/or modify         *
+* it under the terms of the GNU General Public License as published by         *
+* the Free Software Foundation, either version 3 of the License, or            *
+* (at your option) any later version.                                          *
+*                                                                              *
+* This program is distributed in the hope that it will be useful,              *
+* but WITHOUT ANY WARRANTY; without even the implied warranty of               *
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                *
+* GNU General Public License (http://www.gnu.org/licenses/gpl.txt)             *
+* for more details.                                                            *
+*                                                                              *
+********************************************************************************/
 
 #include "cscamera.h"
 #include "cameraparaid.h"
@@ -459,7 +436,7 @@ bool CSCamera::restartCamera()
     }
 
     qInfo() << "CSCamera: restart end, wait connect...";
-
+    
     return true;
 }
 
@@ -496,6 +473,8 @@ bool CSCamera::connectCamera(CameraInfo info)
     }
 
     initDefaultStreamInfo();
+
+
     
     initCameraInfo();
 
@@ -1046,10 +1025,6 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
 {
     switch (paraId)
     {
-    case PARA_DEPTH_AUTO_EXPOSURE:
-        //onParaUpdatedDelay(PARA_DEPTH_GAIN, 3000);
-        //onParaUpdatedDelay(PARA_DEPTH_EXPOSURE, 3000);
-        break;
     case PARA_DEPTH_FILTER_TYPE:
         emit cameraParaRangeUpdated(PARA_DEPTH_FILTER);
         setDepthFilterValue(FILTER_RANGE_MAP[filterType].min);
@@ -1078,16 +1053,20 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
             onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 3000);
         } 
         break;
-    case PARA_RGB_AUTO_EXPOSURE:
-        //onParaUpdatedDelay(PARA_RGB_EXPOSURE, 3000);
-        //onParaUpdatedDelay(PARA_RGB_GAIN, 3000);
-        break;
-    case PARA_RGB_AUTO_WHITE_BALANCE:
-        //onParaUpdatedDelay(PARA_RGB_WHITE_BALANCE, 3000);
-        break;
     case PARA_TRIGGER_MODE:
         onTriggerModeChanged(value.toInt() == TRIGGER_MODE_SOFTWAER);
         break;
+    case PARA_CAMERA_IP:
+    {
+        // update cameraInfo when ip changed
+        QVariant ip;
+        getCameraPara(PARA_CAMERA_IP, ip);
+
+        CameraIpSetting cameraIp = ip.value<CameraIpSetting>();
+        QString ipStr = QString("%1.%2.%3.%4").arg(cameraIp.ipBytes[0]).arg(cameraIp.ipBytes[1]).arg(cameraIp.ipBytes[2]).arg(cameraIp.ipBytes[3]);
+        strncpy(cameraInfo.cameraInfo.uniqueId, ipStr.toStdString().c_str(), sizeof(cameraInfo.cameraInfo.uniqueId));
+        break;
+    }
     default:
         break;
     }
@@ -1332,8 +1311,10 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
         value = (int)propExt.triggerMode;
         break;
     case PROPERTY_EXT_CAMERA_IP:
+    {
         value = QVariant::fromValue(propExt.cameraIp);
         break;
+    }
     default:
         Q_ASSERT(false);
         break;
@@ -1548,40 +1529,39 @@ void CSCamera::getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& 
     }
 }
 
+#define RGB_EXPOSURE_MAX 30000
+#define RGB_EXPOSURE_MIN 1
+
 void CSCamera::correctExposureRange(float& min, float& max, float& step)
 {
-#ifdef WIN32
     if (cameraInfo.connectType == CONNECT_TYPE_USB)
     {
-        rgbExposureMin = min;
         float d = max - min;
-        min = 1;
-        max = 30000;
+        rgbExposureMin = min;
+        rgbExposureMax = max;
 
-        rgbExposureStep = max / d;
-        step = rgbExposureStep;
+        min = RGB_EXPOSURE_MIN;
+        step = 1;
+
+        rgbExposureStep = (RGB_EXPOSURE_MAX - min) / d;
+        max = min + rgbExposureStep * d;
     }
-#endif
 }
 
 void CSCamera::correctExposureValue(float& value)
 {
-#ifdef WIN32
     if (cameraInfo.connectType == CONNECT_TYPE_USB)
     {
-        value = qRound(rgbExposureStep * (value - rgbExposureMin));
+        value = RGB_EXPOSURE_MIN + qRound(rgbExposureStep * (value - rgbExposureMin));
     }
-#endif
 }
 
 void CSCamera::convertExposureValue(float& value)
 {
-#ifdef WIN32
     if (cameraInfo.connectType == CONNECT_TYPE_USB)
     {
-        value = (value / rgbExposureStep) + rgbExposureMin;
+        value = (value - RGB_EXPOSURE_MIN) / rgbExposureStep + rgbExposureMin;
     }
-#endif
 }
 
 void CSCamera::setDepthFormat(STREAM_FORMAT format)

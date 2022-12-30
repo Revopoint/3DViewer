@@ -48,7 +48,7 @@
   
   - [在MacOS平台下编译](3DViewer-Compile.md#4)
   
-  - [在Linux平台下编译](3DViewer-Compile.md#5)
+  - [在Linux（Ubuntu）平台下编译](3DViewer-Compile.md#5)
   
     
 

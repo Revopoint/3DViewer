@@ -44,5 +44,5 @@
 - [3DViewer Compile](3DViewer-Compile.md#1)
   - [Compile on Windows Platform](3DViewer-Compile.md#3)
   - [Compile on MacOS Platform](3DViewer-Compile.md#4)
-  - [Compile on Linux Platform](3DViewer-Compile.md#5)  
+  - [Compile on Linux (Ubuntu)Platform](3DViewer-Compile.md#5)  
 
