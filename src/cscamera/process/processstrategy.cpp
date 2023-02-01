@@ -37,10 +37,13 @@ void ProcessStrategy::setCamera(std::shared_ptr<ICSCamera> camera)
     cameraPtr = camera;
 }
 
-void ProcessStrategy::setCameraParaState(bool dirty)
+void ProcessStrategy::setCameraParaState(int paraId, bool dirty)
 {
     QMutexLocker locker(&mutex);
-    isCameraParaDirty = dirty;
+    if (dependentParameters.contains(paraId))
+    {
+        isCameraParaDirty = dirty;
+    }
 }
 
 void ProcessStrategy::process(const FrameData& frameData, OutputDataPort& outputDataPort)

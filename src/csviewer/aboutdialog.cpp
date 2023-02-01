@@ -29,7 +29,7 @@ AboutDialog::AboutDialog(QWidget* parent)
 
     ui->closeButton->setProperty("isCSStyle", true);
 
-    QString appName = QString("<strong>%1 %2</strong>").arg(APP_NAME).arg(APP_VERSION);
+    QString appName = QString("<strong>%1 V%2</strong>").arg(APP_NAME).arg(APP_VERSION);
     ui->appNameLabel->setText(appName);
 
     QString appBuiltTime = QString(tr("Built on %1")).arg(APP_BUILD_TIME);

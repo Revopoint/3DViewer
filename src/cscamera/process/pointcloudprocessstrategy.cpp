@@ -29,7 +29,9 @@ PointCloudProcessStrategy::PointCloudProcessStrategy()
     : DepthProcessStrategy(STRATEGY_CLOUD_POINT)
     , withTexture(false)
 {
-
+    dependentParameters.push_back(PARA_RGB_INTRINSICS);
+    dependentParameters.push_back(PARA_EXTRINSICS);
+    dependentParameters.push_back(PARA_HAS_RGB);
 }
 
 void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort& outputDataPort)
@@ -48,6 +50,7 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
 
     Pointcloud pc;
     QImage texImage;
+    
     for (const StreamData& streamData : streamDatas)
     {
         switch (streamData.dataInfo.format)
@@ -67,26 +70,23 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
             return;
         }
     }
-
-    emit output3DUpdated(pc, texImage);
-    outputDataPort.setPointCloud(pc);
+    
+    if (pc.getVertices().size() > 0)
+    {
+        emit output3DUpdated(pc, texImage);
+        outputDataPort.setPointCloud(pc);
+    }
 }
 
 void PointCloudProcessStrategy::onLoadCameraPara()
 {
     DepthProcessStrategy::onLoadCameraPara();
-
-    const auto parameters =
+    for (auto para : dependentParameters)
     {
-        PARA_RGB_INTRINSICS,
-        PARA_EXTRINSICS,
-        PARA_HAS_RGB
-    };
-
-    for (auto para : parameters)
-    {
+        auto emPara = (CAMERA_PARA_ID)para;
         QVariant value;
-        cameraPtr->getCameraPara(para, value);
+
+        cameraPtr->getCameraPara(emPara, value);
         switch (para)
         {
         case PARA_RGB_INTRINSICS:
@@ -99,7 +99,6 @@ void PointCloudProcessStrategy::onLoadCameraPara()
             withTexture = value.toBool();
             break;
         default:
-            Q_ASSERT(false);
             break;
         }
     }

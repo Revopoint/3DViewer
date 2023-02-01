@@ -23,6 +23,7 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QVector>
+#include <QCloseEvent>
 #include <cstypes.h>
 #include <hpp/Processing.hpp>
 
@@ -68,6 +69,8 @@ public:
 
     ViewerWindow(QWidget* parent = nullptr);
     ~ViewerWindow();
+
+    void closeEvent(QCloseEvent* event) override;
 private slots:
     void onRenderPageChanged(int idx);
     void onCameraStateChanged(int state);

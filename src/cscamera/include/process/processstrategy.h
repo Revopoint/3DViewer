@@ -23,6 +23,7 @@
 #include <QObject>
 #include <memory>
 #include <QMutex>
+#include <QVector>
 
 #include "cstypes.h"
 #include "cscameraapi.h"
@@ -47,7 +48,7 @@ class CS_CAMERA_EXPORT ProcessStrategy : public QObject
 public:
     ProcessStrategy(PROCESS_STRA_TYPE type);
     void setCamera(std::shared_ptr<ICSCamera> camera);
-    void setCameraParaState(bool dirty);
+    void setCameraParaState(int paraId, bool dirty);
 
     PROCESS_STRA_TYPE getProcessStraType();
     void process(const FrameData& frameData, OutputDataPort& outputDataPort);
@@ -76,6 +77,8 @@ protected:
     QMutex mutex;
     PROCESS_STRA_TYPE strategyType;
     bool strategyEnable = true;
+
+    QVector<int> dependentParameters;
 };
 
 }

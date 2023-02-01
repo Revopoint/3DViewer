@@ -52,7 +52,8 @@ CameraPlayerDialog::CameraPlayerDialog(QWidget* parent)
         suc &= (bool)connect(checkBox, &QCheckBox::toggled, this, &CameraPlayerDialog::onToggledCheckBox);
     }
 
-    suc &= (bool)connect(ui->frameNumberSlider, &QSlider::sliderReleased, this, &CameraPlayerDialog::onSliderValueChanged);
+    //suc &= (bool)connect(ui->frameNumberSlider, &QSlider::sliderReleased, this, &CameraPlayerDialog::onSliderValueChanged);
+    suc &= (bool)connect(ui->frameNumberSlider, &QSlider::valueChanged, this, &CameraPlayerDialog::onSliderValueChanged);
 
     suc &= (bool)connect(ui->frameIncrease, &QPushButton::clicked, this, [=]()
         {

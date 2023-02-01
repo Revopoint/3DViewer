@@ -45,7 +45,12 @@ DepthProcessStrategy::DepthProcessStrategy(PROCESS_STRA_TYPE type)
     , filterValue(0)
     , filterType(0)
 {
-
+    dependentParameters.push_back(PARA_DEPTH_RANGE);
+    dependentParameters.push_back(PARA_DEPTH_SCALE);
+    dependentParameters.push_back(PARA_DEPTH_INTRINSICS);
+    dependentParameters.push_back(PARA_DEPTH_FILL_HOLE);
+    dependentParameters.push_back(PARA_DEPTH_FILTER_TYPE);
+    dependentParameters.push_back(PARA_DEPTH_FILTER);
 }
 
 void DepthProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort& outputDataPort)
@@ -291,20 +296,12 @@ QVector<OutputData2D> DepthProcessStrategy::onProcessPAIR(const StreamData& stre
 
 void DepthProcessStrategy::onLoadCameraPara()
 {
-    const auto parameters =
+    for (auto para : dependentParameters)
     {
-        PARA_DEPTH_RANGE,
-        PARA_DEPTH_SCALE,
-        PARA_DEPTH_INTRINSICS,
-        PARA_DEPTH_FILL_HOLE,
-        PARA_DEPTH_FILTER_TYPE,
-        PARA_DEPTH_FILTER
-    };
+        auto emPara = (CAMERA_PARA_ID)para;
 
-    for (auto para : parameters)
-    {
         QVariant value;
-        cameraPtr->getCameraPara(para, value);
+        cameraPtr->getCameraPara(emPara, value);
         switch (para)
         {
         case PARA_DEPTH_RANGE:
@@ -330,7 +327,6 @@ void DepthProcessStrategy::onLoadCameraPara()
             }
             break;
         default:
-            Q_ASSERT(false);
             break;
         }
     }

@@ -499,6 +499,7 @@ void RenderWidget3D::initButtons()
     fullScreenBtn = new QPushButton(bottomItem);
     fullScreenBtn->setObjectName("FullScreenButton");
     fullScreenBtn->setCheckable(true);
+    fullScreenBtn->setFocusPolicy(Qt::NoFocus);
 
     connect(fullScreenBtn, &QPushButton::toggled, this, [=](bool checked) {
             emit fullScreenUpdated(renderId, checked);

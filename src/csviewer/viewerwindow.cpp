@@ -26,6 +26,7 @@
 #include <QFileDialog>
 #include <QTranslator>
 #include <QThread>
+#include <QMessageBox>
 
 #include <cstypes.h>
 #include <icscamera.h>
@@ -143,7 +144,7 @@ void ViewerWindow::initConnections()
 void ViewerWindow::initWindow()
 {
     setWindowIcon(QIcon(":/resources/3DViewer.ico"));
-    QString title = QString("%1 %2").arg(APP_NAME).arg(APP_VERSION);
+    QString title = QString("%1 V%2").arg(APP_NAME).arg(APP_VERSION);
     setWindowTitle(title);
     showMaximized();
 
@@ -643,4 +644,25 @@ void ViewerWindow::onTriggeredGithub()
 void ViewerWindow::onTriggeredWebsite()
 {
     QDesktopServices::openUrl(QUrl(WEBSITE_URL));
+}
+
+void ViewerWindow::closeEvent(QCloseEvent* event)
+{
+    QMessageBox msgBox;
+    msgBox.setIcon(QMessageBox::Question);
+    msgBox.setWindowTitle(tr("Tips"));
+    msgBox.setText(tr("Confirm to exit the application ?"));
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.button(QMessageBox::Yes)->setText(tr("Yes"));
+    msgBox.button(QMessageBox::No)->setText(tr("No"));
+
+    int button = msgBox.exec();
+    if (button == QMessageBox::No)
+    {
+        event->ignore();
+    }
+    else if (button == QMessageBox::Yes)
+    {
+        event->accept();
+    }
 }

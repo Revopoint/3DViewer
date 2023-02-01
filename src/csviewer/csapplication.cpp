@@ -154,7 +154,7 @@ void CSApplication::onCameraParaUpdated(int paraId, QVariant value)
         auto stra = processStrategys[straType];
         if (stra)
         {
-            stra->setCameraParaState(true);
+            stra->setCameraParaState(paraId, true);
         }
     }
 }

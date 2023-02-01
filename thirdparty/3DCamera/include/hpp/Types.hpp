@@ -439,7 +439,10 @@ typedef enum EN_FRINGE_PATTERN_TYPE_T
 	EN_FRINGE_PATTERN_TYPE_STANDARD_WHITE_ADDED = 0x01,
 	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH = 0x02,
 	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH_WHITE_ADDED = 0x03,
-	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH_DOUBLE_WHITE_ADDED = 0x04
+	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH_DOUBLE_WHITE_ADDED = 0x04,
+	EN_FRINGE_PATTERN_TYPE_3FREQ4STEP_MULTI = 0x05,
+	EN_FRINGE_PATTERN_TYPE_3FREQ4STEP_MULTI_DEPTH = 0x06,
+
 }FRINGE_PATTERN_TYPE;
 
 typedef struct MaxFrameTimeGain_tag
@@ -481,6 +484,11 @@ typedef struct WriteReadHidData_tag
 
 }WriteReadHidData;
 
+//透视变换矩阵行数,列数
+#define PER_TRANSF_MATRIX_ROW	4
+#define PER_TRANSF_MATRIX_COL	4
+#define PER_TRANSF_MATRIX_SIZE	16
+
 /**
 * @~chinese
 * @brief 透视变换矩阵
@@ -493,8 +501,8 @@ typedef struct PerspectiveTransformationMatrix
 	short height;
 	union 
 	{
-		float matrix[4][4];
-		float mat_[16];
+		float matrix[PER_TRANSF_MATRIX_ROW][PER_TRANSF_MATRIX_COL];
+		float mat_[PER_TRANSF_MATRIX_SIZE];
 	};
 	
 } PerspectiveTransformationMatrix;
@@ -645,6 +653,8 @@ typedef union PropertyExtension
     int reserved[15];							/**< @~chinese 预留									    @~english reserved */
 }PropertyExtension;		
 
+#define KEY_INFO_RESERVED_LEN	2
+
 #pragma pack(push, 1)
 /**
 * @~chinese
@@ -655,7 +665,7 @@ typedef union PropertyExtension
 typedef struct KeyInfo {
     char   key_num;
 	char   key_level;	//KEY_EVENT_DOWN = 0,KEY_EVENT_UP = 1
-	char   reserved[2];	//reserved fot 2 bytes
+	char   reserved[KEY_INFO_RESERVED_LEN];	//reserved fot 2 bytes
     int   key_time;		//按键时间，特别说明：设备上电到第一次按键值一直为0
 }KeyInfo;
 
@@ -675,15 +685,19 @@ typedef struct GyroPositionAndPose_tag
 	float	yaw;
 }GyroPositionAndPose;
 
+#define ADDITION_RESERVED_LEN	8
+#define ADDITION_RESERVED_LEN2	4
 
 typedef struct AdditionData
 {
-    char    reserved[8];
+    char    reserved[ADDITION_RESERVED_LEN];
     KeyInfo keyInfo;
-    char    reserved2[4];
+    char    reserved2[ADDITION_RESERVED_LEN2];
     int     timestamp;
 	GyroPositionAndPose	gyroPosAndPos;
 }AdditionData;
+
+#define EXTRA_INFO_RESERVED_LEN	24
 
 /**
 * @~chinese
@@ -694,7 +708,7 @@ typedef struct AdditionData
 typedef union ExtraInfo
 {
     AdditionData addition;
-    char reserved[24];
+    char reserved[EXTRA_INFO_RESERVED_LEN];
 }ExtraInfo;
 #pragma pack(pop)
 
@@ -759,6 +773,9 @@ typedef struct Extrinsics
 	float rotation[9];                           /**<@~chinese 3x3旋转矩阵      @~english column-major 3x3 rotation matrix */
 	float translation[3];                        /**<@~chinese 3元素的平移矩阵  @~english three-element translation vector */
 }Extrinsics;
+
+//畸变参数个数
+#define DISTORT_PARAM_CNT	5
 
 /**
 * @~chinese

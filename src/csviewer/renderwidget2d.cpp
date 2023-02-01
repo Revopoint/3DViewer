@@ -209,6 +209,7 @@ void RenderWidget2D::initButtons()
         exitButton->setObjectName("ExitButton");
         exitButton->setIconSize(QSize(20, 20));
         exitButton->setIcon(QIcon(":/resources/fork_large.png"));
+        exitButton->setFocusPolicy(Qt::NoFocus);
 
         connect(exitButton, &QPushButton::clicked, this, &RenderWidget2D::onClickExitButton);
     }
@@ -218,6 +219,7 @@ void RenderWidget2D::initButtons()
         fullScreenBtn = new QPushButton(this);
         fullScreenBtn->setObjectName("FullScreenButton");
         fullScreenBtn->setCheckable(true);
+        fullScreenBtn->setFocusPolicy(Qt::NoFocus);
 
         connect(fullScreenBtn, &QPushButton::toggled, this, &RenderWidget2D::onClickFullScreen);
 

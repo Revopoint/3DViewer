@@ -30,7 +30,7 @@
 #include <algorithm>
 #include <3DCamera.hpp>
 
-static CSRange DEPTH_RANGE_LIMIT = { 0, 10000 };
+static CSRange DEPTH_RANGE_LIMIT = { 0, 65535 };
 static CSRange CAMERA_HDR_LEVEL_RANGE = { 2,8 };
 #define HDR_SCALE_DEFAULT  5
 
@@ -310,6 +310,8 @@ void CSCamera::onStreamStarted()
     PropertyExtension propExt;
     ERROR_CODE ret = cameraPtr->getPropertyExtension(PROPERTY_EXT_DEPTH_SCALE, propExt);
     depthScale = propExt.depthScale;
+
+    DEPTH_RANGE_LIMIT.max = 65535 * depthScale;
 }
 
 bool CSCamera::stopStream()
@@ -474,8 +476,6 @@ bool CSCamera::connectCamera(CameraInfo info)
 
     initDefaultStreamInfo();
 
-
-    
     initCameraInfo();
 
     setCameraState(CAMERA_CONNECTED);
@@ -769,7 +769,6 @@ void CSCamera::onGetFrame(int timeout)
         IFramePtr depthFrame, rgbFrame;
 
         cameraPtr->getPairedFrame(depthFrame, rgbFrame, timeout);
-
         //cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
         //cameraPtr->getFrame(STREAM_TYPE_RGB, rgbFrame, timeout);
 
@@ -832,7 +831,7 @@ StreamInfo CSCamera::getDepthStreamInfo()
     ERROR_CODE ret = cameraPtr->getStreamInfos(STREAM_TYPE_DEPTH, streamInfos);
     if (ret != SUCCESS || streamInfos.empty())
     {
-        qWarning("camera get stream info failed(%d)!\n", ret);
+        qWarning("camera get depth stream info failed(%d)!\n", ret);
         return info;
     }
 
@@ -857,7 +856,7 @@ StreamInfo CSCamera::getRgbStreamInfo()
     ERROR_CODE ret = cameraPtr->getStreamInfos(STREAM_TYPE_RGB, streamInfos);
     if (ret != SUCCESS || streamInfos.empty())
     {
-        qWarning("camera get stream info failed(%d)!\n", ret);
+        qWarning("camera get rgb stream info failed(%d)!\n", ret);
         return info;
     }
 

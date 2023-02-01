@@ -100,7 +100,7 @@ target_link_libraries(${TARGET_NAME}
 if(APPLE)
     set_target_properties(${TARGET_NAME} PROPERTIES
         MACOSX_BUNDLE_ICON_FILE 3DViewer.icns
-        MACOSX_BUNDLE_BUNDLE_NAME 3DViewer
+        MACOSX_BUNDLE_BUNDLE_NAME ${TARGET_NAME}
     )
 endif()
 
