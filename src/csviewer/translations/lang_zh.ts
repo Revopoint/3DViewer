@@ -197,22 +197,22 @@
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="653"/>
+        <location filename="../viewerwindow.cpp" line="666"/>
         <source>Tips</source>
         <translation type="unfinished">提示</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="654"/>
+        <location filename="../viewerwindow.cpp" line="667"/>
         <source>Confirm to exit the application ?</source>
         <translation type="unfinished">确定要退出吗？</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="656"/>
+        <location filename="../viewerwindow.cpp" line="669"/>
         <source>Yes</source>
         <translation type="unfinished">是</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="657"/>
+        <location filename="../viewerwindow.cpp" line="670"/>
         <source>No</source>
         <translation type="unfinished">否</translation>
     </message>
@@ -602,7 +602,7 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="unfinished">暂停预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="874"/>
+        <location filename="../parasettingswidget.cpp" line="883"/>
         <source>Capture frame data</source>
         <translation type="unfinished">保存帧数据</translation>
     </message>
@@ -1200,29 +1200,29 @@ and the image quality of objects farther away may become worse.</source>
     </message>
     <message>
         <location filename="../formatconvertdialog.cpp" line="71"/>
-        <location filename="../formatconvertdialog.cpp" line="102"/>
+        <location filename="../formatconvertdialog.cpp" line="104"/>
         <source>Select source file</source>
         <translation type="unfinished">选择源文件</translation>
     </message>
     <message>
-        <location filename="../formatconvertdialog.cpp" line="144"/>
-        <location filename="../formatconvertdialog.cpp" line="168"/>
+        <location filename="../formatconvertdialog.cpp" line="155"/>
+        <location filename="../formatconvertdialog.cpp" line="179"/>
         <source>Tips</source>
         <translation type="unfinished">提示</translation>
     </message>
     <message>
-        <location filename="../formatconvertdialog.cpp" line="169"/>
+        <location filename="../formatconvertdialog.cpp" line="180"/>
         <source>Converting, are you sure to stop now ?</source>
         <translation type="unfinished">正在转换，确定要停止吗？</translation>
     </message>
     <message>
-        <location filename="../formatconvertdialog.cpp" line="147"/>
-        <location filename="../formatconvertdialog.cpp" line="171"/>
+        <location filename="../formatconvertdialog.cpp" line="158"/>
+        <location filename="../formatconvertdialog.cpp" line="182"/>
         <source>Yes</source>
         <translation type="unfinished">是</translation>
     </message>
     <message>
-        <location filename="../formatconvertdialog.cpp" line="172"/>
+        <location filename="../formatconvertdialog.cpp" line="183"/>
         <source>No</source>
         <translation type="unfinished">否</translation>
     </message>
@@ -1235,7 +1235,7 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>cs::FormatConverter</name>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="62"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="111"/>
         <source>Converting, please wait</source>
         <translation type="unfinished">正在转换，请稍等</translation>
     </message>
@@ -1244,38 +1244,44 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="obsolete">开始转换</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="82"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="76"/>
         <source>Invalid zip file, not find CaptureParameters.yaml</source>
         <translation type="unfinished">非法ZIP文件，没有找到CaptureParameters.yaml文件</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="90"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="85"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="117"/>
         <source>Parse zip file failed</source>
         <translation type="unfinished">解析ZIP文件失败</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="98"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="94"/>
         <source>No depth data</source>
         <translation type="unfinished">没有深度数据</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="108"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="132"/>
         <source>Failed to create folder</source>
         <translation type="unfinished">创建文件夹失败</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="138"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="166"/>
         <source>Failed to generate point cloud</source>
         <translation type="unfinished">生成点云失败</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="77"/>
-        <location filename="../../cscamera/formatconverter.cpp" line="158"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="122"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="186"/>
         <source>Converting...</source>
         <translation type="unfinished">转换中...</translation>
     </message>
     <message>
-        <location filename="../../cscamera/formatconverter.cpp" line="163"/>
+        <location filename="../../cscamera/formatconverter.cpp" line="71"/>
+        <source>Loading file...</source>
+        <translation type="unfinished">加载文件中...</translation>
+    </message>
+    <message>
+        <location filename="../../cscamera/formatconverter.cpp" line="191"/>
         <source>Conversion completed, %1 successful, %2 failed</source>
         <translation type="unfinished">转换完成，成功%1个，失败%2个</translation>
     </message>

@@ -111,8 +111,8 @@ void ViewerWindow::initConnections()
 
     suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,           ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,       ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
-    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated,           ui->renderWindow,   &RenderWindow::onOutput3DUpdated);
-    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated,           ui->renderWindow,   &RenderWindow::onOutput2DUpdated);
+    //suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated,           ui->renderWindow,   &RenderWindow::onOutput3DUpdated);
+    //suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated,           ui->renderWindow,   &RenderWindow::onOutput2DUpdated);
 
     suc &= (bool)connect(ui->renderWindow, &RenderWindow::roiRectFUpdated,   this,               &ViewerWindow::onRoiRectFUpdated);
     suc &= (bool)connect(ui->renderWindow, &RenderWindow::renderExit,        this,               &ViewerWindow::onRenderExit, Qt::QueuedConnection);
@@ -430,7 +430,8 @@ void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
 void ViewerWindow::onCameraStreamStarted()
 {
     // get camera parameter
-    auto camera = cs::CSApplication::getInstance()->getCamera();
+    auto app = cs::CSApplication::getInstance();
+    auto camera = app->getCamera();
 
     QVariant hasRgbV, hasIrV, hasDepthV;
     camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
@@ -465,6 +466,12 @@ void ViewerWindow::onCameraStreamStarted()
 
     updateWindowActions();
     onRenderWindowUpdated();
+
+    bool suc = true;
+    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated, ui->renderWindow, &RenderWindow::onOutput3DUpdated);
+    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated, ui->renderWindow, &RenderWindow::onOutput2DUpdated);
+
+    Q_ASSERT(suc);
 }
 
 void ViewerWindow::onWindowsMenuTriggered(QAction* action)
@@ -555,6 +562,12 @@ void ViewerWindow::destoryRenderWindows()
         delete action;
     }
     windowActions.clear();
+    
+    auto app = cs::CSApplication::getInstance();
+
+    disconnect(app, &cs::CSApplication::output3DUpdated, ui->renderWindow, &RenderWindow::onOutput3DUpdated);
+    disconnect(app, &cs::CSApplication::output2DUpdated, ui->renderWindow, &RenderWindow::onOutput2DUpdated);
+
     onRenderWindowUpdated();
 }
 

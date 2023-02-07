@@ -600,6 +600,11 @@ bool CapturedZipParser::parseTimeStamps()
                 continue;
             }
 
+            if (line.isEmpty())
+            {
+                break;
+            }
+
             // get time stamp
             auto arr = line.split("=");
             if (arr.size() >= 2)
@@ -643,7 +648,7 @@ bool CapturedZipParser::parseTimeStamps()
 
 
     // check the time stamps in zip file 
-    if (!checkTimeStampsValid())
+    if (checkTimeStampsValid())
     {
         qInfo() << "Time stamps is valid";
     }
@@ -883,6 +888,11 @@ int CapturedZipParser::getRgbFrameIndexByTimeStamp(int depthIndex)
 
 int CapturedZipParser::getNearestRgbFrame(int depthIndex, int timeStamp)
 {
+    if (rgbTimeStamps.size() <= 0)
+    {
+        return depthIndex;
+    }
+
     int start = 0;
     int end = rgbTimeStamps.size() - 1;
     int mid;

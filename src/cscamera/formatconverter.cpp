@@ -29,6 +29,8 @@ FormatConverter::FormatConverter()
 {
     moveToThread(this);
     start();
+
+    connect(this, &FormatConverter::loadFileSignal, this, &FormatConverter::onLoadFile, Qt::QueuedConnection);
 }
 
 FormatConverter::~FormatConverter()
@@ -54,6 +56,53 @@ void FormatConverter::setWithTexture(bool withTexture)
     this->withTexture = withTexture;
 }
 
+void FormatConverter::onLoadFile()
+{
+    do 
+    {
+        isFileValid = true;
+        if (!capturedZipParser)
+        {
+            capturedZipParser = new CapturedZipParser();
+        }
+
+        capturedZipParser->setZipFile(sourceFile);
+
+        emit convertStateChanged(CONVERT_LOADING, 0, tr("Loading file..."));
+
+        if (!capturedZipParser->checkFileValid())
+        {
+            qWarning() << "Illegal zip file, or the zip file does not contain CaptureParameters.yaml";
+            emit convertStateChanged(CONVERT_LOADING_FAILED, 0, tr("Invalid zip file, not find CaptureParameters.yaml"));
+            isFileValid = false;
+            break;
+        }
+
+        // parse the zip file
+        if (!capturedZipParser->parseCaptureInfo())
+        {
+            qWarning() << "Parse zip file failed";
+            emit convertStateChanged(CONVERT_LOADING_FAILED, 0, tr("Parse zip file failed"));
+            isFileValid = false;
+            break;
+        }
+
+        QVector<int> dataTypes = capturedZipParser->getDataTypes();
+        if (!dataTypes.contains(CAMERA_DATA_DEPTH))
+        {
+            qWarning() << "convert failed, no depth data";
+            emit convertStateChanged(CONVERT_LOADING_FAILED, 0, tr("No depth data"));
+            isFileValid = false;
+            break;
+        }
+
+        // has RGB data or not
+        hasRGBData = dataTypes.contains(CAMERA_DATA_RGB);
+        emit convertStateChanged(CONVERT_READDY, 0, "");
+
+    } while (false);
+}
+
 void FormatConverter::onConvert()
 {
     if (getIsConverting())
@@ -63,57 +112,36 @@ void FormatConverter::onConvert()
         return;
     }
 
+    if (!isFileValid)
+    {
+        emit convertStateChanged(CONVERT_FAILED, 0, tr("Parse zip file failed"));
+        return;
+    }
+
     setIsConverting(true);
+    emit convertStateChanged(CONVERTING, 0, tr("Converting..."));
+
     do 
     {
-        if (!capturedZipParser)
-        {
-            capturedZipParser = new CapturedZipParser();
-        }
-
-        capturedZipParser->setZipFile(sourceFile);
-
-        int couvertCount = 0;
-        emit convertStateChanged(CONVERTING, couvertCount, tr("Converting..."));
-
-        if (!capturedZipParser->checkFileValid())
-        {
-            qWarning() << "Illegal zip file, or the zip file does not contain CaptureParameters.yaml";
-            emit convertStateChanged(CONVERT_FAILED, couvertCount, tr("Invalid zip file, not find CaptureParameters.yaml"));
-            break;
-        }
-
-        // parse the zip file
-        if (!capturedZipParser->parseCaptureInfo())
-        {
-            qWarning() << "Parse zip file failed";
-            emit convertStateChanged(CONVERT_FAILED, couvertCount, tr("Parse zip file failed"));
-            break;
-        }
-
-        QVector<int> dataTypes = capturedZipParser->getDataTypes();
-        if (!dataTypes.contains(CAMERA_DATA_DEPTH))
-        {
-            qWarning() << "convert failed, no depth data";
-            emit convertStateChanged(CONVERT_FAILED, couvertCount, tr("No depth data"));
-            break;
-        }
-
         QDir outputDir(outputDirectory);
         if (!outputDir.exists())
         {
             if (!outputDir.mkpath(outputDirectory))
             {
                 qWarning() << "make path failed, dir:" << outputDirectory;
-                emit convertStateChanged(CONVERT_FAILED, couvertCount, tr("Failed to create folder"));
+                emit convertStateChanged(CONVERT_FAILED, 0, tr("Failed to create folder"));
+                isFileValid = false;
                 break;
             }
         }
 
+        int couvertCount = 0;
         const int totalCount = capturedZipParser->getFrameCount();
         QString fileName = capturedZipParser->getCaptureName();
 
         int successCount = 0;
+        bool convertWithTexture = withTexture && hasRGBData;
+
         for (couvertCount = 0; couvertCount < totalCount; couvertCount++)
         {
             if (getInterruptConvert())
@@ -126,12 +154,12 @@ void FormatConverter::onConvert()
             int rgbIndex = couvertCount;
 
             // If the timestamp is valid, find the RGB frame index through the timestamp
-            if (withTexture && capturedZipParser->getIsTimeStampsValid())
+            if (convertWithTexture  && capturedZipParser->getIsTimeStampsValid())
             {
                 rgbIndex = capturedZipParser->getRgbFrameIndexByTimeStamp(couvertCount);
             }
 
-            if (!capturedZipParser->generatePointCloud(couvertCount, rgbIndex, withTexture, pc, texImage))
+            if (!capturedZipParser->generatePointCloud(couvertCount, rgbIndex, convertWithTexture, pc, texImage))
             {
                 qWarning() << "Failed to generate point cloud";
                 int progress = couvertCount * 1.0 / totalCount * 100;
@@ -143,7 +171,7 @@ void FormatConverter::onConvert()
             QByteArray pathData = savePath.toLocal8Bit();
             std::string savePathNew = pathData.data();
 
-            if (withTexture && !texImage.isNull())
+            if (convertWithTexture && !texImage.isNull())
             {
                 pc.exportToFile(savePathNew, texImage.bits(), texImage.width(), texImage.height());
             }
@@ -186,5 +214,15 @@ void FormatConverter::setInterruptConvert(bool value)
 bool FormatConverter::getInterruptConvert()
 {
     return interruptConvert;
+}
+
+bool FormatConverter::getHasRGBData() const
+{
+    return hasRGBData;
+}
+
+void FormatConverter::setHasRGBData(bool value)
+{
+    hasRGBData = value;
 }
 

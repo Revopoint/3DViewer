@@ -87,6 +87,8 @@ void FormatConvertDialog::onClickedBrowseSource()
 
         formatConverter->setSourceFile(filePath);
         formatConverter->setOutputDirectory(outputDir);
+
+        emit formatConverter->loadFileSignal();
     }
     else
     {
@@ -120,15 +122,24 @@ void FormatConvertDialog::onConvertStateChanged(int state, int progress, QString
     auto convertState = (cs::FormatConverter::CONVERT_STATE)state;
     switch (convertState)
     {
+    case cs::FormatConverter::CONVERT_LOADING:
+        ui->convertButton->setEnabled(false);
+        break;
+    case cs::FormatConverter::CONVERT_READDY:
+        ui->withTextureCheckBox->setEnabled(formatConverter->getHasRGBData());
+        ui->convertButton->setEnabled(true);
+        break;
     case cs::FormatConverter::CONVERTING:
         emit showMessage(message, 0);
         ui->convertProgress->setValue(progress);
         ui->convertButton->setEnabled(false);
+        ui->withTextureCheckBox->setEnabled(false);
         break;
     case cs::FormatConverter::CONVERT_SUCCESS:
     case cs::FormatConverter::CONVERT_FAILED:
         showMessageBox(message);
         ui->convertButton->setEnabled(true);
+        ui->withTextureCheckBox->setEnabled(true);
         break;
     case cs::FormatConverter::CONVERT_ERROR:
         break;
@@ -204,4 +215,5 @@ void FormatConvertDialog::showEvent(QShowEvent* event)
     ui->lineEditSrc->setText("");
     ui->lineEditOutput->setText("");
     ui->convertProgress->setValue(0);
+    ui->withTextureCheckBox->setEnabled(false);
 }

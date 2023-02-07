@@ -834,6 +834,15 @@ void ParaSettingsWidget::onPreviewStateChanged(bool toggled)
 
 void ParaSettingsWidget::onClickedStopStream()
 {
+    if (isSingleShotMode)
+    {
+        auto camera = cs::CSApplication::getInstance()->getCamera();
+
+        camera->setCameraPara(PARA_TRIGGER_MODE, TRIGGER_MODE_OFF);
+        isSingleShotMode = false;
+        ui->captureMultipleButton->setEnabled(true);
+    }
+
     stopParaMonitor();
     emit cs::CSApplication::getInstance()->stopStream();
 }
