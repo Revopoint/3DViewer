@@ -116,6 +116,8 @@ signals:
     void renderWindowUpdated(QVector<int> windows);
     void windowLayoutModeUpdated(int mode);
     void windowLayoutChanged(QVector<int> windows);
+
+    void showProgressBar(bool show);
 private:
     void initWindow();
     void initConnections();

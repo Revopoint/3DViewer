@@ -38,6 +38,8 @@ void CustomSlider::wheelEvent(QWheelEvent*)
 
 void CustomSlider::mouseReleaseEvent(QMouseEvent* event)
 {
+    QSlider::mouseReleaseEvent(event);
+
     if (event->button() == Qt::LeftButton)
     {
         const int value = QStyle::sliderValueFromPosition(minimum(), maximum(), event->pos().x(), width());

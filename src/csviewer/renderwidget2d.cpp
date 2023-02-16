@@ -272,6 +272,8 @@ void RenderWidget2D::onClickFullScreen(bool checked)
         updateImageSize();
     }
     emit fullScreenUpdated(getRenderId(), checked);
+    // notify to update
+    update();
 }
 
 void RenderWidget2D::resizeEvent(QResizeEvent* event)

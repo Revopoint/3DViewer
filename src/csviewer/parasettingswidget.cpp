@@ -610,7 +610,10 @@ void ParaSettingsWidget::onParaValueChanged(int paraId, QVariant value)
     cameraPtr->setCameraPara((CAMERA_PARA_ID)paraId, value);
     if (paraId == PARA_DEPTH_HDR_MODE || paraId == PARA_DEPTH_HDR_LEVEL)
     {
-
+        if (!(paraId == PARA_DEPTH_HDR_MODE && value.toInt() == HDR_MODE_CLOSE))
+        {
+            emit showProgressBar(true);
+        }
     }
 }
 
@@ -736,6 +739,9 @@ void ParaSettingsWidget::onParaLinkResponse(int paraId, QVariant value)
     case PARA_DEPTH_FILTER_TYPE:
         paraWidgets[PARA_DEPTH_FILTER]->setEnabled(!(value.toInt() == FILTER_CLOSE));
         break;
+    case PARA_DEPTH_HDR_SETTINGS:
+        emit showProgressBar(false);
+        break;
     default:
         break;
     }
@@ -749,6 +755,8 @@ void ParaSettingsWidget::onRefreshHdrSetting()
     paraWidgets[paraId]->getValue(value);
 
     cameraPtr->setCameraPara(paraId, value);
+
+    emit showProgressBar(true);
 }
 
 void ParaSettingsWidget::onUpdateHdrSetting()
@@ -757,6 +765,8 @@ void ParaSettingsWidget::onUpdateHdrSetting()
     QVariant value;
     paraWidgets[paraId]->getValue(value);
     cameraPtr->setCameraPara(paraId, value);
+
+    emit showProgressBar(true);
 }
 
 void ParaSettingsWidget::onRoiRectFUpdated(QRectF rect)

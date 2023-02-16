@@ -102,8 +102,8 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutChanged,       app,  &cs::CSApplication::onWindowLayoutChanged, Qt::QueuedConnection);
 
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::showMessage,        this, &ViewerWindow::onShowStatusBarMessage);
-
     suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::roiStateChanged,    this, &ViewerWindow::onRoiEditStateChanged);
+    suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::showProgressBar,    this, &ViewerWindow::showProgressBar, Qt::QueuedConnection);
 
     suc &= (bool)connect(this, &ViewerWindow::translateSignal,     this,                   &ViewerWindow::onTranslate,            Qt::QueuedConnection);
     suc &= (bool)connect(this, &ViewerWindow::translateSignal,     ui->cameraListWidget,   &CameraListWidget::translateSignal,    Qt::QueuedConnection);
@@ -111,8 +111,6 @@ void ViewerWindow::initConnections()
 
     suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,           ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,       ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
-    //suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated,           ui->renderWindow,   &RenderWindow::onOutput3DUpdated);
-    //suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated,           ui->renderWindow,   &RenderWindow::onOutput2DUpdated);
 
     suc &= (bool)connect(ui->renderWindow, &RenderWindow::roiRectFUpdated,   this,               &ViewerWindow::onRoiRectFUpdated);
     suc &= (bool)connect(ui->renderWindow, &RenderWindow::renderExit,        this,               &ViewerWindow::onRenderExit, Qt::QueuedConnection);
@@ -137,6 +135,18 @@ void ViewerWindow::initConnections()
 
     suc &= (bool)connect(ui->menuViews,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
     suc &= (bool)connect(ui->menuAutoNameWhenCapturuing, &QMenu::triggered, this, &ViewerWindow::onAutoNameMenuTriggered);
+
+    suc &= (bool)connect(this, &ViewerWindow::showProgressBar, this, [=](bool show) 
+        {
+            if (show)
+            {
+                circleProgressBar->open();
+            }
+            else 
+            {
+                circleProgressBar->close();
+            }
+        });
 
     Q_ASSERT(suc);      
 }
@@ -466,10 +476,10 @@ void ViewerWindow::onCameraStreamStarted()
 
     updateWindowActions();
     onRenderWindowUpdated();
-
+    
     bool suc = true;
-    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated, ui->renderWindow, &RenderWindow::onOutput3DUpdated);
-    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated, ui->renderWindow, &RenderWindow::onOutput2DUpdated);
+    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated, ui->renderWindow, &RenderWindow::onOutput3DUpdated, Qt::QueuedConnection);
+    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated, ui->renderWindow, &RenderWindow::onOutput2DUpdated, Qt::QueuedConnection);
 
     Q_ASSERT(suc);
 }

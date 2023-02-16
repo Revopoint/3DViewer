@@ -103,6 +103,8 @@ signals:
     void hdrModeChanged(int mode);
     void clickedCloseButton();
     void showMessage(QString msg, int timeout = 0);
+    
+    void showProgressBar(bool show);
 private:
     void initWidget();
     void initDepthPara();

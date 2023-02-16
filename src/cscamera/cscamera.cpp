@@ -94,7 +94,6 @@ static const QMap<CAMERA_PARA_ID, ParaInfo> CAMERA_PROPERTY_MAP =
     
 
     { PARA_RGB_GAIN,                { STREAM_TYPE_RGB ,   PROPERTY_GAIN} },
-    { PARA_RGB_EXPOSURE,            { STREAM_TYPE_RGB ,   PROPERTY_EXPOSURE} },
     { PARA_RGB_AUTO_EXPOSURE,       { STREAM_TYPE_RGB ,   PROPERTY_ENABLE_AUTO_EXPOSURE} },
     { PARA_RGB_AUTO_WHITE_BALANCE,  { STREAM_TYPE_RGB ,   PROPERTY_ENABLE_AUTO_WHITEBALANCE} },
     { PARA_RGB_WHITE_BALANCE,       { STREAM_TYPE_RGB ,   PROPERTY_WHITEBALANCE} }
@@ -111,7 +110,8 @@ static const QMap<CAMERA_PARA_ID, int> CAMERA_EXTENSION_PROPERTY_MAP =
     { PARA_DEPTH_ROI,              PROPERTY_EXT_DEPTH_ROI },
     { PARA_DEPTH_RANGE,            PROPERTY_EXT_DEPTH_RANGE },
     { PARA_TRIGGER_MODE,           PROPERTY_EXT_TRIGGER_MODE },
-    { PARA_CAMERA_IP,              PROPERTY_EXT_CAMERA_IP }
+    { PARA_CAMERA_IP,              PROPERTY_EXT_CAMERA_IP },
+    { PARA_RGB_EXPOSURE,           PROPERTY_EXT_EXPOSURE_TIME_RGB }
 };
 
 static const QList<CAMERA_PARA_ID> CAMERA_OPTION_PARA_LIST =
@@ -1030,13 +1030,16 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
         break;
     case PARA_DEPTH_HDR_MODE: 
         {
-            setCameraPara(PARA_DEPTH_HDR_LEVEL, hdrTimes);
             // close HDR
-            if (value.toInt() == 0)
+            if (value.toInt() == HDR_MODE_CLOSE)
             {
                 qInfo() << "close HDR, then restore exposure : " << cachedDepthExposure << ", gain : " << cachedDepthGain;
                 setCameraPara(PARA_DEPTH_EXPOSURE, cachedDepthExposure);
                 setCameraPara(PARA_DEPTH_GAIN, cachedDepthGain);
+            }
+            else 
+            {
+                setCameraPara(PARA_DEPTH_HDR_LEVEL, hdrTimes);
             }
             break;
         }
@@ -1049,7 +1052,7 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
         }
         else 
         {
-            onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 3000);
+            onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 5000);
         } 
         break;
     case PARA_TRIGGER_MODE:
@@ -1166,12 +1169,6 @@ void CSCamera::getPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& value)
         qWarning() << "get camera property failed, paraId:" << paraId << ", ret:" << ret;
         Q_ASSERT(false);
     }
-
-    if (paraId == PARA_RGB_EXPOSURE)
-    {
-        correctExposureValue(v);
-    }
-
     value = v;
 
 #ifdef  _CS_DEBUG_
@@ -1184,6 +1181,7 @@ void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
 #ifdef  _CS_DEBUG_
     qDebug() << "setPropertyPrivate, paraId : " << metaEnum.valueToKey(paraId) << ", value  = " << value.toFloat();
 #endif
+
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
     PROPERTY_TYPE propertyType = (PROPERTY_TYPE)CAMERA_PROPERTY_MAP[paraId].id;
 
@@ -1193,11 +1191,6 @@ void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
     if (paraId == PARA_DEPTH_EXPOSURE)
     {
         updateFrametime(valueF);
-    }
-
-    if (paraId == PARA_RGB_EXPOSURE)
-    {
-        convertExposureValue(valueF);
     }
 
     ERROR_CODE ret = cameraPtr->setProperty(streamType, propertyType, valueF);
@@ -1223,11 +1216,6 @@ void CSCamera::getPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVa
         qWarning() << "get camera property range failed, paraId:" << paraId << ",ret:" << ret;
         Q_ASSERT(false);
         return;
-    }
-
-    if (paraId == PARA_RGB_EXPOSURE)
-    {
-        correctExposureRange(minf, maxf, stepf);
     }
 
     min = minf;
@@ -1314,6 +1302,9 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
         value = QVariant::fromValue(propExt.cameraIp);
         break;
     }
+    case PROPERTY_EXT_EXPOSURE_TIME_RGB:
+        value = propExt.uiExposureTime;
+        break;
     default:
         Q_ASSERT(false);
         break;
@@ -1344,6 +1335,8 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
 
             getCameraPara(PARA_DEPTH_GAIN, tmp);
             cachedDepthGain = qRound(tmp.toFloat());
+
+            qDebug() << "HDR is close, cached depth exposure : " << cachedDepthExposure << ", gain : " << cachedDepthGain;
         }
         // update HDR mode
         hdrMode = (CAMERA_HDR_MODE)value.toInt();
@@ -1383,6 +1376,9 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
     case PROPERTY_EXT_CAMERA_IP:
         propExt.cameraIp = value.value<CameraIpSetting>();
         break;
+    case PROPERTY_EXT_EXPOSURE_TIME_RGB:
+        propExt.uiExposureTime = value.toFloat();
+        break;
     default:
         Q_ASSERT(false);
         return;
@@ -1400,25 +1396,40 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
 
 void CSCamera::getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step)
 {
-    PROPERTY_TYPE_EXTENSION type = (PROPERTY_TYPE_EXTENSION)CAMERA_EXTENSION_PROPERTY_MAP[paraId];
-
-    switch (type)
+    switch (paraId)
     {
-    case PROPERTY_EXT_CONTRAST_MIN:
+    case PARA_DEPTH_THRESHOLD:
         min = 0;
         max = 40;
         step = 1;
         break;
-    case PROPERTY_EXT_DEPTH_RANGE:
+    case PARA_DEPTH_RANGE:
         min = DEPTH_RANGE_LIMIT.min;
         max = DEPTH_RANGE_LIMIT.max;
         step = 1;
         break;
-    case PROPERTY_EXT_HDR_SCALE_SETTING:
+    case PARA_DEPTH_HDR_LEVEL:
         min = CAMERA_HDR_LEVEL_RANGE.min;
         max = CAMERA_HDR_LEVEL_RANGE.max;
         step = 1;
         break;
+    case PARA_RGB_EXPOSURE:
+    {
+        PropertyExtension propExt;
+        ERROR_CODE ret = cameraPtr->getPropertyExtension(PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB, propExt);
+        if (ret != SUCCESS)
+        {
+            qWarning() << "get the camera extension property failed, type:" << PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB << ",ret:" << ret;
+            Q_ASSERT(false);
+        }
+        else 
+        {
+            min = propExt.objVRange_.fMin_;
+            max = propExt.objVRange_.fMax_;
+            step = propExt.objVRange_.fStep_;
+        }
+        break;
+    }
     default:
         break;
     }
@@ -1525,41 +1536,6 @@ void CSCamera::getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& 
     for (int i = minV; i <= maxV; i++)
     {
         list.push_back({ QString::number(i), i });
-    }
-}
-
-#define RGB_EXPOSURE_MAX 30000
-#define RGB_EXPOSURE_MIN 1
-
-void CSCamera::correctExposureRange(float& min, float& max, float& step)
-{
-    if (cameraInfo.connectType == CONNECT_TYPE_USB)
-    {
-        float d = max - min;
-        rgbExposureMin = min;
-        rgbExposureMax = max;
-
-        min = RGB_EXPOSURE_MIN;
-        step = 1;
-
-        rgbExposureStep = (RGB_EXPOSURE_MAX - min) / d;
-        max = min + rgbExposureStep * d;
-    }
-}
-
-void CSCamera::correctExposureValue(float& value)
-{
-    if (cameraInfo.connectType == CONNECT_TYPE_USB)
-    {
-        value = RGB_EXPOSURE_MIN + qRound(rgbExposureStep * (value - rgbExposureMin));
-    }
-}
-
-void CSCamera::convertExposureValue(float& value)
-{
-    if (cameraInfo.connectType == CONNECT_TYPE_USB)
-    {
-        value = (value - RGB_EXPOSURE_MIN) / rgbExposureStep + rgbExposureMin;
     }
 }
 
