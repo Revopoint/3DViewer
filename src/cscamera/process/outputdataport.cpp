@@ -79,7 +79,7 @@ QMap<CS_CAMERA_DATA_TYPE, OutputData2D> OutputDataPort::getOutputData2Ds()
     return outputData2DMap;
 }
 
-FrameData OutputDataPort::getFrameData()
+FrameData OutputDataPort::getFrameData() const
 {
     return frameData;
 }

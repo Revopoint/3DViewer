@@ -35,8 +35,9 @@ public:
     virtual ~OutputSaver();
     void run() override;
 
-    void setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex);
+    void updateSaveIndex();
 protected:
+    void setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex);
     void savePointCloud();
 
     void saveOutput2D();

@@ -36,6 +36,9 @@
 
 using namespace cs;
 
+#define MAX_CACHED_COUNT 20
+#define MAX_SAVING_COUNT 50
+
 CameraCaptureTool::CameraCaptureTool()
 {
     qInfo() << "CameraCaptureTool";
@@ -148,8 +151,11 @@ void CameraCaptureTool::setCurOutputData(const CameraCaptureConfig& config)
 CameraCaptureBase::CameraCaptureBase(const CameraCaptureConfig& config, CAPTURE_TYPE captureType)
     : captureConfig(config)
     , captureType(captureType)
+    , maxCachedCount(MAX_CACHED_COUNT)
+    , maxSavingCount(MAX_SAVING_COUNT)
 {
-    //threadPool.setMaxThreadCount(1);
+    int maxThread = threadPool.maxThreadCount() > 4 ? 4 : threadPool.maxThreadCount();
+    threadPool.setMaxThreadCount(maxThread);
 }
 
 CAPTURE_TYPE CameraCaptureBase::getCaptureType() const
@@ -165,80 +171,60 @@ void CameraCaptureBase::run()
 
     emit captureStateChanged(captureConfig.captureType, CAPTURING, tr("Start capturing"));
 
-    int captured = 0;
-    {
-        QMutexLocker locker(&saverMutex);
-        captured = capturedDataCount;
-    }
+    int captured = getCapturedCount();
+    int skip = getSkipCount();
 
-    emit captureNumberUpdated(capturedDataCount, skipDataCount);
+    emit captureNumberUpdated(captured, skip);
 
-    while (!isInterruptionRequested() && (skipDataCount + captured) < captureConfig.captureNumber)
+    while (!isInterruptionRequested() && (skip + captured) < captureConfig.captureNumber)
     {
-        mutex.lock();
-        if (outputDatas.isEmpty())
+        saverMutex.lock();
+        if (outputDatas.isEmpty() || outputSaverList.size() >= maxSavingCount)
         {
             QThread::msleep(2);
-            mutex.unlock();
+            saverMutex.unlock();
         }
         else 
-        {
-            OutputDataPort outputData;
-            outputData = outputDatas.dequeue();
-            mutex.unlock();
+        {   
+            OutputSaver* outputSaver = nullptr;
 
-            if (outputData.isEmpty())
-            {
-                emit captureStateChanged(captureConfig.captureType, CAPTURE_ERROR, tr("save frame data is empty"));
-                continue;
-            }
+            outputSaver = outputDatas.dequeue();
+            outputSaverList.push_back(outputSaver);
+            saverMutex.unlock();
 
-            int rgbFrameIndex = -1, depthFrameIndex = -1, pointCloudIndex = -1;
-            getCaptureIndex(outputData, rgbFrameIndex, depthFrameIndex, pointCloudIndex);
+            outputSaver->updateSaveIndex();
 
             // save a frame in separate thread
-            OutputSaver* outputSaver = nullptr;
-            if (captureConfig.saveFormat == "raw")
-            {
-                outputSaver = new RawOutputSaver(this, captureConfig, outputData);
-            }
-            else 
-            {
-                outputSaver = new ImageOutputSaver(this, captureConfig, outputData);
-            }
-
-            outputSaver->setSaveIndex(rgbFrameIndex, depthFrameIndex, pointCloudIndex);
-
             threadPool.start(outputSaver, QThread::NormalPriority);
         }
 
-        {
-            QMutexLocker locker(&saverMutex);
-            captured = capturedDataCount;
-        }
+        captured = getCapturedCount();
+        skip = getSkipCount();
     }
     
     captureFinished = true;
 
     qInfo() << "wait all thread finished";
-
     //wait all thread finished
+    threadPool.clear();
     threadPool.waitForDone();
-
-    int timeMs = time.elapsed();
 
     onCaptureDataDone();
 
+    int timeMs = time.elapsed();
     qInfo("captured %d frames (%d dropped), spend time : %d ms", capturedDataCount, skipDataCount, timeMs);
 
     QString msg = QString(tr("End capture, captured %1 frames (%2 dropped)")).arg(capturedDataCount).arg(skipDataCount);
     emit captureStateChanged(captureConfig.captureType, CAPTURE_FINISHED, msg);
 }
 
-void CameraCaptureBase::saveFinished()
+// called by OutputSaver
+void CameraCaptureBase::saveFinished(OutputSaver* saver)
 {
     QMutexLocker locker(&saverMutex);
+
     capturedDataCount++;
+    outputSaverList.removeAll(saver);
 
     emit captureNumberUpdated(capturedDataCount, skipDataCount);
 }
@@ -255,11 +241,42 @@ void CameraCaptureBase::setCameraCaptureConfig(const CameraCaptureConfig& config
 
 void CameraCaptureBase::setOutputData(const OutputDataPort& outputDataPort)
 {
-    QMutexLocker locker(&mutex);
-    outputDatas.clear();
-    outputDatas.enqueue(outputDataPort);
+    QMutexLocker locker(&saverMutex);
+    while(!outputDatas.isEmpty())
+    {
+        auto output = outputDatas.dequeue();
+        delete output;
+    }
 
+    outputDatas.enqueue(genOutputSaver(outputDataPort));
     cachedDataCount++;
+}
+
+OutputSaver* CameraCaptureBase::genOutputSaver(const OutputDataPort& outputData)
+{
+    OutputSaver* outputSaver = nullptr;
+    if (captureConfig.saveFormat == "raw")
+    {
+        outputSaver = new RawOutputSaver(this, captureConfig, outputData);
+    }
+    else
+    {
+        outputSaver = new ImageOutputSaver(this, captureConfig, outputData);
+    }
+
+    return outputSaver;
+}
+
+int CameraCaptureBase::getCapturedCount()
+{
+    QMutexLocker locker(&saverMutex);
+    return capturedDataCount;
+}
+
+int CameraCaptureBase::getSkipCount()
+{
+    QMutexLocker locker(&saverMutex);
+    return skipDataCount;
 }
 
 YAML::Node genYamlNodeFromIntrinsics(const Intrinsics& intrinsics)
@@ -554,7 +571,7 @@ CameraCaptureSingle::CameraCaptureSingle(const CameraCaptureConfig& config)
     realSaveFolder = config.saveDir;
 }
 
-void CameraCaptureSingle::getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex)
+void CameraCaptureSingle::getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex)
 {
     rgbFrameIndex = depthFrameIndex = pointCloudIndex = -1;
 }
@@ -593,7 +610,7 @@ void CameraCaptureMultiple::addOutputData(const OutputDataPort& outputDataPort)
         return;
     }
 
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&saverMutex);
     if (cachedDataCount + skipDataCount  >= captureConfig.captureNumber)
     {
         qInfo() << "output data count >= capture count, skip the output data";
@@ -609,12 +626,12 @@ void CameraCaptureMultiple::addOutputData(const OutputDataPort& outputDataPort)
     }
     else 
     {
-        outputDatas.enqueue(outputDataPort);
+        outputDatas.enqueue(genOutputSaver(outputDataPort));
         cachedDataCount++;
     }
 }
 
-void CameraCaptureMultiple::getCaptureIndex(OutputDataPort& output, int& rgbFrameIdx, int& depthFrameIdx, int& pointCloudIdx)
+void CameraCaptureMultiple::getCaptureIndex(const OutputDataPort& output, int& rgbFrameIdx, int& depthFrameIdx, int& pointCloudIdx)
 {
     rgbFrameIdx = capturedRgbCount;
     depthFrameIdx = capturedDepthCount;

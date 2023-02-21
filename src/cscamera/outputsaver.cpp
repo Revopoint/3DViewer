@@ -47,7 +47,14 @@ void OutputSaver::run()
     // save point cloud
     savePointCloud();
 
-    cameraCapture->saveFinished();
+    cameraCapture->saveFinished(this);
+}
+
+void OutputSaver::updateSaveIndex()
+{
+    int rgbFrameIndex = -1, depthFrameIndex = -1, pointCloudIndex = -1;
+    cameraCapture->getCaptureIndex(outputDataPort, rgbFrameIndex, depthFrameIndex, pointCloudIndex);
+    setSaveIndex(rgbFrameIndex, depthFrameIndex, pointCloudIndex);
 }
 
 void OutputSaver::setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex)

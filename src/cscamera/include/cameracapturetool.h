@@ -25,6 +25,7 @@
 #include <QMutex>
 #include <QString>
 #include <QThreadPool>
+#include <QList>
 
 #include "cstypes.h"
 #include "cscameraapi.h"
@@ -33,6 +34,7 @@
 namespace cs 
 {
 class ICSCamera;
+class OutputSaver;
 
 enum CAPTURE_TYPE
 {
@@ -58,10 +60,10 @@ public:
     virtual void addOutputData(const OutputDataPort& outputDataPort) {}
     virtual void setOutputData(const OutputDataPort& outputDataPort);
     
-    virtual void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) {}
+    virtual void getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) {}
 
     void run() override;
-    void saveFinished();
+    void saveFinished(OutputSaver* saver);
 
     void setCamera(std::shared_ptr<ICSCamera>& camera);
     void setCameraCaptureConfig(const CameraCaptureConfig& config);
@@ -71,6 +73,10 @@ signals:
 protected:
     virtual void onCaptureDataDone();
     void saveCameraPara(QString filePath);
+    int getCapturedCount();
+    int getSkipCount();
+
+    OutputSaver* genOutputSaver(const OutputDataPort& outputData);
 protected:
     CameraCaptureConfig captureConfig;
     CAPTURE_TYPE captureType;
@@ -83,11 +89,14 @@ protected:
     int capturedDataCount = 0;
 
     // cached data
-    QQueue<OutputDataPort> outputDatas;
+    QQueue<OutputSaver*> outputDatas;
     QMutex mutex;
     QMutex saverMutex;
+    QList<OutputSaver*> outputSaverList;
 
-    const int maxCachedCount = 10;
+    const int maxCachedCount;
+    const int maxSavingCount;
+
     bool captureFinished = false;
 
     QThreadPool threadPool;
@@ -104,7 +113,7 @@ class CameraCaptureSingle : public CameraCaptureBase
     Q_OBJECT
 public:
     CameraCaptureSingle(const CameraCaptureConfig& config);
-    void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
+    void getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 protected:
 
 };
@@ -116,7 +125,7 @@ class CameraCaptureMultiple : public CameraCaptureBase
 public:
     CameraCaptureMultiple(const CameraCaptureConfig& config);
     void addOutputData(const OutputDataPort& outputDataPort) override;
-    void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
+    void getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 
 protected:
     void onCaptureDataDone() override;
