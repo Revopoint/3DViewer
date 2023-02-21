@@ -46,9 +46,9 @@ public:
     void addOutputData2D(const OutputData2D& outputData2D);
     void addOutputData2D(const QVector<OutputData2D>& outputData2Ds);
 private:
-    FrameData frameData;
-    QMap<CS_CAMERA_DATA_TYPE, OutputData2D> outputData2DMap;
-    mutable cs::Pointcloud pointCloud;
+    FrameData m_frameData;
+    QMap<CS_CAMERA_DATA_TYPE, OutputData2D> m_outputData2DMap;
+    mutable cs::Pointcloud m_pointCloud;
 };
 
 #endif // _CS_OUTPUTDATAPORT_H

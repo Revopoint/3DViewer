@@ -132,24 +132,24 @@ private:
     void stopParaMonitor();
     void startParaMonitor();
 private:
-    Ui::ParameterSettingsWidget* ui;
-    std::shared_ptr<cs::ICSCamera> cameraPtr;
+    Ui::ParameterSettingsWidget* m_ui;
+    std::shared_ptr<cs::ICSCamera> m_cameraPtr;
 
-    QMap<int, CSParaWidget*> paraWidgets;
-    CaptureSettingDialog* captureSettingDialog;
+    QMap<int, CSParaWidget*> m_paraWidgets;
+    CaptureSettingDialog* m_captureSettingDialog;
 
-    QSpacerItem* verticalSpacer = nullptr;
+    QSpacerItem* m_verticalSpacer = nullptr;
 
-    QPushButton* hdrRefreshButton;
-    QPushButton* hdrConfirmButton;
-    QWidget* hdrButtonArea;
+    QPushButton* m_hdrRefreshButton;
+    QPushButton* m_hdrConfirmButton;
+    QWidget* m_hdrButtonArea;
 
-    CSTextImageButton* topItemButton;
-    bool isSingleShotMode = false;
+    CSTextImageButton* m_topItemButton;
+    bool m_isSingleShotMode = false;
 
-    ParaMonitorThread* paraMonitorThread;
+    ParaMonitorThread* m_paraMonitorThread;
 
-    CameraCaptureConfig captureConfig;
+    CameraCaptureConfig m_captureConfig;
 };
 
 class ParaMonitorThread : public QThread
@@ -163,10 +163,10 @@ public:
     void setAutoExposureRgb(bool enable);
     void setAutoWhiteBalance(bool enable);
 private:
-    bool enableAutoExposureDepth = false;
-    bool enableAutoExposureRgb = false;
-    bool enableAutoWhiteBalance = false;
-    std::shared_ptr<cs::ICSCamera> cameraPtr;
+    bool m_enableAutoExposureDepth = false;
+    bool m_enableAutoExposureRgb = false;
+    bool m_enableAutoWhiteBalance = false;
+    std::shared_ptr<cs::ICSCamera> m_cameraPtr;
 };
 
 #endif //_CS_PARASETTINGSWIDGET_H

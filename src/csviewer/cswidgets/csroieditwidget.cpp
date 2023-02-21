@@ -25,8 +25,8 @@
 
 CSRoiEditWidget::CSRoiEditWidget(int paraId, const char* name, QWidget * parent)
     : CSParaWidget(paraId, name, parent)
-    , fullScreenButton(new QPushButton(tr("Full Screen"), this))
-    , roiEditButton(new QPushButton(tr("Edit ROI"), this))
+    , m_fullScreenButton(new QPushButton(tr("Full Screen"), this))
+    , m_roiEditButton(new QPushButton(tr("Edit ROI"), this))
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 20, 0);
@@ -34,15 +34,15 @@ CSRoiEditWidget::CSRoiEditWidget(int paraId, const char* name, QWidget * parent)
 
     layout->addWidget(new QLabel(name, this));
     layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
-    layout->addWidget(fullScreenButton);
-    layout->addWidget(roiEditButton);
+    layout->addWidget(m_fullScreenButton);
+    layout->addWidget(m_roiEditButton);
 
-    fullScreenButton->setProperty("isCSStyle", true);
-    roiEditButton->setProperty("isCSStyle", true);
+    m_fullScreenButton->setProperty("isCSStyle", true);
+    m_roiEditButton->setProperty("isCSStyle", true);
 
     bool suc = true;
-    suc = (bool)connect(fullScreenButton, &QPushButton::clicked, this, &CSRoiEditWidget::clickedFullScreen);
-    suc = (bool)connect(roiEditButton,    &QPushButton::clicked, this, &CSRoiEditWidget::clickedEditRoi);
+    suc = (bool)connect(m_fullScreenButton, &QPushButton::clicked, this, &CSRoiEditWidget::clickedFullScreen);
+    suc = (bool)connect(m_roiEditButton,    &QPushButton::clicked, this, &CSRoiEditWidget::clickedEditRoi);
     Q_ASSERT(suc);
 }
 
@@ -53,6 +53,6 @@ CSRoiEditWidget::~CSRoiEditWidget()
 
 void CSRoiEditWidget::retranslate(const char* context)
 {
-    fullScreenButton->setText(tr("Full Screen"));
-    roiEditButton->setText(tr("Edit ROI"));
+    m_fullScreenButton->setText(tr("Full Screen"));
+    m_roiEditButton->setText(tr("Edit ROI"));
 }

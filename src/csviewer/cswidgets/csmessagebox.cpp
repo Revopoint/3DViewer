@@ -24,13 +24,13 @@
 
 CSMessageBox::CSMessageBox(QWidget* parent)
     : QDialog(parent)
-    , confirmButton(new QPushButton(tr("OK"), this))
-    , msgLabel(new QLabel(this))
+    , m_confirmButton(new QPushButton(tr("OK"), this))
+    , m_msgLabel(new QLabel(this))
 {
     setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
     resize(250, 200);
-    msgLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
-    msgLabel->setAlignment(Qt::AlignCenter);
+    m_msgLabel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    m_msgLabel->setAlignment(Qt::AlignCenter);
 
     QVBoxLayout* vLayout = new QVBoxLayout(this);
     auto spacerItem = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -38,14 +38,14 @@ CSMessageBox::CSMessageBox(QWidget* parent)
 
 
     vLayout->addItem(spacerItem2);
-    vLayout->addWidget(msgLabel);
+    vLayout->addWidget(m_msgLabel);
     vLayout->addItem(spacerItem);
-    vLayout->addWidget(confirmButton);
+    vLayout->addWidget(m_confirmButton);
 
     setObjectName("CSMessageBox");
-    confirmButton->setProperty("isCSStyle", true);
+    m_confirmButton->setProperty("isCSStyle", true);
 
-    connect(confirmButton, &QPushButton::clicked, [=]() 
+    connect(m_confirmButton, &QPushButton::clicked, [=]() 
         {
             close();
             emit accepted();
@@ -59,12 +59,12 @@ CSMessageBox::~CSMessageBox()
 
 void CSMessageBox::updateMessage(QString msg)
 {
-    msgLabel->setText(msg);
+    m_msgLabel->setText(msg);
 }
 
 void CSMessageBox::retranslate()
 {
-    confirmButton->setText(tr("OK"));
+    m_confirmButton->setText(tr("OK"));
     setWindowTitle(tr("Tips"));
 }
 

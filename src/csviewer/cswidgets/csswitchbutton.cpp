@@ -24,22 +24,22 @@
 
 CSSwitchButton::CSSwitchButton(int paraId, const char* title , QWidget* parent)
     : CSParaWidget(paraId, title, parent)
-    , titleLabel(new QLabel(this))
-    , button(new QPushButton(this))
+    , m_titleLabel(new QLabel(this))
+    , m_button(new QPushButton(this))
 {
     setObjectName("CWSwitchButton");
-    titleLabel->setObjectName("TitleLabel");
+    m_titleLabel->setObjectName("TitleLabel");
 
     QHBoxLayout* hLayout = new QHBoxLayout(this);
     hLayout->setContentsMargins(0,0,20, 0);
-    hLayout->addWidget(titleLabel);
+    hLayout->addWidget(m_titleLabel);
     hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout->addWidget(button);
+    hLayout->addWidget(m_button);
 
-    button->setCheckable(true);
+    m_button->setCheckable(true);
 
     bool suc = true;
-    suc &= (bool)connect(button, &QPushButton::clicked, this, &CSSwitchButton::onButtonToggled);
+    suc &= (bool)connect(m_button, &QPushButton::clicked, this, &CSSwitchButton::onButtonToggled);
 
     Q_ASSERT(suc);
 }
@@ -50,7 +50,7 @@ CSSwitchButton::~CSSwitchButton()
 
 void CSSwitchButton::setValue(const QVariant& value)
 {
-    button->setChecked(value.toBool());
+    m_button->setChecked(value.toBool());
 }
 
 void CSSwitchButton::onButtonToggled(bool checked)
@@ -60,13 +60,13 @@ void CSSwitchButton::onButtonToggled(bool checked)
 
 void CSSwitchButton::retranslate(const char* context)
 {
-    if (strlen(paraName) > 0)
+    if (strlen(m_paraName) > 0)
     {
-        titleLabel->setText(QApplication::translate(context, paraName));
+        m_titleLabel->setText(QApplication::translate(context, m_paraName));
     }
 }
 
 void CSSwitchButton::clearValues()
 {
-    button->setChecked(false);
+    m_button->setChecked(false);
 }

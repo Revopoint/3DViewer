@@ -62,19 +62,19 @@ signals:
     void loadFileSignal();
 private:
     // zip file
-    QString sourceFile;
+    QString m_sourceFile;
     // output directory
-    QString outputDirectory;
+    QString m_outputDirectory;
 
-    bool withTexture = false;
+    bool m_withTexture = false;
 
-    CapturedZipParser* capturedZipParser = nullptr;
+    CapturedZipParser* m_capturedZipParser = nullptr;
 
-    bool isConverting = false;
-    bool interruptConvert = false;
+    bool m_isConverting = false;
+    bool m_interruptConvert = false;
     
-    bool isFileValid = false;
-    bool hasRGBData = false;
+    bool m_isFileValid = false;
+    bool m_hasRGBData = false;
 };
 
 }

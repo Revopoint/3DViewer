@@ -30,30 +30,30 @@ Q_DECLARE_METATYPE(HdrExposureSetting);
 
 CSTableWidget::CSTableWidget(int paraId, int cols, QStringList titleLabels, QWidget* parent)
     : CSParaWidget(paraId, "", parent)
-    , tableWidget(new QTableWidget(this))
-    , headers(titleLabels)
+    , m_tableWidget(new QTableWidget(this))
+    , m_headers(titleLabels)
 {
     setObjectName("CSTableWidget");
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 20, 20, 0);
-    layout->addWidget(tableWidget);
+    layout->addWidget(m_tableWidget);
 
-    tableWidget->setColumnCount(cols);
-    tableWidget->verticalHeader()->setVisible(false);
-    tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    tableWidget->setHorizontalHeaderLabels(titleLabels); 
-    tableWidget->setFocusPolicy(Qt::NoFocus);
-    tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    m_tableWidget->setColumnCount(cols);
+    m_tableWidget->verticalHeader()->setVisible(false);
+    m_tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    m_tableWidget->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    m_tableWidget->setHorizontalHeaderLabels(titleLabels); 
+    m_tableWidget->setFocusPolicy(Qt::NoFocus);
+    m_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
-    tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    tableWidget->verticalScrollBar()->setDisabled(true);
-    tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    tableWidget->setVerticalScrollMode(QTableWidget::ScrollPerPixel);
+    m_tableWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    m_tableWidget->verticalScrollBar()->setDisabled(true);
+    m_tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_tableWidget->setVerticalScrollMode(QTableWidget::ScrollPerPixel);
 
-    tableWidget->setFixedHeight(30+20);
+    m_tableWidget->setFixedHeight(30+20);
 }
 
 CSTableWidget::~CSTableWidget()
@@ -66,42 +66,42 @@ void CSTableWidget::setValue(const QVariant& settings)
     const HdrExposureSetting& hdrSetting = settings.value<HdrExposureSetting>();
     const int count = hdrSetting.count;
 
-    tableWidget->clearContents();
-    tableWidget->setRowCount(count);
-    tableWidget->setFixedHeight((30+2 )* (count+1)-1);
+    m_tableWidget->clearContents();
+    m_tableWidget->setRowCount(count);
+    m_tableWidget->setFixedHeight((30+2 )* (count+1)-1);
 
     for (int i = 0; i < count; i++)
     {
         QTableWidgetItem* item = new QTableWidgetItem(QString::number(i + 1));
         item->setTextAlignment(Qt::AlignCenter);
-        tableWidget->setItem(i, 0, item);
+        m_tableWidget->setItem(i, 0, item);
         item->setFlags(item->flags() & (~Qt::ItemIsSelectable) & (~Qt::ItemIsEditable));
 
         //exposure
         item = new QTableWidgetItem(QString::number(hdrSetting.param[i].exposure));
         item->setTextAlignment(Qt::AlignCenter);
-        tableWidget->setItem(i, 1, item);
+        m_tableWidget->setItem(i, 1, item);
 
         //gain
         item = item->clone();
         item->setText(QString::number(hdrSetting.param[i].gain));
-        tableWidget->setItem(i, 2, item);
+        m_tableWidget->setItem(i, 2, item);
     }
 }
 
 void CSTableWidget::getValue(QVariant& value)
 {
     HdrExposureSetting hdrSettings;
-    const int rows = tableWidget->rowCount();
+    const int rows = m_tableWidget->rowCount();
     
     hdrSettings.count = rows;
 
     for (int i = 0; i < rows; i++)
     {
-        auto item1 = tableWidget->item(i, 1);
+        auto item1 = m_tableWidget->item(i, 1);
         auto exposure = item1->text().toUInt();
 
-        auto item2 = tableWidget->item(i, 2);
+        auto item2 = m_tableWidget->item(i, 2);
         auto gain = item2->text().toUInt();
 
         hdrSettings.param[i].exposure = exposure;
@@ -114,14 +114,14 @@ void CSTableWidget::getValue(QVariant& value)
 void CSTableWidget::retranslate(const char* context)
 {
     QStringList tranHeaders;
-    for (auto s : headers)
+    for (auto s : m_headers)
     {
         tranHeaders << QApplication::translate(context, s.toStdString().c_str());
     }
-    tableWidget->setHorizontalHeaderLabels(tranHeaders);
+    m_tableWidget->setHorizontalHeaderLabels(tranHeaders);
 }
 
 void CSTableWidget::clearValues()
 {
-    tableWidget->clearContents();
+    m_tableWidget->clearContents();
 }

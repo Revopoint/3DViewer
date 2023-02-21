@@ -75,32 +75,32 @@ private:
     int getNearestRgbFrame(int depthIndex, int timeStamp);
 private:
     // zip file path
-    QString zipFile = "";
+    QString m_zipFile = "";
     // name of capture 
-    QString captureName = "";
+    QString m_captureName = "";
     // captured data types
-    QVector<int> dataTypes;
+    QVector<int> m_dataTypes;
     // captured data format: images or raw
-    QString dataFormat = "";
+    QString m_dataFormat = "";
     // resolution
-    QSize depthResolution = QSize(0, 0);
-    QSize rgbResolution = QSize(0, 0);
+    QSize m_depthResolution = QSize(0, 0);
+    QSize m_rgbResolution = QSize(0, 0);
     // the frame count of capture
-    int capturedFrameCount = 0;
+    int m_capturedFrameCount = 0;
     // the time stamps in zip file is valid
-    bool isTimeStampsValid = false;
+    bool m_isTimeStampsValid = false;
     // the time stamps of frames
-    QVector<int> depthTimeStamps;
-    QVector<int> rgbTimeStamps;
-    bool enableTexture = false;
+    QVector<int> m_depthTimeStamps;
+    QVector<int> m_rgbTimeStamps;
+    bool m_enableTexture = false;
 
     // camera parameter
-    Intrinsics depthIntrinsics;
-    Intrinsics rgbIntrinsics;
-    Extrinsics extrinsics;
-    float depthScale = 0.0f;
-    float depthMin = 0.0f;
-    float depthMax = 0.0f;
+    Intrinsics m_depthIntrinsics;
+    Intrinsics m_rgbIntrinsics;
+    Extrinsics m_extrinsics;
+    float m_depthScale = 0.0f;
+    float m_depthMin = 0.0f;
+    float m_depthMax = 0.0f;
 };
 
 }

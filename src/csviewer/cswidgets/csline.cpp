@@ -43,19 +43,19 @@ void CSLine::paintEvent(QPaintEvent* event)
 
 CSHLine::CSHLine(QWidget* parent)
     : QWidget(parent)
-    , line(new CSLine(this))
+    , m_line(new CSLine(this))
 {
-    line->setFrameShape(QFrame::HLine);
+    m_line->setFrameShape(QFrame::HLine);
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(line);
+    layout->addWidget(m_line);
     layout->setContentsMargins(0, 15, 0, 15);
 }
 
 CSVLine::CSVLine(QWidget* parent)
     : QWidget(parent)
 {
-    line->setFrameShape(QFrame::VLine);
+    m_line->setFrameShape(QFrame::VLine);
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->addWidget(line);
+    layout->addWidget(m_line);
     layout->setContentsMargins(15, 0, 15, 0);
 }

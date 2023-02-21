@@ -26,20 +26,20 @@
 
 CSProgressBar::CSProgressBar(QWidget* parent)
     : QDialog(parent)
-    , startAngle(90)
+    , m_startAngle(90)
 {
     resize(160, 160);
     setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
     setObjectName("CSProgressBar");
 
-    timer.setInterval(30);
+    m_timer.setInterval(30);
 
-    connect(&timer, &QTimer::timeout, [=]() 
+    connect(&m_timer, &QTimer::timeout, [=]() 
         {
-            startAngle -= 20;
-            if (startAngle < 0 )
+            m_startAngle -= 20;
+            if (m_startAngle < 0 )
             {
-                startAngle = 360;
+                m_startAngle = 360;
             }
 
             update();
@@ -50,7 +50,7 @@ CSProgressBar::CSProgressBar(QWidget* parent)
 
 CSProgressBar::~CSProgressBar()
 {
-    timer.stop();
+    m_timer.stop();
 }
 
 void CSProgressBar::paintEvent(QPaintEvent* ev)
@@ -64,7 +64,7 @@ void CSProgressBar::paintEvent(QPaintEvent* ev)
     rec.adjust(thickness, thickness, -thickness, -thickness);
     minWidth = qMin(rec.width(), rec.height()) / 2;
 
-    QConicalGradient gradient(rec.center(), startAngle);
+    QConicalGradient gradient(rec.center(), m_startAngle);
     gradient.setColorAt(0, QColor(0, 169, 255));
     gradient.setColorAt(0.4, Qt::white);
     gradient.setColorAt(0.6, Qt::white);
@@ -115,12 +115,12 @@ void CSProgressBar::open()
 {
     QDialog::open();
     qDebug() << "start timer";
-    timer.start();
+    m_timer.start();
 }
 
 void CSProgressBar::done(int ret)
 {
     qDebug() << "stop timer";
-    timer.stop();
+    m_timer.stop();
     QDialog::done(ret);
 }

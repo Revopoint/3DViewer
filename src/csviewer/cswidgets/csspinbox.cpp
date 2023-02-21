@@ -25,24 +25,24 @@
 
 CSSpinBox::CSSpinBox(int paraId, const char* title, QWidget* parent)
     : CSParaWidget(paraId, title, parent)
-    , titleLabel(new QLabel(this))
-    , spinBox(new CustomSpinBox(this))
+    , m_titleLabel(new QLabel(this))
+    , m_spinBox(new CustomSpinBox(this))
 {
     setObjectName("CSSpinBox");
-    titleLabel->setObjectName("TitleLabel");
+    m_titleLabel->setObjectName("TitleLabel");
 
     QFormLayout* layout = new QFormLayout(this);
-    titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    m_titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
     layout->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 
-    layout->setWidget(0, QFormLayout::LabelRole, titleLabel);
-    layout->setWidget(0, QFormLayout::FieldRole, spinBox);
+    layout->setWidget(0, QFormLayout::LabelRole, m_titleLabel);
+    layout->setWidget(0, QFormLayout::FieldRole, m_spinBox);
 
     layout->setSpacing(0);
     layout->setContentsMargins(15, 0, 15, 0);
 
     bool suc = true;
-    suc &= (bool)connect(spinBox, SIGNAL(valueChanged(int)), this, SLOT(onSpinBoxValueChanged(int)));
+    suc &= (bool)connect(m_spinBox, SIGNAL(valueChanged(int)), this, SLOT(onSpinBoxValueChanged(int)));
 
     Q_ASSERT(suc);
 }
@@ -57,20 +57,20 @@ void CSSpinBox::setParaRange(const QVariant& min, const QVariant& max, const QVa
     const int intMin = qRound(min.toFloat());
     const int intMax = qRound(max.toFloat());
 
-    spinBox->setMinimum(intMin);
-    spinBox->setMaximum(intMax);
+    m_spinBox->setMinimum(intMin);
+    m_spinBox->setMaximum(intMax);
 }
 
 void CSSpinBox::setValue(const QVariant& value)
 {
     const int intValue = value.toInt();
-    const int curValue = spinBox->value();
+    const int curValue = m_spinBox->value();
 
     if (intValue != curValue)
     {
-        spinBox->blockSignals(true);
-        spinBox->setValue(intValue);
-        spinBox->blockSignals(false);
+        m_spinBox->blockSignals(true);
+        m_spinBox->setValue(intValue);
+        m_spinBox->blockSignals(false);
     }
 }
 
@@ -81,13 +81,13 @@ void CSSpinBox::onSpinBoxValueChanged(int value)
 
 void CSSpinBox::retranslate(const char* context)
 {
-    if (strlen(paraName) > 0)
+    if (strlen(m_paraName) > 0)
     {
-        titleLabel->setText(QApplication::translate(context, paraName));
+        m_titleLabel->setText(QApplication::translate(context, m_paraName));
     }
 }
 
 void CSSpinBox::clearValues()
 {
-    spinBox->clear();
+    m_spinBox->clear();
 }

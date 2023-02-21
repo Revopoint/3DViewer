@@ -56,27 +56,27 @@ CSSlider::CSSlider(QWidget* parent)
 
 CSSlider::CSSlider(int paraId, const char* title, QWidget* parent)
     : CSParaWidget(paraId, title, parent)
-    , lineEdit(new CSLineEdit(this))
-    , slider(new CustomSlider(Qt::Horizontal,this))
-    , minLabel(new QLabel("0", this))
-    , maxLabel(new QLabel("0", this))
-    , intValidator(new QIntValidator(-10000000, 10000000, this))
-    , step(1)
+    , m_lineEdit(new CSLineEdit(this))
+    , m_slider(new CustomSlider(Qt::Horizontal,this))
+    , m_minLabel(new QLabel("0", this))
+    , m_maxLabel(new QLabel("0", this))
+    , m_intValidator(new QIntValidator(-10000000, 10000000, this))
+    , m_step(1)
 {
     setObjectName("CSSlider");
-    lineEdit->setValidator(intValidator);
+    m_lineEdit->setValidator(m_intValidator);
 
     QHBoxLayout* hLayout = new QHBoxLayout(this);
     hLayout->setContentsMargins(0, 0, 0, 0);
     hLayout->setSpacing(0);
 
-    titleLabel = new QLabel(this);
-    hLayout->addWidget(titleLabel);
+    m_titleLabel = new QLabel(this);
+    hLayout->addWidget(m_titleLabel);
 
-    titleLabel->setObjectName("TitleLabel");
+    m_titleLabel->setObjectName("TitleLabel");
 
     QVBoxLayout* vLayout2 = new QVBoxLayout();
-    hLayout->addWidget(lineEdit);
+    hLayout->addWidget(m_lineEdit);
     hLayout->addItem(vLayout2);
     hLayout->setSpacing(0);
     vLayout2->setContentsMargins(0, 0, 0, 0);
@@ -84,34 +84,34 @@ CSSlider::CSSlider(int paraId, const char* title, QWidget* parent)
     QHBoxLayout* hLayout2 = new QHBoxLayout();
     hLayout2->setContentsMargins(0, 0, 0, 0);
 
-    hLayout2->addWidget(minLabel);
+    hLayout2->addWidget(m_minLabel);
     hLayout2->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout2->addWidget(maxLabel);
+    hLayout2->addWidget(m_maxLabel);
 
-    minLabel->setProperty("fontSize10", true);
-    maxLabel->setProperty("fontSize10", true);
+    m_minLabel->setProperty("fontSize10", true);
+    m_maxLabel->setProperty("fontSize10", true);
     
-    vLayout2->addWidget(slider);
+    vLayout2->addWidget(m_slider);
     vLayout2->addItem(hLayout2);
     vLayout2->setSpacing(0);
     vLayout2->setContentsMargins(20, 0, 20, 0);
 
-    minLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-    maxLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    m_minLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    m_maxLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
 
-    slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    m_slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
     bool suc = true;
-    suc &= (bool)connect(lineEdit, &QLineEdit::editingFinished,  this, &CSSlider::onLineEditTextChanged);
+    suc &= (bool)connect(m_lineEdit, &QLineEdit::editingFinished,  this, &CSSlider::onLineEditTextChanged);
     //suc &= (bool)connect(slider, &QSlider::sliderReleased, this, &CSSlider::onSliderValueChanged);
-    suc &= (bool)connect(slider,   &CustomSlider::sliderClicked, this, &CSSlider::onSliderClicked);
-    suc &= (bool)connect(lineEdit, &CSLineEdit::focusOutSignal,  this, &CSSlider::onLinEditFocusOut);
+    suc &= (bool)connect(m_slider,   &CustomSlider::sliderClicked, this, &CSSlider::onSliderClicked);
+    suc &= (bool)connect(m_lineEdit, &CSLineEdit::focusOutSignal,  this, &CSSlider::onLinEditFocusOut);
 
     Q_ASSERT(suc);
 
     if(QString(title).isEmpty())
     {
-        titleLabel->setVisible(false);
+        m_titleLabel->setVisible(false);
     }
 }
 
@@ -122,85 +122,85 @@ CSSlider::~CSSlider()
 
 void CSSlider::setParaRange(const QVariant& min, const QVariant& max, const QVariant& step)
 {
-    minLabel->setText(QString::number(min.toInt()));
-    maxLabel->setText(QString::number(max.toInt()));
-    this->step = step.toInt() > 0 ? step.toInt() : 1;
+    m_minLabel->setText(QString::number(min.toInt()));
+    m_maxLabel->setText(QString::number(max.toInt()));
+    this->m_step = step.toInt() > 0 ? step.toInt() : 1;
 
-    int sliderMin = min.toInt() / this->step;
-    int sliderMax = max.toInt() / this->step;
+    int sliderMin = min.toInt() / this->m_step;
+    int sliderMax = max.toInt() / this->m_step;
 
-    slider->setRange(sliderMin, sliderMax);
+    m_slider->setRange(sliderMin, sliderMax);
 }
 
 void CSSlider::setValue(const QVariant& value)
 {
     int intValue = value.toInt();
 
-    const int min = slider->minimum() * this->step;
-    const int max = slider->maximum() * this->step;
+    const int min = m_slider->minimum() * this->m_step;
+    const int max = m_slider->maximum() * this->m_step;
 
     intValue = intValue > max ? max : intValue;
     intValue = intValue < min ? min : intValue;
 
-    int sliderValue = intValue / this->step;
-    sliderValue += (intValue % this->step) > 0 ? 1 : 0;
+    int sliderValue = intValue / this->m_step;
+    sliderValue += (intValue % this->m_step) > 0 ? 1 : 0;
 
-    lineEdit->setText(QString::number(intValue));
-    slider->setValue(sliderValue);
+    m_lineEdit->setText(QString::number(intValue));
+    m_slider->setValue(sliderValue);
 }
 
 void CSSlider::onLineEditTextChanged()
 {
-    int value = lineEdit->text().toInt();
-    int sliderValue = value / this->step;
+    int value = m_lineEdit->text().toInt();
+    int sliderValue = value / this->m_step;
 
-    lineEdit->setText(QString::number(sliderValue * this->step));
-    slider->setValue(sliderValue);
+    m_lineEdit->setText(QString::number(sliderValue * this->m_step));
+    m_slider->setValue(sliderValue);
 
-    emit valueChanged(getParaId(), sliderValue * this->step);
+    emit valueChanged(getParaId(), sliderValue * this->m_step);
 }
 
 void CSSlider::onSliderClicked(int value)
 {
-    slider->setValue(value);
+    m_slider->setValue(value);
 
-    int realValue = value * this->step;
-    lineEdit->setText(QString::number(realValue));
+    int realValue = value * this->m_step;
+    m_lineEdit->setText(QString::number(realValue));
 
     emit valueChanged(getParaId(), realValue);
 }
 
 void CSSlider::onSliderValueChanged()
 {
-    int value = slider->value();
-    int realValue = value * this->step;
+    int value = m_slider->value();
+    int realValue = value * this->m_step;
 
-    lineEdit->setText(QString::number(realValue));
+    m_lineEdit->setText(QString::number(realValue));
     emit valueChanged(getParaId(), realValue);
 }
 
 void CSSlider::retranslate(const char* context)
 {
-    if (strlen(paraName) > 0)
+    if (strlen(m_paraName) > 0)
     {
-        titleLabel->setText(QApplication::translate(context, paraName));
+        m_titleLabel->setText(QApplication::translate(context, m_paraName));
     }
 }
 
 void CSSlider::onLinEditFocusOut()
 {
-    auto tex = lineEdit->text();
+    auto tex = m_lineEdit->text();
     int num = 0;
-    if (intValidator->validate(tex, num) != QIntValidator::Acceptable)
+    if (m_intValidator->validate(tex, num) != QIntValidator::Acceptable)
     {
-        const int min = slider->minimum();
-        lineEdit->setText(QString::number(min));
-        emit lineEdit->editingFinished();
+        const int min = m_slider->minimum();
+        m_lineEdit->setText(QString::number(min));
+        emit m_lineEdit->editingFinished();
     }
 }
 
 void CSSlider::clearValues()
 {
-    lineEdit->setText("");
-    slider->setValue(0);
+    m_lineEdit->setText("");
+    m_slider->setValue(0);
 }

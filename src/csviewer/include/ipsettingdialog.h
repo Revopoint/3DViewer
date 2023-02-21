@@ -43,7 +43,7 @@ private:
 private:
     void onApply();
 private:
-    Ui::IpSettingWidget* ui;
+    Ui::IpSettingWidget* m_ui;
 };
 
 #endif // _CS_IP_SETTING_DIALOG_H

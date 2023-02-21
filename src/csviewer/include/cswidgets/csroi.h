@@ -34,7 +34,7 @@ public:
     ~CSROIWidget();
 
     void setOffset(QMargins offset);
-    int getButtonAreaHeight() const { return buttonAreaHeight; }
+    int getButtonAreaHeight() const { return m_buttonAreaHeight; }
     void updateRoiRectF(QRectF rect);
     void paintEvent(QPaintEvent* event) override;
 
@@ -49,18 +49,18 @@ signals:
     void roiValueUpdated(QRectF rect);
     void roiVisialeChanged(bool visible);
 private:
-    QRectF roiRect;
-    QRectF roiRectLast;
+    QRectF m_roiRect;
+    QRectF m_roiRectLast;
 
-    QMargins roiOffset;
-    int buttonAreaHeight = 40;
+    QMargins m_roiOffset;
+    int m_buttonAreaHeight = 40;
 
-    QPushButton* cancelButton;
-    QPushButton* okButton;
-    QWidget* buttonArea;
+    QPushButton* m_cancelButton;
+    QPushButton* m_okButton;
+    QWidget* m_buttonArea;
 
-    int pressPositon = -1;
-    QPoint lastPosition;
+    int m_pressPositon = -1;
+    QPoint m_lastPosition;
 };
 
 #endif //_CS_CSROI_H

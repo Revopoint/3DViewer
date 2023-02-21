@@ -34,7 +34,7 @@ public:
     void setType(int t);
     int getType() const;
 private:
-    int type;
+    int m_type;
 };
 
 #endif

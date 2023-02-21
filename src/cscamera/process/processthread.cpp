@@ -29,7 +29,7 @@
 using namespace cs;
 
 ProcessThread::ProcessThread(std::shared_ptr<Processor> processor)
-    : processorPtr(processor)
+    : m_processorPtr(processor)
 {
     setObjectName("ProcessThread");
     moveToThread(this);
@@ -49,16 +49,16 @@ void ProcessThread::run()
         bool hasData = false;
         FrameData data;
 
-        mutex.lock();
-        if (!cachedFrameData.isEmpty()) {
-            data = cachedFrameData.dequeue();
+        m_mutex.lock();
+        if (!m_cachedFrameData.isEmpty()) {
+            data = m_cachedFrameData.dequeue();
             hasData = true;
         }
-        mutex.unlock();
+        m_mutex.unlock();
 
         if (hasData)
         {
-            processorPtr->process(data);
+            m_processorPtr->process(data);
         }
         else 
         {
@@ -70,17 +70,17 @@ void ProcessThread::run()
 // exec not on ProcessThread
 void ProcessThread::onFrameDataUpdated(FrameData frameData)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_mutex);
     if (!isRunning()) 
     {
         start();
     }
 
-    if (cachedFrameData.size() >= MAX_CACHED_FRAME)
+    if (m_cachedFrameData.size() >= MAX_CACHED_FRAME)
     {
         qWarning() << "dequeue, skip one frame";
-        cachedFrameData.dequeue();
+        m_cachedFrameData.dequeue();
     }
 
-    cachedFrameData.enqueue(frameData);
+    m_cachedFrameData.enqueue(frameData);
 }

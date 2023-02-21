@@ -81,10 +81,10 @@ private:
     bool isNetConnect(QString uuid);
     QString splitCameraInfo(QString info);
 private:
-    std::shared_ptr<ICSCamera> cameraProxy;
-    QList<CameraInfo> cameraInfoList;
-    QReadWriteLock lock;
-    QTimer cameraRestartTimer;
+    std::shared_ptr<ICSCamera> m_cameraProxy;
+    QList<CameraInfo> m_cameraInfoList;
+    QReadWriteLock m_lock;
+    QTimer m_cameraRestartTimer;
 };
 
 }

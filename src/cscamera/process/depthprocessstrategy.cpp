@@ -39,18 +39,18 @@ DepthProcessStrategy::DepthProcessStrategy()
 
 DepthProcessStrategy::DepthProcessStrategy(PROCESS_STRA_TYPE type)
     : ProcessStrategy(type)
-    , calcDepthCoord(false)
-    , depthCoordCalcPos(QPointF(-1.0f, -1.0f))
-    , fillHole(false)
-    , filterValue(0)
-    , filterType(0)
+    , m_calcDepthCoord(false)
+    , m_depthCoordCalcPos(QPointF(-1.0f, -1.0f))
+    , m_fillHole(false)
+    , m_filterValue(0)
+    , m_filterType(0)
 {
-    dependentParameters.push_back(PARA_DEPTH_RANGE);
-    dependentParameters.push_back(PARA_DEPTH_SCALE);
-    dependentParameters.push_back(PARA_DEPTH_INTRINSICS);
-    dependentParameters.push_back(PARA_DEPTH_FILL_HOLE);
-    dependentParameters.push_back(PARA_DEPTH_FILTER_TYPE);
-    dependentParameters.push_back(PARA_DEPTH_FILTER);
+    m_dependentParameters.push_back(PARA_DEPTH_RANGE);
+    m_dependentParameters.push_back(PARA_DEPTH_SCALE);
+    m_dependentParameters.push_back(PARA_DEPTH_INTRINSICS);
+    m_dependentParameters.push_back(PARA_DEPTH_FILL_HOLE);
+    m_dependentParameters.push_back(PARA_DEPTH_FILTER_TYPE);
+    m_dependentParameters.push_back(PARA_DEPTH_FILTER);
 }
 
 void DepthProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort& outputDataPort)
@@ -92,10 +92,10 @@ OutputData2D DepthProcessStrategy::processDepthData(const ushort* dataPtr, int l
     outputData.image = image;
 
     // calc point info
-    if (calcDepthCoord)
+    if (m_calcDepthCoord)
     {
-        int x = depthCoordCalcPos.x() * width;
-        int y = depthCoordCalcPos.y() * height;
+        int x = m_depthCoordCalcPos.x() * width;
+        int y = m_depthCoordCalcPos.y() * height;
 
         if (!(x < 0 || y < 0 || x >= width || y >= height))
         {
@@ -105,10 +105,10 @@ OutputData2D DepthProcessStrategy::processDepthData(const ushort* dataPtr, int l
             cs::float3 point;
             cs::float2 texcoord;
 
-            pc.generatePoint(point, texcoord, x, y, d, width, height, depthScale, &depthIntrinsics);
+            pc.generatePoint(point, texcoord, x, y, d, width, height, m_depthScale, &m_depthIntrinsics);
 
             outputData.info.vertex = QVector3D(point.x, point.y, point.z);
-            outputData.info.depthScale = depthScale;
+            outputData.info.depthScale = m_depthScale;
         }
     }
 
@@ -123,20 +123,20 @@ void DepthProcessStrategy::onProcessDepthData(const ushort* dataPtr, int length,
     copyData<const ushort, float>(dataPtr, floatPtr, length);
 
     //fill hole
-    if (fillHole)
+    if (m_fillHole)
     {
         depthFillHole(floatPtr, width, height);
     }
 
     // filter
-    FILTER_TYPE type = (FILTER_TYPE)filterType;
+    FILTER_TYPE type = (FILTER_TYPE)m_filterType;
     switch (type)
     {
     case FILTER_SMOOTH:
-        filter::AverageBlur<float>(floatPtr, width, height, filterValue);
+        filter::AverageBlur<float>(floatPtr, width, height, m_filterValue);
         break;
     case FILTER_MEDIAN:
-        filter::MedianBlur<float>(floatPtr, width, height, filterValue);
+        filter::MedianBlur<float>(floatPtr, width, height, m_filterValue);
         break;
     case FILTER_TDSMOOTH:
         timeDomainSmooth(dataPtr, length, width, height, floatPtr);
@@ -147,17 +147,17 @@ void DepthProcessStrategy::onProcessDepthData(const ushort* dataPtr, int length,
    
     // colorize
     cs::colorizer color;
-    color.setRange(depthRange.first, depthRange.second);
+    color.setRange(m_depthRange.first, m_depthRange.second);
 
     depthImage =  QImage(width, height, QImage::Format_RGB888);
-    color.process<float>(floatPtr, depthScale, depthImage.bits(), length);
+    color.process<float>(floatPtr, m_depthScale, depthImage.bits(), length);
 }
 
 void DepthProcessStrategy::timeDomainSmooth(const ushort* dataPtr, int length, int width, int height, float* output)
 {
-    if (filterCachedData.size() >= filterValue)
+    if (m_filterCachedData.size() >= m_filterValue)
     {
-        filterCachedData.pop_front();
+        m_filterCachedData.pop_front();
     }
 
     //copy data
@@ -165,12 +165,12 @@ void DepthProcessStrategy::timeDomainSmooth(const ushort* dataPtr, int length, i
     curFrame.resize(length * sizeof(ushort));
     memcpy(curFrame.data(), dataPtr, curFrame.size());
 
-    filterCachedData.push_back(curFrame);
+    m_filterCachedData.push_back(curFrame);
 
     // smooth
     const int size = width * height;
     QList<ushort*> list;
-    for (auto& data : filterCachedData)
+    for (auto& data : m_filterCachedData)
     {
         if(data.size() == size * sizeof(ushort))
         {
@@ -296,34 +296,34 @@ QVector<OutputData2D> DepthProcessStrategy::onProcessPAIR(const StreamData& stre
 
 void DepthProcessStrategy::onLoadCameraPara()
 {
-    for (auto para : dependentParameters)
+    for (auto para : m_dependentParameters)
     {
         auto emPara = (CAMERA_PARA_ID)para;
 
         QVariant value;
-        cameraPtr->getCameraPara(emPara, value);
+        m_cameraPtr->getCameraPara(emPara, value);
         switch (para)
         {
         case PARA_DEPTH_RANGE:
-            depthRange = value.value<QPair<float, float> >();
+            m_depthRange = value.value<QPair<float, float> >();
             break;
         case PARA_DEPTH_SCALE:
-            depthScale = value.toFloat();
+            m_depthScale = value.toFloat();
             break;
         case PARA_DEPTH_INTRINSICS:
-            depthIntrinsics = value.value<Intrinsics>();
+            m_depthIntrinsics = value.value<Intrinsics>();
             break;
         case PARA_DEPTH_FILL_HOLE:
-            fillHole = value.toBool();
+            m_fillHole = value.toBool();
             break;
         case PARA_DEPTH_FILTER:
-            filterValue = value.toInt();
+            m_filterValue = value.toInt();
             break;
         case PARA_DEPTH_FILTER_TYPE:
-            filterType = value.toInt();
-            if (filterType != FILTER_TDSMOOTH)
+            m_filterType = value.toInt();
+            if (m_filterType != FILTER_TDSMOOTH)
             {
-                filterCachedData.clear();
+                m_filterCachedData.clear();
             }
             break;
         default:
@@ -332,29 +332,29 @@ void DepthProcessStrategy::onLoadCameraPara()
     }
 
     //add log
-    if (qAbs(depthScale) < 0.0000001)
+    if (qAbs(m_depthScale) < 0.0000001)
     {
-        qWarning() << "invalid depth scale, depthScale = " << depthScale;
+        qWarning() << "invalid depth scale, depthScale = " << m_depthScale;
         Q_ASSERT(false);
     }
 }
 
 bool DepthProcessStrategy::getCalcDepthCoord() const
 {
-    return calcDepthCoord;
+    return m_calcDepthCoord;
 }
 
 void DepthProcessStrategy::setCalcDepthCoord(bool calc)
 {
-    calcDepthCoord = calc;
+    m_calcDepthCoord = calc;
 }
 
 QPointF DepthProcessStrategy::getDepthCoordCalcPos() const
 {
-    return depthCoordCalcPos;
+    return m_depthCoordCalcPos;
 }
 
 void  DepthProcessStrategy::setDepthCoordCalcPos(QPointF pos)
 {
-    depthCoordCalcPos = pos;
+    m_depthCoordCalcPos = pos;
 }

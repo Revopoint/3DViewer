@@ -66,11 +66,11 @@ private slots:
     void onLineEditFinished();
     void onClickedSave();
 private:
-    Ui::CameraPlayerWidget* ui;
-    cs::CameraPlayer* cameraPlayer;
+    Ui::CameraPlayerWidget* m_ui;
+    cs::CameraPlayer* m_cameraPlayer;
 
-    QMap<int, QCheckBox*> dataTypeCheckBoxs;
-    CSProgressBar* circleProgressBar;
+    QMap<int, QCheckBox*> m_dataTypeCheckBoxs;
+    CSProgressBar* m_circleProgressBar;
 };
 
 #endif  // _CS_CAMERA_PLAYER_DIALOG

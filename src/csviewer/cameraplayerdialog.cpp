@@ -30,51 +30,51 @@
 
 CameraPlayerDialog::CameraPlayerDialog(QWidget* parent)
     : QDialog(parent)
-    , ui(new Ui::CameraPlayerWidget)
-    , cameraPlayer(nullptr)
-    , circleProgressBar(new CSProgressBar(this))
+    , m_ui(new Ui::CameraPlayerWidget)
+    , m_cameraPlayer(nullptr)
+    , m_circleProgressBar(new CSProgressBar(this))
 {
     setWindowFlags(this->windowFlags() & Qt::WindowCloseButtonHint  & Qt::WindowMinMaxButtonsHint);
 
-    ui->setupUi(this);
-    ui->frameEdit->setValidator(new QIntValidator(-10000000, 10000000, this));
-    ui->captureSingleButton->setToolTip(tr("Save current frame"));
+    m_ui->setupUi(this);
+    m_ui->frameEdit->setValidator(new QIntValidator(-10000000, 10000000, this));
+    m_ui->captureSingleButton->setToolTip(tr("Save current frame"));
 
-    dataTypeCheckBoxs[(int)CAMERA_DATA_DEPTH] = ui->checkBoxDepth;
-    dataTypeCheckBoxs[(int)CAMERA_DATA_RGB] = ui->checkBoxRgb;
-    dataTypeCheckBoxs[(int)CAMERA_DATA_POINT_CLOUD] = ui->checkBoxPC;
-    dataTypeCheckBoxs[(int)(CAMERA_DATA_R)] = ui->checkBoxIrR;
-    dataTypeCheckBoxs[(int)(CAMERA_DATA_L)] = ui->checkBoxIrL;
+    m_dataTypeCheckBoxs[(int)CAMERA_DATA_DEPTH] = m_ui->checkBoxDepth;
+    m_dataTypeCheckBoxs[(int)CAMERA_DATA_RGB] = m_ui->checkBoxRgb;
+    m_dataTypeCheckBoxs[(int)CAMERA_DATA_POINT_CLOUD] = m_ui->checkBoxPC;
+    m_dataTypeCheckBoxs[(int)(CAMERA_DATA_R)] = m_ui->checkBoxIrR;
+    m_dataTypeCheckBoxs[(int)(CAMERA_DATA_L)] = m_ui->checkBoxIrL;
 
     bool suc = true;
-    for (auto checkBox : dataTypeCheckBoxs.values())
+    for (auto checkBox : m_dataTypeCheckBoxs.values())
     {
         suc &= (bool)connect(checkBox, &QCheckBox::toggled, this, &CameraPlayerDialog::onToggledCheckBox);
     }
 
     //suc &= (bool)connect(ui->frameNumberSlider, &QSlider::sliderReleased, this, &CameraPlayerDialog::onSliderValueChanged);
-    suc &= (bool)connect(ui->frameNumberSlider, &QSlider::valueChanged, this, &CameraPlayerDialog::onSliderValueChanged);
+    suc &= (bool)connect(m_ui->frameNumberSlider, &QSlider::valueChanged, this, &CameraPlayerDialog::onSliderValueChanged);
 
-    suc &= (bool)connect(ui->frameIncrease, &QPushButton::clicked, this, [=]()
+    suc &= (bool)connect(m_ui->frameIncrease, &QPushButton::clicked, this, [=]()
         {
-            ui->frameNumberSlider->setValue(ui->frameNumberSlider->value() + 1);
+            m_ui->frameNumberSlider->setValue(m_ui->frameNumberSlider->value() + 1);
             onSliderValueChanged();
         });
 
-    suc &= (bool)connect(ui->frameDecrease, &QPushButton::clicked, this, [=]()
+    suc &= (bool)connect(m_ui->frameDecrease, &QPushButton::clicked, this, [=]()
         {
-            ui->frameNumberSlider->setValue(ui->frameNumberSlider->value() - 1);
+            m_ui->frameNumberSlider->setValue(m_ui->frameNumberSlider->value() - 1);
             onSliderValueChanged();
         });
 
-    suc &= (bool)connect(ui->frameEdit, &QLineEdit::editingFinished, this, &CameraPlayerDialog::onLineEditFinished);
+    suc &= (bool)connect(m_ui->frameEdit, &QLineEdit::editingFinished, this, &CameraPlayerDialog::onLineEditFinished);
     //suc &= (bool)connect(ui->frameEdit, &CSLineEdit::focusOutSignal, this, &CameraPlayerDialog::onLineEditFinished);
 
-    suc &= (bool)connect(ui->playerRenderWindow,  &RenderWindow::renderExit, this, &CameraPlayerDialog::onRenderExit);
-    suc &= (bool)connect(ui->captureSingleButton, &QPushButton::clicked,     this, &CameraPlayerDialog::onClickedSave);
+    suc &= (bool)connect(m_ui->playerRenderWindow,  &RenderWindow::renderExit, this, &CameraPlayerDialog::onRenderExit);
+    suc &= (bool)connect(m_ui->captureSingleButton, &QPushButton::clicked,     this, &CameraPlayerDialog::onClickedSave);
 
-    suc &= (bool)connect(this, &CameraPlayerDialog::output2DUpdated, ui->playerRenderWindow, &RenderWindow::onOutput2DUpdated);
-    suc &= (bool)connect(this, &CameraPlayerDialog::output3DUpdated, ui->playerRenderWindow, &RenderWindow::onOutput3DUpdated);
+    suc &= (bool)connect(this, &CameraPlayerDialog::output2DUpdated, m_ui->playerRenderWindow, &RenderWindow::onOutput2DUpdated);
+    suc &= (bool)connect(this, &CameraPlayerDialog::output3DUpdated, m_ui->playerRenderWindow, &RenderWindow::onOutput3DUpdated);
     suc &= (bool)connect(cs::CSApplication::getInstance(), &cs::CSApplication::show3DTextureChanged, this, &CameraPlayerDialog::onShowTextureUpdated);
 
     
@@ -83,15 +83,15 @@ CameraPlayerDialog::CameraPlayerDialog(QWidget* parent)
 
 CameraPlayerDialog::~CameraPlayerDialog()
 {
-    if (cameraPlayer)
+    if (m_cameraPlayer)
     {
-        cameraPlayer->quit();
-        cameraPlayer->wait();
+        m_cameraPlayer->quit();
+        m_cameraPlayer->wait();
        
-        delete cameraPlayer;
-        cameraPlayer = nullptr;
+        delete m_cameraPlayer;
+        m_cameraPlayer = nullptr;
     }
-    delete ui;
+    delete m_ui;
 }
 
 void CameraPlayerDialog::onLoadFile()
@@ -105,16 +105,16 @@ void CameraPlayerDialog::onLoadFile()
     if (url.isValid())
     {
         QString filePath = url.toLocalFile();
-        if (!cameraPlayer)
+        if (!m_cameraPlayer)
         {
-            cameraPlayer = new cs::CameraPlayer();
+            m_cameraPlayer = new cs::CameraPlayer();
 
-            connect(cameraPlayer, &cs::CameraPlayer::playerStateChanged, this, &CameraPlayerDialog::onPlayerStateChanged);    
-            connect(cameraPlayer, &cs::CameraPlayer::output2DUpdated,    this, &CameraPlayerDialog::output2DUpdated);
-            connect(cameraPlayer, &cs::CameraPlayer::output3DUpdated,    this, &CameraPlayerDialog::output3DUpdated);
-            connect(this, &CameraPlayerDialog::loadFile, cameraPlayer,   &cs::CameraPlayer::onLoadFile);
-            connect(this, &CameraPlayerDialog::currentFrameUpdated,      cameraPlayer, &cs::CameraPlayer::onPalyFrameUpdated);
-            connect(this, &CameraPlayerDialog::saveCurrentFrame,         cameraPlayer, &cs::CameraPlayer::onSaveCurrentFrame);
+            connect(m_cameraPlayer, &cs::CameraPlayer::playerStateChanged, this, &CameraPlayerDialog::onPlayerStateChanged);    
+            connect(m_cameraPlayer, &cs::CameraPlayer::output2DUpdated,    this, &CameraPlayerDialog::output2DUpdated);
+            connect(m_cameraPlayer, &cs::CameraPlayer::output3DUpdated,    this, &CameraPlayerDialog::output3DUpdated);
+            connect(this, &CameraPlayerDialog::loadFile, m_cameraPlayer,   &cs::CameraPlayer::onLoadFile);
+            connect(this, &CameraPlayerDialog::currentFrameUpdated,      m_cameraPlayer, &cs::CameraPlayer::onPalyFrameUpdated);
+            connect(this, &CameraPlayerDialog::saveCurrentFrame,         m_cameraPlayer, &cs::CameraPlayer::onSaveCurrentFrame);
         }
 
         emit loadFile(filePath);
@@ -141,10 +141,10 @@ void CameraPlayerDialog::onPlayerStateChanged(int state, QString msg)
         break;
     case cs::CameraPlayer::PLAYER_SAVE_SUCCESS:
     case cs::CameraPlayer::PLAYER_SAVE_FAILED:
-        circleProgressBar->close();
+        m_circleProgressBar->close();
         break;
     case cs::CameraPlayer::PLAYER_SAVING:
-        circleProgressBar->open();
+        m_circleProgressBar->open();
         break;
     default:
         break;
@@ -154,9 +154,9 @@ void CameraPlayerDialog::onPlayerStateChanged(int state, QString msg)
 void CameraPlayerDialog::onPlayReady()
 {
     qInfo() << "on play ready";
-    Q_ASSERT(cameraPlayer);
+    Q_ASSERT(m_cameraPlayer);
 
-    auto dataTypes = cameraPlayer->getDataTypes();
+    auto dataTypes = m_cameraPlayer->getDataTypes();
 
     QVector<int> windows;
     for (auto type : dataTypes)
@@ -164,41 +164,41 @@ void CameraPlayerDialog::onPlayReady()
         windows.push_back(type);
     }
 
-    ui->playerRenderWindow->setShowTextureEnable(cameraPlayer->enablePointCloudTexture());
-    ui->playerRenderWindow->onRenderWindowsUpdated(windows);
+    m_ui->playerRenderWindow->setShowTextureEnable(m_cameraPlayer->enablePointCloudTexture());
+    m_ui->playerRenderWindow->onRenderWindowsUpdated(windows);
 
     // update check boxs
-    for (auto checkBox : dataTypeCheckBoxs.values())
+    for (auto checkBox : m_dataTypeCheckBoxs.values())
     {
         checkBox->setChecked(false);
         checkBox->setEnabled(false);
     }
 
-    for (auto dataTye : dataTypeCheckBoxs.keys())
+    for (auto dataTye : m_dataTypeCheckBoxs.keys())
     {
         if (windows.contains(dataTye))
         {
-            dataTypeCheckBoxs[dataTye]->setEnabled(true);
-            dataTypeCheckBoxs[dataTye]->setChecked(true);
+            m_dataTypeCheckBoxs[dataTye]->setEnabled(true);
+            m_dataTypeCheckBoxs[dataTye]->setChecked(true);
         }
     }
 
-    cameraPlayer->currentDataTypesUpdated(windows);
-    int frameNumber = cameraPlayer->getFrameNumber();
+    m_cameraPlayer->currentDataTypesUpdated(windows);
+    int frameNumber = m_cameraPlayer->getFrameNumber();
     updateFrameRange(frameNumber);
      
-    ui->playerRenderWindow->hideRenderFps();
+    m_ui->playerRenderWindow->hideRenderFps();
 
     show();
 }
 
 void CameraPlayerDialog::updateFrameRange(int frameNumer)
 {
-    ui->frameNumberSlider->setRange(1, frameNumer);
-    ui->frameMinText->setText("1");
-    ui->frameMaxText->setText(QString::number(frameNumer));
-    ui->frameEdit->setText("1");
-    ui->frameNumberSlider->setValue(1);
+    m_ui->frameNumberSlider->setRange(1, frameNumer);
+    m_ui->frameMinText->setText("1");
+    m_ui->frameMaxText->setText(QString::number(frameNumer));
+    m_ui->frameEdit->setText("1");
+    m_ui->frameNumberSlider->setValue(1);
 
     emit currentFrameUpdated(1);
 }
@@ -206,57 +206,57 @@ void CameraPlayerDialog::updateFrameRange(int frameNumer)
 void CameraPlayerDialog::onToggledCheckBox()
 {
     QVector<int> windows;
-    for (auto dataTye : dataTypeCheckBoxs.keys())
+    for (auto dataTye : m_dataTypeCheckBoxs.keys())
     {
-        if (dataTypeCheckBoxs[dataTye]->isEnabled() && dataTypeCheckBoxs[dataTye]->isChecked())
+        if (m_dataTypeCheckBoxs[dataTye]->isEnabled() && m_dataTypeCheckBoxs[dataTye]->isChecked())
         {
             windows.push_back(dataTye);
         }
     }
 
-    cameraPlayer->currentDataTypesUpdated(windows);
-    ui->playerRenderWindow->onRenderWindowsUpdated(windows);
-    ui->playerRenderWindow->hideRenderFps();
+    m_cameraPlayer->currentDataTypesUpdated(windows);
+    m_ui->playerRenderWindow->onRenderWindowsUpdated(windows);
+    m_ui->playerRenderWindow->hideRenderFps();
 
-    emit currentFrameUpdated(ui->frameNumberSlider->value(), true);
+    emit currentFrameUpdated(m_ui->frameNumberSlider->value(), true);
 }
 
 void CameraPlayerDialog::onSliderValueChanged()
 {
     //qDebug() << "onSliderValueChanged, value = " << ui->frameNumberSlider->value();
-    QString text = QString::number(ui->frameNumberSlider->value());
-    ui->frameEdit->setText(text);
+    QString text = QString::number(m_ui->frameNumberSlider->value());
+    m_ui->frameEdit->setText(text);
 
-    emit currentFrameUpdated(ui->frameNumberSlider->value());
+    emit currentFrameUpdated(m_ui->frameNumberSlider->value());
 }
 
 void CameraPlayerDialog::onLineEditFinished()
 {
-    QString text = ui->frameEdit->text();
+    QString text = m_ui->frameEdit->text();
     int number = text.toInt();
 
-    int min = ui->frameNumberSlider->minimum();
-    int max = ui->frameNumberSlider->maximum();
+    int min = m_ui->frameNumberSlider->minimum();
+    int max = m_ui->frameNumberSlider->maximum();
     
     if (number >= min && number <= max)
     {
-        ui->frameNumberSlider->setValue(number);
-        emit currentFrameUpdated(ui->frameNumberSlider->value());
+        m_ui->frameNumberSlider->setValue(number);
+        emit currentFrameUpdated(m_ui->frameNumberSlider->value());
     }
     else 
     {
-        ui->frameEdit->setText(QString::number(ui->frameNumberSlider->value()));
-        emit currentFrameUpdated(ui->frameNumberSlider->value());
+        m_ui->frameEdit->setText(QString::number(m_ui->frameNumberSlider->value()));
+        emit currentFrameUpdated(m_ui->frameNumberSlider->value());
     }
 }
 
 void CameraPlayerDialog::onRenderExit(int renderId)
 {
-    for (auto dataTye : dataTypeCheckBoxs.keys())
+    for (auto dataTye : m_dataTypeCheckBoxs.keys())
     {
         if (dataTye == renderId)
         {
-            dataTypeCheckBoxs[dataTye]->setChecked(false);
+            m_dataTypeCheckBoxs[dataTye]->setChecked(false);
             onToggledCheckBox();
             break;
         }
@@ -265,10 +265,10 @@ void CameraPlayerDialog::onRenderExit(int renderId)
 
 void CameraPlayerDialog::onShowTextureUpdated(bool texture)
 {
-    if (cameraPlayer)
+    if (m_cameraPlayer)
     {
-        cameraPlayer->onShow3DTextureChanged(texture);
-        emit currentFrameUpdated(ui->frameNumberSlider->value(), true);
+        m_cameraPlayer->onShow3DTextureChanged(texture);
+        emit currentFrameUpdated(m_ui->frameNumberSlider->value(), true);
     }
 }
 
@@ -291,6 +291,6 @@ void CameraPlayerDialog::onClickedSave()
 
 void CameraPlayerDialog::onTranslate()
 {
-    ui->retranslateUi(this);
-    ui->captureSingleButton->setToolTip(tr("Save current frame"));
+    m_ui->retranslateUi(this);
+    m_ui->captureSingleButton->setToolTip(tr("Save current frame"));
 }

@@ -34,10 +34,10 @@ private:
 private:
     Qt::LayoutDirection layoutDirection;
     
-    QIcon icon;
-    QLabel* buttonIcon;
-    QLabel* buttonText;
-    const char* buttonTitle;
+    QIcon m_icon;
+    QLabel* m_buttonIcon;
+    QLabel* m_buttonText;
+    const char* m_buttonTitle;
 };
 
 

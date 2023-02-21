@@ -35,7 +35,7 @@ class CSHLine : public QWidget
 public:
     CSHLine(QWidget* parent = nullptr);
 private:
-    CSLine* line;
+    CSLine* m_line;
 };
 
 class CSVLine : public QWidget
@@ -43,6 +43,6 @@ class CSVLine : public QWidget
 public:
     CSVLine(QWidget* parent = nullptr);
 private:
-    CSLine* line;
+    CSLine* m_line;
 };
 #endif //_CS_CSLINE_H

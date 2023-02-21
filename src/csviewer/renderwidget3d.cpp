@@ -423,7 +423,7 @@ void RenderWidget3D::initButtons()
     exitButton->setIcon(QIcon(":/resources/fork_large.png"));
 
     connect(exitButton, &QPushButton::clicked, this, [=]() {
-            emit renderExit(renderId);
+            emit renderExit(m_renderId);
         });
 
     // trackball 
@@ -502,7 +502,7 @@ void RenderWidget3D::initButtons()
     fullScreenBtn->setFocusPolicy(Qt::NoFocus);
 
     connect(fullScreenBtn, &QPushButton::toggled, this, [=](bool checked) {
-            emit fullScreenUpdated(renderId, checked);
+            emit fullScreenUpdated(m_renderId, checked);
         });
 
     QIcon icon2;

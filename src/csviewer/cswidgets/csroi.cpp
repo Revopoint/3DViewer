@@ -43,45 +43,45 @@ enum ROI_POSITION
 
 CSROIWidget::CSROIWidget(QWidget* parent)
     : QWidget(parent)
-    , roiRect(QRectF(0.0, 0.0, 1.0, 1.0))
-    , roiOffset(10, 10, 10, 10)
+    , m_roiRect(QRectF(0.0, 0.0, 1.0, 1.0))
+    , m_roiOffset(10, 10, 10, 10)
 {
     setAttribute(Qt::WA_StyledBackground, true);
     //setVisible(false);
-    roiRectLast = roiRect;
+    m_roiRectLast = m_roiRect;
 
-    buttonArea = new QWidget(this);
-    buttonArea->setObjectName("RoiButtonArea");
-    QHBoxLayout* hlayout = new QHBoxLayout(buttonArea);
+    m_buttonArea = new QWidget(this);
+    m_buttonArea->setObjectName("RoiButtonArea");
+    QHBoxLayout* hlayout = new QHBoxLayout(m_buttonArea);
     hlayout->setContentsMargins(0, 0, 0, 0);
     hlayout->setSpacing(0);
 
-    cancelButton = new QPushButton(buttonArea);
-    okButton = new QPushButton(buttonArea);
+    m_cancelButton = new QPushButton(m_buttonArea);
+    m_okButton = new QPushButton(m_buttonArea);
 
-    cancelButton->setObjectName("CancelButton");
-    okButton->setObjectName("OkButton");
+    m_cancelButton->setObjectName("CancelButton");
+    m_okButton->setObjectName("OkButton");
 
-    QWidget* line = new QWidget(buttonArea);
+    QWidget* line = new QWidget(m_buttonArea);
     line->setObjectName("Line");
     line->setFixedHeight(15);
     line->setFixedWidth(1);
 
-    hlayout->addWidget(cancelButton);
+    hlayout->addWidget(m_cancelButton);
     hlayout->addWidget(line);
-    hlayout->addWidget(okButton);
+    hlayout->addWidget(m_okButton);
 
-    connect(cancelButton, &QPushButton::clicked, this, [=]()
+    connect(m_cancelButton, &QPushButton::clicked, this, [=]()
     {
-        roiRect = roiRectLast;
+        m_roiRect = m_roiRectLast;
         setVisible(false);
         emit roiVisialeChanged(false);
     });
 
-    connect(okButton, &QPushButton::clicked, this, [=]()
+    connect(m_okButton, &QPushButton::clicked, this, [=]()
     {
-        roiRectLast = roiRect;
-        emit roiValueUpdated(roiRect);
+        m_roiRectLast = m_roiRect;
+        emit roiValueUpdated(m_roiRect);
 
     });
 }
@@ -93,12 +93,12 @@ CSROIWidget::~CSROIWidget()
 
 void CSROIWidget::updateRoiRectF(QRectF rect)
 {
-    roiRect = rect;
+    m_roiRect = rect;
 }
 
 void CSROIWidget::setOffset(QMargins offset)
 {
-    roiOffset = offset;
+    m_roiOffset = offset;
 }
 
 void CSROIWidget::paintEvent(QPaintEvent* event)
@@ -113,16 +113,16 @@ void CSROIWidget::paintEvent(QPaintEvent* event)
 
 void CSROIWidget::updateButtonsPos()
 {
-    int w = width() - roiOffset.left() - roiOffset.right();
-    int h = height() - roiOffset.top() - roiOffset.bottom();
+    int w = width() - m_roiOffset.left() - m_roiOffset.right();
+    int h = height() - m_roiOffset.top() - m_roiOffset.bottom();
 
-    int right = w * roiRect.right() + roiOffset.left();
-    int bottom = h * roiRect.bottom() + roiOffset.top();
+    int right = w * m_roiRect.right() + m_roiOffset.left();
+    int bottom = h * m_roiRect.bottom() + m_roiOffset.top();
 
-    int x = right - buttonArea->width();
+    int x = right - m_buttonArea->width();
     int y = bottom + 10;
 
-    buttonArea->setGeometry(x, y, buttonArea->width(), buttonArea->height());
+    m_buttonArea->setGeometry(x, y, m_buttonArea->width(), m_buttonArea->height());
 }
 
 void CSROIWidget::drawRoi()
@@ -132,15 +132,15 @@ void CSROIWidget::drawRoi()
     QColor color(0, 169, 255);
     painter.setPen(QPen(color, 2));
 
-    int w = width() - roiOffset.left() - roiOffset.right();
-    int h = height() - roiOffset.top() - roiOffset.bottom();
+    int w = width() - m_roiOffset.left() - m_roiOffset.right();
+    int h = height() - m_roiOffset.top() - m_roiOffset.bottom();
 
-    painter.translate(roiOffset.left(), roiOffset.top());
+    painter.translate(m_roiOffset.left(), m_roiOffset.top());
 
-    int left = w * roiRect.left();
-    int top = h * roiRect.top();
-    int right = w * roiRect.right();
-    int bottom = h * roiRect.bottom();
+    int left = w * m_roiRect.left();
+    int top = h * m_roiRect.top();
+    int right = w * m_roiRect.right();
+    int bottom = h * m_roiRect.bottom();
 
     painter.drawRect(QRect(left, top , right - left, bottom - top));
 
@@ -175,8 +175,8 @@ void CSROIWidget::drawRoi()
 
 void CSROIWidget::mouseReleaseEvent(QMouseEvent* event)
 {
-    pressPositon = -1;
-    lastPosition = QPoint(0, 0);
+    m_pressPositon = -1;
+    m_lastPosition = QPoint(0, 0);
 
     //QWidget::mouseReleaseEvent(event);
 }
@@ -185,25 +185,25 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
 {
     //QWidget::mousePressEvent(event);
     //QPoint pos = QCursor().pos();
-    pressPositon = -1;
+    m_pressPositon = -1;
 
-    int w = width() - roiOffset.left() - roiOffset.right();
-    int h = height() - roiOffset.top() - roiOffset.bottom();
+    int w = width() - m_roiOffset.left() - m_roiOffset.right();
+    int h = height() - m_roiOffset.top() - m_roiOffset.bottom();
 
-    int left = w * roiRect.left() + roiOffset.left();
-    int top = h * roiRect.top() + roiOffset.top();
-    int right = w * roiRect.right() + roiOffset.left();
-    int bottom = h * roiRect.bottom() + roiOffset.top();
+    int left = w * m_roiRect.left() + m_roiOffset.left();
+    int top = h * m_roiRect.top() + m_roiOffset.top();
+    int right = w * m_roiRect.right() + m_roiOffset.left();
+    int bottom = h * m_roiRect.bottom() + m_roiOffset.top();
 
     static int width = 30;
     static int halfWidth = width / 2;
 
     QPoint pt = this->mapFromGlobal(event->globalPos());
-    lastPosition = pt;
+    m_lastPosition = pt;
 
     if (left == right && top == bottom)
     {
-        pressPositon = RIGHT_BOTTOM;
+        m_pressPositon = RIGHT_BOTTOM;
         return;
     }
 
@@ -213,7 +213,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     QRect rect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon = LEFT_TOP;
+        m_pressPositon = LEFT_TOP;
         return;
     }
 
@@ -222,7 +222,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon =CENTER_TOP;
+        m_pressPositon =CENTER_TOP;
         return;
     }
 
@@ -231,7 +231,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon = RIGHT_TOP;
+        m_pressPositon = RIGHT_TOP;
         return;
     }
 
@@ -240,7 +240,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon =RIGHT_CENTER;
+        m_pressPositon =RIGHT_CENTER;
         return;
     }
 
@@ -249,7 +249,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon =LEFT_CENTER;
+        m_pressPositon =LEFT_CENTER;
         return;
     }
 
@@ -258,7 +258,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon = LEFT_BOTTOM;
+        m_pressPositon = LEFT_BOTTOM;
         return;
     }
 
@@ -267,7 +267,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon = CENTER_BOTTOM;
+        m_pressPositon = CENTER_BOTTOM;
         return;
     }
 
@@ -276,7 +276,7 @@ void CSROIWidget::mousePressEvent(QMouseEvent* event)
     rect = QRect(x, y, width, width);
     if(rect.contains(pt))
     {
-        pressPositon = RIGHT_BOTTOM;
+        m_pressPositon = RIGHT_BOTTOM;
         return;
     }
 }
@@ -285,29 +285,29 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
 {
      auto pos = event->pos();
      QPoint curPos = event->pos();
-     QPoint dPos = curPos - lastPosition;
+     QPoint dPos = curPos - m_lastPosition;
 
      //qDebug() << "pos x = " << pos.x() << ", y = " << pos.y();
-     auto dx = (dPos.x()) * 1.0 / (width() - roiOffset.left() - roiOffset.right());
-     auto dy = (dPos.y()) * 1.0 / (height() - roiOffset.top() - roiOffset.bottom());
+     auto dx = (dPos.x()) * 1.0 / (width() - m_roiOffset.left() - m_roiOffset.right());
+     auto dy = (dPos.y()) * 1.0 / (height() - m_roiOffset.top() - m_roiOffset.bottom());
      
      //roiRect
-     lastPosition = curPos;
-     if(pressPositon < 0)
+     m_lastPosition = curPos;
+     if(m_pressPositon < 0)
      {
          translateRoi(dx, dy);
          return;
      }
 
-     auto left = roiRect.left();
-     auto top = roiRect.top();
-     auto right = roiRect.right();
-     auto bottom = roiRect.bottom();
+     auto left = m_roiRect.left();
+     auto top = m_roiRect.top();
+     auto right = m_roiRect.right();
+     auto bottom = m_roiRect.bottom();
 
      auto x = left;
      auto y = top;
 
-     if(pressPositon == LEFT_TOP)
+     if(m_pressPositon == LEFT_TOP)
      {
         x += dx;
         y += dy;
@@ -318,19 +318,19 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
         y = y < 0 ? 0 : y;
         y = y > bottom ? bottom : y;
 
-        roiRect.setLeft(x);
-        roiRect.setTop(y);
+        m_roiRect.setLeft(x);
+        m_roiRect.setTop(y);
      }
-     else if(pressPositon == LEFT_CENTER)
+     else if(m_pressPositon == LEFT_CENTER)
      {
          x += dx;
 
          x = x > right ? right : x;
          x = x < 0 ? 0 : x;
 
-         roiRect.setLeft(x);
+         m_roiRect.setLeft(x);
      }
-     else if(pressPositon == LEFT_BOTTOM)
+     else if(m_pressPositon == LEFT_BOTTOM)
      {
          y = bottom;
          x += dx;
@@ -342,25 +342,25 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
          y = y > 1 ? 1 : y;
          y = y < top ? top : y;
 
-         roiRect.setLeft(x);
-         roiRect.setBottom(y);
+         m_roiRect.setLeft(x);
+         m_roiRect.setBottom(y);
      }
-     else if(pressPositon == CENTER_TOP)
+     else if(m_pressPositon == CENTER_TOP)
      {
          y += dy;
          y = y < 0 ? 0 : y;
          y = y > bottom ? bottom : y;
-         roiRect.setTop(y);
+         m_roiRect.setTop(y);
      }
-     else if(pressPositon == CENTER_BOTTOM)
+     else if(m_pressPositon == CENTER_BOTTOM)
      {
          y = bottom;
          y += dy;
          y = y > 1 ? 1: y;
          y = y < top ? top : y;
-         roiRect.setBottom(y);
+         m_roiRect.setBottom(y);
      }
-     else if(pressPositon == RIGHT_TOP)
+     else if(m_pressPositon == RIGHT_TOP)
      {
          x = right;
          x += dx;
@@ -372,10 +372,10 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
          y = y < 0 ? 0 : y;
          y = y > bottom ? bottom : y;
 
-         roiRect.setRight(x);
-         roiRect.setTop(y);
+         m_roiRect.setRight(x);
+         m_roiRect.setTop(y);
      }
-     else if(pressPositon == RIGHT_CENTER)
+     else if(m_pressPositon == RIGHT_CENTER)
      {
          x = right;
          x += dx;
@@ -383,9 +383,9 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
          x = x > 1 ? 1 : x;
          x = x < left? left : x;
 
-         roiRect.setRight(x);
+         m_roiRect.setRight(x);
      }
-     else if(pressPositon == RIGHT_BOTTOM)
+     else if(m_pressPositon == RIGHT_BOTTOM)
      {
          x = right;
          y = bottom;
@@ -398,8 +398,8 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
          y = y >1 ? 1 : y;
          y = y <top ? top : y;
 
-         roiRect.setRight(x);
-         roiRect.setBottom(y);
+         m_roiRect.setRight(x);
+         m_roiRect.setBottom(y);
      }
 
      update();
@@ -408,10 +408,10 @@ void CSROIWidget::mouseMoveEvent(QMouseEvent* event)
 void CSROIWidget::translateRoi(float x, float y)
 {
     //qDebug() << "dx : " << x << ", dy : "<< y;
-    auto left = roiRect.left();
-    auto top = roiRect.top();
-    auto right = roiRect.right();
-    auto bottom = roiRect.bottom();
+    auto left = m_roiRect.left();
+    auto top = m_roiRect.top();
+    auto right = m_roiRect.right();
+    auto bottom = m_roiRect.bottom();
 
     if (x > 0)
     {
@@ -443,8 +443,8 @@ void CSROIWidget::translateRoi(float x, float y)
         top = t;
     }
 
-    roiRect.setTopLeft(QPointF(left, top));
-    roiRect.setBottomRight(QPointF(right, bottom));
+    m_roiRect.setTopLeft(QPointF(left, top));
+    m_roiRect.setBottomRight(QPointF(right, bottom));
 
     update();
 }

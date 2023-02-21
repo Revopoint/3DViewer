@@ -43,13 +43,13 @@ class RenderWidget : public QWidget
 public:
     RenderWidget(int renderId, QWidget* parent = nullptr)
         : QWidget(parent)
-        , renderId(renderId)
+        , m_renderId(renderId)
     {
         setAttribute(Qt::WA_StyledBackground);
     }
     int getRenderId() const 
     { 
-        return renderId; 
+        return m_renderId; 
     }
     virtual void setShowFullScreen(bool value) {}
     virtual void onTranslate() {}
@@ -57,8 +57,8 @@ signals:
     void renderExit(int renderId);
     void fullScreenUpdated(int renderID, bool value);
 protected:
-    int renderId;
-    bool showFullScreen = false;
+    int m_renderId;
+    bool m_showFullScreen = false;
 };
 
 class RenderWidget2D : public RenderWidget
@@ -92,26 +92,26 @@ private:
     void onClickExitButton();
     void onClickFullScreen(bool checked);
 protected:
-    QScrollArea* scrollArea;
-    QWidget* centerWidget;
-    QWidget* topControlArea;
-    QWidget* bottomControlArea = nullptr;
+    QScrollArea* m_scrollArea;
+    QWidget* m_centerWidget;
+    QWidget* m_topControlArea;
+    QWidget* m_bottomControlArea = nullptr;
 
-    QWidget* imageArea;
-    QLabel* imageLabel;
-    QLabel* fpsLabel;
+    QWidget* m_imageArea;
+    QLabel* m_imageLabel;
+    QLabel* m_fpsLabel;
 
-    QPushButton* exitButton = nullptr;
-    QPushButton* fullScreenBtn = nullptr;
-    QLabel* titleLabel = nullptr;
+    QPushButton* m_exitButton = nullptr;
+    QPushButton* m_fullScreenBtn = nullptr;
+    QLabel* m_titleLabel = nullptr;
 
-    float ratioWH = 1.6f;
-    QPainter painter;
+    float m_ratioWH = 1.6f;
+    QPainter m_painter;
 
     // fps
-    QTime frameTime;
-    int frameCount;
-    float fps;
+    QTime m_frameTime;
+    int m_frameCount;
+    float m_fps;
 
     bool enableImageScale = true;
     float imageAreaScale = 1.0f;

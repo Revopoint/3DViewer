@@ -41,14 +41,14 @@ static QMap<int, QString> renderTitleMap =
 
 RenderWidget2D::RenderWidget2D(int renderId, QWidget* parent)
     : RenderWidget(renderId, parent)
-    , scrollArea(new QScrollArea(this))
-    , centerWidget(new QWidget(this))
-    , topControlArea(new QWidget(centerWidget))
-    , imageArea(new QWidget(centerWidget))
-    , imageLabel(new QLabel(imageArea))
-    , fpsLabel(new  QLabel(imageArea))
-    , frameCount(0)
-    , fps(0)
+    , m_scrollArea(new QScrollArea(this))
+    , m_centerWidget(new QWidget(this))
+    , m_topControlArea(new QWidget(m_centerWidget))
+    , m_imageArea(new QWidget(m_centerWidget))
+    , m_imageLabel(new QLabel(m_imageArea))
+    , m_fpsLabel(new  QLabel(m_imageArea))
+    , m_frameCount(0)
+    , m_fps(0)
 {
     initWidget();
 }
@@ -61,67 +61,67 @@ RenderWidget2D::~RenderWidget2D()
 void RenderWidget2D::initWidget()
 {
     setProperty("isRender", true);
-    imageLabel->setProperty("isImage", true);
-    centerWidget->setObjectName("RenderCenterWidget");
+    m_imageLabel->setProperty("isImage", true);
+    m_centerWidget->setObjectName("RenderCenterWidget");
 
     QVBoxLayout* rootLayout = new QVBoxLayout(this);
-    rootLayout->addWidget(topControlArea);
-    rootLayout->addWidget(scrollArea);
+    rootLayout->addWidget(m_topControlArea);
+    rootLayout->addWidget(m_scrollArea);
     rootLayout->setContentsMargins(0, 0, 0, 10);
     rootLayout->setSpacing(0);
 
-    scrollArea->setWidget(centerWidget);
-    scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_scrollArea->setWidget(m_centerWidget);
+    m_scrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    centerWidget->setGeometry(0, 0, scrollArea->width()* imageAreaScale, scrollArea->height() * imageAreaScale);
+    m_centerWidget->setGeometry(0, 0, m_scrollArea->width()* imageAreaScale, m_scrollArea->height() * imageAreaScale);
     setMinimumSize(QSize(300, 180));
 
     // image area
-    QVBoxLayout* vLayout = new QVBoxLayout(imageArea);
+    QVBoxLayout* vLayout = new QVBoxLayout(m_imageArea);
     vLayout->setContentsMargins(5, 5, 5, 5 + bottomOffset);
     vLayout->setSpacing(0);
-    vLayout->addWidget(imageLabel);
+    vLayout->addWidget(m_imageLabel);
 
     ////top
-    topControlArea->setProperty("TopControlArea", true);
-    topControlArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    m_topControlArea->setProperty("TopControlArea", true);
+    m_topControlArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 
-    QHBoxLayout* hLayout = new QHBoxLayout(topControlArea);
+    QHBoxLayout* hLayout = new QHBoxLayout(m_topControlArea);
 
-    titleLabel = new QLabel(renderTitleMap[renderId], topControlArea);
-    hLayout->addWidget(titleLabel);
+    m_titleLabel = new QLabel(renderTitleMap[m_renderId], m_topControlArea);
+    hLayout->addWidget(m_titleLabel);
     hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLayout->setContentsMargins(15, 10, 15, 10);
     hLayout->setSpacing(10);
 
     hLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-    hLayout->addWidget(fpsLabel);
+    hLayout->addWidget(m_fpsLabel);
 
-    fpsLabel->setObjectName("fpsLabel");
-    titleLabel->setVisible(false);
+    m_fpsLabel->setObjectName("fpsLabel");
+    m_titleLabel->setVisible(false);
 
     updateFps();
 }
 
 void RenderWidget2D::onFrameIncrease()
 {
-    if (frameCount == 0)
+    if (m_frameCount == 0)
     {
-        frameTime.restart();
-        frameCount++;
+        m_frameTime.restart();
+        m_frameCount++;
         return;
     }
 
-    int msec = frameTime.elapsed();
+    int msec = m_frameTime.elapsed();
     if (msec > 1000)
     {
-        fps = frameCount * 1.0f / (msec / 1000.0f);
+        m_fps = m_frameCount * 1.0f / (msec / 1000.0f);
 
-        frameTime.restart();
-        frameCount = 0;
+        m_frameTime.restart();
+        m_frameCount = 0;
     }
 
-    frameCount++;
+    m_frameCount++;
 }
 
 void RenderWidget2D::onRenderDataUpdated(OutputData2D outputData)
@@ -144,14 +144,14 @@ void RenderWidget2D::onRenderDataUpdated(OutputData2D outputData)
     cachedImage = outputData.image;
 
     QPixmap pixmap = QPixmap::fromImage(outputData.image);
-    pixmap = pixmap.scaled(imageLabel->size());
-    painter.begin(&pixmap);
+    pixmap = pixmap.scaled(m_imageLabel->size());
+    m_painter.begin(&pixmap);
     //painter
     onPainterInfos(outputData);
     updateFps();
 
-    painter.end();
-    imageLabel->setPixmap(pixmap);
+    m_painter.end();
+    m_imageLabel->setPixmap(pixmap);
     onFrameIncrease();
 }
 
@@ -170,13 +170,13 @@ void RenderWidget2D::onPainterInfos(OutputData2D outputData)
 
 void RenderWidget2D::updateFps()
 {
-    QString text = QString("FPS : %1").arg(QString::number(fps, 'f', 2));
-    fpsLabel->setText(tr(text.toStdString().c_str()));
+    QString text = QString("FPS : %1").arg(QString::number(m_fps, 'f', 2));
+    m_fpsLabel->setText(tr(text.toStdString().c_str()));
 }
 
 void RenderWidget2D::setWHRatio(float ratio)
 {
-    ratioWH = ratio;
+    m_ratioWH = ratio;
     updateImageSize();
 }
 
@@ -187,73 +187,73 @@ void RenderWidget2D::setEnableScale(bool enable)
 
 void RenderWidget2D::setShowFullScreen(bool value)
 {
-    showFullScreen = value;
-    if (showFullScreen)
+    m_showFullScreen = value;
+    if (m_showFullScreen)
     {
         initButtons();
     }
 
-    titleLabel->setVisible(value);
+    m_titleLabel->setVisible(value);
 }
 
 void RenderWidget2D::hideRenderFps()
 {
-    fpsLabel->setVisible(false);
+    m_fpsLabel->setVisible(false);
 }
 
 void RenderWidget2D::initButtons()
 {
-    if (!exitButton)
+    if (!m_exitButton)
     {
-        exitButton = new QPushButton(this);
-        exitButton->setObjectName("ExitButton");
-        exitButton->setIconSize(QSize(20, 20));
-        exitButton->setIcon(QIcon(":/resources/fork_large.png"));
-        exitButton->setFocusPolicy(Qt::NoFocus);
+        m_exitButton = new QPushButton(this);
+        m_exitButton->setObjectName("ExitButton");
+        m_exitButton->setIconSize(QSize(20, 20));
+        m_exitButton->setIcon(QIcon(":/resources/fork_large.png"));
+        m_exitButton->setFocusPolicy(Qt::NoFocus);
 
-        connect(exitButton, &QPushButton::clicked, this, &RenderWidget2D::onClickExitButton);
+        connect(m_exitButton, &QPushButton::clicked, this, &RenderWidget2D::onClickExitButton);
     }
 
-    if (!fullScreenBtn)
+    if (!m_fullScreenBtn)
     {
-        fullScreenBtn = new QPushButton(this);
-        fullScreenBtn->setObjectName("FullScreenButton");
-        fullScreenBtn->setCheckable(true);
-        fullScreenBtn->setFocusPolicy(Qt::NoFocus);
+        m_fullScreenBtn = new QPushButton(this);
+        m_fullScreenBtn->setObjectName("FullScreenButton");
+        m_fullScreenBtn->setCheckable(true);
+        m_fullScreenBtn->setFocusPolicy(Qt::NoFocus);
 
-        connect(fullScreenBtn, &QPushButton::toggled, this, &RenderWidget2D::onClickFullScreen);
+        connect(m_fullScreenBtn, &QPushButton::toggled, this, &RenderWidget2D::onClickFullScreen);
 
         QIcon icon1;
         icon1.addFile(QStringLiteral(":/resources/full_screen_exit.png"), QSize(), QIcon::Normal, QIcon::Off);
         icon1.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Active, QIcon::On);
         icon1.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Selected, QIcon::On);
 
-        fullScreenBtn->setIconSize(QSize(22, 22));
-        fullScreenBtn->setIcon(icon1);
+        m_fullScreenBtn->setIconSize(QSize(22, 22));
+        m_fullScreenBtn->setIcon(icon1);
     }
 
-    auto layout = topControlArea->layout();
+    auto layout = m_topControlArea->layout();
     if (layout)
     {
-        layout->addWidget(exitButton);
+        layout->addWidget(m_exitButton);
     }
 
-    if (!bottomControlArea)
+    if (!m_bottomControlArea)
     {
-        bottomControlArea = new QWidget(this);
+        m_bottomControlArea = new QWidget(this);
 
-        QHBoxLayout* hLayout = new QHBoxLayout(bottomControlArea);
+        QHBoxLayout* hLayout = new QHBoxLayout(m_bottomControlArea);
         hLayout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
         hLayout->setContentsMargins(0, 0, 15, 10);
         hLayout->setSpacing(10);
 
         hLayout->addItem(new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum));
-        hLayout->addWidget(fullScreenBtn);
+        hLayout->addWidget(m_fullScreenBtn);
 
         auto rootLayout = this->layout();
         if (rootLayout)
         {
-            rootLayout->addWidget(bottomControlArea);
+            rootLayout->addWidget(m_bottomControlArea);
         }
     }
 }
@@ -329,8 +329,8 @@ void RenderWidget2D::keyReleaseEvent(QKeyEvent* event)
 
 void RenderWidget2D::updateImageSize()
 {
-    int width = scrollArea->width();
-    int height = scrollArea->height();
+    int width = m_scrollArea->width();
+    int height = m_scrollArea->height();
 
     if (imageAreaScale < 1)
     {
@@ -339,40 +339,40 @@ void RenderWidget2D::updateImageSize()
         int x = (width - scaleW) / 2;
         int y = (height - scaleH) / 2;
 
-        centerWidget->setGeometry(x, y, scaleW, scaleH);
+        m_centerWidget->setGeometry(x, y, scaleW, scaleH);
     }
     else 
     {
-        centerWidget->setGeometry(0, 0, width * imageAreaScale, height * imageAreaScale);
+        m_centerWidget->setGeometry(0, 0, width * imageAreaScale, height * imageAreaScale);
     }
-    const int w1 = centerWidget->width();
-    const int h1 = centerWidget->height() - bottomOffset;
+    const int w1 = m_centerWidget->width();
+    const int h1 = m_centerWidget->height() - bottomOffset;
     
     int imgW, imgH;
-    if (w1 / ratioWH < h1)
+    if (w1 / m_ratioWH < h1)
     {
         imgW = w1;
-        imgH = w1 / ratioWH;
+        imgH = w1 / m_ratioWH;
     }
     else
     {
         imgH = h1;
-        imgW = h1 * ratioWH;
+        imgW = h1 * m_ratioWH;
     }
 
     int x = (w1 - imgW) / 2;
     int y = (h1 - imgH) / 2;
 
     //imageLabel->setGeometry(0, 0, imgW, imgH);
-    imageArea->setGeometry(x, y, imgW, imgH + bottomOffset);
-    auto layout = imageArea->layout();
+    m_imageArea->setGeometry(x, y, imgW, imgH + bottomOffset);
+    auto layout = m_imageArea->layout();
     layout->setContentsMargins(5, 5, 5, 5 + bottomOffset);
 
     if (!cachedImage.isNull())
     {
         QPixmap pixmap = QPixmap::fromImage(cachedImage);
-        pixmap = pixmap.scaled(imageLabel->size());
-        imageLabel->setPixmap(pixmap);
+        pixmap = pixmap.scaled(m_imageLabel->size());
+        m_imageLabel->setPixmap(pixmap);
     }
 }
 
@@ -386,11 +386,11 @@ DepthRenderWidget2D::DepthRenderWidget2D(int renderId, QWidget* parent)
     , mousePressPoint(0,0)
     , isRoiEdit(false)
     , isShowCoord(false)
-    , roiWidget(new CSROIWidget(centerWidget))
+    , roiWidget(new CSROIWidget(m_centerWidget))
 {
     roiWidget->setObjectName("ROIWidget");
 
-    QMargins margins = imageArea->layout()->contentsMargins();
+    QMargins margins = m_imageArea->layout()->contentsMargins();
     margins.setBottom(margins.bottom() + roiWidget->getButtonAreaHeight());
 
     roiWidget->setOffset(margins);
@@ -410,11 +410,11 @@ DepthRenderWidget2D::~DepthRenderWidget2D()
 
 void DepthRenderWidget2D::mousePressEvent(QMouseEvent* event)
 {
-    QPoint pt = imageLabel->mapFromGlobal(event->globalPos());
-    const auto rect = imageLabel->rect();
+    QPoint pt = m_imageLabel->mapFromGlobal(event->globalPos());
+    const auto rect = m_imageLabel->rect();
 
-    mousePressPoint.rx() = (pt.x() * 1.0f) / imageLabel->width();
-    mousePressPoint.ry() = (pt.y() * 1.0f) / imageLabel->height();
+    mousePressPoint.rx() = (pt.x() * 1.0f) / m_imageLabel->width();
+    mousePressPoint.ry() = (pt.y() * 1.0f) / m_imageLabel->height();
 
     setShowCoord(rect.contains(pt));
 }
@@ -437,14 +437,14 @@ void DepthRenderWidget2D::onPainterInfos(OutputData2D outputData)
     // draw point information
     if (isShowCoord)
     {
-        painter.setPen(QPen(Qt::yellow, 2));
-        QPoint p = QPoint(mousePressPoint.x() * imageLabel->width(), mousePressPoint.y() * imageLabel->height());
-        painter.drawLine(p.x(), p.y() - 2, p.x(), p.y() - 5);
-        painter.drawLine(p.x(), p.y() + 2, p.x(), p.y() + 5);
-        painter.drawLine(p.x() - 2, p.y(), p.x() - 5, p.y());
-        painter.drawLine(p.x() + 2, p.y(), p.x() + 5, p.y());
+        m_painter.setPen(QPen(Qt::yellow, 2));
+        QPoint p = QPoint(mousePressPoint.x() * m_imageLabel->width(), mousePressPoint.y() * m_imageLabel->height());
+        m_painter.drawLine(p.x(), p.y() - 2, p.x(), p.y() - 5);
+        m_painter.drawLine(p.x(), p.y() + 2, p.x(), p.y() + 5);
+        m_painter.drawLine(p.x() - 2, p.y(), p.x() - 5, p.y());
+        m_painter.drawLine(p.x() + 2, p.y(), p.x() + 5, p.y());
 
-        painter.setPen(QPen(Qt::yellow, 1));
+        m_painter.setPen(QPen(Qt::yellow, 1));
         //QFont font;
         //font.setPointSizeF(12);
         //painter.setFont(font);
@@ -458,10 +458,10 @@ void DepthRenderWidget2D::onPainterInfos(OutputData2D outputData)
             .arg(QString::number(v.z(), 'f', 2))
             .arg(QString::number(depthScale, 'f', 3));
 
-        QRect rect = imageLabel->rect();
+        QRect rect = m_imageLabel->rect();
         rect.adjust(10, 0, 0, -10);
 
-        painter.drawText(rect, Qt::AlignLeft | Qt::AlignBottom, text);
+        m_painter.drawText(rect, Qt::AlignLeft | Qt::AlignBottom, text);
     }
 }
 void DepthRenderWidget2D::onRoiEditStateChanged(bool edit, QRectF rect)
@@ -497,6 +497,6 @@ void DepthRenderWidget2D::updateImageSize()
 {
     RenderWidget2D::updateImageSize();
 
-    QRect imageAreaRect = imageArea->geometry();
+    QRect imageAreaRect = m_imageArea->geometry();
     roiWidget->setGeometry(imageAreaRect);
 }

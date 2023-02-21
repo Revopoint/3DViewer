@@ -40,19 +40,19 @@ using namespace cs::parameter;
 
 HDRSettingsDialog::HDRSettingsDialog(CSParaWidget* hdrMode, CSParaWidget* hdrLevel, CSParaWidget* hdrSettings, QWidget* parent)
     : QDialog(parent)
-    , hdrModeWidget(hdrMode)
-    , hdrLevelWidget(hdrLevel)
-    , hdrTableWidget(hdrSettings)
-    , hdrMeterButton(new QPushButton(tr("Refresh"), this))
-    , hdrOkButton(new QPushButton(tr("OK"), this))
-    , circleProgressBar(new CSProgressBar(this))
+    , m_hdrModeWidget(hdrMode)
+    , m_hdrLevelWidget(hdrLevel)
+    , m_hdrTableWidget(hdrSettings)
+    , m_hdrMeterButton(new QPushButton(tr("Refresh"), this))
+    , m_hdrOkButton(new QPushButton(tr("OK"), this))
+    , m_circleProgressBar(new CSProgressBar(this))
 {
     setWindowTitle(tr("HDR Setting"));
     setWindowFlags(Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
     resize(400, 520);
     setModal(true);
 
-    auto widgets = { hdrModeWidget, hdrLevelWidget, hdrTableWidget };
+    auto widgets = { m_hdrModeWidget, m_hdrLevelWidget, m_hdrTableWidget };
     for (auto widget : widgets)
     {
         widget->setParent(this);
@@ -81,34 +81,34 @@ void HDRSettingsDialog::resizeEvent(QResizeEvent* event)
 void HDRSettingsDialog::updateProgressPosition()
 {
     QPoint globalPos = this->mapToGlobal(QPoint(0, 0));
-    int x = globalPos.x() + (width() / 2) - circleProgressBar->width() / 2;
-    int y = globalPos.y() + (height() / 2) - circleProgressBar->height() / 2;
-    circleProgressBar->setGeometry(x, y, circleProgressBar->width(), circleProgressBar->height());
+    int x = globalPos.x() + (width() / 2) - m_circleProgressBar->width() / 2;
+    int y = globalPos.y() + (height() / 2) - m_circleProgressBar->height() / 2;
+    m_circleProgressBar->setGeometry(x, y, m_circleProgressBar->width(), m_circleProgressBar->height());
 }
 
 void HDRSettingsDialog::initDialog()
 {
-    circleProgressBar->resize(100, 100);
+    m_circleProgressBar->resize(100, 100);
 
     QVBoxLayout* rootLayout = new QVBoxLayout(this);
     rootLayout->setSpacing(10);
     rootLayout->setContentsMargins(10, 15, 10, 15);
 
-    rootLayout->addWidget(hdrModeWidget);
-    rootLayout->addWidget(hdrLevelWidget);
+    rootLayout->addWidget(m_hdrModeWidget);
+    rootLayout->addWidget(m_hdrLevelWidget);
 
     QHBoxLayout* hLayout = new QHBoxLayout();
-    hLayout->addWidget(hdrMeterButton);
+    hLayout->addWidget(m_hdrMeterButton);
     hLayout->setContentsMargins(20, 0, 20, 0);
     rootLayout->addItem(hLayout);
 
-    hdrMeterButton->setProperty("isCSStyle", true);
-    hdrOkButton->setProperty("isCSStyle", true);
+    m_hdrMeterButton->setProperty("isCSStyle", true);
+    m_hdrOkButton->setProperty("isCSStyle", true);
 
-    rootLayout->addWidget(hdrTableWidget);
+    rootLayout->addWidget(m_hdrTableWidget);
 
     QHBoxLayout* hLayout2 = new QHBoxLayout();
-    hLayout2->addWidget(hdrOkButton);
+    hLayout2->addWidget(m_hdrOkButton);
     hLayout2->setContentsMargins(20, 0, 20, 0);
     rootLayout->addItem(hLayout2);
 }
@@ -116,19 +116,19 @@ void HDRSettingsDialog::initDialog()
 void HDRSettingsDialog::initConnections()
 {
     bool suc = true;
-    suc &= (bool)connect(hdrMeterButton, &QPushButton::clicked, this, &HDRSettingsDialog::refreshHdrSetting);
-    suc &= (bool)connect(hdrOkButton, &QPushButton::clicked, this, &HDRSettingsDialog::updateHdrSetting);
+    suc &= (bool)connect(m_hdrMeterButton, &QPushButton::clicked, this, &HDRSettingsDialog::refreshHdrSetting);
+    suc &= (bool)connect(m_hdrOkButton, &QPushButton::clicked, this, &HDRSettingsDialog::updateHdrSetting);
 
     suc &= (bool)connect(this, &HDRSettingsDialog::progressStateChanged, this, [=](bool active) 
         {
             if (active)
             {
                 updateProgressPosition();
-                circleProgressBar->open();
+                m_circleProgressBar->open();
             }
             else 
             {
-                circleProgressBar->close();
+                m_circleProgressBar->close();
             }
         });
 
@@ -141,29 +141,29 @@ void HDRSettingsDialog::onHdrModeChanged(int mode)
     switch (hdrMode)
     {
     case HDR_MODE_CLOSE:
-        hdrLevelWidget->setEnabled(false);
-        hdrTableWidget->setEnabled(false);
-        hdrMeterButton->setEnabled(false);
-        hdrOkButton->setEnabled(false);
+        m_hdrLevelWidget->setEnabled(false);
+        m_hdrTableWidget->setEnabled(false);
+        m_hdrMeterButton->setEnabled(false);
+        m_hdrOkButton->setEnabled(false);
         break;
     case HDR_MODE_MANUAL:
-        hdrTableWidget->setEnabled(true);
-        hdrLevelWidget->setEnabled(true);
-        hdrMeterButton->setEnabled(false);
-        hdrOkButton->setEnabled(true);
+        m_hdrTableWidget->setEnabled(true);
+        m_hdrLevelWidget->setEnabled(true);
+        m_hdrMeterButton->setEnabled(false);
+        m_hdrOkButton->setEnabled(true);
         break;
     default:
-        hdrTableWidget->setEnabled(false);
-        hdrLevelWidget->setEnabled(true);
-        hdrMeterButton->setEnabled(true);
-        hdrOkButton->setEnabled(false);
+        m_hdrTableWidget->setEnabled(false);
+        m_hdrLevelWidget->setEnabled(true);
+        m_hdrMeterButton->setEnabled(true);
+        m_hdrOkButton->setEnabled(false);
         break;
     }
 }
 
 void HDRSettingsDialog::onTranslate()
 {
-    hdrMeterButton->setText(tr("Refresh"));
-    hdrOkButton->setText(tr("OK"));
+    m_hdrMeterButton->setText(tr("Refresh"));
+    m_hdrOkButton->setText(tr("OK"));
     setWindowTitle(tr("HDR Setting"));
 }

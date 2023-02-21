@@ -55,7 +55,7 @@ private:
     bool isNetConnect(QString info);
     void addListWidgetItem(const QString& text);
 private:
-    Ui::CameraListWidget* ui;
-    CSTextImageButton* topItemButton;
+    Ui::CameraListWidget* m_ui;
+    CSTextImageButton* m_topItemButton;
 };
 #endif // _CS_CAMERALISTWIDGET_H

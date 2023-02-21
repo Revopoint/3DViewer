@@ -35,8 +35,8 @@ public:
 private:
 
 private:
-    QTimer timer;
-    int startAngle;
+    QTimer m_timer;
+    int m_startAngle;
 };
 
 #endif  // _CS_CSPROGRESSBAR_H

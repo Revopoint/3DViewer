@@ -25,43 +25,43 @@ OutputDataPort::OutputDataPort()
 }
 
 OutputDataPort::OutputDataPort(const FrameData& frameData)
-    : frameData(frameData)
+    : m_frameData(frameData)
 {
 
 }
 
 OutputDataPort::OutputDataPort(const OutputDataPort& other)
 {
-    outputData2DMap = other.outputData2DMap;
-    pointCloud = other.pointCloud;
-    frameData = other.frameData;
+    m_outputData2DMap = other.m_outputData2DMap;
+    m_pointCloud = other.m_pointCloud;
+    m_frameData = other.m_frameData;
 }
 
 OutputDataPort::~OutputDataPort()
 {
-    outputData2DMap.clear();
+    m_outputData2DMap.clear();
 }
 
 bool OutputDataPort::isEmpty() const
 {
-    return !hasData(CAMERA_DATA_POINT_CLOUD) && outputData2DMap.isEmpty();
+    return !hasData(CAMERA_DATA_POINT_CLOUD) && m_outputData2DMap.isEmpty();
 }
 
 bool OutputDataPort::hasData(CS_CAMERA_DATA_TYPE dataType) const
 {
     if (dataType == CAMERA_DATA_POINT_CLOUD)
     {
-        return pointCloud.size() > 0;
+        return m_pointCloud.size() > 0;
     }
     else 
     {
-        return outputData2DMap.contains(dataType);
+        return m_outputData2DMap.contains(dataType);
     }
 }
 
 cs::Pointcloud OutputDataPort::getPointCloud()
 {
-    return pointCloud;
+    return m_pointCloud;
 }
 
 OutputData2D OutputDataPort::getOutputData2D(CS_CAMERA_DATA_TYPE dataType)
@@ -71,28 +71,28 @@ OutputData2D OutputDataPort::getOutputData2D(CS_CAMERA_DATA_TYPE dataType)
         return OutputData2D();
     }
 
-    return outputData2DMap[dataType];
+    return m_outputData2DMap[dataType];
 }
 
 QMap<CS_CAMERA_DATA_TYPE, OutputData2D> OutputDataPort::getOutputData2Ds()
 {
-    return outputData2DMap;
+    return m_outputData2DMap;
 }
 
 FrameData OutputDataPort::getFrameData() const
 {
-    return frameData;
+    return m_frameData;
 }
 
 void OutputDataPort::setPointCloud(const cs::Pointcloud& pointCloud)
 {
-    this->pointCloud = pointCloud;
+    this->m_pointCloud = pointCloud;
 }
 
 void OutputDataPort::addOutputData2D(const OutputData2D& outputData2D)
 {
     CS_CAMERA_DATA_TYPE dataType = (CS_CAMERA_DATA_TYPE)outputData2D.info.cameraDataType;
-    outputData2DMap[dataType] = outputData2D;
+    m_outputData2DMap[dataType] = outputData2D;
 }
 
 void OutputDataPort::addOutputData2D(const QVector<OutputData2D>& outputData2Ds)
@@ -105,5 +105,5 @@ void OutputDataPort::addOutputData2D(const QVector<OutputData2D>& outputData2Ds)
 
 void OutputDataPort::setFrameData(const FrameData& frameData)
 {
-    this->frameData = frameData;
+    this->m_frameData = frameData;
 }

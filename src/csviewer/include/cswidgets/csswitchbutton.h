@@ -37,7 +37,7 @@ public:
 private slots:
     void onButtonToggled(bool checked);
 private:
-    QLabel* titleLabel;
-    QPushButton* button;
+    QLabel* m_titleLabel;
+    QPushButton* m_button;
 };
 #endif //_CS_CSSWITCHBUTTON_H

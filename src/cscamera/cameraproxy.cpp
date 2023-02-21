@@ -30,8 +30,8 @@ CameraProxy::CameraProxy()
 
 CameraProxy::~CameraProxy()
 {
-    if (csCamera) {
-        delete csCamera;
+    if (m_csCamera) {
+        delete m_csCamera;
     }
 
     qDebug() << "~CameraProxy";
@@ -39,26 +39,26 @@ CameraProxy::~CameraProxy()
 
 bool CameraProxy::startStream()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->startStream();
+        result = m_csCamera->startStream();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 bool CameraProxy::stopStream()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->stopStream();
+        result = m_csCamera->stopStream();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
@@ -66,91 +66,91 @@ bool CameraProxy::stopStream()
 bool CameraProxy::restartStream()
 {
     bool result = true;
-    lock.lockForRead();
+    m_lock.lockForRead();
 
-    if (csCamera)
+    if (m_csCamera)
     {
-        result =  csCamera->restartStream();
+        result =  m_csCamera->restartStream();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 bool CameraProxy::restartCamera()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->restartCamera();
+        result = m_csCamera->restartCamera();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 bool CameraProxy::disconnectCamera()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->disconnectCamera();
+        result = m_csCamera->disconnectCamera();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return true;
 }
 
 bool CameraProxy::reconnectCamera()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->reconnectCamera();
+        result = m_csCamera->reconnectCamera();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return true;
 }
 
 bool CameraProxy::pauseStream()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->pauseStream();
+        result = m_csCamera->pauseStream();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 bool CameraProxy::resumeStream()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->resumeStream();
+        result = m_csCamera->resumeStream();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 bool CameraProxy::softTrigger()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     bool result = false;
-    if (csCamera)
+    if (m_csCamera)
     {
-        result = csCamera->softTrigger();
+        result = m_csCamera->softTrigger();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
@@ -159,40 +159,40 @@ void CameraProxy::bindCamera(ICSCamera* camera)
 {
     unBindCamera();
 
-    lock.lockForWrite();
-    csCamera = camera;
+    m_lock.lockForWrite();
+    m_csCamera = camera;
 
     bool suc = true;
-    suc &= (bool)connect(csCamera, &ICSCamera::cameraStateChanged,         this, &ICSCamera::cameraStateChanged);
-    suc &= (bool)connect(csCamera, &ICSCamera::framedDataUpdated,          this, &ICSCamera::framedDataUpdated,          Qt::DirectConnection);
-    suc &= (bool)connect(csCamera, &ICSCamera::cameraParaUpdated,          this, &ICSCamera::cameraParaUpdated,          Qt::QueuedConnection);
-    suc &= (bool)connect(csCamera, &ICSCamera::cameraParaRangeUpdated,     this, &ICSCamera::cameraParaRangeUpdated,     Qt::QueuedConnection);
-    suc &= (bool)connect(csCamera, &ICSCamera::cameraParaItemsUpdated,     this, &ICSCamera::cameraParaItemsUpdated,     Qt::QueuedConnection);
+    suc &= (bool)connect(m_csCamera, &ICSCamera::cameraStateChanged,         this, &ICSCamera::cameraStateChanged);
+    suc &= (bool)connect(m_csCamera, &ICSCamera::framedDataUpdated,          this, &ICSCamera::framedDataUpdated,          Qt::DirectConnection);
+    suc &= (bool)connect(m_csCamera, &ICSCamera::cameraParaUpdated,          this, &ICSCamera::cameraParaUpdated,          Qt::QueuedConnection);
+    suc &= (bool)connect(m_csCamera, &ICSCamera::cameraParaRangeUpdated,     this, &ICSCamera::cameraParaRangeUpdated,     Qt::QueuedConnection);
+    suc &= (bool)connect(m_csCamera, &ICSCamera::cameraParaItemsUpdated,     this, &ICSCamera::cameraParaItemsUpdated,     Qt::QueuedConnection);
 
     Q_ASSERT(suc);
-    lock.unlock();
+    m_lock.unlock();
 }
 
 void CameraProxy::unBindCamera()
 {
-    lock.lockForWrite();
-    if (csCamera)
+    m_lock.lockForWrite();
+    if (m_csCamera)
     {
-        delete csCamera;
-        csCamera = nullptr;
+        delete m_csCamera;
+        m_csCamera = nullptr;
     }
-    lock.unlock();
+    m_lock.unlock();
 }
 
 CSCameraInfo CameraProxy::getCameraInfo() const
 {
     CSCameraInfo info = { "", 0, {"", "", "", "", ""}, "" };
-    lock.lockForRead();
-    if (csCamera)
+    m_lock.lockForRead();
+    if (m_csCamera)
     {
-        info = csCamera->getCameraInfo();
+        info = m_csCamera->getCameraInfo();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return info;
 }
@@ -201,52 +201,52 @@ int CameraProxy::getCameraState() const
 {
     int result = -1;
 
-    lock.lockForRead();
-    if (csCamera)
+    m_lock.lockForRead();
+    if (m_csCamera)
     {
-        result = csCamera->getCameraState();
+        result = m_csCamera->getCameraState();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     return result;
 }
 
 void CameraProxy::getCameraPara(CAMERA_PARA_ID paraId, QVariant& value)
 {
-    lock.lockForRead();
-    if (csCamera)
+    m_lock.lockForRead();
+    if (m_csCamera)
     {
-        csCamera->getCameraPara(paraId, value);
+        m_csCamera->getCameraPara(paraId, value);
     }
-    lock.unlock();
+    m_lock.unlock();
 }
 
 void CameraProxy::setCameraPara(CAMERA_PARA_ID paraId, QVariant value)
 {
-    lock.lockForRead();
-    if (csCamera)
+    m_lock.lockForRead();
+    if (m_csCamera)
     {
-        csCamera->setCameraPara(paraId, value);
+        m_csCamera->setCameraPara(paraId, value);
     }
-    lock.unlock();
+    m_lock.unlock();
 }
 
 void CameraProxy::getCameraParaRange(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step)
 {
-    lock.lockForRead();
-    if (csCamera)
+    m_lock.lockForRead();
+    if (m_csCamera)
     {
-        csCamera->getCameraParaRange(paraId, min, max, step);
+        m_csCamera->getCameraParaRange(paraId, min, max, step);
     }
-    lock.unlock();
+    m_lock.unlock();
 }
 
 void CameraProxy::getCameraParaItems(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& list)
 {
-    lock.lockForRead();
-    if (csCamera)
+    m_lock.lockForRead();
+    if (m_csCamera)
     {
-        csCamera->getCameraParaItems(paraId, list);
+        m_csCamera->getCameraParaItems(paraId, list);
     }
-    lock.unlock();
+    m_lock.unlock();
 }

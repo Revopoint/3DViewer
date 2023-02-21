@@ -26,20 +26,20 @@
 CSTextImageButton::CSTextImageButton(const QIcon& icon, const char* text, Qt::LayoutDirection layoutDirection, QWidget* parent)
     : QPushButton(parent)
     , layoutDirection(layoutDirection)
-    , icon(icon)
-    , buttonTitle(text)
+    , m_icon(icon)
+    , m_buttonTitle(text)
 {
     setCheckable(true);
     initButton();
 
-    buttonText->setProperty("ButtonTitle", true);
+    m_buttonText->setProperty("ButtonTitle", true);
 }
 
 void CSTextImageButton::retranslate(const char* context)
 {
-    if (strlen(buttonTitle) > 0)
+    if (strlen(m_buttonTitle) > 0)
     {
-        buttonText->setText(QApplication::translate(context, buttonTitle));
+        m_buttonText->setText(QApplication::translate(context, m_buttonTitle));
     }
 }
 
@@ -49,35 +49,35 @@ void CSTextImageButton::initButton()
     layout->setSpacing(0);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    buttonText = new QLabel(tr(buttonTitle), this);
-    buttonIcon = new QLabel(this);
+    m_buttonText = new QLabel(tr(m_buttonTitle), this);
+    m_buttonIcon = new QLabel(this);
 
-    auto size = icon.availableSizes().first();
-    buttonIcon->setFixedSize(size);
-    buttonIcon->setPixmap(icon.pixmap(size));
+    auto size = m_icon.availableSizes().first();
+    m_buttonIcon->setFixedSize(size);
+    m_buttonIcon->setPixmap(m_icon.pixmap(size));
 
     if (layoutDirection == Qt::LeftToRight)
     {
-        layout->addWidget(buttonText);
+        layout->addWidget(m_buttonText);
         layout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-        layout->addWidget(buttonIcon);
+        layout->addWidget(m_buttonIcon);
     }
     else 
     {
-        layout->addWidget(buttonIcon);
+        layout->addWidget(m_buttonIcon);
         layout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
-        layout->addWidget(buttonText);
+        layout->addWidget(m_buttonText);
     }
 
     connect(this, &QPushButton::toggled, [=](bool checked) 
         {
             if (checked)
             {
-                buttonIcon->setPixmap(icon.pixmap(size, QIcon::Selected, QIcon::On));
+                m_buttonIcon->setPixmap(m_icon.pixmap(size, QIcon::Selected, QIcon::On));
             }
             else 
             {
-                buttonIcon->setPixmap(icon.pixmap(size));
+                m_buttonIcon->setPixmap(m_icon.pixmap(size));
             }
         });
 }

@@ -26,11 +26,11 @@
 
 AppConfig::AppConfig()
 {
-    settings = new QSettings(CONFIG_SAVE_PATH, QSettings::IniFormat, this);
+    m_settings = new QSettings(CONFIG_SAVE_PATH, QSettings::IniFormat, this);
 
-    language = settings->value("language", "en").toString();
-    defaultSavePath = settings->value("defaultSavePath", QDir::homePath()).toString();
-    autoNameWhenCaptring = settings->value("autoNameWhenCapturing", false).toBool();
+    m_language = m_settings->value("language", "en").toString();
+    m_defaultSavePath = m_settings->value("defaultSavePath", QDir::homePath()).toString();
+    m_autoNameWhenCaptring = m_settings->value("autoNameWhenCapturing", false).toBool();
 }
 
 AppConfig::~AppConfig()
@@ -40,41 +40,41 @@ AppConfig::~AppConfig()
 
 void AppConfig::setLanguage(QString lan)
 {
-    language = lan;
+    m_language = lan;
     save();
 }
 
 void AppConfig::setDefaultSavePath(QString path)
 {
-    defaultSavePath = path;
+    m_defaultSavePath = path;
     save();
 }
 
 QString AppConfig::getLanguage() const
 {
-    return language;
+    return m_language;
 }
 
 QString AppConfig::getDefaultSavePath() const
 {
-    return defaultSavePath;
+    return m_defaultSavePath;
 }
 
 void AppConfig::save()
 {
-    settings->setValue("language", language);
-    settings->setValue("defaultSavePath", defaultSavePath);
-    settings->setValue("autoNameWhenCapturing", autoNameWhenCaptring);
-    settings->sync();
+    m_settings->setValue("language", m_language);
+    m_settings->setValue("defaultSavePath", m_defaultSavePath);
+    m_settings->setValue("autoNameWhenCapturing", m_autoNameWhenCaptring);
+    m_settings->sync();
 }
 
 void AppConfig::setAutoNameWhenCapturing(bool autoName)
 {
-    autoNameWhenCaptring = autoName;
+    m_autoNameWhenCaptring = autoName;
     save();
 }
 
 bool AppConfig::getAutoNameWhenCapturing() const
 {
-    return autoNameWhenCaptring;
+    return m_autoNameWhenCaptring;
 }

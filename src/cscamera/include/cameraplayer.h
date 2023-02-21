@@ -70,12 +70,12 @@ private:
 
 private:
 
-    CapturedZipParser* zipParser = nullptr;
-    int currentFrame = 0;
-    QVector<int> currentDataTypes;
-    bool show3dTexture = true;
+    CapturedZipParser* m_zipParser = nullptr;
+    int m_currentFrame = 0;
+    QVector<int> m_currentDataTypes;
+    bool m_show3dTexture = true;
 
-    QReadWriteLock lock;
+    QReadWriteLock m_lock;
 };
 }
 #endif //_CS_CAMERA_PLAYER_H

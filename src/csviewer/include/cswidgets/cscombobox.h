@@ -46,12 +46,12 @@ public:
 private slots:
     void onComboBoxIndexChanged(int index);
 private:
-    CustomComboBox* comboBox;
-    QLabel* titleLabel;
-    int lastIndex;
+    CustomComboBox* m_comboBox;
+    QLabel* m_titleLabel;
+    int m_lastIndex;
 
-    QPushButton* tipsButton = nullptr;
-    const char* tips;
+    QPushButton* m_tipsButton = nullptr;
+    const char* m_tips;
 };
 
 #endif // _CS_CSCOMBOBOX_H

@@ -31,21 +31,21 @@ using namespace cs;
 #define RESTART_CAMERA_TIME_OUT (120 * 1000) //ms 
 
 CameraThread::CameraThread()
-    : cameraProxy(std::make_shared<CameraProxy>())
+    : m_cameraProxy(std::make_shared<CameraProxy>())
 {
     setObjectName("CameraThread");
     moveToThread(this);
-    cameraProxy->moveToThread(this);
+    m_cameraProxy->moveToThread(this);
 
     initConnections();
 
     // restart camera timer
-    cameraRestartTimer.moveToThread(this);
-    cameraRestartTimer.setSingleShot(true);
-    cameraRestartTimer.setInterval(RESTART_CAMERA_TIME_OUT);
+    m_cameraRestartTimer.moveToThread(this);
+    m_cameraRestartTimer.setSingleShot(true);
+    m_cameraRestartTimer.setInterval(RESTART_CAMERA_TIME_OUT);
 
     bool suc = true;
-    suc &= (bool)connect(&cameraRestartTimer, &QTimer::timeout, this, &CameraThread::onRestartCameraTimeout);
+    suc &= (bool)connect(&m_cameraRestartTimer, &QTimer::timeout, this, &CameraThread::onRestartCameraTimeout);
     Q_ASSERT(suc);
 }
 
@@ -54,7 +54,7 @@ CameraThread::~CameraThread()
     CSCamera::setCameraChangeCallback(nullptr, nullptr);
     CSCamera::setCameraAlarmCallback(nullptr, nullptr);
 
-    disconnect(cameraProxy.get(), &CameraProxy::cameraStateChanged, this, &CameraThread::cameraStateChanged);
+    disconnect(m_cameraProxy.get(), &CameraProxy::cameraStateChanged, this, &CameraThread::cameraStateChanged);
     disconnect(this, &CameraThread::cameraStateChanged, this, &CameraThread::onCameraStateChanged);
     disconnect(this, &CameraThread::reconnectCamera, this, &CameraThread::onReconnectCamera);
 
@@ -76,12 +76,12 @@ void CameraThread::onCameraAlarm(const char* jsonData, int iDataLen, void* userD
 
 std::shared_ptr<ICSCamera> CameraThread::getCamera() const
 {
-    return cameraProxy;
+    return m_cameraProxy;
 }
 
 void CameraThread::updateCameraInfoList(const std::vector<CameraInfo>& added, const std::vector<CameraInfo>& removed)
 {
-    lock.lockForWrite();
+    m_lock.lockForWrite();
 
     if (removed.size() > 0)
     {
@@ -93,7 +93,7 @@ void CameraThread::updateCameraInfoList(const std::vector<CameraInfo>& added, co
         onAddCameras(added);
     }
 
-    lock.unlock();
+    m_lock.unlock();
 
     notifyCameraListUpdated();
 }
@@ -102,9 +102,9 @@ void CameraThread::onAddCameras(const std::vector<CameraInfo>& added)
 {
     for (const auto& info : added)
     {
-        auto it = cameraInfoList.begin();
+        auto it = m_cameraInfoList.begin();
         bool contains = false;
-        while (it != cameraInfoList.end())
+        while (it != m_cameraInfoList.end())
         {
             if (std::string(info.serial) == std::string((*it).serial))
             {
@@ -115,13 +115,13 @@ void CameraThread::onAddCameras(const std::vector<CameraInfo>& added)
 
         if (!contains)
         {
-            cameraInfoList.push_back(info);
+            m_cameraInfoList.push_back(info);
 
             //connect camera
-            const int state = cameraProxy->getCameraState();
+            const int state = m_cameraProxy->getCameraState();
             if (state == CAMERA_RESTARTING_CAMERA) 
             {
-                auto curInfo = cameraProxy->getCameraInfo().cameraInfo;
+                auto curInfo = m_cameraProxy->getCameraInfo().cameraInfo;
                 if (std::string(info.serial) == std::string(curInfo.serial))
                 {
                     qInfo() << "onAddCameras, try to connect camera, serial = " << info.serial;
@@ -136,22 +136,22 @@ void CameraThread::onRemoveCameras(const std::vector<CameraInfo>& removed)
 {
     for (const auto& info : removed)
     {
-        auto it = cameraInfoList.begin();
-        while (it != cameraInfoList.end())
+        auto it = m_cameraInfoList.begin();
+        while (it != m_cameraInfoList.end())
         {
             if (std::string(info.serial) == std::string((*it).serial))
             {
-                it = cameraInfoList.erase(it);
+                it = m_cameraInfoList.erase(it);
             }
             else
             {
                 ++it;
             }
 
-            CameraInfo curInfo = cameraProxy->getCameraInfo().cameraInfo;
+            CameraInfo curInfo = m_cameraProxy->getCameraInfo().cameraInfo;
             if (std::string(info.serial) == std::string(curInfo.serial))
             {
-                const int state = cameraProxy->getCameraState();
+                const int state = m_cameraProxy->getCameraState();
 
                 // do not unbind the camera when restart a camera manually
                 if (state != CAMERA_RESTARTING_CAMERA)
@@ -167,7 +167,7 @@ void CameraThread::onRemoveCameras(const std::vector<CameraInfo>& removed)
 void CameraThread::initConnections()
 {
     bool suc = true;
-    suc &= (bool)connect(cameraProxy.get(), &CameraProxy::cameraStateChanged, this, &CameraThread::cameraStateChanged);
+    suc &= (bool)connect(m_cameraProxy.get(), &CameraProxy::cameraStateChanged, this, &CameraThread::cameraStateChanged);
     suc &= (bool)connect(this, &CameraThread::cameraStateChanged, this, &CameraThread::onCameraStateChanged, Qt::QueuedConnection);
     suc &= (bool)connect(this, &CameraThread::reconnectCamera,    this, &CameraThread::onReconnectCamera,      Qt::QueuedConnection);
 
@@ -201,7 +201,7 @@ void CameraThread::run()
 void CameraThread::unBindCamera()
 {
     qInfo() << "try to unbind camera";
-    qobject_cast<CameraProxy*>(cameraProxy.get())->unBindCamera();
+    qobject_cast<CameraProxy*>(m_cameraProxy.get())->unBindCamera();
     qInfo() << "unbind camera end";
 
     emit cameraStateChanged(CAMERA_DISCONNECTED);
@@ -212,7 +212,7 @@ void CameraThread::bindCamera(CSCamera* camera)
     //bind thread
     camera->setCameraThread(this);
     //bind the camera to proxy
-    qobject_cast<CameraProxy*>(cameraProxy.get())->bindCamera(camera);
+    qobject_cast<CameraProxy*>(m_cameraProxy.get())->bindCamera(camera);
 }
 
 void CameraThread::onDisconnectCamera()
@@ -225,12 +225,12 @@ void CameraThread::onReconnectCamera()
 {
     qInfo() << "try to reconnect camera";
 
-    if (cameraProxy->reconnectCamera())
+    if (m_cameraProxy->reconnectCamera())
     {
         qInfo() << "reconnect camera success";
     }
 
-    cameraRestartTimer.stop();
+    m_cameraRestartTimer.stop();
 }
 
 // notify connect failed when time out
@@ -263,7 +263,7 @@ void CameraThread::onConnectCamera(QString info)
     }
 
     // 3. not to connect if already connected
-    QString curSerial = QString(cameraProxy->getCameraInfo().cameraInfo.serial);
+    QString curSerial = QString(m_cameraProxy->getCameraInfo().cameraInfo.serial);
     if (curSerial == realSerial)
     {
         qDebug() << "already connected, serial = " << realSerial;
@@ -273,16 +273,16 @@ void CameraThread::onConnectCamera(QString info)
     // 4. connecting
     emit cameraStateChanged(CAMERA_CONNECTING);
     qInfo() << "begin connect camera";
-    CSCamera* camera = new CSCamera();
-    if (!camera->connectCamera(cameraInfo))
+    CSCamera* m_camera = new CSCamera();
+    if (!m_camera->connectCamera(cameraInfo))
     {
-        camera->deleteLater();
+        m_camera->deleteLater();
         emit cameraStateChanged(CAMERA_CONNECTFAILED);
         return;
     }
 
     // 5. connect success, then bind the camera 
-    bindCamera(camera);
+    bindCamera(m_camera);
     emit cameraStateChanged(CAMERA_CONNECTED);
     qInfo() << "connect camera end";
 }
@@ -290,35 +290,35 @@ void CameraThread::onConnectCamera(QString info)
 void CameraThread::onRestartCamera()
 {
     qInfo() << "try to restart camera";
-    cameraProxy->restartCamera();
+    m_cameraProxy->restartCamera();
     qInfo() << "restart camera end";
 }
 
 void CameraThread::onStartStream()
 {
     qInfo() << "begin start stream";
-    cameraProxy->startStream();
+    m_cameraProxy->startStream();
     qInfo() << "start stream end";
 }
 
 void CameraThread::onStopStream()
 {
     qInfo() << "begin stop stream";
-    cameraProxy->stopStream();
+    m_cameraProxy->stopStream();
     qInfo() << "start stop end";
 }
 
 void CameraThread::onPausedStream()
 {
     qInfo() << "begin pause stream";
-    cameraProxy->pauseStream();
+    m_cameraProxy->pauseStream();
     qInfo() << "pause stream end";
 }
 
 void CameraThread::onResumeStream()
 {
     qInfo() << "begin resume stream";
-    cameraProxy->resumeStream();
+    m_cameraProxy->resumeStream();
     qInfo() << "resume stream end";
 }
 
@@ -334,7 +334,7 @@ void CameraThread::onCameraStateChanged(int state)
        break;
    case CAMERA_RESTARTING_CAMERA:
        qInfo() << "start restart camera timer.";
-       cameraRestartTimer.start();
+       m_cameraRestartTimer.start();
        break;
    default:
        break;
@@ -347,17 +347,17 @@ void CameraThread::onQueryCameras()
     std::vector<CameraInfo> cameras;
     CSCamera::queryCameras(cameras);
 
-    lock.lockForWrite();
+    m_lock.lockForWrite();
 
     // 2. if not connecting a camera, set find is true
-    auto curCameraSerial = QString(cameraProxy->getCameraInfo().cameraInfo.serial);
+    auto curCameraSerial = QString(m_cameraProxy->getCameraInfo().cameraInfo.serial);
     bool find = curCameraSerial.isEmpty();
 
     // 3. update cameraInfoList
-    cameraInfoList.clear();
+    m_cameraInfoList.clear();
     for (auto info : cameras)
     {
-        cameraInfoList.push_back(info);
+        m_cameraInfoList.push_back(info);
         // find connected camera
         if (!find && curCameraSerial == QString(info.serial))
         {
@@ -370,7 +370,7 @@ void CameraThread::onQueryCameras()
     {
         unBindCamera();
     }
-    lock.unlock();
+    m_lock.unlock();
 
     // 5. notify the camera list updated
     notifyCameraListUpdated();
@@ -378,8 +378,8 @@ void CameraThread::onQueryCameras()
 
 bool CameraThread::findCameraInfo(const QString& serial, CameraInfo& cameraInfo)
 {
-    QReadLocker locker(&lock);
-    for (const auto& info : cameraInfoList)
+    QReadLocker locker(&m_lock);
+    for (const auto& info : m_cameraInfoList)
     {
         if (QString(info.serial) == serial) {
             cameraInfo = info;
@@ -391,16 +391,16 @@ bool CameraThread::findCameraInfo(const QString& serial, CameraInfo& cameraInfo)
 
 void CameraThread::notifyCameraListUpdated()
 {
-    lock.lockForRead();
+    m_lock.lockForRead();
     // notify camera list updated
     QStringList infoList;
-    for (const auto& info : cameraInfoList)
+    for (const auto& info : m_cameraInfoList)
     {
         QString str = isNetConnect(info.uniqueId) ? (QString("%1(%2)").arg(info.serial).arg(info.uniqueId)): info.serial;
         infoList << str;
     }
 
-    lock.unlock();
+    m_lock.unlock();
     emit cameraListUpdated(infoList);
 }
 

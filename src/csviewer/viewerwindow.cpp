@@ -49,44 +49,44 @@
 
 ViewerWindow::ViewerWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::ViewerWindow)
-    , translator(new QTranslator(this))
-    , cameraInfoDialog(new CameraInfoDialog())
-    , circleProgressBar(new CSProgressBar(this))
-    , globalMessageBox(new CSMessageBox(this))
+    , m_ui(new Ui::ViewerWindow)
+    , m_translator(new QTranslator(this))
+    , m_cameraInfoDialog(new CameraInfoDialog())
+    , m_circleProgressBar(new CSProgressBar(this))
+    , m_globalMessageBox(new CSMessageBox(this))
 {
     // init translator
-    qApp->installTranslator(translator);
+    qApp->installTranslator(m_translator);
 
     // set ui
-    ui->setupUi(this);
+    m_ui->setupUi(this);
     // init widgets
     initWindow();
     // set up signal connections
     initConnections();
 
     // set language
-    language = (cs::CSApplication::getInstance()->getAppConfig()->getLanguage() == "zh") ? LANGUAGE_ZH : LANGUAGE_EN;
+    m_language = (cs::CSApplication::getInstance()->getAppConfig()->getLanguage() == "zh") ? LANGUAGE_ZH : LANGUAGE_EN;
 
-    ui->actionEnglish->setChecked(language == LANGUAGE_EN);
-    ui->actionChinese->setChecked(language == LANGUAGE_ZH);
+    m_ui->actionEnglish->setChecked(m_language == LANGUAGE_EN);
+    m_ui->actionChinese->setChecked(m_language == LANGUAGE_ZH);
 
     onLanguageChanged();
 }
 
 ViewerWindow::~ViewerWindow()
 {
-    qApp->removeTranslator(translator);
-    delete ui;
-    delete cameraInfoDialog;
-    if (cameraPlayerDialog)
+    qApp->removeTranslator(m_translator);
+    delete m_ui;
+    delete m_cameraInfoDialog;
+    if (m_cameraPlayerDialog)
     {
-        delete cameraPlayerDialog;
+        delete m_cameraPlayerDialog;
     }
 
-    if (formatConvertDialog)
+    if (m_formatConvertDialog)
     {
-        delete formatConvertDialog;
+        delete m_formatConvertDialog;
     }
 }
 
@@ -101,50 +101,50 @@ void ViewerWindow::initConnections()
     suc &= (bool)connect(qApp, &QApplication::aboutToQuit,               this, &ViewerWindow::onAboutToQuit);
     suc &= (bool)connect(this, &ViewerWindow::windowLayoutChanged,       app,  &cs::CSApplication::onWindowLayoutChanged, Qt::QueuedConnection);
 
-    suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::showMessage,        this, &ViewerWindow::onShowStatusBarMessage);
-    suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::roiStateChanged,    this, &ViewerWindow::onRoiEditStateChanged);
-    suc &= (bool)connect(ui->paraSettingWidget, &ParaSettingsWidget::showProgressBar,    this, &ViewerWindow::showProgressBar, Qt::QueuedConnection);
+    suc &= (bool)connect(m_ui->paraSettingWidget, &ParaSettingsWidget::showMessage,        this, &ViewerWindow::onShowStatusBarMessage);
+    suc &= (bool)connect(m_ui->paraSettingWidget, &ParaSettingsWidget::roiStateChanged,    this, &ViewerWindow::onRoiEditStateChanged);
+    suc &= (bool)connect(m_ui->paraSettingWidget, &ParaSettingsWidget::showProgressBar,    this, &ViewerWindow::showProgressBar, Qt::QueuedConnection);
 
     suc &= (bool)connect(this, &ViewerWindow::translateSignal,     this,                   &ViewerWindow::onTranslate,            Qt::QueuedConnection);
-    suc &= (bool)connect(this, &ViewerWindow::translateSignal,     ui->cameraListWidget,   &CameraListWidget::translateSignal,    Qt::QueuedConnection);
-    suc &= (bool)connect(this, &ViewerWindow::translateSignal,     ui->paraSettingWidget,  &ParaSettingsWidget::translateSignal,  Qt::QueuedConnection);
+    suc &= (bool)connect(this, &ViewerWindow::translateSignal,     m_ui->cameraListWidget,   &CameraListWidget::translateSignal,    Qt::QueuedConnection);
+    suc &= (bool)connect(this, &ViewerWindow::translateSignal,     m_ui->paraSettingWidget,  &ParaSettingsWidget::translateSignal,  Qt::QueuedConnection);
 
-    suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,           ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
-    suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,       ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
+    suc &= (bool)connect(this, &ViewerWindow::renderWindowUpdated,           m_ui->renderWindow,   &RenderWindow::onRenderWindowsUpdated);
+    suc &= (bool)connect(this, &ViewerWindow::windowLayoutModeUpdated,       m_ui->renderWindow,   &RenderWindow::onWindowLayoutModeUpdated);
 
-    suc &= (bool)connect(ui->renderWindow, &RenderWindow::roiRectFUpdated,   this,               &ViewerWindow::onRoiRectFUpdated);
-    suc &= (bool)connect(ui->renderWindow, &RenderWindow::renderExit,        this,               &ViewerWindow::onRenderExit, Qt::QueuedConnection);
+    suc &= (bool)connect(m_ui->renderWindow, &RenderWindow::roiRectFUpdated,   this,               &ViewerWindow::onRoiRectFUpdated);
+    suc &= (bool)connect(m_ui->renderWindow, &RenderWindow::renderExit,        this,               &ViewerWindow::onRenderExit, Qt::QueuedConnection);
 
     // menu
-    suc &= (bool)connect(ui->menuLanguage,            &QMenu::triggered,     this, &ViewerWindow::onUpdateLanguage);
-    suc &= (bool)connect(ui->actionRestartCamera,     &QAction::triggered,   this, &ViewerWindow::onTriggeredRestartCamera);
-    suc &= (bool)connect(ui->actionExit,              &QAction::triggered,   this, &ViewerWindow::onAppExit);
-    suc &= (bool)connect(ui->actionInfomation,        &QAction::triggered,   this, &ViewerWindow::onTriggeredInformation);
-    suc &= (bool)connect(ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
-    suc &= (bool)connect(ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
-    suc &= (bool)connect(ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
-    suc &= (bool)connect(ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
-    suc &= (bool)connect(ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
-    suc &= (bool)connect(ui->actionManual,            &QAction::triggered,   this, &ViewerWindow::onTriggeredManual);
-    suc &= (bool)connect(ui->actionGithub,            &QAction::triggered,   this, &ViewerWindow::onTriggeredGithub);
-    suc &= (bool)connect(ui->actionWebSite,           &QAction::triggered,   this, &ViewerWindow::onTriggeredWebsite);
-    suc &= (bool)connect(ui->actionAbout,             &QAction::triggered,   this, &ViewerWindow::onTriggeredAbout);
+    suc &= (bool)connect(m_ui->menuLanguage,            &QMenu::triggered,     this, &ViewerWindow::onUpdateLanguage);
+    suc &= (bool)connect(m_ui->actionRestartCamera,     &QAction::triggered,   this, &ViewerWindow::onTriggeredRestartCamera);
+    suc &= (bool)connect(m_ui->actionExit,              &QAction::triggered,   this, &ViewerWindow::onAppExit);
+    suc &= (bool)connect(m_ui->actionInfomation,        &QAction::triggered,   this, &ViewerWindow::onTriggeredInformation);
+    suc &= (bool)connect(m_ui->actionOpenLogDir,        &QAction::triggered,   this, &ViewerWindow::onTriggeredLogDir);
+    suc &= (bool)connect(m_ui->actionsetDefaultSaveDir, &QAction::triggered,   this, &ViewerWindow::onTriggeredDefaultSavePath);
+    suc &= (bool)connect(m_ui->actionIpSetting,         &QAction::triggered,   this, &ViewerWindow::onTriggeredIpSetting);
+    suc &= (bool)connect(m_ui->actionplayFile,          &QAction::triggered,   this, &ViewerWindow::onTriggeredLoadFile);
+    suc &= (bool)connect(m_ui->actionConvertDepth2PC,   &QAction::triggered,   this, &ViewerWindow::onTriggeredFormatConvert);
+    suc &= (bool)connect(m_ui->actionManual,            &QAction::triggered,   this, &ViewerWindow::onTriggeredManual);
+    suc &= (bool)connect(m_ui->actionGithub,            &QAction::triggered,   this, &ViewerWindow::onTriggeredGithub);
+    suc &= (bool)connect(m_ui->actionWebSite,           &QAction::triggered,   this, &ViewerWindow::onTriggeredWebsite);
+    suc &= (bool)connect(m_ui->actionAbout,             &QAction::triggered,   this, &ViewerWindow::onTriggeredAbout);
 
-    suc &= (bool)connect(ui->actionTile,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTile);
-    suc &= (bool)connect(ui->actionTabs,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTabs);
+    suc &= (bool)connect(m_ui->actionTile,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTile);
+    suc &= (bool)connect(m_ui->actionTabs,              &QAction::triggered,   this, &ViewerWindow::onTriggeredWindowsTabs);
 
-    suc &= (bool)connect(ui->menuViews,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
-    suc &= (bool)connect(ui->menuAutoNameWhenCapturuing, &QMenu::triggered, this, &ViewerWindow::onAutoNameMenuTriggered);
+    suc &= (bool)connect(m_ui->menuViews,  &QMenu::triggered,   this, &ViewerWindow::onWindowsMenuTriggered);
+    suc &= (bool)connect(m_ui->menuAutoNameWhenCapturuing, &QMenu::triggered, this, &ViewerWindow::onAutoNameMenuTriggered);
 
     suc &= (bool)connect(this, &ViewerWindow::showProgressBar, this, [=](bool show) 
         {
             if (show)
             {
-                circleProgressBar->open();
+                m_circleProgressBar->open();
             }
             else 
             {
-                circleProgressBar->close();
+                m_circleProgressBar->close();
             }
         });
 
@@ -158,16 +158,16 @@ void ViewerWindow::initWindow()
     setWindowTitle(title);
     showMaximized();
 
-    ui->actionEnglish->setChecked(language == LANGUAGE_EN);
-    ui->actionChinese->setChecked(language == LANGUAGE_ZH);
+    m_ui->actionEnglish->setChecked(m_language == LANGUAGE_EN);
+    m_ui->actionChinese->setChecked(m_language == LANGUAGE_ZH);
 
     auto config = cs::CSApplication::getInstance()->getAppConfig();
     QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
-    ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+    m_ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 
     bool autoName = config->getAutoNameWhenCapturing();
-    ui->actionOff->setChecked(!autoName);
-    ui->actionOn->setChecked(autoName);
+    m_ui->actionOff->setChecked(!autoName);
+    m_ui->actionOn->setChecked(autoName);
 }
 
 void ViewerWindow::onRenderPageChanged(int idx)
@@ -182,42 +182,42 @@ void ViewerWindow::onCameraStateChanged(int state)
     {
     case CAMERA_CONNECTING:
     case CAMERA_RESTARTING_CAMERA:
-        ui->menuCamera->setEnabled(false);
+        m_ui->menuCamera->setEnabled(false);
     case CAMERA_STARTING_STREAM:
     case CAMERA_STOPPING_STREAM:
     case CAMERA_DISCONNECTING:
-        circleProgressBar->open();
+        m_circleProgressBar->open();
         break;
     
     case CAMERA_CONNECTED:
     {
-        ui->menuCamera->setEnabled(true);
+        m_ui->menuCamera->setEnabled(true);
 
         // update camera info dialog
         CSCameraInfo info = cs::CSApplication::getInstance()->getCamera()->getCameraInfo();
-        cameraInfoDialog->updateCameraInfo(info);
+        m_cameraInfoDialog->updateCameraInfo(info);
 
-        circleProgressBar->close();
+        m_circleProgressBar->close();
         break;
     }
     case CAMERA_DISCONNECTED:
     case CAMERA_DISCONNECTFAILED:
     case CAMERA_CONNECTFAILED:
-        circleProgressBar->close();
-        ui->menuCamera->setEnabled(false);
+        m_circleProgressBar->close();
+        m_ui->menuCamera->setEnabled(false);
         destoryRenderWindows();
         break;
     case CAMERA_STARTED_STREAM:
         onCameraStreamStarted();
     case CAMERA_STOPPED_STREAM:
-        circleProgressBar->close();
+        m_circleProgressBar->close();
         break;
     default:    
         break;
     }
 
     // update windows state
-    ui->menuWindows->setEnabled(cameraState == CAMERA_STARTED_STREAM);
+    m_ui->menuWindows->setEnabled(cameraState == CAMERA_STARTED_STREAM);
 
     updateStatusBar(state);
 }
@@ -232,43 +232,43 @@ void ViewerWindow::updateStatusBar(int state)
     switch (cameraState)
     {
     case CAMERA_CONNECTING:
-        ui->statusBar->showMessage(tr("Connecting camera"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Connecting camera"), timeoutMS);
         break;
     case CAMERA_CONNECTED:
-        ui->statusBar->showMessage(tr("Camera connected successfully"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Camera connected successfully"), timeoutMS);
         break;
     case CAMERA_CONNECTFAILED:
-        ui->statusBar->showMessage(tr("Camera connection failed"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Camera connection failed"), timeoutMS);
         break;
     case CAMERA_DISCONNECTING:
-        ui->statusBar->showMessage(tr("Disconnecting camera"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Disconnecting camera"), timeoutMS);
         break;
     case CAMERA_DISCONNECTED:
-        ui->statusBar->showMessage(tr("Camera disconnected successfully"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Camera disconnected successfully"), timeoutMS);
         break;
     case CAMERA_DISCONNECTFAILED:
-        ui->statusBar->showMessage(tr("Camera disconnection failed"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Camera disconnection failed"), timeoutMS);
         break;
     case CAMERA_STARTING_STREAM:
-        ui->statusBar->showMessage(tr("Starting preview"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Starting preview"), timeoutMS);
         break;
     case CAMERA_STARTED_STREAM:
-        ui->statusBar->showMessage(tr("Start preview successfully"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Start preview successfully"), timeoutMS);
         break;
     case CAMERA_PAUSING_STREAM:
-        ui->statusBar->showMessage(tr("Pausing preview"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Pausing preview"), timeoutMS);
         break;
     case CAMERA_PAUSED_STREAM:
-        ui->statusBar->showMessage(tr("Preview has been paused"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Preview has been paused"), timeoutMS);
         break;
     case CAMERA_RESTARTING_CAMERA:
-        ui->statusBar->showMessage(tr("Restarting camera"));
+        m_ui->statusBar->showMessage(tr("Restarting camera"));
         break;    
     case CAMERA_STOPPING_STREAM:
-        ui->statusBar->showMessage(tr("Stopping preview"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Stopping preview"), timeoutMS);
         break;
     case CAMERA_STOPPED_STREAM:
-        ui->statusBar->showMessage(tr("Preview has been stopped"), timeoutMS);
+        m_ui->statusBar->showMessage(tr("Preview has been stopped"), timeoutMS);
         break;
     default:
         break;
@@ -277,28 +277,28 @@ void ViewerWindow::updateStatusBar(int state)
 
 void ViewerWindow::onRoiEditStateChanged(bool edit, QRectF rect)
 {
-    ui->renderWindow->onRoiEditStateChanged(edit, rect);
+    m_ui->renderWindow->onRoiEditStateChanged(edit, rect);
 }
 
 void ViewerWindow::onRoiRectFUpdated(QRectF rect)
 {
-    ui->paraSettingWidget->onRoiRectFUpdated(rect);
+    m_ui->paraSettingWidget->onRoiRectFUpdated(rect);
 }
 
 void ViewerWindow::onUpdateLanguage(QAction* action)
 {
     auto app = cs::CSApplication::getInstance();
 
-    if (action == ui->actionChinese)
+    if (action == m_ui->actionChinese)
     {
-        ui->actionEnglish->setChecked(false);
-        language = LANGUAGE_ZH;
+        m_ui->actionEnglish->setChecked(false);
+        m_language = LANGUAGE_ZH;
         app->getAppConfig()->setLanguage("zh");
     }
     else
     {
-        ui->actionChinese->setChecked(false);
-        language = LANGUAGE_EN;
+        m_ui->actionChinese->setChecked(false);
+        m_language = LANGUAGE_EN;
         app->getAppConfig()->setLanguage("en");
     }
 
@@ -313,7 +313,7 @@ void ViewerWindow::onTriggeredRestartCamera()
 
 void ViewerWindow::onTriggeredInformation()
 {
-    cameraInfoDialog->show();
+    m_cameraInfoDialog->show();
 }
 
 void ViewerWindow::onTriggeredLogDir()
@@ -333,7 +333,7 @@ void ViewerWindow::onTriggeredDefaultSavePath()
         config->setDefaultSavePath(dirPath);
 
         QString defaultSavePath = tr("Set default save path (") + dirPath + ")";
-        ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+        m_ui->actionsetDefaultSaveDir->setText(defaultSavePath);
         
         onShowStatusBarMessage(defaultSavePath, 3000);
     }
@@ -356,7 +356,7 @@ void ViewerWindow::onAboutToQuit()
 void ViewerWindow::onLanguageChanged()
 {
     QString qmFile;
-    switch (language)
+    switch (m_language)
     {
     case LANGUAGE_ZH:
         qmFile = "lang_zh.qm";
@@ -370,7 +370,7 @@ void ViewerWindow::onLanguageChanged()
     }
 
     qmFile = QString("%1/translations/%2").arg(QApplication::applicationDirPath()).arg(qmFile);
-    if (!translator->load(QDir::cleanPath(qmFile)))
+    if (!m_translator->load(QDir::cleanPath(qmFile)))
     {
         qDebug() << "load qm failed : " << qmFile;
         return;
@@ -381,59 +381,59 @@ void ViewerWindow::onLanguageChanged()
 
 void ViewerWindow::onTranslate()
 {
-    ui->retranslateUi(this);
-    cameraInfoDialog->onTranslate();
-    globalMessageBox->retranslate();
+    m_ui->retranslateUi(this);
+    m_cameraInfoDialog->onTranslate();
+    m_globalMessageBox->retranslate();
 
     auto config = cs::CSApplication::getInstance()->getAppConfig();
     QString defaultSavePath = tr("Set default save path ") + "(" + config->getDefaultSavePath() + ")";
-    ui->actionsetDefaultSaveDir->setText(defaultSavePath);
+    m_ui->actionsetDefaultSaveDir->setText(defaultSavePath);
 
-    if (ipSettingDialog)
+    if (m_ipSettingDialog)
     {
-        ipSettingDialog->onTranslate();
+        m_ipSettingDialog->onTranslate();
     }
 
-    if (formatConvertDialog)
+    if (m_formatConvertDialog)
     {
-        formatConvertDialog->onTranslate();
+        m_formatConvertDialog->onTranslate();
     }
 
-    if (cameraPlayerDialog)
+    if (m_cameraPlayerDialog)
     {
-        cameraPlayerDialog->onTranslate();
+        m_cameraPlayerDialog->onTranslate();
     }
 
-    ui->renderWindow->onTranslate();
+    m_ui->renderWindow->onTranslate();
 
-    if (aboutDialog)
+    if (m_aboutDialog)
     {
-        aboutDialog->onTranslate();
+        m_aboutDialog->onTranslate();
     }
 }
 
 void ViewerWindow::onRemovedCurrentCamera(QString serial)
 {
-    globalMessageBox->updateMessage(tr("The current camera has been disconnected"));
-    globalMessageBox->open();
+    m_globalMessageBox->updateMessage(tr("The current camera has been disconnected"));
+    m_globalMessageBox->open();
 
-    connect(globalMessageBox, &CSMessageBox::accepted, this, &ViewerWindow::onConfirmCameraRemoved, Qt::UniqueConnection);
+    connect(m_globalMessageBox, &CSMessageBox::accepted, this, &ViewerWindow::onConfirmCameraRemoved, Qt::UniqueConnection);
 }
 
 void ViewerWindow::onConfirmCameraRemoved()
 {
-    disconnect(globalMessageBox, &CSMessageBox::accepted, this, &ViewerWindow::onConfirmCameraRemoved);
+    disconnect(m_globalMessageBox, &CSMessageBox::accepted, this, &ViewerWindow::onConfirmCameraRemoved);
 }
 
 void ViewerWindow::onShowStatusBarMessage(QString msg, int timeout)
 {
     if (msg.isEmpty())
     {
-        ui->statusBar->clearMessage();
+        m_ui->statusBar->clearMessage();
     }
     else 
     {
-        ui->statusBar->showMessage(msg, timeout);
+        m_ui->statusBar->showMessage(msg, timeout);
     }
 }
 
@@ -448,38 +448,38 @@ void ViewerWindow::onCameraStreamStarted()
     camera->getCameraPara(cs::parameter::PARA_DEPTH_HAS_IR, hasIrV);
     camera->getCameraPara(cs::parameter::PARA_HAS_DEPTH, hasDepthV);
 
-    for (auto action : windowActions)
+    for (auto action : m_windowActions)
     {
-        ui->menuWindows->removeAction(action);
+        m_ui->menuWindows->removeAction(action);
         delete action;
     }
-    windowActions.clear();
+    m_windowActions.clear();
 
     if (hasIrV.toBool())
     {
-        windowActions.push_back(new CSAction(CAMERA_DATA_L, "IR(L)"));
-        windowActions.push_back(new CSAction(CAMERA_DATA_R, "IR(R)"));
+        m_windowActions.push_back(new CSAction(CAMERA_DATA_L, "IR(L)"));
+        m_windowActions.push_back(new CSAction(CAMERA_DATA_R, "IR(R)"));
     }
 
     if (hasDepthV.toBool())
     {
-        windowActions.push_back(new CSAction(CAMERA_DATA_DEPTH, "Depth"));
-        windowActions.push_back(new CSAction(CAMERA_DATA_POINT_CLOUD, "Point Cloud"));
+        m_windowActions.push_back(new CSAction(CAMERA_DATA_DEPTH, "Depth"));
+        m_windowActions.push_back(new CSAction(CAMERA_DATA_POINT_CLOUD, "Point Cloud"));
     }
 
     if (hasRgbV.toBool())
     {
-        windowActions.push_back( new CSAction(CAMERA_DATA_RGB, "RGB"));
+        m_windowActions.push_back( new CSAction(CAMERA_DATA_RGB, "RGB"));
     }
 
-    ui->renderWindow->setShowTextureEnable(hasRgbV.toBool());
+    m_ui->renderWindow->setShowTextureEnable(hasRgbV.toBool());
 
     updateWindowActions();
     onRenderWindowUpdated();
     
     bool suc = true;
-    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated, ui->renderWindow, &RenderWindow::onOutput3DUpdated, Qt::QueuedConnection);
-    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated, ui->renderWindow, &RenderWindow::onOutput2DUpdated, Qt::QueuedConnection);
+    suc &= (bool)connect(app, &cs::CSApplication::output3DUpdated, m_ui->renderWindow, &RenderWindow::onOutput3DUpdated, Qt::QueuedConnection);
+    suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated, m_ui->renderWindow, &RenderWindow::onOutput2DUpdated, Qt::QueuedConnection);
 
     Q_ASSERT(suc);
 }
@@ -495,7 +495,7 @@ void ViewerWindow::onWindowsMenuTriggered(QAction* action)
 void ViewerWindow::onRenderWindowUpdated()
 {
     QVector<int> windows;
-    for (auto action : windowActions)
+    for (auto action : m_windowActions)
     {
         if (action->isChecked())
         {
@@ -510,8 +510,8 @@ void ViewerWindow::onRenderWindowUpdated()
 
 void ViewerWindow::onTriggeredWindowsTile()
 {
-    renderLayoutMode = LAYOUT_TILE;
-    ui->actionTabs->setChecked(false);
+    m_renderLayoutMode = LAYOUT_TILE;
+    m_ui->actionTabs->setChecked(false);
 
     emit windowLayoutModeUpdated(LAYOUT_TILE);
     onWindowLayoutChanged();
@@ -519,8 +519,8 @@ void ViewerWindow::onTriggeredWindowsTile()
 
 void ViewerWindow::onTriggeredWindowsTabs()
 {
-    renderLayoutMode = LAYOUT_TAB;
-    ui->actionTile->setChecked(false);
+    m_renderLayoutMode = LAYOUT_TAB;
+    m_ui->actionTile->setChecked(false);
 
     emit windowLayoutModeUpdated(LAYOUT_TAB);
     onWindowLayoutChanged();
@@ -529,7 +529,7 @@ void ViewerWindow::onTriggeredWindowsTabs()
 void ViewerWindow::onWindowLayoutChanged()
 {
     QVector<int> windows;
-    for (auto action : windowActions)
+    for (auto action : m_windowActions)
     {
         if (action->isChecked())
         {
@@ -542,9 +542,9 @@ void ViewerWindow::onWindowLayoutChanged()
 
 void ViewerWindow::updateWindowActions()
 {
-    for (auto action : windowActions)
+    for (auto action : m_windowActions)
     {
-        ui->menuViews->addAction(action);
+        m_ui->menuViews->addAction(action);
 
         action->setCheckable(true);
         action->setChecked(true);
@@ -553,7 +553,7 @@ void ViewerWindow::updateWindowActions()
 
 void ViewerWindow::onRenderExit(int renderId)
 {
-    for (auto action : windowActions) 
+    for (auto action : m_windowActions) 
     {
         if (action->getType() == renderId)
         {
@@ -566,66 +566,66 @@ void ViewerWindow::onRenderExit(int renderId)
 
 void ViewerWindow::destoryRenderWindows()
 {
-    for (auto action : windowActions)
+    for (auto action : m_windowActions)
     {
-        ui->menuWindows->removeAction(action);
+        m_ui->menuWindows->removeAction(action);
         delete action;
     }
-    windowActions.clear();
+    m_windowActions.clear();
     
     auto app = cs::CSApplication::getInstance();
 
-    disconnect(app, &cs::CSApplication::output3DUpdated, ui->renderWindow, &RenderWindow::onOutput3DUpdated);
-    disconnect(app, &cs::CSApplication::output2DUpdated, ui->renderWindow, &RenderWindow::onOutput2DUpdated);
+    disconnect(app, &cs::CSApplication::output3DUpdated, m_ui->renderWindow, &RenderWindow::onOutput3DUpdated);
+    disconnect(app, &cs::CSApplication::output2DUpdated, m_ui->renderWindow, &RenderWindow::onOutput2DUpdated);
 
     onRenderWindowUpdated();
 }
 
 void ViewerWindow::onTriggeredIpSetting()
 {
-    if (!ipSettingDialog) {
-        ipSettingDialog = new IpSettingDialog(this);
-        connect(ipSettingDialog, &IpSettingDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage);
+    if (!m_ipSettingDialog) {
+        m_ipSettingDialog = new IpSettingDialog(this);
+        connect(m_ipSettingDialog, &IpSettingDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage);
     }
 
-    ipSettingDialog->show();
+    m_ipSettingDialog->show();
 }
 
 void ViewerWindow::onTriggeredLoadFile()
 {
-    if (!cameraPlayerDialog)
+    if (!m_cameraPlayerDialog)
     {
-        cameraPlayerDialog = new CameraPlayerDialog();
-        connect(cameraPlayerDialog, &CameraPlayerDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
+        m_cameraPlayerDialog = new CameraPlayerDialog();
+        connect(m_cameraPlayerDialog, &CameraPlayerDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
     }
 
-    cameraPlayerDialog->onLoadFile();
+    m_cameraPlayerDialog->onLoadFile();
 }
 
 void ViewerWindow::onTriggeredFormatConvert()
 {
-    if (!formatConvertDialog)
+    if (!m_formatConvertDialog)
     {
-        formatConvertDialog = new FormatConvertDialog();
-        connect(formatConvertDialog, &FormatConvertDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
+        m_formatConvertDialog = new FormatConvertDialog();
+        connect(m_formatConvertDialog, &FormatConvertDialog::showMessage, this, &ViewerWindow::onShowStatusBarMessage, Qt::QueuedConnection);
     }
 
-    formatConvertDialog->show();
+    m_formatConvertDialog->show();
 }
 
 void ViewerWindow::onAutoNameMenuTriggered(QAction* action)
 {
     bool autoName = false;
-    if (action == ui->actionOff)
+    if (action == m_ui->actionOff)
     {
-        bool isChekcked = ui->actionOff->isChecked();
-        ui->actionOn->setChecked(!isChekcked);
+        bool isChekcked = m_ui->actionOff->isChecked();
+        m_ui->actionOn->setChecked(!isChekcked);
         autoName = !isChekcked;
     }
     else 
     {
-        bool isChekcked = ui->actionOn->isChecked();
-        ui->actionOff->setChecked(!isChekcked);
+        bool isChekcked = m_ui->actionOn->isChecked();
+        m_ui->actionOff->setChecked(!isChekcked);
         autoName = isChekcked;
     }
 
@@ -637,7 +637,7 @@ void ViewerWindow::onAutoNameMenuTriggered(QAction* action)
 void ViewerWindow::onTriggeredManual()
 {
     QString manualPath = QString("%1/document/manual").arg(APP_PATH);
-    if (language == LANGUAGE_ZH)
+    if (m_language == LANGUAGE_ZH)
     {
         manualPath += "/Chinese/index.html";
     }
@@ -651,12 +651,12 @@ void ViewerWindow::onTriggeredManual()
 
 void ViewerWindow::onTriggeredAbout()
 {
-    if (!aboutDialog)
+    if (!m_aboutDialog)
     {
-        aboutDialog = new AboutDialog(this);
+        m_aboutDialog = new AboutDialog(this);
     }
 
-    aboutDialog->show();
+    m_aboutDialog->show();
 }
 
 void ViewerWindow::onTriggeredGithub()

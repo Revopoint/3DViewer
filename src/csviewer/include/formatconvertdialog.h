@@ -53,8 +53,8 @@ private slots:
 private:
     void showMessageBox(QString message);
 private:
-    Ui::FormatConvertDialog* ui;
-    cs::FormatConverter* formatConverter = nullptr;
+    Ui::FormatConvertDialog* m_ui;
+    cs::FormatConverter* m_formatConverter = nullptr;
 };
 
 #endif //  _CS_FORMATCONVERTDIALOG_H

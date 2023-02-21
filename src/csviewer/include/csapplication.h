@@ -86,16 +86,16 @@ private:
     void disconnections();
     void updateProcessStrategys();
 private:
-    std::shared_ptr<CameraThread> cameraThread;
-    std::shared_ptr<Processor> processor;
-    std::shared_ptr<ProcessThread> processThread;
+    std::shared_ptr<CameraThread> m_cameraThread;
+    std::shared_ptr<Processor> m_processor;
+    std::shared_ptr<ProcessThread> m_processThread;
     
-    QMap<int, cs::ProcessStrategy*> processStrategys;
-    std::shared_ptr<CameraCaptureTool> cameraCaptureTool;
+    QMap<int, cs::ProcessStrategy*> m_processStrategys;
+    std::shared_ptr<CameraCaptureTool> m_cameraCaptureTool;
 
-    std::shared_ptr<AppConfig> appConfig;
+    std::shared_ptr<AppConfig> m_appConfig;
 
-    bool show3DTexture = false;
+    bool m_show3DTexture = false;
 };
 }
 

@@ -21,19 +21,19 @@
 
 CSAction::CSAction(int type, QObject* parent)
     : QAction(parent)
-    , type(type)
+    , m_type(type)
 {
 }
 
 CSAction::CSAction(int type, const QString& text, QObject* parent)
     : QAction(text, parent)
-    , type(type)
+    , m_type(type)
 {
 }
 
 CSAction::CSAction(int type, const QIcon& icon, const QString& text, QObject* parent)
     : QAction(icon, text, parent)
-    , type(type)
+    , m_type(type)
 {
 
 }
@@ -45,10 +45,10 @@ CSAction::~CSAction()
 
 void CSAction::setType(int t)
 {
-    type = t;
+    m_type = t;
 }
 
 int CSAction::getType() const
 {
-    return type;
+    return m_type;
 }

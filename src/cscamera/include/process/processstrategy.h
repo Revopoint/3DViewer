@@ -72,13 +72,13 @@ protected:
         }
     }
 protected:
-    std::shared_ptr<ICSCamera> cameraPtr;
-    bool isCameraParaDirty;
-    QMutex mutex;
-    PROCESS_STRA_TYPE strategyType;
-    bool strategyEnable = true;
+    std::shared_ptr<ICSCamera> m_cameraPtr;
+    bool m_isCameraParaDirty;
+    QMutex m_mutex;
+    PROCESS_STRA_TYPE m_strategyType;
+    bool m_strategyEnable = true;
 
-    QVector<int> dependentParameters;
+    QVector<int> m_dependentParameters;
 };
 
 }

@@ -27,11 +27,11 @@ using namespace cs;
 
 PointCloudProcessStrategy::PointCloudProcessStrategy()
     : DepthProcessStrategy(STRATEGY_CLOUD_POINT)
-    , withTexture(false)
+    , m_withTexture(false)
 {
-    dependentParameters.push_back(PARA_RGB_INTRINSICS);
-    dependentParameters.push_back(PARA_EXTRINSICS);
-    dependentParameters.push_back(PARA_HAS_RGB);
+    m_dependentParameters.push_back(PARA_RGB_INTRINSICS);
+    m_dependentParameters.push_back(PARA_EXTRINSICS);
+    m_dependentParameters.push_back(PARA_HAS_RGB);
 }
 
 void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort& outputDataPort)
@@ -81,22 +81,22 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
 void PointCloudProcessStrategy::onLoadCameraPara()
 {
     DepthProcessStrategy::onLoadCameraPara();
-    for (auto para : dependentParameters)
+    for (auto para : m_dependentParameters)
     {
         auto emPara = (CAMERA_PARA_ID)para;
         QVariant value;
 
-        cameraPtr->getCameraPara(emPara, value);
+        m_cameraPtr->getCameraPara(emPara, value);
         switch (para)
         {
         case PARA_RGB_INTRINSICS:
-            rgbIntrinsics = value.value<Intrinsics>();
+            m_rgbIntrinsics = value.value<Intrinsics>();
             break;
         case PARA_EXTRINSICS:
-            extrinsics = value.value<Extrinsics>();
+            m_extrinsics = value.value<Extrinsics>();
             break;
         case PARA_HAS_RGB:
-            withTexture = value.toBool();
+            m_withTexture = value.toBool();
             break;
         default:
             break;
@@ -106,12 +106,12 @@ void PointCloudProcessStrategy::onLoadCameraPara()
 
 bool PointCloudProcessStrategy::getWithTexture() const
 {
-    return withTexture;
+    return m_withTexture;
 }
 
 void PointCloudProcessStrategy::setWithTexture(bool with)
 {
-    withTexture = with;
+    m_withTexture = with;
 }
 
 void PointCloudProcessStrategy::generatePointCloud(const StreamData& depthData, Pointcloud& pc)
@@ -130,17 +130,17 @@ void PointCloudProcessStrategy::generatePointCloud(const StreamData& depthData, 
 
     float* floatPtr = (float*)floatData.data();
 
-    bool hasTex = withTexture && depthData.data.size() > 1;
+    bool hasTex = m_withTexture && depthData.data.size() > 1;
     switch (depthData.dataInfo.format)
     {
     case STREAM_FORMAT_Z16:
     case STREAM_FORMAT_Z16Y8Y8:
         if (hasTex) {
-            pc.generatePoints<float>(floatPtr, width, height, depthScale, &depthIntrinsics, &rgbIntrinsics, &extrinsics, true);
+            pc.generatePoints<float>(floatPtr, width, height, m_depthScale, &m_depthIntrinsics, &m_rgbIntrinsics, &m_extrinsics, true);
         }
         else
         {
-            pc.generatePoints<float>(floatPtr, width, height, depthScale, &depthIntrinsics, nullptr, nullptr, true);
+            pc.generatePoints<float>(floatPtr, width, height, m_depthScale, &m_depthIntrinsics, nullptr, nullptr, true);
         }
         break;
     case STREAM_FORMAT_XZ32:
@@ -156,7 +156,7 @@ void PointCloudProcessStrategy::generatePointCloud(const StreamData& depthData, 
 void PointCloudProcessStrategy::generateTexture(const StreamData& rgbData, QImage& texImage)
 {
     // rgb process
-    if (withTexture)
+    if (m_withTexture)
     {
         STREAM_FORMAT format = rgbData.dataInfo.format;
 
