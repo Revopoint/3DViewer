@@ -562,10 +562,10 @@ typedef enum PROPERTY_TYPE_EXTENSION
 	PROPERTY_EXT_CLEAR_FRAME_BUFFER		= 0x13,   /**<@~chinese 清除SDK内部的Frame队列	  @~english empty sdk frame buffer*/
 	PROPERTY_EXT_GET_RECONSTRUCTIONMAT	= 0x14,	 /**<@~chinese 获取视差重建点云的矩阵	  @~english get parallax reconstruction point cloud.*/
 
-	PROPERTY_EXT_EXPOSURE_TIME_RGB      = 0x15,	 /**<@~chinese 曝光时间,单位毫秒,仅限RGB流	  @~english exposure time,unit ms.*/
-	PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB = 0x16, /**<@~chinese 曝光时间范围,单位毫秒,仅限RGB流	  @~english exposure time,unit ms.*/
+	PROPERTY_EXT_EXPOSURE_TIME_RGB      = 0x15,	 /**<@~chinese 曝光时间,单位微秒,仅限RGB流	  @~english exposure time,unit us.*/
+	PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB = 0x16, /**<@~chinese 曝光时间范围,单位微秒,仅限RGB流	  @~english exposure time,unit us.*/
 	PROPERTY_EXT_CPU_TEMPRATRUE			= 0x17,  /**<@~chinese CPU温度,单位摄氏度,	  @~english CPU tempratrue,unit degree Celsius */
-	PROPERTY_EXT_GET_CAMERA_STATE		= 0x18,	 /**<@~chinese 获取相机当前状态,	  @~english Get camera current state */
+	//PROPERTY_EXT_GET_CAMERA_STATE       = 0x18, /**< @~chinese 获取相机当前状态,	  @~english Get camera current state */
     
 	PROPERTY_EXT_SET_FAKE_MODE			= 0x904, /**< @~chinese 设置真假分辨率                @~english set fake mode */
 	PROPERTY_EXT_AUTO_EXPOSURE_MODE		= 0x912, /**< @~chinese 深度相机自动曝光模式,参考AUTO_EXPOSURE_MODE         @~english auto exposure mode of depth camera，reference AUTO_EXPOSURE_MODE*/
@@ -643,8 +643,8 @@ typedef union PropertyExtension
 	WriteReadHidData*	writeReadHidData;		/**< @~chinese 对应PROPERTY_EXT_WRITE_READ_HID	@~english corresponding PROPERTY_EXT_WRITE_READ_HID	*/
 	PerspectiveTransformationMatrix	reconstructionMat; /**< @~chinese 对应PROPERTY_EXT_GET_RECONSTRUCTIONMAT	@~english corresponding PROPERTY_EXT_GET_RECONSTRUCTIONMAT	*/
 
-	unsigned int  uiExposureTime;	            /**< @~chinese 对应PROPERTY_EXT_EXPOSURE_TIME 曝光时间,单位毫秒  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME exposure time,unit ms*/
-	ValueRange objVRange_;						/**< @~chinese 对应PROPERTY_EXT_EXPOSURE_TIME_RANGE 曝光时间范围,单位毫秒  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME_RANGE exposure time range,unit ms*/
+	unsigned int  uiExposureTime;	            /**< @~chinese 对应PROPERTY_EXT_EXPOSURE_TIME_RGB 曝光时间,单位微秒  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME exposure time,unit us*/
+	ValueRange objVRange_;						/**< @~chinese 对应PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB 曝光时间范围,单位微秒  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME_RANGE exposure time range,unit us*/
 	unsigned int uiTempratrue_;					/**< @~chinese 对应PROPERTY_EXT_CPU_TEMPRATRUE 温度,单位摄氏度  @~english corresponding PROPERTY_EXT_CPU_TEMPRATRUE exposure tempratrue,unit degree Celsius*/
 
 	bool boolCameraState;						/**< @~chinese 对应PROPERTY_EXT_GET_CAMERA_STATE 相机当前连接状态  @~english Camera current connect state*/
