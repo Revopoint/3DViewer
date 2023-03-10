@@ -1006,10 +1006,14 @@ void CSCamera::setCameraPara(CAMERA_PARA_ID paraId, QVariant value)
     if (CAMERA_PROPERTY_MAP.contains(paraId))
     {
         setPropertyPrivate(paraId, value);
+
+        onParaUpdatedDelay(paraId, 200);
     }
     else if (CAMERA_EXTENSION_PROPERTY_MAP.contains(paraId))
     {
         setExtensionPropertyPrivate(paraId, value);
+
+        onParaUpdatedDelay(paraId, 200);
     }
     else
     {
@@ -1033,9 +1037,7 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
             // close HDR
             if (value.toInt() == HDR_MODE_CLOSE)
             {
-                qInfo() << "close HDR, then restore exposure : " << m_cachedDepthExposure << ", gain : " << m_cachedDepthGain;
-                setCameraPara(PARA_DEPTH_EXPOSURE, m_cachedDepthExposure);
-                setCameraPara(PARA_DEPTH_GAIN, m_cachedDepthGain);
+                restoreExposureGain();
             }
             else 
             {
@@ -1052,7 +1054,7 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
         }
         else 
         {
-            onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 5000);
+            onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 7000);
         } 
         break;
     case PARA_TRIGGER_MODE:
@@ -1087,6 +1089,16 @@ void CSCamera::onParaUpdatedDelay(CAMERA_PARA_ID paraId, int delayMS)
 {
     QTimer::singleShot(delayMS, this, [=]() {
             emit updateParaSignal(paraId);
+        });
+}
+
+void CSCamera::restoreExposureGain()
+{
+    QTimer::singleShot(3000, this, 
+        [=]() {
+            qInfo() << "close HDR, then restore exposure : " << m_cachedDepthExposure << ", gain : " << m_cachedDepthGain;
+            setPropertyPrivate(PARA_DEPTH_EXPOSURE, m_cachedDepthExposure);
+            setPropertyPrivate(PARA_DEPTH_GAIN, m_cachedDepthGain);
         });
 }
 
@@ -1200,7 +1212,6 @@ void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
         qWarning() << "set the camera property failed, paraId:" << paraId << ",ret:" << ret << ",value:" << valueF;
         Q_ASSERT(false);
     }
-    onParaUpdatedDelay(paraId, 200);
 }
 
 void CSCamera::getPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step)
@@ -1390,8 +1401,6 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
         qWarning() << "set the camera extension property failed," << "paraId:" << paraId << ",ret:" << ret;
         Q_ASSERT(false);
     }
-
-    onParaUpdatedDelay(paraId, 200);
 }
 
 void CSCamera::getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step)

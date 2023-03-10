@@ -112,7 +112,7 @@
         <translation type="obsolete">重启相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="325"/>
+        <location filename="../viewerwindow.cpp" line="335"/>
         <source>Set default save path (</source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
@@ -121,98 +121,98 @@
         <translation type="obsolete">相机列表</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="155"/>
-        <location filename="../viewerwindow.cpp" line="379"/>
+        <location filename="../viewerwindow.cpp" line="165"/>
+        <location filename="../viewerwindow.cpp" line="389"/>
         <source>Set default save path </source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="225"/>
+        <location filename="../viewerwindow.cpp" line="235"/>
         <source>Connecting camera</source>
         <translation type="unfinished">正在连接相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="228"/>
+        <location filename="../viewerwindow.cpp" line="238"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished">相机连接成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="231"/>
+        <location filename="../viewerwindow.cpp" line="241"/>
         <source>Camera connection failed</source>
         <translation type="unfinished">相机连接失败</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="234"/>
+        <location filename="../viewerwindow.cpp" line="244"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished">正在断开相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="237"/>
+        <location filename="../viewerwindow.cpp" line="247"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished">相机断开成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="240"/>
+        <location filename="../viewerwindow.cpp" line="250"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished">相机断开失败</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="243"/>
+        <location filename="../viewerwindow.cpp" line="253"/>
         <source>Starting preview</source>
         <translation type="unfinished">正在启动预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="246"/>
+        <location filename="../viewerwindow.cpp" line="256"/>
         <source>Start preview successfully</source>
         <translation type="unfinished">启动预览成功</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="249"/>
+        <location filename="../viewerwindow.cpp" line="259"/>
         <source>Pausing preview</source>
         <translation type="unfinished">正在暂停预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="252"/>
+        <location filename="../viewerwindow.cpp" line="262"/>
         <source>Preview has been paused</source>
         <translation type="unfinished">已经暂停预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="255"/>
+        <location filename="../viewerwindow.cpp" line="265"/>
         <source>Restarting camera</source>
         <translation type="unfinished">正在重启相机</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="258"/>
+        <location filename="../viewerwindow.cpp" line="268"/>
         <source>Stopping preview</source>
         <translation type="unfinished">正在停止预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="261"/>
+        <location filename="../viewerwindow.cpp" line="271"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished">已经停止预览</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="319"/>
+        <location filename="../viewerwindow.cpp" line="329"/>
         <source>Set default save path</source>
         <translation type="unfinished">设置默认存储位置</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="666"/>
+        <location filename="../viewerwindow.cpp" line="676"/>
         <source>Tips</source>
         <translation type="unfinished">提示</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="667"/>
+        <location filename="../viewerwindow.cpp" line="677"/>
         <source>Confirm to exit the application ?</source>
         <translation type="unfinished">确定要退出吗？</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="669"/>
+        <location filename="../viewerwindow.cpp" line="679"/>
         <source>Yes</source>
         <translation type="unfinished">是</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="670"/>
+        <location filename="../viewerwindow.cpp" line="680"/>
         <source>No</source>
         <translation type="unfinished">否</translation>
     </message>
@@ -221,7 +221,7 @@
         <translation type="obsolete">保存点云</translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="407"/>
+        <location filename="../viewerwindow.cpp" line="417"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished">当前相机已经断开</translation>
     </message>
@@ -537,13 +537,13 @@ and the image quality of objects farther away may become worse.</source>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="152"/>
-        <location filename="../parasettingswidget.cpp" line="796"/>
+        <location filename="../parasettingswidget.cpp" line="806"/>
         <source>Refresh</source>
         <translation type="unfinished">刷新</translation>
     </message>
     <message>
         <location filename="../parasettingswidget.cpp" line="153"/>
-        <location filename="../parasettingswidget.cpp" line="797"/>
+        <location filename="../parasettingswidget.cpp" line="807"/>
         <source>OK</source>
         <translation type="unfinished">确定</translation>
     </message>
@@ -568,7 +568,7 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="unfinished">已经进入单次触发模式！点击该按钮获取下一帧数据。</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="639"/>
+        <location filename="../parasettingswidget.cpp" line="642"/>
         <source>Set ROI </source>
         <translation type="unfinished">设置ROI </translation>
     </message>
@@ -577,32 +577,32 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="obsolete">使用鼠标在深度图中框选ROI区域，然后点击“确定”按钮</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="791"/>
+        <location filename="../parasettingswidget.cpp" line="801"/>
         <source>Capture single frame</source>
         <translation type="unfinished">保存单帧</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="792"/>
+        <location filename="../parasettingswidget.cpp" line="802"/>
         <source>Capture multiple frames</source>
         <translation type="unfinished">保存多帧</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="793"/>
+        <location filename="../parasettingswidget.cpp" line="803"/>
         <source>Single Shot</source>
         <translation type="unfinished">单次触发</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="794"/>
+        <location filename="../parasettingswidget.cpp" line="804"/>
         <source>Stop preview</source>
         <translation type="unfinished">停止预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="804"/>
+        <location filename="../parasettingswidget.cpp" line="814"/>
         <source>Pause preview</source>
         <translation type="unfinished">暂停预览</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="883"/>
+        <location filename="../parasettingswidget.cpp" line="893"/>
         <source>Capture frame data</source>
         <translation type="unfinished">保存帧数据</translation>
     </message>
@@ -619,8 +619,8 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="obsolete">白平衡：</translation>
     </message>
     <message>
-        <location filename="../parasettingswidget.cpp" line="790"/>
-        <location filename="../parasettingswidget.cpp" line="804"/>
+        <location filename="../parasettingswidget.cpp" line="800"/>
+        <location filename="../parasettingswidget.cpp" line="814"/>
         <source>Start preview</source>
         <translation type="unfinished">启动预览</translation>
     </message>
@@ -830,17 +830,16 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="166"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="172"/>
         <source>Start capturing</source>
         <translation type="unfinished">开始保存</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="192"/>
         <source>save frame data is empty</source>
-        <translation type="unfinished">保存数据为空</translation>
+        <translation type="obsolete">保存数据为空</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="234"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="217"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished">保存完毕，已保存%1帧（丢失%2帧）</translation>
     </message>
@@ -946,7 +945,7 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>cs::CameraCaptureTool</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="72"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="75"/>
         <source>captruing, please wait...</source>
         <translation type="unfinished">正在保存，请稍等</translation>
     </message>
@@ -1088,17 +1087,17 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>cs::CameraCaptureMultiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="608"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="625"/>
         <source>a frame dropped</source>
         <translation type="unfinished">丢失一帧数据</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="707"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="724"/>
         <source>Please wait for the file to be compressed to zip</source>
         <translation type="unfinished">正打包为ZIP，请稍等...</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="719"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="736"/>
         <source>Failed to compress zip file</source>
         <translation type="unfinished">打包为ZIP失败</translation>
     </message>

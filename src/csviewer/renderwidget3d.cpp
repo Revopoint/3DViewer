@@ -48,7 +48,7 @@ CSCustomCamera::CSCustomCamera()
 
 CSCustomCamera::CSCustomCamera(CSCustomCamera const& copy, osg::CopyOp copyOp)
     : Camera(copy, copyOp)
-    , mainCamera(copy.mainCamera)
+    , m_mainCamera(copy.m_mainCamera)
 {
     initCamera();
 }
@@ -59,25 +59,25 @@ CSCustomCamera::~CSCustomCamera()
 
 void CSCustomCamera::setOrthoProjection(bool isOrtho)
 {
-    isOrthoProjection = isOrtho;
+    m_isOrthoProjection = isOrtho;
 }
 
 void CSCustomCamera::setTran(osg::Vec3 tran)
 {
-    translate = tran;
+    m_translate = tran;
 }
 
 void CSCustomCamera::traverse(osg::NodeVisitor& nv)
 {
-   osg::Viewport* viewPort =  mainCamera->getViewport();
+   osg::Viewport* viewPort =  m_mainCamera->getViewport();
    const int width = viewPort->width();
    const int height = viewPort->height();
 
-   if (isOrthoProjection)
+   if (m_isOrthoProjection)
    {
        setProjectionMatrixAsOrtho(-width / 2, width / 2, -height / 2, height / 2, -1000.0, 1000.0);
        const int space = 20;      
-       translate = osg::Vec3(width/2 - AXIS_LEN - space, -height/2 + AXIS_LEN + space, -AXIS_LEN);
+       m_translate = osg::Vec3(width/2 - AXIS_LEN - space, -height/2 + AXIS_LEN + space, -AXIS_LEN);
    }
    else 
    {
@@ -86,10 +86,10 @@ void CSCustomCamera::traverse(osg::NodeVisitor& nv)
 
    setViewport(0, 0, width, height);
 
-    if (mainCamera.valid() && nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
+    if (m_mainCamera.valid() && nv.getVisitorType() == osg::NodeVisitor::CULL_VISITOR)
     {
-        osg::Matrix matrix = mainCamera->getViewMatrix();
-        matrix.setTrans(translate);
+        osg::Matrix matrix = m_mainCamera->getViewMatrix();
+        matrix.setTrans(m_translate);
 
         this->setViewMatrix(matrix);
     }
@@ -107,23 +107,23 @@ void CSCustomCamera::initCamera()
 
 RenderWidget3D::RenderWidget3D(int renderId, QWidget* parent)
     : RenderWidget(renderId, parent)
-    , osgQOpenGLWidgetPtr(new osgQOpenGLWidget(this))
-    , homeButton(new QPushButton(this))
-    , textureButton(new QPushButton(this))
-    , topItem(new QWidget(this))
-    , bottomItem(new QWidget(this))
-    , exitButton(new QPushButton(this))
+    , m_osgQOpenGLWidgetPtr(new osgQOpenGLWidget(this))
+    , m_homeButton(new QPushButton(this))
+    , m_textureButton(new QPushButton(this))
+    , m_topItem(new QWidget(this))
+    , m_bottomItem(new QWidget(this))
+    , m_exitButton(new QPushButton(this))
 {
     QHBoxLayout* pLayout = new QHBoxLayout(this);
     pLayout->setMargin(2);
-    pLayout->addWidget(osgQOpenGLWidgetPtr);
-    osgQOpenGLWidgetPtr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    pLayout->addWidget(m_osgQOpenGLWidgetPtr);
+    m_osgQOpenGLWidgetPtr->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumSize(QSize(300, 180));
 
     initButtons();
     updateButtonArea();
 
-    bool suc = connect(osgQOpenGLWidgetPtr, SIGNAL(initialized()), this, SLOT(initWindow()));
+    bool suc = connect(m_osgQOpenGLWidgetPtr, SIGNAL(initialized()), this, SLOT(initWindow()));
     Q_ASSERT(suc);
 }
 
@@ -136,24 +136,24 @@ void RenderWidget3D::resizeEvent(QResizeEvent* event)
 {
     updateButtonArea();
 
-    osgViewer::Viewer* pViewer = osgQOpenGLWidgetPtr->getOsgViewer();
+    osgViewer::Viewer* pViewer = m_osgQOpenGLWidgetPtr->getOsgViewer();
     if(pViewer)
     {
         osg::ref_ptr<osg::Camera> camera = pViewer->getCamera();
-        camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(osgQOpenGLWidgetPtr->width()) / static_cast<double>(osgQOpenGLWidgetPtr->height()), 1.0f, 10000.0f);
+        camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(m_osgQOpenGLWidgetPtr->width()) / static_cast<double>(m_osgQOpenGLWidgetPtr->height()), 1.0f, 10000.0f);
     }
 }
 
 void RenderWidget3D::initWindow()
 {
-    osgViewer::Viewer* pViewer = osgQOpenGLWidgetPtr->getOsgViewer();
+    osgViewer::Viewer* pViewer = m_osgQOpenGLWidgetPtr->getOsgViewer();
 
     osg::ref_ptr<osg::Camera> camera = pViewer->getCamera();
     camera->setClearColor(osg::Vec4(242.0 / 255.0, 242.0 / 255, 242.0 / 255, 1.0));
 
     camera->setClearMask(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     camera->setComputeNearFarMode(osg::Camera::COMPUTE_NEAR_FAR_USING_BOUNDING_VOLUMES);
-    camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(osgQOpenGLWidgetPtr->width()) / static_cast<double>(osgQOpenGLWidgetPtr->height()), 1.0f, 10000.0f);
+    camera->setProjectionMatrixAsPerspective(30.0f, static_cast<double>(m_osgQOpenGLWidgetPtr->width()) / static_cast<double>(m_osgQOpenGLWidgetPtr->height()), 1.0f, 10000.0f);
 
     //camera->setViewport(0, 0, width(), height());
 
@@ -162,23 +162,23 @@ void RenderWidget3D::initWindow()
     pViewer->setThreadingModel(osgViewer::ViewerBase::SingleThreaded);
     pViewer->setRunFrameScheme(osgViewer::ViewerBase::ON_DEMAND);
 
-    rootNode = new osg::Group();
-    rootNode->setName("rootNode");
+    m_rootNode = new osg::Group();
+    m_rootNode->setName("rootNode");
 
-    sceneNode = new osg::MatrixTransform();
+    m_sceneNode = new osg::MatrixTransform();
 
-    pViewer->setSceneData(rootNode);
+    pViewer->setSceneData(m_rootNode);
 
     osg::Multisample* multi = new osg::Multisample;
     multi->setHint(osg::Multisample::NICEST);
-    rootNode->getOrCreateStateSet()->setAttributeAndModes(multi, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
-    rootNode->getOrCreateStateSet()->setMode(GL_MULTISAMPLE_ARB, osg::StateAttribute::ON);
+    m_rootNode->getOrCreateStateSet()->setAttributeAndModes(multi, osg::StateAttribute::ON | osg::StateAttribute::OVERRIDE);
+    m_rootNode->getOrCreateStateSet()->setMode(GL_MULTISAMPLE_ARB, osg::StateAttribute::ON);
 
     osg::LightModel* lightModel = new osg::LightModel();
     lightModel->setTwoSided(false);
     lightModel->setLocalViewer(true);
     lightModel->setAmbientIntensity(osg::Vec4(0.4, 0.4, 0.4, 1.0));
-    rootNode->getOrCreateStateSet()->setAttributeAndModes(lightModel);
+    m_rootNode->getOrCreateStateSet()->setAttributeAndModes(lightModel);
 
     pViewer->getLight()->setAmbient(osg::Vec4(0.1, 0.1, 0.1, 1.0));
     pViewer->getLight()->setDiffuse(osg::Vec4(0.9, 0.9, 0.9, 1.0));
@@ -187,25 +187,25 @@ void RenderWidget3D::initWindow()
     osgGA::TrackballManipulator* manipulator = new osgGA::TrackballManipulator();
     pViewer->setCameraManipulator(manipulator);
 
-    manipulator->setNode(sceneNode);
+    manipulator->setNode(m_sceneNode);
     manipulator->setTrackballSize(1000);
     manipulator->setAllowThrow(false);
 
     //rotate show
     osg::Matrix matrix;
     matrix.setRotate(osg::Quat(-osg::PI_2, osg::X_AXIS));
-    sceneNode->setMatrix(matrix);
+    m_sceneNode->setMatrix(matrix);
 
-    rootNode->addChild(sceneNode);
+    m_rootNode->addChild(m_sceneNode);
 
-    material = new osg::Material();
-    material->setDiffuse(osg::Material::BACK, osg::Vec4(0.486, 0.486, 0.811, 1.0));
-    material->setDiffuse(osg::Material::FRONT, osg::Vec4(23.0f / 255.f, 96.0f / 255.f, 133.0f / 255.f, 1.0));
-    material->setColorMode(osg::Material::DIFFUSE);
+    m_material = new osg::Material();
+    m_material->setDiffuse(osg::Material::BACK, osg::Vec4(0.486, 0.486, 0.811, 1.0));
+    m_material->setDiffuse(osg::Material::FRONT, osg::Vec4(23.0f / 255.f, 96.0f / 255.f, 133.0f / 255.f, 1.0));
+    m_material->setColorMode(osg::Material::DIFFUSE);
 
     initNode();
 
-    connect(homeButton, &QPushButton::clicked, this, [=]() 
+    connect(m_homeButton, &QPushButton::clicked, this, [=]() 
         {
             pViewer->home();
         });
@@ -217,33 +217,33 @@ void RenderWidget3D::initWindow()
     csAxes->setMainCamera(pViewer->getCamera());
     csAxes->setOrthoProjection(true);
 
-    rootNode->addChild(csAxes);
+    m_rootNode->addChild(csAxes);
 
     // make trackball
     // set line property
     osg::ref_ptr<osg::LineWidth> lineSize = new osg::LineWidth;
     lineSize->setWidth(2.0);
-    osg::ref_ptr<osg::StateSet> stateSet = rootNode->getOrCreateStateSet();
+    osg::ref_ptr<osg::StateSet> stateSet = m_rootNode->getOrCreateStateSet();
     stateSet->setAttributeAndModes(lineSize, osg::StateAttribute::ON);
 
     osg::ref_ptr<osg::MatrixTransform> trackball = makeTrackball();
-    trackballCamera = new CSCustomCamera;
-    trackballCamera->addChild(trackball);
-    trackballCamera->setMainCamera(pViewer->getCamera());
-    trackballCamera->setOrthoProjection(false);
-    trackballCamera->setTran(osg::Vec3(0, 0, -500));
+    m_trackballCamera = new CSCustomCamera;
+    m_trackballCamera->addChild(trackball);
+    m_trackballCamera->setMainCamera(pViewer->getCamera());
+    m_trackballCamera->setOrthoProjection(false);
+    m_trackballCamera->setTran(osg::Vec3(0, 0, -500));
 
-    rootNode->addChild(trackballCamera);
+    m_rootNode->addChild(m_trackballCamera);
 
-    osgQOpenGLWidgetPtr->mutex()->writeLock();
-    isReady = true;
-    osgQOpenGLWidgetPtr->mutex()->writeUnlock();
+    m_osgQOpenGLWidgetPtr->mutex()->writeLock();
+    m_isReady = true;
+    m_osgQOpenGLWidgetPtr->mutex()->writeUnlock();
 }
 
 void RenderWidget3D::updateNodeVertexs(cs::Pointcloud& pointCloud)
 {
-    auto vertexArr = dynamic_cast<osg::Vec3Array*>(geom->getVertexArray());
-    auto normalArr = dynamic_cast<osg::Vec3Array*>(geom->getNormalArray());
+    auto vertexArr = dynamic_cast<osg::Vec3Array*>(m_geom->getVertexArray());
+    auto normalArr = dynamic_cast<osg::Vec3Array*>(m_geom->getNormalArray());
    
     const int num_ver = qMin(pointCloud.getNormals().size(), pointCloud.getVertices().size());
     vertexArr->resize(num_ver);
@@ -252,12 +252,12 @@ void RenderWidget3D::updateNodeVertexs(cs::Pointcloud& pointCloud)
     memcpy((void*)vertexArr->getDataPointer(), pointCloud.getVertices().data(), sizeof(cs::float3) * num_ver);
     memcpy((void*)normalArr->getDataPointer(), pointCloud.getNormals().data(), sizeof(cs::float3) * num_ver);
 
-    if (geom->getNumPrimitiveSets() > 0)
+    if (m_geom->getNumPrimitiveSets() > 0)
     {
-        geom->removePrimitiveSet(0);
+        m_geom->removePrimitiveSet(0);
     }
 
-    geom->insertPrimitiveSet(0, new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, num_ver));
+    m_geom->insertPrimitiveSet(0, new osg::DrawArrays(osg::PrimitiveSet::POINTS, 0, num_ver));
 }
 
 void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage& image)
@@ -267,19 +267,19 @@ void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage&
     const int height = image.height();
 
     bool bTexture = (!image.isNull() && texFrame != nullptr && width > 0 && height > 0);
-    if (!bTexture || !textureButton->isChecked())
+    if (!bTexture || !m_textureButton->isChecked())
     {
-        osg::StateSet* ss = geom->getOrCreateStateSet();
-        geom->setColorBinding(osg::Geometry::BIND_OFF);
+        osg::StateSet* ss = m_geom->getOrCreateStateSet();
+        m_geom->setColorBinding(osg::Geometry::BIND_OFF);
         ss->setMode(GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
-        geom->getOrCreateStateSet()->setAttributeAndModes(material);
+        m_geom->getOrCreateStateSet()->setAttributeAndModes(m_material);
         return;
     }
     
-    geom->getOrCreateStateSet()->removeAttribute(material);
+    m_geom->getOrCreateStateSet()->removeAttribute(m_material);
 
-    auto colorArr = dynamic_cast<osg::Vec4Array*>(geom->getColorArray());
+    auto colorArr = dynamic_cast<osg::Vec4Array*>(m_geom->getColorArray());
     int numVer = qMin(pointCloud.getNormals().size(), pointCloud.getVertices().size());
     numVer = qMin(pointCloud.getTexcoords().size(), size_t(numVer));
     colorArr->resize(numVer);
@@ -300,21 +300,21 @@ void RenderWidget3D::updateNodeTexture(cs::Pointcloud& pointCloud, const QImage&
         osgColor[i] = std::move(osg::Vec4(color[0] / 255.f, color[1] / 255.f, color[2] / 255.f, 1.f));
     }
 
-    osg::StateSet* ss = geom->getOrCreateStateSet();
-    geom->setColorArray(colorArr);
-    geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
+    osg::StateSet* ss = m_geom->getOrCreateStateSet();
+    m_geom->setColorArray(colorArr);
+    m_geom->setColorBinding(osg::Geometry::BIND_PER_VERTEX);
     ss->setMode(GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 }
 
 void RenderWidget3D::onRenderDataUpdated(cs::Pointcloud& pointCloud, const QImage& image)
 {
-    lastPointCloud = pointCloud;
-    lastTextureImage = image;
+    m_lastPointCloud = pointCloud;
+    m_lastTextureImage = image;
 
-    osgQOpenGLWidgetPtr->mutex()->writeLock();
-    if (!isReady)
+    m_osgQOpenGLWidgetPtr->mutex()->writeLock();
+    if (!m_isReady)
     {
-        osgQOpenGLWidgetPtr->mutex()->writeUnlock();
+        m_osgQOpenGLWidgetPtr->mutex()->writeUnlock();
         return;
     }
 
@@ -327,23 +327,23 @@ void RenderWidget3D::onRenderDataUpdated(cs::Pointcloud& pointCloud, const QImag
     //draw
     refresh();
 
-    if (isFirstFrame)
+    if (m_isFirstFrame)
     {
-        osgViewer::Viewer* pViewer = osgQOpenGLWidgetPtr->getOsgViewer();
+        osgViewer::Viewer* pViewer = m_osgQOpenGLWidgetPtr->getOsgViewer();
         if (pViewer)
         {
             pViewer->home();
         }
 
-        isFirstFrame = false;
+        m_isFirstFrame = false;
     }
     
-    osgQOpenGLWidgetPtr->mutex()->writeUnlock();
+    m_osgQOpenGLWidgetPtr->mutex()->writeUnlock();
 }
 
 void RenderWidget3D::refresh()
 {
-    osgViewer::Viewer* pViewer = osgQOpenGLWidgetPtr->getOsgViewer();
+    osgViewer::Viewer* pViewer = m_osgQOpenGLWidgetPtr->getOsgViewer();
     static bool firstFlag = true;
     if (firstFlag)
     {
@@ -351,12 +351,12 @@ void RenderWidget3D::refresh()
         firstFlag = false;
     }
    
-    geom->setUseVertexBufferObjects(true);
-    geom->setUseDisplayList(false);
+    m_geom->setUseVertexBufferObjects(true);
+    m_geom->setUseDisplayList(false);
 
-    geom->getVertexArray()->dirty();
-    geom->getNormalArray()->dirty();
-    geom->getColorArray()->dirty();
+    m_geom->getVertexArray()->dirty();
+    m_geom->getNormalArray()->dirty();
+    m_geom->getColorArray()->dirty();
 
     pViewer->requestRedraw();
 }
@@ -364,144 +364,144 @@ void RenderWidget3D::refresh()
 void RenderWidget3D::initNode()
 {
     // vertex
-    geom = new osg::Geometry;
-    geom->setUseDisplayList(false);
-    geom->setVertexArray(new osg::Vec3Array());
+    m_geom = new osg::Geometry;
+    m_geom->setUseDisplayList(false);
+    m_geom->setVertexArray(new osg::Vec3Array());
 
     // normal
-    geom->setNormalArray(new osg::Vec3Array());
-    geom->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
+    m_geom->setNormalArray(new osg::Vec3Array());
+    m_geom->setNormalBinding(osg::Geometry::BIND_PER_VERTEX);
 
     // texture
-    geom->setColorArray(new osg::Vec4Array());
+    m_geom->setColorArray(new osg::Vec4Array());
 
-    osg::StateSet* ss = geom->getOrCreateStateSet();
+    osg::StateSet* ss = m_geom->getOrCreateStateSet();
     ss->setMode(GL_LIGHTING, osg::StateAttribute::ON | osg::StateAttribute::PROTECTED);
 
-    geom->setUseVertexBufferObjects(true);
+    m_geom->setUseVertexBufferObjects(true);
     //set point size
-    geom->getOrCreateStateSet()->setAttribute(new osg::Point(2));
+    m_geom->getOrCreateStateSet()->setAttribute(new osg::Point(2));
 
     osg::ref_ptr<osg::Geode> geode = new osg::Geode;
-    geode->addDrawable(geom);
+    geode->addDrawable(m_geom);
     osg::ref_ptr<osg::MatrixTransform> mt = new osg::MatrixTransform;
     mt->addChild(geode);
 
-    sceneNode->addChild(mt.release());
+    m_sceneNode->addChild(mt.release());
 }
 
 void RenderWidget3D::updateButtonArea()
 {
-    topItem->setGeometry(0, 0, width(), topItem->height());
-    bottomItem->setGeometry(0, height()- bottomItem->height(), width(), bottomItem->height());
+    m_topItem->setGeometry(0, 0, width(), m_topItem->height());
+    m_bottomItem->setGeometry(0, height()- m_bottomItem->height(), width(), m_bottomItem->height());
 }
 
 void RenderWidget3D::initButtons()
 {
-    topItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    bottomItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    topItem->setFixedHeight(48);
-    bottomItem->setFixedHeight(48);
+    m_topItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    m_bottomItem->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    m_topItem->setFixedHeight(48);
+    m_bottomItem->setFixedHeight(48);
 
-    homeButton->setObjectName("homeButton");
-    homeButton->setIconSize(QSize(28, 28));
-    homeButton->setIcon(QIcon(":/resources/home.png"));
-    homeButton->setToolTip(tr("Home"));
+    m_homeButton->setObjectName("homeButton");
+    m_homeButton->setIconSize(QSize(28, 28));
+    m_homeButton->setIcon(QIcon(":/resources/home.png"));
+    m_homeButton->setToolTip(tr("Home"));
 
-    textureButton->setCheckable(true);
-    textureButton->setObjectName("textureButton");
-    textureButton->setIconSize(QSize(28, 28));
-    textureButton->setToolTip(tr("Texture on"));
+    m_textureButton->setCheckable(true);
+    m_textureButton->setObjectName("textureButton");
+    m_textureButton->setIconSize(QSize(28, 28));
+    m_textureButton->setToolTip(tr("Texture on"));
 
     QIcon icon1;
     icon1.addFile(QStringLiteral(":/resources/texture_off.png"), QSize(), QIcon::Normal, QIcon::Off);
     icon1.addFile(QStringLiteral(":/resources/texture_on.png"), QSize(), QIcon::Active, QIcon::On);
     icon1.addFile(QStringLiteral(":/resources/texture_on.png"), QSize(), QIcon::Selected, QIcon::On);
-    textureButton->setIcon(icon1);
+    m_textureButton->setIcon(icon1);
 
-    exitButton->setIconSize(QSize(22, 22));
-    exitButton->setIcon(QIcon(":/resources/fork_large.png"));
+    m_exitButton->setIconSize(QSize(22, 22));
+    m_exitButton->setIcon(QIcon(":/resources/fork_large.png"));
 
-    connect(exitButton, &QPushButton::clicked, this, [=]() {
+    connect(m_exitButton, &QPushButton::clicked, this, [=]() {
             emit renderExit(m_renderId);
         });
 
     // trackball 
-    trackballButton = new QPushButton(this);
-    trackballButton->setObjectName("TrackballButton");
-    trackballButton->setCheckable(true);
-    trackballButton->setChecked(true);
-    trackballButton->setToolTip(tr("Hide track ball"));
+    m_trackballButton = new QPushButton(this);
+    m_trackballButton->setObjectName("TrackballButton");
+    m_trackballButton->setCheckable(true);
+    m_trackballButton->setChecked(true);
+    m_trackballButton->setToolTip(tr("Hide track ball"));
 
     QIcon icon3;
     icon3.addFile(QStringLiteral(":/resources/trackball_off.png"), QSize(), QIcon::Normal, QIcon::Off);
     icon3.addFile(QStringLiteral(":/resources/trackball_on.png"), QSize(), QIcon::Active, QIcon::On);
     icon3.addFile(QStringLiteral(":/resources/trackball_on.png"), QSize(), QIcon::Selected, QIcon::On);
 
-    trackballButton->setIconSize(QSize(28, 28));
-    trackballButton->setIcon(icon3);
-    connect(trackballButton, &QPushButton::toggled, this,
+    m_trackballButton->setIconSize(QSize(28, 28));
+    m_trackballButton->setIcon(icon3);
+    connect(m_trackballButton, &QPushButton::toggled, this,
         [=](bool checked)
         {
             if (!checked)
             {
-                if (trackballCamera.valid())
+                if (m_trackballCamera.valid())
                 {
-                    rootNode->removeChild(trackballCamera);
+                    m_rootNode->removeChild(m_trackballCamera);
                 }
-                trackballButton->setToolTip(tr("Show track ball"));
+                m_trackballButton->setToolTip(tr("Show track ball"));
             }
             else
             {
-                if (trackballCamera.valid())
+                if (m_trackballCamera.valid())
                 {
-                    rootNode->addChild(trackballCamera);
+                    m_rootNode->addChild(m_trackballCamera);
                 }
-                trackballButton->setToolTip(tr("Hide track ball"));
+                m_trackballButton->setToolTip(tr("Hide track ball"));
             }
 
-            onRenderDataUpdated(lastPointCloud, lastTextureImage);
+            onRenderDataUpdated(m_lastPointCloud, m_lastTextureImage);
         });
     
 
-    QHBoxLayout* layout = new QHBoxLayout(topItem);
+    QHBoxLayout* layout = new QHBoxLayout(m_topItem);
 
-    titlLabel = new QLabel("Point Cloud", topItem);
-    layout->addWidget(titlLabel);
+    m_titlLabel = new QLabel("Point Cloud", m_topItem);
+    layout->addWidget(m_titlLabel);
     layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
-    layout->addWidget(textureButton);
-    layout->addWidget(trackballButton);
-    layout->addWidget(homeButton);
-    layout->addWidget(exitButton);
+    layout->addWidget(m_textureButton);
+    layout->addWidget(m_trackballButton);
+    layout->addWidget(m_homeButton);
+    layout->addWidget(m_exitButton);
 
     layout->setContentsMargins(15, 10, 15, 10);
 
-    connect(textureButton, &QPushButton::toggled, [=](bool toggled)
+    connect(m_textureButton, &QPushButton::toggled, [=](bool toggled)
         {
-            if (textureButton->isChecked())
+            if (m_textureButton->isChecked())
             {
-                textureButton->setToolTip(tr("Texture off"));
+                m_textureButton->setToolTip(tr("Texture off"));
             }
             else
             {
-                textureButton->setToolTip(tr("Texture on"));
+                m_textureButton->setToolTip(tr("Texture on"));
             }
 
-            onRenderDataUpdated(lastPointCloud, lastTextureImage);
+            onRenderDataUpdated(m_lastPointCloud, m_lastTextureImage);
             emit show3DTextureChanged(toggled);
         });
 
     // bottom item
-    layout = new QHBoxLayout(bottomItem);
+    layout = new QHBoxLayout(m_bottomItem);
     layout->addItem(new QSpacerItem(10, 10, QSizePolicy::Expanding, QSizePolicy::Fixed));
     layout->setContentsMargins(0, 0, 15, 10);
 
-    fullScreenBtn = new QPushButton(bottomItem);
-    fullScreenBtn->setObjectName("FullScreenButton");
-    fullScreenBtn->setCheckable(true);
-    fullScreenBtn->setFocusPolicy(Qt::NoFocus);
+    m_fullScreenBtn = new QPushButton(m_bottomItem);
+    m_fullScreenBtn->setObjectName("FullScreenButton");
+    m_fullScreenBtn->setCheckable(true);
+    m_fullScreenBtn->setFocusPolicy(Qt::NoFocus);
 
-    connect(fullScreenBtn, &QPushButton::toggled, this, [=](bool checked) {
+    connect(m_fullScreenBtn, &QPushButton::toggled, this, [=](bool checked) {
             emit fullScreenUpdated(m_renderId, checked);
         });
 
@@ -510,53 +510,53 @@ void RenderWidget3D::initButtons()
     icon2.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Active, QIcon::On);
     icon2.addFile(QStringLiteral(":/resources/full_screen.png"), QSize(), QIcon::Selected, QIcon::On);
 
-    fullScreenBtn->setIconSize(QSize(22, 22));
-    fullScreenBtn->setIcon(icon2);
+    m_fullScreenBtn->setIconSize(QSize(22, 22));
+    m_fullScreenBtn->setIcon(icon2);
 
-    layout->addWidget(fullScreenBtn);
+    layout->addWidget(m_fullScreenBtn);
 
-    fullScreenBtn->setVisible(false);
-    titlLabel->setVisible(false);
-    exitButton->setVisible(false);
+    m_fullScreenBtn->setVisible(false);
+    m_titlLabel->setVisible(false);
+    m_exitButton->setVisible(false);
 }
 
 void RenderWidget3D::onTranslate()
 {
-    if (textureButton->isChecked())
+    if (m_textureButton->isChecked())
     {
-        textureButton->setToolTip(tr("Texture off"));
+        m_textureButton->setToolTip(tr("Texture off"));
     }
     else
     {
-        textureButton->setToolTip(tr("Texture on"));
+        m_textureButton->setToolTip(tr("Texture on"));
     }
 
-    if (trackballButton)
+    if (m_trackballButton)
     {
-        if (!trackballButton->isChecked())
+        if (!m_trackballButton->isChecked())
         {
-            trackballButton->setToolTip(tr("Show track ball"));
+            m_trackballButton->setToolTip(tr("Show track ball"));
         }
         else 
         {
-            trackballButton->setToolTip(tr("Hide track ball"));
+            m_trackballButton->setToolTip(tr("Hide track ball"));
         }
     }
 
-    homeButton->setToolTip(tr("Home"));
+    m_homeButton->setToolTip(tr("Home"));
 }
 
 void RenderWidget3D::setTextureEnable(bool enable)
 {
     //textureButton->setEnabled(enable);
-    textureButton->setVisible(enable);
+    m_textureButton->setVisible(enable);
 }
 
 void RenderWidget3D::setShowFullScreen(bool value)
 {
-    fullScreenBtn->setVisible(value);
-    titlLabel->setVisible(value);
-    exitButton->setVisible(value);
+    m_fullScreenBtn->setVisible(value);
+    m_titlLabel->setVisible(value);
+    m_exitButton->setVisible(value);
 }
 
 osg::ref_ptr<osg::MatrixTransform> RenderWidget3D::makeCoordinate()

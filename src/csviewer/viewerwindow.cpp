@@ -209,8 +209,10 @@ void ViewerWindow::onCameraStateChanged(int state)
         break;
     case CAMERA_STARTED_STREAM:
         onCameraStreamStarted();
+        break;
     case CAMERA_STOPPED_STREAM:
-        m_circleProgressBar->close();
+    case CAMERA_PAUSED_STREAM:
+        onCameraStreamStopped();
         break;
     default:    
         break;
@@ -482,6 +484,16 @@ void ViewerWindow::onCameraStreamStarted()
     suc &= (bool)connect(app, &cs::CSApplication::output2DUpdated, m_ui->renderWindow, &RenderWindow::onOutput2DUpdated, Qt::QueuedConnection);
 
     Q_ASSERT(suc);
+
+    m_circleProgressBar->close();
+}
+
+void ViewerWindow::onCameraStreamStopped()
+{
+    m_circleProgressBar->close();
+    auto app = cs::CSApplication::getInstance();
+    disconnect(app, &cs::CSApplication::output3DUpdated, m_ui->renderWindow, &RenderWindow::onOutput3DUpdated);
+    disconnect(app, &cs::CSApplication::output2DUpdated, m_ui->renderWindow, &RenderWindow::onOutput2DUpdated);
 }
 
 void ViewerWindow::onWindowsMenuTriggered(QAction* action)

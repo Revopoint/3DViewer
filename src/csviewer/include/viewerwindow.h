@@ -81,6 +81,7 @@ private slots:
 
     // start the stream
     void onCameraStreamStarted();
+    void onCameraStreamStopped();
 private slots:
     // menu
     void onUpdateLanguage(QAction* action);

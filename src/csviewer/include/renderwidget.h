@@ -113,18 +113,18 @@ protected:
     int m_frameCount;
     float m_fps;
 
-    bool enableImageScale = true;
-    float imageAreaScale = 1.0f;
-    float imageAreaScaleMin = 1;
-    float imageAreaScaleMax = 10;
-    float imageScaleStep = 0.1;
+    bool m_enableImageScale = true;
+    float m_imageAreaScale = 1.0f;
+    float m_imageAreaScaleMin = 1;
+    float m_imageAreaScaleMax = 10;
+    float m_imageScaleStep = 0.1;
 
-    bool holdCtrl = false;
+    bool m_holdCtrl = false;
 
-    QImage cachedImage;
+    QImage m_cachedImage;
 
-    int bottomOffset = 0;
-    bool isFirstFrame = true;
+    int m_bottomOffset = 0;
+    bool m_isFirstFrame = true;
 };
 
 class CSROIWidget;
@@ -148,11 +148,11 @@ signals:
 private:
     void onPainterInfos(OutputData2D outputData) override;
 private:
-    QPointF mousePressPoint;
-    bool isRoiEdit;
-    bool isShowCoord;
+    QPointF m_mousePressPoint;
+    bool m_isRoiEdit;
+    bool m_isShowCoord;
 
-    CSROIWidget* roiWidget;
+    CSROIWidget* m_roiWidget;
 };
 
 typedef enum Axis
@@ -170,7 +170,7 @@ public:
     CSCustomCamera(CSCustomCamera const& copy, osg::CopyOp copyOp = osg::CopyOp::SHALLOW_COPY);
     virtual ~CSCustomCamera();
     META_Node(osg, CSCustomCamera);
-    inline void setMainCamera(Camera* camera) { mainCamera = camera; }
+    inline void setMainCamera(Camera* camera) { m_mainCamera = camera; }
     virtual void traverse(osg::NodeVisitor& nv);
 
     void setOrthoProjection(bool isOrtho);
@@ -178,9 +178,9 @@ public:
 private:
     void initCamera();
 protected:
-    osg::observer_ptr<Camera> mainCamera;
-    bool isOrthoProjection = false;
-    osg::Vec3 translate;
+    osg::observer_ptr<Camera> m_mainCamera;
+    bool m_isOrthoProjection = false;
+    osg::Vec3 m_translate;
 };
 
 class RenderWidget3D : public RenderWidget
@@ -212,27 +212,27 @@ private:
 signals:
     void show3DTextureChanged(bool texture);
 private:
-    osgQOpenGLWidget* osgQOpenGLWidgetPtr;
-    osg::ref_ptr<osg::Group> rootNode;
-    osg::ref_ptr<osg::MatrixTransform> sceneNode;
-    osg::ref_ptr<osg::Material> material;
-    osg::ref_ptr<osg::Geometry> geom;
-    osg::ref_ptr<CSCustomCamera> trackballCamera;
+    osgQOpenGLWidget* m_osgQOpenGLWidgetPtr;
+    osg::ref_ptr<osg::Group> m_rootNode;
+    osg::ref_ptr<osg::MatrixTransform> m_sceneNode;
+    osg::ref_ptr<osg::Material> m_material;
+    osg::ref_ptr<osg::Geometry> m_geom;
+    osg::ref_ptr<CSCustomCamera> m_trackballCamera;
 
-    QPushButton* homeButton;
-    QPushButton* textureButton;
-    QPushButton* exitButton;
-    QPushButton* fullScreenBtn;
-    QPushButton* trackballButton;
+    QPushButton* m_homeButton;
+    QPushButton* m_textureButton;
+    QPushButton* m_exitButton;
+    QPushButton* m_fullScreenBtn;
+    QPushButton* m_trackballButton;
 
-    QLabel* titlLabel;
-    QWidget* topItem;
-    QWidget* bottomItem;
+    QLabel* m_titlLabel;
+    QWidget* m_topItem;
+    QWidget* m_bottomItem;
 
-    bool isReady = false;
-    bool isFirstFrame = true;
+    bool m_isReady = false;
+    bool m_isFirstFrame = true;
 
-    cs::Pointcloud lastPointCloud;
-    QImage lastTextureImage;
+    cs::Pointcloud m_lastPointCloud;
+    QImage m_lastTextureImage;
 };
 #endif // _CS_RENDERWIDGET2D_H

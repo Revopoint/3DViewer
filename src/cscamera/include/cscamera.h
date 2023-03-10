@@ -111,6 +111,7 @@ private:
     void startStreamThread();
 
     bool isNetworkConnect(QString uuid);
+    void restoreExposureGain();
 signals:
     void updateParaSignal(int paraId);
 private slots:
