@@ -51,7 +51,8 @@ CSApplication::CSApplication()
     , m_cameraCaptureTool(std::make_shared<CameraCaptureTool>())
     , m_appConfig(std::make_shared<AppConfig>())
 {
-    CameraThread::setSdkLogPath(LOG_ROOT_DIR + "/sdk.log");
+    CameraThread::enableSdkLog(LOG_ROOT_DIR);
+
     m_cameraThread = std::make_shared<CameraThread>();
 
     qRegisterMetaType<StreamData>("StreamData");

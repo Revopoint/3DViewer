@@ -319,7 +319,6 @@ void CaptureSettingDialog::reject()
         else if (button == QMessageBox::Yes)
         {
             onStopCapture();
-            QDialog::reject();
         }
     }
     else

@@ -20,6 +20,8 @@
 #include "camerathread.h"
 
 #include <QDebug>
+#include <QDir>
+#include <QDateTime>
 #include <QReadLocker>
 #include <QWriteLocker>
 
@@ -187,9 +189,66 @@ void CameraThread::initialize()
     }
 }
 
-void CameraThread::setSdkLogPath(QString path)
+void CameraThread::enableSdkLog(QString logDir)
 {
-    CSCamera::setSdkLogPath(path);
+    QString logPrefix = "3DCameraSDK";
+    QString day = QDateTime::currentDateTime().toString("yyyyMMdd");
+    QString logFile = logPrefix + "." + day + ".log";
+
+    QDir dir(logDir);
+    // check the file exists or not
+    if (dir.exists(logFile))
+    {
+        QStringList filters;
+        filters << (logPrefix + ".*.log.*");
+        dir.setNameFilters(filters);
+
+        auto fileList = dir.entryList();
+
+        // sort 
+        qSort(fileList.begin(), fileList.end(), [](const QString& s1, const QString& s2)
+            {
+                QStringList ss1 = s1.split(".");
+                QStringList ss2 = s2.split(".");
+                if (ss1.size() == 4 && ss2.size() == 4)
+                {
+                    return ss1.at(3).toInt() > ss2.at(3).toInt();
+                }
+
+                return false;
+            });
+          
+        foreach(QString file, fileList) {
+            QStringList s = file.split(".");
+            if (s.size() == 4)
+            {
+                int index = s.at(3).toInt();
+                QString newName = logFile + "." + QString::number(index + 1);
+                dir.rename(file, newName);
+            }
+        }
+
+        QString newName = logFile + "." + QString::number(1);
+        dir.rename(logFile, newName);
+    }
+
+    // delete logs from a week ago
+    QString endDay = QDateTime::currentDateTime().addDays(-7).toString("yyyyMMdd");
+
+    QStringList filters;
+    filters << (logPrefix + ".*.log*");
+    dir.setNameFilters(filters);
+
+    auto fileList = dir.entryList();
+    foreach(QString file, fileList) {
+        QStringList s = file.split(".");
+        if (s.size() >= 3 && s.at(1).length() == 8 && s.at(1) < endDay) {
+            dir.remove(file);
+        }
+    }
+
+    // set current 3DCamera log
+    CSCamera::setSdkLogPath(logDir + QDir::separator() + logFile);
 }
 
 void CameraThread::run()
@@ -209,9 +268,9 @@ void CameraThread::unBindCamera()
 
 void CameraThread::bindCamera(CSCamera* camera)
 {
-    //bind thread
+    // bind thread
     camera->setCameraThread(this);
-    //bind the camera to proxy
+    // bind the camera to proxy
     qobject_cast<CameraProxy*>(m_cameraProxy.get())->bindCamera(camera);
 }
 

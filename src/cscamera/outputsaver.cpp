@@ -50,6 +50,11 @@ void OutputSaver::run()
     m_cameraCapture->saveFinished(this);
 }
 
+void OutputSaver::updateCaptureConfig(const CameraCaptureConfig& config)
+{
+    m_captureConfig = config;
+}
+
 void OutputSaver::updateSaveIndex()
 {
     int rgbFrameIndex = -1, depthFrameIndex = -1, pointCloudIndex = -1;

@@ -103,7 +103,10 @@ void CameraCaptureTool::startCapture(CameraCaptureConfig config, bool autoNaming
 
     suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::captureStateChanged, this, &CameraCaptureTool::captureStateChanged);
     suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::captureNumberUpdated, this, &CameraCaptureTool::captureNumberUpdated);
-    suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::finished, this, &CameraCaptureTool::stopCapture);
+    suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::finished, this, [=]() 
+        {
+            m_cameraCapture->deleteLater();
+        });
 
     Q_ASSERT(suc);
 
@@ -121,9 +124,8 @@ void CameraCaptureTool::stopCapture()
     }
 
     m_cameraCapture->requestInterruption();
-    m_cameraCapture->wait();
 
-    delete m_cameraCapture;
+    //delete m_cameraCapture later
     m_cameraCapture = nullptr;
 }
 
@@ -193,6 +195,7 @@ void CameraCaptureBase::run()
             m_saverMutex.unlock();
 
             outputSaver->updateSaveIndex();
+            outputSaver->updateCaptureConfig(m_captureConfig);
 
             // save a frame in separate thread
             m_threadPool.start(outputSaver, QThread::NormalPriority);

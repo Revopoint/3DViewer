@@ -35,6 +35,7 @@ public:
     virtual ~OutputSaver();
     void run() override;
 
+    void updateCaptureConfig(const CameraCaptureConfig& config);
     void updateSaveIndex();
 protected:
     void setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex);

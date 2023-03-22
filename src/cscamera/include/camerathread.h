@@ -45,7 +45,8 @@ public:
     void updateCameraInfoList(const std::vector<CameraInfo>& added, const std::vector<CameraInfo>& removed);
     std::shared_ptr<ICSCamera> getCamera() const;
     
-    static void setSdkLogPath(QString path);
+    static void enableSdkLog(QString logDir);
+
 public slots:
     void onConnectCamera(QString serial);
     void onDisconnectCamera();
