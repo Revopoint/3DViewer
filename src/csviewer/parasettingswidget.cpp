@@ -440,7 +440,7 @@ void ParaSettingsWidget::onCameraStateChanged(int state)
 void ParaSettingsWidget::updateControlButtonState(int cameraState)
 {
     bool enable = (cameraState == CAMERA_CONNECTED || cameraState == CAMERA_STARTED_STREAM || cameraState == CAMERA_PAUSED_STREAM
-        || cameraState == CAMERA_STOPPED_STREAM);
+        || cameraState == CAMERA_STOPPED_STREAM || cameraState == CAMERA_START_STREAM_FAILED);
 
     m_ui->previewButton->setEnabled(enable);
 
@@ -475,7 +475,7 @@ void ParaSettingsWidget::updateWidgetsState(int cameraState)
         auto paraId = widget->getParaId();
         const bool isStreamTypePara = streamTypePara.contains(paraId);
 
-        bool enable = (cameraState == CAMERA_CONNECTED || cameraState == CAMERA_PAUSED_STREAM || cameraState == CAMERA_STOPPED_STREAM) ? isStreamTypePara
+        bool enable = (cameraState == CAMERA_CONNECTED || cameraState == CAMERA_PAUSED_STREAM || cameraState == CAMERA_STOPPED_STREAM || cameraState == CAMERA_START_STREAM_FAILED) ? isStreamTypePara
             : (cameraState == CAMERA_STARTED_STREAM ? !isStreamTypePara : false);
 
         widget->setEnabled(enable);

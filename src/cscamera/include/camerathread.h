@@ -46,6 +46,8 @@ public:
     std::shared_ptr<ICSCamera> getCamera() const;
     
     static void enableSdkLog(QString logDir);
+    static void initialize(void* user);
+    static void deInitialize();
 
 public slots:
     void onConnectCamera(QString serial);
@@ -69,7 +71,6 @@ private:
     void run() override;
 
     void initConnections();
-    void initialize();
     
     void onAddCameras(const std::vector<CameraInfo>& added);
     void onRemoveCameras(const std::vector<CameraInfo>& removed);

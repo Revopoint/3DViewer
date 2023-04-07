@@ -76,7 +76,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="335"/>
+        <location filename="../viewerwindow.cpp" line="344"/>
         <source>Set default save path (</source>
         <translation type="unfinished"></translation>
     </message>
@@ -86,102 +86,107 @@
     </message>
     <message>
         <location filename="../viewerwindow.cpp" line="165"/>
-        <location filename="../viewerwindow.cpp" line="389"/>
+        <location filename="../viewerwindow.cpp" line="398"/>
         <source>Set default save path </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="235"/>
+        <location filename="../viewerwindow.cpp" line="241"/>
         <source>Connecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="238"/>
+        <location filename="../viewerwindow.cpp" line="244"/>
         <source>Camera connected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="241"/>
+        <location filename="../viewerwindow.cpp" line="247"/>
         <source>Camera connection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="244"/>
+        <location filename="../viewerwindow.cpp" line="250"/>
         <source>Disconnecting camera</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="247"/>
+        <location filename="../viewerwindow.cpp" line="253"/>
         <source>Camera disconnected successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="250"/>
+        <location filename="../viewerwindow.cpp" line="256"/>
         <source>Camera disconnection failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="253"/>
+        <location filename="../viewerwindow.cpp" line="259"/>
         <source>Starting preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="256"/>
+        <location filename="../viewerwindow.cpp" line="262"/>
         <source>Start preview successfully</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="259"/>
-        <source>Pausing preview</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../viewerwindow.cpp" line="262"/>
-        <source>Preview has been paused</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../viewerwindow.cpp" line="265"/>
-        <source>Restarting camera</source>
+        <source>Start preview failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../viewerwindow.cpp" line="268"/>
-        <source>Stopping preview</source>
+        <source>Pausing preview</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../viewerwindow.cpp" line="271"/>
+        <source>Preview has been paused</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.cpp" line="274"/>
+        <source>Restarting camera</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.cpp" line="277"/>
+        <source>Stopping preview</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../viewerwindow.cpp" line="280"/>
         <source>Preview has been stopped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="329"/>
+        <location filename="../viewerwindow.cpp" line="338"/>
         <source>Set default save path</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="417"/>
+        <location filename="../viewerwindow.cpp" line="426"/>
         <source>The current camera has been disconnected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="676"/>
+        <location filename="../viewerwindow.cpp" line="695"/>
         <source>Tips</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="677"/>
+        <location filename="../viewerwindow.cpp" line="696"/>
         <source>Confirm to exit the application ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="679"/>
+        <location filename="../viewerwindow.cpp" line="698"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../viewerwindow.cpp" line="680"/>
+        <location filename="../viewerwindow.cpp" line="699"/>
         <source>No</source>
         <translation type="unfinished"></translation>
     </message>
@@ -656,12 +661,12 @@ and the image quality of objects farther away may become worse.</translation>
 <context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="172"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="174"/>
         <source>Start capturing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="217"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="220"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -902,17 +907,17 @@ and the image quality of objects farther away may become worse.</translation>
 <context>
     <name>cs::CameraCaptureMultiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="625"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="628"/>
         <source>a frame dropped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="724"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="727"/>
         <source>Please wait for the file to be compressed to zip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="736"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="739"/>
         <source>Failed to compress zip file</source>
         <translation type="unfinished"></translation>
     </message>

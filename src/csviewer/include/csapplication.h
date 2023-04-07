@@ -44,6 +44,7 @@ public:
     static CSApplication* getInstance();
     ~CSApplication();
     void start();
+    void stop();
     std::shared_ptr<ICSCamera> getCamera() const;
 
     void setCurOutputData(const CameraCaptureConfig& config);

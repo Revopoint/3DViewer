@@ -88,12 +88,19 @@ CSApplication::~CSApplication()
 void CSApplication::start()
 {
     initConnections();
+
     m_cameraThread->start();
 
     auto camera = m_cameraThread->getCamera();
     m_cameraCaptureTool->setCamera(camera);
 
     m_processor->addProcessEndLisener(m_cameraCaptureTool.get());
+}
+
+void CSApplication::stop()
+{
+    getCamera()->disconnectCamera();
+    CameraThread::deInitialize();
 }
 
 std::shared_ptr<ICSCamera> CSApplication::getCamera() const

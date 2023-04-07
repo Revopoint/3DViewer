@@ -207,6 +207,10 @@ void ViewerWindow::onCameraStateChanged(int state)
         m_ui->menuCamera->setEnabled(false);
         destoryRenderWindows();
         break;
+    case CAMERA_START_STREAM_FAILED:
+        m_circleProgressBar->close();
+        destoryRenderWindows();
+        break;
     case CAMERA_STARTED_STREAM:
         onCameraStreamStarted();
         break;
@@ -256,6 +260,9 @@ void ViewerWindow::updateStatusBar(int state)
         break;
     case CAMERA_STARTED_STREAM:
         m_ui->statusBar->showMessage(tr("Start preview successfully"), timeoutMS);
+        break;
+    case CAMERA_START_STREAM_FAILED:
+        m_ui->statusBar->showMessage(tr("Start preview failed"), timeoutMS);
         break;
     case CAMERA_PAUSING_STREAM:
         m_ui->statusBar->showMessage(tr("Pausing preview"), timeoutMS);
@@ -352,7 +359,7 @@ void ViewerWindow::onAppExit()
 
 void ViewerWindow::onAboutToQuit()
 {
-    cs::CSApplication::getInstance()->getCamera()->disconnectCamera();
+    cs::CSApplication::getInstance()->stop();
 }
 
 void ViewerWindow::onLanguageChanged()

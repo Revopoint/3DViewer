@@ -53,9 +53,6 @@ CameraThread::CameraThread()
 
 CameraThread::~CameraThread()
 {
-    CSCamera::setCameraChangeCallback(nullptr, nullptr);
-    CSCamera::setCameraAlarmCallback(nullptr, nullptr);
-
     disconnect(m_cameraProxy.get(), &CameraProxy::cameraStateChanged, this, &CameraThread::cameraStateChanged);
     disconnect(this, &CameraThread::cameraStateChanged, this, &CameraThread::onCameraStateChanged);
     disconnect(this, &CameraThread::reconnectCamera, this, &CameraThread::onReconnectCamera);
@@ -176,11 +173,24 @@ void CameraThread::initConnections()
     Q_ASSERT(suc);
 }
 
-void CameraThread::initialize()
+void CameraThread::initialize(void* user)
 {
     bool result = true;
-    result &= (CSCamera::setCameraChangeCallback(onCameraChanged, this) == 0);
-    result &= (CSCamera::setCameraAlarmCallback(onCameraAlarm, this) == 0);
+    result &= (CSCamera::setCameraChangeCallback(onCameraChanged, user) == 0);
+    result &= (CSCamera::setCameraAlarmCallback(onCameraAlarm, user) == 0);
+
+    if (!result)
+    {
+        qDebug() << "set camera callback failed.";
+        Q_ASSERT(result);
+    }
+}
+
+void CameraThread::deInitialize()
+{
+    bool result = true;
+    result &= (CSCamera::setCameraChangeCallback(nullptr, nullptr) == 0);
+    result &= (CSCamera::setCameraAlarmCallback(nullptr, nullptr) == 0);
 
     if (!result)
     {
@@ -253,7 +263,7 @@ void CameraThread::enableSdkLog(QString logDir)
 
 void CameraThread::run()
 {
-    initialize();
+    initialize(this);
     exec();
 }
 

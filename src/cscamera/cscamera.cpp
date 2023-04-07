@@ -258,7 +258,6 @@ bool CSCamera::startStream()
     suc &= (bool)connect(this, &CSCamera::updateParaSignal, this, &CSCamera::onParaUpdated);
     Q_ASSERT(suc);
 
-    qInfo() << "begin start stream";
     setCameraState(CAMERA_STARTING_STREAM);
     bool result = true;
     if (m_isDepthStreamSup)
@@ -285,9 +284,15 @@ bool CSCamera::startStream()
         qInfo() << "start rgb stream end";
     }
 
+    if (!result)
+    {
+        qWarning("Error : start stream failed.");
+        setCameraState(CAMERA_START_STREAM_FAILED);
+        return false;
+    }
+
     // start get frame thread
     startStreamThread();
-    qInfo() << "start stream thread";
 
     onStreamStarted();
 
@@ -364,6 +369,7 @@ bool CSCamera::startDepthStream()
     if (ret != SUCCESS)
     {
         qWarning("camera start depth stream failed(%d)!", ret);
+        Q_ASSERT(false);
         return false;
     }
     else
@@ -390,6 +396,7 @@ bool CSCamera::startRgbStream()
     if (ret != SUCCESS)
     {
         qDebug("camera start rgb stream failed(%d)!", ret);
+        Q_ASSERT(false);
         return false;
     }
 
@@ -1565,6 +1572,12 @@ void CSCamera::setDepthFormat(STREAM_FORMAT format)
     QList<QPair<QString, QVariant>> resolutions;
     getResolutions(STREAM_TYPE_DEPTH, resolutions);
     
+    if(resolutions.size() <= 0)
+    {
+        qWarning() << "Error, the depth resolutions is empty";
+        return;
+    }
+    
     emit cameraParaItemsUpdated(PARA_DEPTH_RESOLUTION);
 
     // 3. update resolution
@@ -1618,6 +1631,11 @@ void CSCamera::setRgbFormat(STREAM_FORMAT format)
     // 2. update resolution items
     QList<QPair<QString, QVariant>> resolutions;
     getResolutions(STREAM_TYPE_RGB, resolutions);
+    if(resolutions.size() <= 0)
+    {
+        qWarning() << "Error, the RGB resolutions is empty";
+        return;
+    }
 
     emit cameraParaItemsUpdated(PARA_RGB_RESOLUTION);
 
@@ -1838,6 +1856,8 @@ void CSCamera::stopStreamThread()
 
 void CSCamera::startStreamThread()
 {
+    qInfo() << "start stream thread";
+
     if (!m_streamThread->isRunning())
     {
         qInfo() << "start stream thread";

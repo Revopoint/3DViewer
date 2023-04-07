@@ -26,23 +26,25 @@
 #include <QVector3D>
 #include <QVariant>
 #include <QMetaType>
+#include <QMetaEnum>
 #include <hpp/Types.hpp>
 
 enum CAMERA_STATE
 {
-    CAMERA_CONNECTING  = 0,
-    CAMERA_CONNECTED,
-    CAMERA_CONNECTFAILED,
-    CAMERA_DISCONNECTING,
-    CAMERA_DISCONNECTED,
-    CAMERA_DISCONNECTFAILED,
-    CAMERA_STARTING_STREAM,
-    CAMERA_STARTED_STREAM,
-    CAMERA_PAUSING_STREAM,
-    CAMERA_PAUSED_STREAM,
-    CAMERA_STOPPING_STREAM,
-    CAMERA_STOPPED_STREAM,
-    CAMERA_RESTARTING_CAMERA
+    CAMERA_CONNECTING                           = 0,
+    CAMERA_CONNECTED                            = 1,
+    CAMERA_CONNECTFAILED                        = 2,   
+    CAMERA_DISCONNECTING                        = 3,
+    CAMERA_DISCONNECTED                         = 4,
+    CAMERA_DISCONNECTFAILED                     = 5,
+    CAMERA_STARTING_STREAM                      = 6,
+    CAMERA_STARTED_STREAM                       = 7,
+    CAMERA_START_STREAM_FAILED                  = 8,
+    CAMERA_PAUSING_STREAM                       = 9,
+    CAMERA_PAUSED_STREAM                        = 10,
+    CAMERA_STOPPING_STREAM                      = 11,
+    CAMERA_STOPPED_STREAM                       = 12,
+    CAMERA_RESTARTING_CAMERA                    = 13,
 };
 
 enum STREAM_DATA_TYPE
