@@ -16,27 +16,27 @@ extern "C" {
 
 /**
 * @~chinese
-* @brief      Æô¶¯Éı¼¶(Òì²½½Ó¿Ú)
-* @param[in]  cInfo				Ö¸¶¨ĞèÒªÉı¼¶µÄÉè±¸ĞÅÏ¢£¬Èç¹û²»Ö¸¶¨Ôò½«±äÁ¿ÖÃ¿Õ
-* @param[in]  upExeDir			Ö¸¶¨Éı¼¶µÄ¿ÉÖ´ĞĞÎÄ¼şÄ¿Â¼£¬ÔÚ´ËÄ¿Â¼ĞèÒªÄÜ¹»ÕÒµ½up¡¢up2¡¢adbÈı¸ö¿ÉÖ´ĞĞÎÄ¼ş
-* @param[in]  upgradePackage		Éı¼¶°üµÄ±¾µØÂ·¾¶
-* @param[in]  upgradePackageMd5			£ºÉı¼¶°üµÄmd5Öµ£¬ÓÃÓÚÑéÖ¤°üÎÄ¼şµÄÍêÕûĞÔ
-* @return     ³É¹¦:Éı¼¶¾ä±ú, Ê§°Ü:nullptr
+* @brief      å¯åŠ¨å‡çº§(å¼‚æ­¥æ¥å£)
+* @param[in]  cInfo				æŒ‡å®šéœ€è¦å‡çº§çš„è®¾å¤‡ä¿¡æ¯ï¼Œå¦‚æœä¸æŒ‡å®šåˆ™å°†å˜é‡ç½®ç©º
+* @param[in]  upExeDir			æŒ‡å®šå‡çº§çš„å¯æ‰§è¡Œæ–‡ä»¶ç›®å½•ï¼Œåœ¨æ­¤ç›®å½•éœ€è¦èƒ½å¤Ÿæ‰¾åˆ°upã€up2ã€adbä¸‰ä¸ªå¯æ‰§è¡Œæ–‡ä»¶
+* @param[in]  upgradePackage		å‡çº§åŒ…çš„æœ¬åœ°è·¯å¾„
+* @param[in]  upgradePackageMd5			ï¼šå‡çº§åŒ…çš„md5å€¼ï¼Œç”¨äºéªŒè¯åŒ…æ–‡ä»¶çš„å®Œæ•´æ€§
+* @return     æˆåŠŸ:å‡çº§å¥æŸ„, å¤±è´¥:nullptr
 * @~english
 * @brief     upgrade device firmware,cannot terminate after startup
 * @param[in]  cInfo				specify the device information to be upgraded.if not specified,set the variable to null
 * @param[in]  upExeDir			specify the directory of executable file to be upgraded.in this directory,can find the up\up2\adb executable files.
 * @param[in]  upgradePackage		: local path of upgrade firmware package
-* @param[in]  upgradePackageMd5			£ºthe md5 of upgradePackage,to check the package is ok.
+* @param[in]  upgradePackageMd5			ï¼šthe md5 of upgradePackage,to check the package is ok.
 * @return success:return SUCCESS, fail:other error code
 **/
 CS_API HANDLE upgradeCamera(CameraInfo cInfo,const char* upExeDir,const char* upgradePackage, const char* upgradePackageMd5);
 
 /**
  * @~chinese
- * @brief      »ñÈ¡µ±Ç°Éı¼¶½ø¶È(Òì²½½Ó¿Ú)
- * @hUpgrade	Éı¼¶¾ä±ú£¬Í¨¹ıupgradeCamera´´½¨
- * @return     ³É¹¦:[0,100],±íÊ¾½ø¶ÈµÄ°Ù·Ö±È, Ê§°Ü:0xff
+ * @brief      è·å–å½“å‰å‡çº§è¿›åº¦(å¼‚æ­¥æ¥å£)
+ * @hUpgrade	å‡çº§å¥æŸ„ï¼Œé€šè¿‡upgradeCameraåˆ›å»º
+ * @return     æˆåŠŸ:[0,100],è¡¨ç¤ºè¿›åº¦çš„ç™¾åˆ†æ¯”, å¤±è´¥:0xff
  * @~english
  * @brief	get the progress of upgrade firmware
  * @hUpgrade	the upgrade handle,create by upgradeCamera.
@@ -48,8 +48,8 @@ CS_API int getUpgradeCameraProgress(HANDLE hUpgrade);
 
  /**
  * @~chinese
- * @brief      Íê³ÉÉı¼¶£¬ÊÍ·ÅÉı¼¶¾ä±ú
- * @hUpgrade	Éı¼¶¾ä±ú£¬Í¨¹ıupgradeCamera´´½¨
+ * @brief      å®Œæˆå‡çº§ï¼Œé‡Šæ”¾å‡çº§å¥æŸ„
+ * @hUpgrade	å‡çº§å¥æŸ„ï¼Œé€šè¿‡upgradeCameraåˆ›å»º
  * @return     
  * @~english
  * @brief		finish the upgrading,release the handle 
@@ -59,8 +59,8 @@ CS_API int getUpgradeCameraProgress(HANDLE hUpgrade);
 CS_API void releaseUpgradeCamera(HANDLE hUpgrade);
 
 /**
-*		½øÈëÉı¼¶Ä£Ê½(recovery mode)
-*@pcSerial		ĞèÒªÉı¼¶µÄĞòÁĞºÅ(µ±Ç°½Ó¿ÚÄÚ²¿Ã»ÓĞÊ¹ÓÃ)
+*		è¿›å…¥å‡çº§æ¨¡å¼(recovery mode)
+*@pcSerial		éœ€è¦å‡çº§çš„åºåˆ—å·(å½“å‰æ¥å£å†…éƒ¨æ²¡æœ‰ä½¿ç”¨)
 */
 CS_API bool enterRecoveryMode(const char* pcSerial,const char* upExeDir="./");
 

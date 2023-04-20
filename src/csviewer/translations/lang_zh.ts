@@ -835,7 +835,7 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="174"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="175"/>
         <source>Start capturing</source>
         <translation type="unfinished">开始保存</translation>
     </message>
@@ -844,7 +844,7 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="obsolete">保存数据为空</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="220"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="221"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished">保存完毕，已保存%1帧（丢失%2帧）</translation>
     </message>
@@ -1092,17 +1092,17 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>cs::CameraCaptureMultiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="628"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="629"/>
         <source>a frame dropped</source>
         <translation type="unfinished">丢失一帧数据</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="727"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="728"/>
         <source>Please wait for the file to be compressed to zip</source>
         <translation type="unfinished">正打包为ZIP，请稍等...</translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="739"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="740"/>
         <source>Failed to compress zip file</source>
         <translation type="unfinished">打包为ZIP失败</translation>
     </message>

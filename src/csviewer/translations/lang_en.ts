@@ -661,12 +661,12 @@ and the image quality of objects farther away may become worse.</translation>
 <context>
     <name>cs::CameraCaptureBase</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="174"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="175"/>
         <source>Start capturing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="220"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="221"/>
         <source>End capture, captured %1 frames (%2 dropped)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -907,17 +907,17 @@ and the image quality of objects farther away may become worse.</translation>
 <context>
     <name>cs::CameraCaptureMultiple</name>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="628"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="629"/>
         <source>a frame dropped</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="727"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="728"/>
         <source>Please wait for the file to be compressed to zip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../cscamera/cameracapturetool.cpp" line="739"/>
+        <location filename="../../cscamera/cameracapturetool.cpp" line="740"/>
         <source>Failed to compress zip file</source>
         <translation type="unfinished"></translation>
     </message>

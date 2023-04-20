@@ -19,23 +19,23 @@ extern "C" {
 #endif
 	/**
 	* @~chinese
-	* @brief      Æô¶¯RpcServer
-	* @param[in]  listenPort	£º¼àÌı¶Ë¿Ú
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      å¯åŠ¨RpcServer
+	* @param[in]  listenPort	ï¼šç›‘å¬ç«¯å£
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	**/
 	CS_API ERROR_CODE startRpcServer(unsigned short listenPort);
 
 	/**
 	* @~chinese
-	* @brief     Í£Ö¹RpcServer
-	* @return    ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief     åœæ­¢RpcServer
+	* @return    æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	**/
 	CS_API ERROR_CODE stopRpcServer();
 
 	/**
-	*	ÉèÖÃRPC clientÁ¬½ÓÖ¸¶¨µÄ·şÎñÆ÷µÄIPµØÖ·ºÍ¶Ë¿ÚºÅ
-	*@pcRpcServerIp		Á¬½ÓÄ¿±êµÄIPµØÖ·
-	*@usRpcServerPort	Á¬½ÓÄ¿±êµÄ¼àÌı¶Ë¿ÚºÅ
+	*	è®¾ç½®RPC clientè¿æ¥æŒ‡å®šçš„æœåŠ¡å™¨çš„IPåœ°å€å’Œç«¯å£å·
+	*@pcRpcServerIp		è¿æ¥ç›®æ ‡çš„IPåœ°å€
+	*@usRpcServerPort	è¿æ¥ç›®æ ‡çš„ç›‘å¬ç«¯å£å·
 	*/
 	CS_API ERROR_CODE setRpcConnectInfo(const char* pcRpcServerIp, unsigned short usRpcServerPort);
 

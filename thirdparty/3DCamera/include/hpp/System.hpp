@@ -24,8 +24,8 @@ class ISystem;
 
 /**
 * @~chinese
-* \defgroup System Ïà»ú½ÓÈë¼àÌı
-* @brief ·¢ÏÖÏà»ú£¬¼àÌıÏà»ú½ÓÈëÁĞ±í±ä¶¯
+* \defgroup System ç›¸æœºæ¥å…¥ç›‘å¬
+* @brief å‘ç°ç›¸æœºï¼Œç›‘å¬ç›¸æœºæ¥å…¥åˆ—è¡¨å˜åŠ¨
 * @{
 * @~english
 * \defgroup System Camera monitor
@@ -38,11 +38,11 @@ typedef void (*CameraChangeCallback)(std::vector<CameraInfo>& addedCameras, std:
 
 /**
 * @~chinese
-* \defgroup System Ïà»ú½ÓÈë¼àÌı
-* @brief ÉÏ±¨Ïà»ú¾¯¸æĞÅÏ¢Í¨µÀ
-* @param[in]	jsonData	ÉÏ±¨Êı¾İ£¬jsonÊı¾İ¸ñÊ½
-* @param[in]	iDataLen	jsonÊı¾İ³¤¶È
-* @param[in]	userData	»Øµ÷ÓÃ»§Êı¾İ£¬ÔÚÉèÖÃ»Øµ÷Ê±´«Èë
+* \defgroup System ç›¸æœºæ¥å…¥ç›‘å¬
+* @brief ä¸ŠæŠ¥ç›¸æœºè­¦å‘Šä¿¡æ¯é€šé“
+* @param[in]	jsonData	ä¸ŠæŠ¥æ•°æ®ï¼Œjsonæ•°æ®æ ¼å¼
+* @param[in]	iDataLen	jsonæ•°æ®é•¿åº¦
+* @param[in]	userData	å›è°ƒç”¨æˆ·æ•°æ®ï¼Œåœ¨è®¾ç½®å›è°ƒæ—¶ä¼ å…¥
 * @{
 * @~english
 * \defgroup System Camera monitor
@@ -58,7 +58,7 @@ typedef void(*CameraAlarmCallback)(const char* jsonData,int iDataLen, void * use
 
 /**
 * @~chinese
-* @brief     ISystemÀà¶ÔÏóÖ¸ÕëÀàĞÍ¶¨Òå
+* @brief     ISystemç±»å¯¹è±¡æŒ‡é’ˆç±»å‹å®šä¹‰
 * @~english
 * @brief     ISytem object point type define
 **/
@@ -66,7 +66,7 @@ typedef std::shared_ptr<ISystem> ISystemPtr;
 
 /*!\class ISystem
 * @~chinese
-* @brief System½Ó¿Ú³éÏóÀà
+* @brief Systemæ¥å£æŠ½è±¡ç±»
 * @~english 
 * @brief System interface
 **/
@@ -78,10 +78,10 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      ²éÑ¯µ±Ç°ÒÑ½ÓÈëÏà»úÉè±¸
-	* @param[out] cameras ÒÑ½ÓÈë»ú»úÉè±¸ĞÅÏ¢ÁĞ±í
-	* @param[in]  timeout	³¬Ê±Ê±¼ä
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËü´íÎóÂë
+	* @brief      æŸ¥è¯¢å½“å‰å·²æ¥å…¥ç›¸æœºè®¾å¤‡
+	* @param[out] cameras å·²æ¥å…¥æœºæœºè®¾å¤‡ä¿¡æ¯åˆ—è¡¨
+	* @param[in]  timeout	è¶…æ—¶æ—¶é—´
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶å®ƒé”™è¯¯ç 
 	* @~english
 	* @brief      Query valid 3d cameras
 	* @param[out] cameras		    :return valid 3d cameras
@@ -92,10 +92,10 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      ÉèÖÃÏà»ú½ÓÈë×´Ì¬±ä¶¯»Øµ÷
-	* @param[in]  callback		±ä¶¯»Øµ÷º¯Êı
-	* @param[in]  userData		»Øµ÷º¯ÊıÓÃ»§Êı¾İ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËü´íÎóÂë
+	* @brief      è®¾ç½®ç›¸æœºæ¥å…¥çŠ¶æ€å˜åŠ¨å›è°ƒ
+	* @param[in]  callback		å˜åŠ¨å›è°ƒå‡½æ•°
+	* @param[in]  userData		å›è°ƒå‡½æ•°ç”¨æˆ·æ•°æ®
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶å®ƒé”™è¯¯ç 
 	* @~english
 	* @brief      Set camera state change callback
 	* @param[in]  callback		camera state change callback
@@ -106,10 +106,10 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      ÉèÖÃÏà»ú¾¯¸æ»Øµ÷º¯Êı
-	* @param[in]  callback		¾¯¸æ»Øµ÷º¯Êı
-	* @param[in]  userData		»Øµ÷º¯ÊıÓÃ»§Êı¾İ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËü´íÎóÂë
+	* @brief      è®¾ç½®ç›¸æœºè­¦å‘Šå›è°ƒå‡½æ•°
+	* @param[in]  callback		è­¦å‘Šå›è°ƒå‡½æ•°
+	* @param[in]  userData		å›è°ƒå‡½æ•°ç”¨æˆ·æ•°æ®
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶å®ƒé”™è¯¯ç 
 	* @~english
 	* @brief      Set camera alarm reporting channel
 	* @param[in]  callback		report alarm callback
@@ -120,9 +120,9 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      Ôö¼ÓÒ»¸öusbÁ¬½ÓµÄÏà»úÎÄ¼şÃèÊö·û,°²×¿¶Ô½Ó»áÊ¹ÓÃ
-	* @param[in]  iFd		ÎÄ¼şÃèÊö·û
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËü´íÎóÂë
+	* @brief      å¢åŠ ä¸€ä¸ªusbè¿æ¥çš„ç›¸æœºæ–‡ä»¶æè¿°ç¬¦,å®‰å“å¯¹æ¥ä¼šä½¿ç”¨
+	* @param[in]  iFd		æ–‡ä»¶æè¿°ç¬¦
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶å®ƒé”™è¯¯ç 
 	* @~english
 	* @brief     add a usb camera fd,used in android.
 	* @param[in]  iFd		usb fd
@@ -132,9 +132,9 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      É¾³ıÒ»¸öusbÁ¬½ÓµÄÏà»úÎÄ¼şÃèÊö·û,°²×¿¶Ô½Ó»áÊ¹ÓÃ
-	* @param[in]  iFd		ÎÄ¼şÃèÊö·û
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËü´íÎóÂë
+	* @brief      åˆ é™¤ä¸€ä¸ªusbè¿æ¥çš„ç›¸æœºæ–‡ä»¶æè¿°ç¬¦,å®‰å“å¯¹æ¥ä¼šä½¿ç”¨
+	* @param[in]  iFd		æ–‡ä»¶æè¿°ç¬¦
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶å®ƒé”™è¯¯ç 
 	* @~english
 	* @brief     remove a usb camera fd,used in android.
 	* @param[in]  iFd		usb fd
@@ -144,9 +144,21 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      ³õÊ¼»¯Çı¶¯
-	* @code		³õÊ¼»¯ĞòÁĞºÅ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      ç½‘ç»œæ–¹å¼æ¢æµ‹æ§åˆ¶,å®‰å“å¯¹æ¥ä¼šä½¿ç”¨
+	* @param[in]  emPT		æ¢æµ‹çŠ¶æ€
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶å®ƒé”™è¯¯ç 
+	* @~english
+	* @brief      stop net probe,used in android.
+	* @param[in]  emPT       probe state
+	* @return success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE netProbeCtrl(ProbeType emPT) = 0;
+
+	/**
+	* @~chinese
+	* @brief      åˆå§‹åŒ–é©±åŠ¨
+	* @code		åˆå§‹åŒ–åºåˆ—å·
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief		initializate the driver
 	* @code	the initializate code of driver
@@ -156,8 +168,8 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡Ïà»úµÄÖÇÄÜÖ¸Õë
-	* @return     Ïà»úµÄÖÇÄÜÖ¸Õë
+	* @brief      è·å–ç›¸æœºçš„æ™ºèƒ½æŒ‡é’ˆ
+	* @return     ç›¸æœºçš„æ™ºèƒ½æŒ‡é’ˆ
 	* @~english
 	* @brief		get the shared pointer of camera.
 	* @return  shared pointer of camera.
@@ -167,7 +179,7 @@ public:
 
 /**
 * @~chinese
-* @brief     »ñÈ¡System¶ÔÏóÖÇÄÜÖ¸Õë
+* @brief     è·å–Systemå¯¹è±¡æ™ºèƒ½æŒ‡é’ˆ
 * @~english
 * @brief     Get System object smart point
 **/
@@ -175,7 +187,7 @@ CS_API std::shared_ptr<ISystem> getSystemPtr();
 
 /**
 * @~chinese
-* @brief     »ñÈ¡Ïà»úÉè±¸½ÓÈë×´Ì¬
+* @brief     è·å–ç›¸æœºè®¾å¤‡æ¥å…¥çŠ¶æ€
 * @~english
 * @brief     judge whether the camera is connected.
 **/
@@ -183,7 +195,7 @@ CS_API CAMERA_STATUS getCameraStatus(const char* pcSerial);
 
 /**
 * @~chinese
-* @brief     »ñÈ¡SDK°æ±¾
+* @brief     è·å–SDKç‰ˆæœ¬
 * @~english
 * @brief     Get SDK verison
 **/
@@ -191,7 +203,7 @@ CS_API ERROR_CODE getSdkVersion(CS_SDK_VERSION** ppCsSdkVersion);
 
 /**
 * @~chinese
-* @brief     ÉèÖÃSDKÈÕÖ¾±¨ÎñÆ÷ĞÅÏ¢
+* @brief     è®¾ç½®SDKæ—¥å¿—æŠ¥åŠ¡å™¨ä¿¡æ¯
 * @~english
 * @brief     Set SDK server infomation
 **/
@@ -199,7 +211,7 @@ CS_API void setSdkLogServerInfo(const char* logServerIp, unsigned short wLogServ
 
 /**
 * @~chinese
-* @brief     ÉèÖÃSDK¿âUVCÊÇ·ñ¿ÉÓÃ
+* @brief     è®¾ç½®SDKåº“UVCæ˜¯å¦å¯ç”¨
 * @~english
 * @brief     Set SDK libuvc enable
 **/
@@ -207,7 +219,7 @@ CS_API void setSdkEnableLibuvc(bool isEnableLibuvc);
 
 /**
 * @~chinese
-* @brief     ÉèÖÃSDK¿âÍøÂçÊÇ·ñ¿ÉÓÃ
+* @brief     è®¾ç½®SDKåº“ç½‘ç»œæ˜¯å¦å¯ç”¨
 * @~english
 * @brief     Set SDK networking enable
 **/
@@ -215,7 +227,7 @@ CS_API void setSdkEnableNetworking(bool isEnableNetWorking);
 
 /**
 * @~chinese
-* @brief     ÉèÖÃÈÕÖ¾ÎÄ¼ş±£´æÂ·¾¶
+* @brief     è®¾ç½®æ—¥å¿—æ–‡ä»¶ä¿å­˜è·¯å¾„
 * @~english
 * @brief     Set log file save path
 **/
@@ -223,7 +235,7 @@ CS_API void setLogSavePath(const char* savePath);
 
 /**
 * @~chinese
-* @brief     »ñÈ¡ÈÕÖ¾ÎÄ¼ş±£´æÂ·¾¶
+* @brief     è·å–æ—¥å¿—æ–‡ä»¶ä¿å­˜è·¯å¾„
 * @~english
 * @brief     Get log file save path
 **/
@@ -231,7 +243,7 @@ CS_API const char* getLogSavePath();
 
 /**
 * @~chinese
-* @brief     ÈÕÖ¾¿ª¹Ø
+* @brief     æ—¥å¿—å¼€å…³
 * @~english
 * @brief     Log enable
 **/
@@ -239,7 +251,7 @@ CS_API void enableLoging(bool enableLoging);
 
 /**
 * @~chinese
-* @brief     Í¨¹ıSN»ñÈ¡Ïà»úÀàĞÍ
+* @brief     é€šè¿‡SNè·å–ç›¸æœºç±»å‹
 * @~english
 * @brief     Get camera type by SN
 **/
@@ -247,7 +259,7 @@ CS_API CameraType getCameraTypeBySN(const char* sn);
 
 /**
 * @~chinese
-* @brief     Í¨¹ıÏà»úÀàĞÍ»ñÈ¡Ãû³Æ
+* @brief     é€šè¿‡ç›¸æœºç±»å‹è·å–åç§°
 * @~english
 * @brief     get camera type name by cameraType
 **/
@@ -255,9 +267,9 @@ CS_API const char* getCameraTypeName(CameraType tCt);
 
 /**
 * @~chinese
-* @brief     ÍøÂç¹¦ÄÜ¿ª¹Ø
+* @brief     ç½‘ç»œåŠŸèƒ½å¼€å…³
 * @~english
-* @brief     ÍøÂç¹¦ÄÜ¿ª¹Ø
+* @brief     ç½‘ç»œåŠŸèƒ½å¼€å…³
 **/
 CS_API void setEnableNetworking(bool bEnable);
 CS_API bool getEnableNetworking();

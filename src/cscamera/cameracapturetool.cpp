@@ -106,6 +106,7 @@ void CameraCaptureTool::startCapture(CameraCaptureConfig config, bool autoNaming
     suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::finished, this, [=]() 
         {
             m_cameraCapture->deleteLater();
+            m_cameraCapture = nullptr;
         });
 
     Q_ASSERT(suc);
