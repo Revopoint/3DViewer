@@ -3,8 +3,6 @@
 /* Include the libailook C header files */
 #include "hpp/Types.hpp"
 
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -49,7 +49,7 @@ typedef void (*FrameCallback)(IFramePtr frame, void *usrData);
 * @brief the shared pointer of camera
 */
 typedef std::shared_ptr<ICamera> ICameraPtr;
-	
+
 /*!\class ICamera
 * @~chinese
 * @brief 相机接口
