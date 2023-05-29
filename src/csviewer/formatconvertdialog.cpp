@@ -30,35 +30,35 @@
 #include "csapplication.h"
 
 FormatConvertDialog::FormatConvertDialog()
-    : ui(new Ui::FormatConvertDialog)
-    , formatConverter(new cs::FormatConverter)
+    : m_ui(new Ui::FormatConvertDialog)
+    , m_formatConverter(new cs::FormatConverter)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    ui->convertButton->setProperty("isCSStyle", true);
-    ui->selectSrcButton->setProperty("isCSStyle", true);
-    ui->selectOutputButton->setProperty("isCSStyle", true);
+    m_ui->convertButton->setProperty("isCSStyle", true);
+    m_ui->selectSrcButton->setProperty("isCSStyle", true);
+    m_ui->selectOutputButton->setProperty("isCSStyle", true);
 
     setWindowFlags(this->windowFlags() & Qt::WindowCloseButtonHint);
 
     bool suc = true;
-    suc &= (bool)connect(ui->convertButton,       &QPushButton::clicked, formatConverter, &cs::FormatConverter::onConvert);
-    suc &= (bool)connect(formatConverter,         &cs::FormatConverter::convertStateChanged, this, &FormatConvertDialog::onConvertStateChanged);
-    suc &= (bool)connect(ui->selectSrcButton,     &QPushButton::clicked, this, &FormatConvertDialog::onClickedBrowseSource);
-    suc &= (bool)connect(ui->selectOutputButton,  &QPushButton::clicked, this, &FormatConvertDialog::onClickedBrowseOutputDirectory);
-    suc &= (bool)connect(ui->withTextureCheckBox, &QCheckBox::toggled,   this, &FormatConvertDialog::onShowTextureChanged);
+    suc &= (bool)connect(m_ui->convertButton,       &QPushButton::clicked, m_formatConverter, &cs::FormatConverter::onConvert);
+    suc &= (bool)connect(m_formatConverter,         &cs::FormatConverter::convertStateChanged, this, &FormatConvertDialog::onConvertStateChanged);
+    suc &= (bool)connect(m_ui->selectSrcButton,     &QPushButton::clicked, this, &FormatConvertDialog::onClickedBrowseSource);
+    suc &= (bool)connect(m_ui->selectOutputButton,  &QPushButton::clicked, this, &FormatConvertDialog::onClickedBrowseOutputDirectory);
+    suc &= (bool)connect(m_ui->withTextureCheckBox, &QCheckBox::toggled,   this, &FormatConvertDialog::onShowTextureChanged);
 
-    suc &= (bool)connect(ui->lineEditSrc,    &QLineEdit::editingFinished, this, &FormatConvertDialog::onSourceFilePathChanged);
-    suc &= (bool)connect(ui->lineEditOutput, &QLineEdit::editingFinished, this, &FormatConvertDialog::onOutputPathChanged);
+    suc &= (bool)connect(m_ui->lineEditSrc,    &QLineEdit::editingFinished, this, &FormatConvertDialog::onSourceFilePathChanged);
+    suc &= (bool)connect(m_ui->lineEditOutput, &QLineEdit::editingFinished, this, &FormatConvertDialog::onOutputPathChanged);
 }
 
 FormatConvertDialog::~FormatConvertDialog()
 {
-    formatConverter->quit();
-    formatConverter->wait();
+    m_formatConverter->quit();
+    m_formatConverter->wait();
 
-    delete formatConverter;
-    delete ui;
+    delete m_formatConverter;
+    delete m_ui;
 }
 
 #define DEFAULT_DIR_NAME "output"
@@ -82,11 +82,13 @@ void FormatConvertDialog::onClickedBrowseSource()
         QFileInfo fileInfo(filePath);
         QString outputDir = fileInfo.absolutePath() + "/" + DEFAULT_DIR_NAME;
         
-        ui->lineEditSrc->setText(filePath);
-        ui->lineEditOutput->setText(outputDir);
+        m_ui->lineEditSrc->setText(filePath);
+        m_ui->lineEditOutput->setText(outputDir);
 
-        formatConverter->setSourceFile(filePath);
-        formatConverter->setOutputDirectory(outputDir);
+        m_formatConverter->setSourceFile(filePath);
+        m_formatConverter->setOutputDirectory(outputDir);
+
+        emit m_formatConverter->loadFileSignal();
     }
     else
     {
@@ -104,9 +106,9 @@ void FormatConvertDialog::onClickedBrowseOutputDirectory()
     if (url.isValid())
     {
         QString filePath = url.toLocalFile();
-        ui->lineEditOutput->setText(filePath);
+        m_ui->lineEditOutput->setText(filePath);
 
-        formatConverter->setOutputDirectory(filePath);
+        m_formatConverter->setOutputDirectory(filePath);
     }
     else
     {
@@ -120,15 +122,24 @@ void FormatConvertDialog::onConvertStateChanged(int state, int progress, QString
     auto convertState = (cs::FormatConverter::CONVERT_STATE)state;
     switch (convertState)
     {
+    case cs::FormatConverter::CONVERT_LOADING:
+        m_ui->convertButton->setEnabled(false);
+        break;
+    case cs::FormatConverter::CONVERT_READDY:
+        m_ui->withTextureCheckBox->setEnabled(m_formatConverter->getHasRGBData());
+        m_ui->convertButton->setEnabled(true);
+        break;
     case cs::FormatConverter::CONVERTING:
         emit showMessage(message, 0);
-        ui->convertProgress->setValue(progress);
-        ui->convertButton->setEnabled(false);
+        m_ui->convertProgress->setValue(progress);
+        m_ui->convertButton->setEnabled(false);
+        m_ui->withTextureCheckBox->setEnabled(false);
         break;
     case cs::FormatConverter::CONVERT_SUCCESS:
     case cs::FormatConverter::CONVERT_FAILED:
         showMessageBox(message);
-        ui->convertButton->setEnabled(true);
+        m_ui->convertButton->setEnabled(true);
+        m_ui->withTextureCheckBox->setEnabled(true);
         break;
     case cs::FormatConverter::CONVERT_ERROR:
         break;
@@ -151,17 +162,17 @@ void FormatConvertDialog::showMessageBox(QString message)
 
 void FormatConvertDialog::onShowTextureChanged(bool show)
 {
-    formatConverter->setWithTexture(show);
+    m_formatConverter->setWithTexture(show);
 }
 
 void FormatConvertDialog::onTranslate()
 {
-    ui->retranslateUi(this);
+    m_ui->retranslateUi(this);
 }
 
 void FormatConvertDialog::reject()
 {
-    if (formatConverter->getIsConverting())
+    if (m_formatConverter->getIsConverting())
     {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Question);
@@ -179,7 +190,7 @@ void FormatConvertDialog::reject()
         }
         else if (ret == QMessageBox::Yes)
         {
-            formatConverter->setInterruptConvert(true);
+            m_formatConverter->setInterruptConvert(true);
             QDialog::reject();
         }
     }
@@ -191,17 +202,18 @@ void FormatConvertDialog::reject()
 
 void FormatConvertDialog::onSourceFilePathChanged()
 {
-    formatConverter->setSourceFile(ui->lineEditSrc->text());
+    m_formatConverter->setSourceFile(m_ui->lineEditSrc->text());
 }
 
 void FormatConvertDialog::onOutputPathChanged()
 {
-    formatConverter->setOutputDirectory(ui->lineEditOutput->text());
+    m_formatConverter->setOutputDirectory(m_ui->lineEditOutput->text());
 }
 
 void FormatConvertDialog::showEvent(QShowEvent* event)
 {
-    ui->lineEditSrc->setText("");
-    ui->lineEditOutput->setText("");
-    ui->convertProgress->setValue(0);
+    m_ui->lineEditSrc->setText("");
+    m_ui->lineEditOutput->setText("");
+    m_ui->convertProgress->setValue(0);
+    m_ui->withTextureCheckBox->setEnabled(false);
 }

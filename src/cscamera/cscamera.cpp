@@ -30,7 +30,7 @@
 #include <algorithm>
 #include <3DCamera.hpp>
 
-static CSRange DEPTH_RANGE_LIMIT = { 0, 10000 };
+static CSRange DEPTH_RANGE_LIMIT = { 0, 65535 };
 static CSRange CAMERA_HDR_LEVEL_RANGE = { 2,8 };
 #define HDR_SCALE_DEFAULT  5
 
@@ -94,7 +94,6 @@ static const QMap<CAMERA_PARA_ID, ParaInfo> CAMERA_PROPERTY_MAP =
     
 
     { PARA_RGB_GAIN,                { STREAM_TYPE_RGB ,   PROPERTY_GAIN} },
-    { PARA_RGB_EXPOSURE,            { STREAM_TYPE_RGB ,   PROPERTY_EXPOSURE} },
     { PARA_RGB_AUTO_EXPOSURE,       { STREAM_TYPE_RGB ,   PROPERTY_ENABLE_AUTO_EXPOSURE} },
     { PARA_RGB_AUTO_WHITE_BALANCE,  { STREAM_TYPE_RGB ,   PROPERTY_ENABLE_AUTO_WHITEBALANCE} },
     { PARA_RGB_WHITE_BALANCE,       { STREAM_TYPE_RGB ,   PROPERTY_WHITEBALANCE} }
@@ -111,7 +110,8 @@ static const QMap<CAMERA_PARA_ID, int> CAMERA_EXTENSION_PROPERTY_MAP =
     { PARA_DEPTH_ROI,              PROPERTY_EXT_DEPTH_ROI },
     { PARA_DEPTH_RANGE,            PROPERTY_EXT_DEPTH_RANGE },
     { PARA_TRIGGER_MODE,           PROPERTY_EXT_TRIGGER_MODE },
-    { PARA_CAMERA_IP,              PROPERTY_EXT_CAMERA_IP }
+    { PARA_CAMERA_IP,              PROPERTY_EXT_CAMERA_IP },
+    { PARA_RGB_EXPOSURE,           PROPERTY_EXT_EXPOSURE_TIME_RGB }
 };
 
 static const QList<CAMERA_PARA_ID> CAMERA_OPTION_PARA_LIST =
@@ -190,7 +190,7 @@ static void rgbCallback(cs::IFramePtr frame, void* usrData)
 }
 
 CSCamera::StreamThread::StreamThread(CSCamera& camera)
-    : camera(camera)
+    : m_camera(camera)
 {
     setObjectName("StreamThread");
 }
@@ -199,7 +199,7 @@ void CSCamera::StreamThread::run()
 {
     while (!isInterruptionRequested())
     {
-        camera.onGetFrame();
+        m_camera.onGetFrame();
     }
 }
 
@@ -211,31 +211,31 @@ CSCamera::StreamThread::~StreamThread()
 }
 
 CSCamera::CSCamera()
-    : cameraState(CAMERA_DISCONNECTED)
-    , cameraPtr(cs::getCameraPtr())
-    , filterValue(0)
-    , filterType(0)
-    , fillHole(false)
-    , hasIrStream(false)
-    , hasDepthStream(false)
-    , isRgbStreamSup(false)
-    , isDepthStreamSup(false)
-    , hdrMode(HDR_MODE_CLOSE)
-    , hdrTimes(2)
-    , streamThread(new StreamThread(*this))
-    , cameraThread(nullptr)
-    , cachedDepthExposure(0)
-    , cachedDepthGain(0)
-    , triggerMode(TRIGGER_MODE_OFF)
-    , depthScale(0.1)
+    : m_cameraState(CAMERA_DISCONNECTED)
+    , m_cameraPtr(cs::getCameraPtr())
+    , m_filterValue(0)
+    , m_filterType(0)
+    , m_fillHole(false)
+    , m_hasIrStream(false)
+    , m_hasDepthStream(false)
+    , m_isRgbStreamSup(false)
+    , m_isDepthStreamSup(false)
+    , m_hdrMode(HDR_MODE_CLOSE)
+    , m_hdrTimes(2)
+    , m_streamThread(new StreamThread(*this))
+    , m_cameraThread(nullptr)
+    , m_cachedDepthExposure(0)
+    , m_cachedDepthGain(0)
+    , m_triggerMode(TRIGGER_MODE_OFF)
+    , m_depthScale(0.1)
 {
-    manualHdrSetting.count = 0;
+    m_manualHdrSetting.count = 0;
 }
 
 CSCamera::~CSCamera()
 {
     doDisconnectCamera();
-    delete streamThread;
+    delete m_streamThread;
     qDebug() << "~CSCamera";
 }
 
@@ -258,10 +258,9 @@ bool CSCamera::startStream()
     suc &= (bool)connect(this, &CSCamera::updateParaSignal, this, &CSCamera::onParaUpdated);
     Q_ASSERT(suc);
 
-    qInfo() << "begin start stream";
     setCameraState(CAMERA_STARTING_STREAM);
     bool result = true;
-    if (isDepthStreamSup)
+    if (m_isDepthStreamSup)
     {
         qInfo() << "begin start depth stream";
         result &= startDepthStream();
@@ -273,7 +272,7 @@ bool CSCamera::startStream()
         qInfo() << "start depth stream end";
     }
 
-    if (isRgbStreamSup)
+    if (m_isRgbStreamSup)
     {
         qInfo() << "begin start rgb stream";
         result &= startRgbStream();
@@ -285,9 +284,15 @@ bool CSCamera::startStream()
         qInfo() << "start rgb stream end";
     }
 
+    if (!result)
+    {
+        qWarning("Error : start stream failed.");
+        setCameraState(CAMERA_START_STREAM_FAILED);
+        return false;
+    }
+
     // start get frame thread
     startStreamThread();
-    qInfo() << "start stream thread";
 
     onStreamStarted();
 
@@ -308,8 +313,10 @@ void CSCamera::onStreamStarted()
 
     // get depth scale
     PropertyExtension propExt;
-    ERROR_CODE ret = cameraPtr->getPropertyExtension(PROPERTY_EXT_DEPTH_SCALE, propExt);
-    depthScale = propExt.depthScale;
+    ERROR_CODE ret = m_cameraPtr->getPropertyExtension(PROPERTY_EXT_DEPTH_SCALE, propExt);
+    m_depthScale = propExt.depthScale;
+
+    DEPTH_RANGE_LIMIT.max = 65535 * m_depthScale;
 }
 
 bool CSCamera::stopStream()
@@ -321,7 +328,7 @@ bool CSCamera::stopStream()
     // stop get frame thread
     stopStreamThread();
 
-    if (isDepthStreamSup)
+    if (m_isDepthStreamSup)
     {
         result &= stopDepthStream();
         if (!result)
@@ -331,7 +338,7 @@ bool CSCamera::stopStream()
         }
     }
 
-    if (isRgbStreamSup)
+    if (m_isRgbStreamSup)
     {
         result &= stopRgbStream();
         if (!result)
@@ -342,8 +349,8 @@ bool CSCamera::stopStream()
 
     }
 
-    hasIrStream = false;
-    hasDepthStream = false;
+    m_hasIrStream = false;
+    m_hasDepthStream = false;
 
     setCameraState(CAMERA_STOPPED_STREAM);
     return true;
@@ -358,10 +365,11 @@ bool CSCamera::startDepthStream()
 
     // you can also use the callback method
     //ret = cameraPtr->startStream(STREAM_TYPE_DEPTH, info, depthCallback, this);
-    ret = cameraPtr->startStream(STREAM_TYPE_DEPTH, info, nullptr, this);
+    ret = m_cameraPtr->startStream(STREAM_TYPE_DEPTH, info, nullptr, this);
     if (ret != SUCCESS)
     {
         qWarning("camera start depth stream failed(%d)!", ret);
+        Q_ASSERT(false);
         return false;
     }
     else
@@ -369,8 +377,8 @@ bool CSCamera::startDepthStream()
         qWarning("start depth format:%2d, width:%4d, height:%4d, fps:%2.1f", info.format, info.width, info.height, info.fps);
     }
 
-    hasIrStream = isDepthStreamSup && ((info.format == STREAM_FORMAT_Z16Y8Y8) || (info.format == STREAM_FORMAT_PAIR));
-    hasDepthStream = isDepthStreamSup && (info.format != STREAM_FORMAT_PAIR);
+    m_hasIrStream = m_isDepthStreamSup && ((info.format == STREAM_FORMAT_Z16Y8Y8) || (info.format == STREAM_FORMAT_PAIR));
+    m_hasDepthStream = m_isDepthStreamSup && (info.format != STREAM_FORMAT_PAIR);
 
     return ret == SUCCESS;
 }
@@ -384,10 +392,11 @@ bool CSCamera::startRgbStream()
 
     // you can also use the callback method
     //ret = cameraPtr->startStream(STREAM_TYPE_RGB, info, rgbCallback, this);
-    ret = cameraPtr->startStream(STREAM_TYPE_RGB, info, nullptr, this);
+    ret = m_cameraPtr->startStream(STREAM_TYPE_RGB, info, nullptr, this);
     if (ret != SUCCESS)
     {
         qDebug("camera start rgb stream failed(%d)!", ret);
+        Q_ASSERT(false);
         return false;
     }
 
@@ -396,7 +405,7 @@ bool CSCamera::startRgbStream()
 
 bool CSCamera::stopDepthStream()
 {
-    ERROR_CODE ret = cameraPtr->stopStream(STREAM_TYPE_DEPTH);
+    ERROR_CODE ret = m_cameraPtr->stopStream(STREAM_TYPE_DEPTH);
     if (ret != SUCCESS)
     {
         qDebug("camera stop depth stream failed(%d)!", ret);
@@ -408,7 +417,7 @@ bool CSCamera::stopDepthStream()
 
 bool CSCamera::stopRgbStream()
 {
-    ERROR_CODE ret = cameraPtr->stopStream(STREAM_TYPE_RGB);
+    ERROR_CODE ret = m_cameraPtr->stopStream(STREAM_TYPE_RGB);
     if (ret != SUCCESS)
     {
         qDebug("camera stop rgb stream failed(%d)!", ret);
@@ -426,7 +435,7 @@ bool CSCamera::restartCamera()
     disconnect(this, &CSCamera::updateParaSignal, this, &CSCamera::onParaUpdated);
     stopStreamThread();
 
-    ERROR_CODE ret = cameraPtr->restart();
+    ERROR_CODE ret = m_cameraPtr->restart();
     if (ret != SUCCESS)
     {
         qInfo() << "camera restart failed, ret = " << ret;
@@ -444,11 +453,11 @@ bool CSCamera::connectCamera(CameraInfo info)
 {
     qInfo() << "connectCamera, camera seiral : "<< info.serial;
 
-    cameraInfo.cameraInfo = info;
+    m_cameraInfo.cameraInfo = info;
 
     setCameraState(CAMERA_CONNECTING);
 
-    ERROR_CODE ret = cameraPtr->connect(info);
+    ERROR_CODE ret = m_cameraPtr->connect(info);
     if (ret != SUCCESS)
     {
         qWarning() << "camera connect failed, error code : " << ret;
@@ -457,7 +466,7 @@ bool CSCamera::connectCamera(CameraInfo info)
     }
 
     // judge if depth stream is supported or not
-    ret = cameraPtr->isStreamSupport(STREAM_TYPE_DEPTH, isDepthStreamSup);
+    ret = m_cameraPtr->isStreamSupport(STREAM_TYPE_DEPTH, m_isDepthStreamSup);
     if (ret != SUCCESS)
     {
         qWarning() << "camera call is support stream failed, error code : " << ret;
@@ -465,7 +474,7 @@ bool CSCamera::connectCamera(CameraInfo info)
     }
 
     // judge if RGB stream is supported or not
-    ret = cameraPtr->isStreamSupport(STREAM_TYPE_RGB, isRgbStreamSup);
+    ret = m_cameraPtr->isStreamSupport(STREAM_TYPE_RGB, m_isRgbStreamSup);
     if (ret != SUCCESS)
     {
         qWarning() << "camera call is support stream failed, error code : " << ret;
@@ -474,8 +483,6 @@ bool CSCamera::connectCamera(CameraInfo info)
 
     initDefaultStreamInfo();
 
-
-    
     initCameraInfo();
 
     setCameraState(CAMERA_CONNECTED);
@@ -486,7 +493,7 @@ bool CSCamera::connectCamera(CameraInfo info)
 bool CSCamera::reconnectCamera()
 {
     qInfo() << "CSCamera, begin reconnect camera";
-    bool result = connectCamera(cameraInfo.cameraInfo);
+    bool result = connectCamera(m_cameraInfo.cameraInfo);
     qInfo() << "CSCamera, reconnect camera end";
     
     return result;
@@ -514,7 +521,7 @@ void CSCamera::doDisconnectCamera()
     setCameraState(CAMERA_DISCONNECTING);
     
     // disconnect camera
-    ERROR_CODE ret = cameraPtr->disconnect();
+    ERROR_CODE ret = m_cameraPtr->disconnect();
     if (ret != SUCCESS)
     {
         qWarning() << "disconnect camera failed, error code : " << ret;
@@ -526,8 +533,8 @@ void CSCamera::doDisconnectCamera()
         setCameraState(CAMERA_DISCONNECTED);
     }
 
-    isRgbStreamSup = false;
-    isDepthStreamSup = false;
+    m_isRgbStreamSup = false;
+    m_isDepthStreamSup = false;
 }
 
 bool CSCamera::pauseStream()
@@ -541,9 +548,9 @@ bool CSCamera::pauseStream()
 
     ERROR_CODE ret = SUCCESS;
     //depth 
-    if (isDepthStreamSup)
+    if (m_isDepthStreamSup)
     {
-        ret = cameraPtr->pauseStream(STREAM_TYPE_DEPTH);
+        ret = m_cameraPtr->pauseStream(STREAM_TYPE_DEPTH);
         if (ret != SUCCESS)
         {
             Q_ASSERT(false);
@@ -552,9 +559,9 @@ bool CSCamera::pauseStream()
     }
      
     //rgb
-    if (isRgbStreamSup)
+    if (m_isRgbStreamSup)
     {
-        ret = cameraPtr->pauseStream(STREAM_TYPE_RGB);
+        ret = m_cameraPtr->pauseStream(STREAM_TYPE_RGB);
         if (ret != SUCCESS)
         {
             //Q_ASSERT(false);
@@ -576,9 +583,9 @@ bool CSCamera::resumeStream()
 
     //depth 
     ERROR_CODE ret = SUCCESS;
-    if (isDepthStreamSup)
+    if (m_isDepthStreamSup)
     {
-        ret = cameraPtr->resumeStream(STREAM_TYPE_DEPTH);
+        ret = m_cameraPtr->resumeStream(STREAM_TYPE_DEPTH);
         if (ret != SUCCESS)
         {
             Q_ASSERT(false);
@@ -587,9 +594,9 @@ bool CSCamera::resumeStream()
     }
 
     //rgb
-    if (isRgbStreamSup)
+    if (m_isRgbStreamSup)
     {
-        ret = cameraPtr->resumeStream(STREAM_TYPE_RGB);
+        ret = m_cameraPtr->resumeStream(STREAM_TYPE_RGB);
         if (ret != SUCCESS)
         {
             //Q_ASSERT(false);
@@ -611,7 +618,7 @@ bool CSCamera::softTrigger()
         return false;
     }
 
-    ERROR_CODE ret = cameraPtr->softTrigger();
+    ERROR_CODE ret = m_cameraPtr->softTrigger();
     if (ret != SUCCESS)
     {
         qWarning("camera soft trigger failed(%d)!", ret);
@@ -624,27 +631,27 @@ bool CSCamera::softTrigger()
 
 void CSCamera::initCameraInfo()
 {
-    CameraType cameraType = getCameraTypeBySN(cameraInfo.cameraInfo.serial);
-    cameraInfo.model = getCameraTypeName(cameraType);
+    CameraType cameraType = getCameraTypeBySN(m_cameraInfo.cameraInfo.serial);
+    m_cameraInfo.model = getCameraTypeName(cameraType);
 
     CS_SDK_VERSION* sdkVersion = nullptr;
     getSdkVersion(&sdkVersion);
 
     if (sdkVersion && sdkVersion->version)
     {
-        cameraInfo.sdkVersion = sdkVersion->version;
+        m_cameraInfo.sdkVersion = sdkVersion->version;
     }
 
     //connect type
-    cameraInfo.connectType = isNetworkConnect(cameraInfo.cameraInfo.uniqueId) ? CONNECT_TYPE_NET : CONNECT_TYPE_USB;
+    m_cameraInfo.connectType = isNetworkConnect(m_cameraInfo.cameraInfo.uniqueId) ? CONNECT_TYPE_NET : CONNECT_TYPE_USB;
 
-    hasIrStream = isDepthStreamSup && ((depthFormat == STREAM_FORMAT_Z16Y8Y8) || (depthFormat == STREAM_FORMAT_PAIR));
-    hasDepthStream = isDepthStreamSup && (depthFormat != STREAM_FORMAT_PAIR);
+    m_hasIrStream = m_isDepthStreamSup && ((m_depthFormat == STREAM_FORMAT_Z16Y8Y8) || (m_depthFormat == STREAM_FORMAT_PAIR));
+    m_hasDepthStream = m_isDepthStreamSup && (m_depthFormat != STREAM_FORMAT_PAIR);
 
     ERROR_CODE ret = SUCCESS;
-    if (isDepthStreamSup)
+    if (m_isDepthStreamSup)
     {
-        ret = cameraPtr->getIntrinsics(STREAM_TYPE_DEPTH, depthIntrinsics);
+        ret = m_cameraPtr->getIntrinsics(STREAM_TYPE_DEPTH, m_depthIntrinsics);
         if (ret != SUCCESS)
         {
             qWarning() << "camera get depth intrinsics failed, error code : " << ret;
@@ -652,9 +659,9 @@ void CSCamera::initCameraInfo()
         }
     }
 
-    if (isRgbStreamSup)
+    if (m_isRgbStreamSup)
     {
-        ret = cameraPtr->getIntrinsics(STREAM_TYPE_RGB, rgbIntrinsics);
+        ret = m_cameraPtr->getIntrinsics(STREAM_TYPE_RGB, m_rgbIntrinsics);
         if (ret != SUCCESS)
         {
             qWarning() << "camera get rgb intrinsics failed, error code : " << ret;
@@ -664,7 +671,7 @@ void CSCamera::initCameraInfo()
         PropertyExtension proExt;
         proExt.depthRgbMatchParam.iRgbOffset = 0;
         proExt.depthRgbMatchParam.iDifThreshold = 0;
-        ret = cameraPtr->setPropertyExtension(PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM, proExt);
+        ret = m_cameraPtr->setPropertyExtension(PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM, proExt);
         if (ret != SUCCESS)
         {
             qWarning() << "camera set depth rgb match para failed, error code : " << ret;
@@ -672,7 +679,7 @@ void CSCamera::initCameraInfo()
         }
     }
 
-    ret = cameraPtr->getExtrinsics(extrinsics);
+    ret = m_cameraPtr->getExtrinsics(m_extrinsics);
     if (ret != SUCCESS)
     {
         qWarning() << "camera get extrinsics failed, error code : " << ret;
@@ -686,9 +693,9 @@ void CSCamera::initDefaultStreamInfo()
     std::vector<StreamInfo> streamInfos;
 
     // default depth stream
-    if (isDepthStreamSup)
+    if (m_isDepthStreamSup)
     {
-        ret = cameraPtr->getStreamInfos(STREAM_TYPE_DEPTH, streamInfos);
+        ret = m_cameraPtr->getStreamInfos(STREAM_TYPE_DEPTH, streamInfos);
         if (ret != SUCCESS || streamInfos.empty())
         {
             qDebug("camera get stream info failed(%d)!\n", ret);
@@ -704,7 +711,7 @@ void CSCamera::initDefaultStreamInfo()
                 });
 
             it = (it == streamInfos.end()) ? streamInfos.begin() : it;
-            depthFormat = it->format;
+            m_depthFormat = it->format;
 
             // resolution
             auto defaultRes = CAMERA_DEFAULT_STREAM_TYPE[PARA_DEPTH_RESOLUTION].toSize();
@@ -712,20 +719,20 @@ void CSCamera::initDefaultStreamInfo()
                 , [=](const StreamInfo& info)
                 {
                     return (defaultRes.width() == info.width && defaultRes.height() == info.height)
-                        && (depthFormat == info.format);
+                        && (m_depthFormat == info.format);
                 });
 
             // use *it if not find the resolution
             itRes = (itRes == streamInfos.end()) ? it : itRes;
-            depthResolution = QSize(itRes->width, itRes->height);
+            m_depthResolution = QSize(itRes->width, itRes->height);
         }
     }
 
-    if (isRgbStreamSup)
+    if (m_isRgbStreamSup)
     {
         // default rgb stream
         streamInfos.clear();
-        ret = cameraPtr->getStreamInfos(STREAM_TYPE_RGB, streamInfos);
+        ret = m_cameraPtr->getStreamInfos(STREAM_TYPE_RGB, streamInfos);
         if (ret != SUCCESS || streamInfos.empty())
         {
             qWarning("camera get stream info failed(%d)!\n", ret);
@@ -741,7 +748,7 @@ void CSCamera::initDefaultStreamInfo()
                 });
 
             it = (it == streamInfos.end()) ? streamInfos.begin() : it;
-            rgbFormat = it->format;
+            m_rgbFormat = it->format;
 
             // resolution
             auto defaultRes = CAMERA_DEFAULT_STREAM_TYPE[PARA_RGB_RESOLUTION].toSize();
@@ -749,12 +756,12 @@ void CSCamera::initDefaultStreamInfo()
                 , [=](const StreamInfo& info)
                 {
                     return (defaultRes.width() == info.width && defaultRes.height() == info.height)
-                        && (rgbFormat == info.format);
+                        && (m_rgbFormat == info.format);
                 });
 
             // use *it if not find the resolution
             itRes = (itRes == streamInfos.end()) ? it : itRes;
-            rgbResolution = QSize(itRes->width, itRes->height);
+            m_rgbResolution = QSize(itRes->width, itRes->height);
         }
     }
 }
@@ -764,12 +771,11 @@ void CSCamera::onGetFrame(int timeout)
 {
     FrameData frameData;
 
-    if (isRgbStreamSup)
+    if (m_isRgbStreamSup)
     {
         IFramePtr depthFrame, rgbFrame;
 
-        cameraPtr->getPairedFrame(depthFrame, rgbFrame, timeout);
-
+        m_cameraPtr->getPairedFrame(depthFrame, rgbFrame, timeout);
         //cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
         //cameraPtr->getFrame(STREAM_TYPE_RGB, rgbFrame, timeout);
 
@@ -779,16 +785,16 @@ void CSCamera::onGetFrame(int timeout)
     else
     {
         IFramePtr depthFrame;
-        cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
+        m_cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
         onProcessFrame(TYPE_DEPTH, depthFrame, frameData);
     }
 
     if (frameData.data.size() > 0)
     {
-        frameData.rgbIntrinsics = rgbIntrinsics;
-        frameData.depthIntrinsics = depthIntrinsics;
-        frameData.extrinsics = extrinsics;
-        frameData.depthScale = depthScale;
+        frameData.rgbIntrinsics = m_rgbIntrinsics;
+        frameData.depthIntrinsics = m_depthIntrinsics;
+        frameData.extrinsics = m_extrinsics;
+        frameData.depthScale = m_depthScale;
 
         emit framedDataUpdated(frameData);
     }
@@ -818,10 +824,10 @@ bool CSCamera::onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& 
 
 void CSCamera::setCameraThread(QThread* thread)
 {
-    cameraThread = thread;
-    Q_ASSERT(cameraThread);
+    m_cameraThread = thread;
+    Q_ASSERT(m_cameraThread);
 
-    moveToThread(cameraThread);
+    moveToThread(m_cameraThread);
 }
 
 StreamInfo CSCamera::getDepthStreamInfo()
@@ -829,18 +835,18 @@ StreamInfo CSCamera::getDepthStreamInfo()
     StreamInfo info = { STREAM_FORMAT_COUNT, 0, 0, 0.0f};
 
     std::vector<StreamInfo> streamInfos;
-    ERROR_CODE ret = cameraPtr->getStreamInfos(STREAM_TYPE_DEPTH, streamInfos);
+    ERROR_CODE ret = m_cameraPtr->getStreamInfos(STREAM_TYPE_DEPTH, streamInfos);
     if (ret != SUCCESS || streamInfos.empty())
     {
-        qWarning("camera get stream info failed(%d)!\n", ret);
+        qWarning("camera get depth stream info failed(%d)!\n", ret);
         return info;
     }
 
     info.fps = -1;
     for (const auto& sInfo : streamInfos)
     {
-        if (sInfo.format == depthFormat && sInfo.width == depthResolution.width() 
-            && sInfo.height == depthResolution.height() && sInfo.fps > info.fps)
+        if (sInfo.format == m_depthFormat && sInfo.width == m_depthResolution.width() 
+            && sInfo.height == m_depthResolution.height() && sInfo.fps > info.fps)
         {
             info = sInfo;
         }
@@ -854,18 +860,18 @@ StreamInfo CSCamera::getRgbStreamInfo()
     StreamInfo info = { STREAM_FORMAT_COUNT, 0, 0, 0.0f };
 
     std::vector<StreamInfo> streamInfos;
-    ERROR_CODE ret = cameraPtr->getStreamInfos(STREAM_TYPE_RGB, streamInfos);
+    ERROR_CODE ret = m_cameraPtr->getStreamInfos(STREAM_TYPE_RGB, streamInfos);
     if (ret != SUCCESS || streamInfos.empty())
     {
-        qWarning("camera get stream info failed(%d)!\n", ret);
+        qWarning("camera get rgb stream info failed(%d)!\n", ret);
         return info;
     }
 
     info.fps = -1;
     for (const auto& sInfo : streamInfos)
     {
-        if (sInfo.format == rgbFormat && sInfo.width == rgbResolution.width()
-            && sInfo.height == rgbResolution.height() && sInfo.fps > info.fps)
+        if (sInfo.format == m_rgbFormat && sInfo.width == m_rgbResolution.width()
+            && sInfo.height == m_rgbResolution.height() && sInfo.fps > info.fps)
         {
             info = sInfo;
         }
@@ -879,43 +885,43 @@ void CSCamera::getUserParaPrivate(CAMERA_PARA_ID paraId, QVariant& value)
     switch (paraId)
     {
     case PARA_DEPTH_STREAM_FORMAT:
-        value = (int)depthFormat;
+        value = (int)m_depthFormat;
         break;
     case PARA_DEPTH_RESOLUTION:
-        value = depthResolution;
+        value = m_depthResolution;
         break;
     case PARA_DEPTH_FILTER:
-        value = filterValue;
+        value = m_filterValue;
         break;
     case PARA_DEPTH_FILTER_TYPE:
-        value = filterType;
+        value = m_filterType;
         break;
     case PARA_DEPTH_FILL_HOLE:
-        value = fillHole;
+        value = m_fillHole;
         break;
     case PARA_RGB_STREAM_FORMAT:
-        value = (int)rgbFormat;
+        value = (int)m_rgbFormat;
         break;
     case PARA_RGB_RESOLUTION:
-        value = rgbResolution;
+        value = m_rgbResolution;
         break;
     case PARA_HAS_RGB:
-        value = isRgbStreamSup;
+        value = m_isRgbStreamSup;
         break;
     case PARA_DEPTH_HAS_IR:
-        value = hasIrStream;
+        value = m_hasIrStream;
         break;
     case PARA_HAS_DEPTH:
-        value = hasDepthStream;
+        value = m_hasDepthStream;
         break;
     case PARA_DEPTH_INTRINSICS:
-        value = QVariant::fromValue(depthIntrinsics);
+        value = QVariant::fromValue(m_depthIntrinsics);
         break;
     case PARA_RGB_INTRINSICS:
-        value = QVariant::fromValue(rgbIntrinsics);
+        value = QVariant::fromValue(m_rgbIntrinsics);
         break;
     case PARA_EXTRINSICS:
-        value = QVariant::fromValue(extrinsics);
+        value = QVariant::fromValue(m_extrinsics);
         break;
     default:
         qDebug() << "unknow camera para : " << paraId;
@@ -937,19 +943,19 @@ void CSCamera::setUserParaPrivate(CAMERA_PARA_ID paraId, QVariant value)
         setDepthFilterValue(value.toInt());
         return;
     case PARA_DEPTH_FILTER_TYPE:
-        if (filterType == value.toInt())
+        if (m_filterType == value.toInt())
         {
             return;
         }
-        filterType = value.toInt();
+        m_filterType = value.toInt();
         break;
     case PARA_DEPTH_FILL_HOLE:
-        if (fillHole == value.toBool())
+        if (m_fillHole == value.toBool())
         {
             return;
         }
 
-        fillHole = value.toBool();
+        m_fillHole = value.toBool();
         break;
     case PARA_RGB_STREAM_FORMAT:
         setRgbFormat((STREAM_FORMAT)value.toInt());
@@ -975,8 +981,8 @@ void CSCamera::getUserParaRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVa
         step = 1;
         break;
     case PARA_DEPTH_FILTER:
-        min = FILTER_RANGE_MAP[filterType].min;
-        max = FILTER_RANGE_MAP[filterType].max;
+        min = FILTER_RANGE_MAP[m_filterType].min;
+        max = FILTER_RANGE_MAP[m_filterType].max;
         step = 1;
         break;
     default:
@@ -1007,10 +1013,14 @@ void CSCamera::setCameraPara(CAMERA_PARA_ID paraId, QVariant value)
     if (CAMERA_PROPERTY_MAP.contains(paraId))
     {
         setPropertyPrivate(paraId, value);
+
+        onParaUpdatedDelay(paraId, 200);
     }
     else if (CAMERA_EXTENSION_PROPERTY_MAP.contains(paraId))
     {
         setExtensionPropertyPrivate(paraId, value);
+
+        onParaUpdatedDelay(paraId, 200);
     }
     else
     {
@@ -1027,22 +1037,23 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
     {
     case PARA_DEPTH_FILTER_TYPE:
         emit cameraParaRangeUpdated(PARA_DEPTH_FILTER);
-        setDepthFilterValue(FILTER_RANGE_MAP[filterType].min);
+        setDepthFilterValue(FILTER_RANGE_MAP[m_filterType].min);
         break;
     case PARA_DEPTH_HDR_MODE: 
         {
-            setCameraPara(PARA_DEPTH_HDR_LEVEL, hdrTimes);
             // close HDR
-            if (value.toInt() == 0)
+            if (value.toInt() == HDR_MODE_CLOSE)
             {
-                qInfo() << "close HDR, then restore exposure : " << cachedDepthExposure << ", gain : " << cachedDepthGain;
-                setCameraPara(PARA_DEPTH_EXPOSURE, cachedDepthExposure);
-                setCameraPara(PARA_DEPTH_GAIN, cachedDepthGain);
+                restoreExposureGain();
+            }
+            else 
+            {
+                setCameraPara(PARA_DEPTH_HDR_LEVEL, m_hdrTimes);
             }
             break;
         }
     case PARA_DEPTH_HDR_LEVEL:
-        if (hdrMode == HDR_MODE_MANUAL)
+        if (m_hdrMode == HDR_MODE_MANUAL)
         {
             QVariant value;
             getCameraPara(PARA_DEPTH_HDR_SETTINGS, value);
@@ -1050,7 +1061,7 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
         }
         else 
         {
-            onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 3000);
+            onParaUpdatedDelay(PARA_DEPTH_HDR_SETTINGS, 7000);
         } 
         break;
     case PARA_TRIGGER_MODE:
@@ -1064,7 +1075,7 @@ void CSCamera::onParaLinkResponse(CAMERA_PARA_ID paraId, const QVariant& value)
 
         CameraIpSetting cameraIp = ip.value<CameraIpSetting>();
         QString ipStr = QString("%1.%2.%3.%4").arg(cameraIp.ipBytes[0]).arg(cameraIp.ipBytes[1]).arg(cameraIp.ipBytes[2]).arg(cameraIp.ipBytes[3]);
-        strncpy(cameraInfo.cameraInfo.uniqueId, ipStr.toStdString().c_str(), sizeof(cameraInfo.cameraInfo.uniqueId));
+        strncpy(m_cameraInfo.cameraInfo.uniqueId, ipStr.toStdString().c_str(), sizeof(m_cameraInfo.cameraInfo.uniqueId));
         break;
     }
     default:
@@ -1085,6 +1096,16 @@ void CSCamera::onParaUpdatedDelay(CAMERA_PARA_ID paraId, int delayMS)
 {
     QTimer::singleShot(delayMS, this, [=]() {
             emit updateParaSignal(paraId);
+        });
+}
+
+void CSCamera::restoreExposureGain()
+{
+    QTimer::singleShot(3000, this, 
+        [=]() {
+            qInfo() << "close HDR, then restore exposure : " << m_cachedDepthExposure << ", gain : " << m_cachedDepthGain;
+            setPropertyPrivate(PARA_DEPTH_EXPOSURE, m_cachedDepthExposure);
+            setPropertyPrivate(PARA_DEPTH_GAIN, m_cachedDepthGain);
         });
 }
 
@@ -1161,18 +1182,12 @@ void CSCamera::getPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& value)
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
     PROPERTY_TYPE propertyType = (PROPERTY_TYPE)CAMERA_PROPERTY_MAP[paraId].id;
 
-    ERROR_CODE ret = cameraPtr->getProperty(streamType, propertyType, v);
+    ERROR_CODE ret = m_cameraPtr->getProperty(streamType, propertyType, v);
     if (ret != SUCCESS)
     {
         qWarning() << "get camera property failed, paraId:" << paraId << ", ret:" << ret;
         Q_ASSERT(false);
     }
-
-    if (paraId == PARA_RGB_EXPOSURE)
-    {
-        correctExposureValue(v);
-    }
-
     value = v;
 
 #ifdef  _CS_DEBUG_
@@ -1185,6 +1200,7 @@ void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
 #ifdef  _CS_DEBUG_
     qDebug() << "setPropertyPrivate, paraId : " << metaEnum.valueToKey(paraId) << ", value  = " << value.toFloat();
 #endif
+
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
     PROPERTY_TYPE propertyType = (PROPERTY_TYPE)CAMERA_PROPERTY_MAP[paraId].id;
 
@@ -1196,19 +1212,13 @@ void CSCamera::setPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value)
         updateFrametime(valueF);
     }
 
-    if (paraId == PARA_RGB_EXPOSURE)
-    {
-        convertExposureValue(valueF);
-    }
-
-    ERROR_CODE ret = cameraPtr->setProperty(streamType, propertyType, valueF);
+    ERROR_CODE ret = m_cameraPtr->setProperty(streamType, propertyType, valueF);
 
     if (ret != SUCCESS)
     {
         qWarning() << "set the camera property failed, paraId:" << paraId << ",ret:" << ret << ",value:" << valueF;
         Q_ASSERT(false);
     }
-    onParaUpdatedDelay(paraId, 200);
 }
 
 void CSCamera::getPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step)
@@ -1218,17 +1228,12 @@ void CSCamera::getPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVa
     STREAM_TYPE  streamType = (STREAM_TYPE)CAMERA_PROPERTY_MAP[paraId].type;
     PROPERTY_TYPE propertyType = (PROPERTY_TYPE)CAMERA_PROPERTY_MAP[paraId].id;
 
-    ERROR_CODE ret = cameraPtr->getPropertyRange(streamType, propertyType, minf, maxf, stepf);
+    ERROR_CODE ret = m_cameraPtr->getPropertyRange(streamType, propertyType, minf, maxf, stepf);
     if (ret != SUCCESS)
     {
         qWarning() << "get camera property range failed, paraId:" << paraId << ",ret:" << ret;
         Q_ASSERT(false);
         return;
-    }
-
-    if (paraId == PARA_RGB_EXPOSURE)
-    {
-        correctExposureRange(minf, maxf, stepf);
     }
 
     min = minf;
@@ -1241,7 +1246,7 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
     PROPERTY_TYPE_EXTENSION type = (PROPERTY_TYPE_EXTENSION)CAMERA_EXTENSION_PROPERTY_MAP[paraId];
 
     PropertyExtension propExt;
-    ERROR_CODE ret = cameraPtr->getPropertyExtension(type, propExt);
+    ERROR_CODE ret = m_cameraPtr->getPropertyExtension(type, propExt);
     if (ret != SUCCESS)
     {
         qWarning() << "get the camera extension property failed, paraId:" << paraId << ",ret:" << ret;
@@ -1260,16 +1265,16 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
     case PROPERTY_EXT_HDR_MODE: 
         {
             getHdrMode((int)propExt.hdrMode);
-            value = hdrMode;
+            value = m_hdrMode;
         }
         break;
     case PROPERTY_EXT_HDR_EXPOSURE:
-        if (hdrMode != HDR_MODE_CLOSE)
+        if (m_hdrMode != HDR_MODE_CLOSE)
         {
-            if (hdrMode == HDR_MODE_MANUAL)
+            if (m_hdrMode == HDR_MODE_MANUAL)
             {
                 //add new settings
-                for (int i = propExt.hdrExposureSetting.count; i < hdrTimes; i++)
+                for (int i = propExt.hdrExposureSetting.count; i < m_hdrTimes; i++)
                 {
                     HdrExposureParam param;
                     param.gain = 1;
@@ -1278,7 +1283,7 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
                     propExt.hdrExposureSetting.param[i] = param;
                 }
 
-                propExt.hdrExposureSetting.count = hdrTimes;
+                propExt.hdrExposureSetting.count = m_hdrTimes;
             }
 
             value = QVariant::fromValue(propExt.hdrExposureSetting);  
@@ -1288,7 +1293,7 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
         {
             HdrScaleSetting scaleSetting = propExt.hdrScaleSetting;
             getHdrTimes(scaleSetting);
-            value = hdrTimes;
+            value = m_hdrTimes;
             break;
         }
     case PROPERTY_EXT_DEPTH_SCALE:
@@ -1315,6 +1320,9 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
         value = QVariant::fromValue(propExt.cameraIp);
         break;
     }
+    case PROPERTY_EXT_EXPOSURE_TIME_RGB:
+        value = propExt.uiExposureTime;
+        break;
     default:
         Q_ASSERT(false);
         break;
@@ -1337,18 +1345,20 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
     case PROPERTY_EXT_HDR_MODE:
     {
         // cached exposure and gain
-        if (hdrMode == HDR_MODE_CLOSE && value.toInt() != HDR_MODE_CLOSE)
+        if (m_hdrMode == HDR_MODE_CLOSE && value.toInt() != HDR_MODE_CLOSE)
         {
             QVariant tmp;
             getCameraPara(PARA_DEPTH_EXPOSURE, tmp);
-            cachedDepthExposure = qRound(tmp.toFloat());
+            m_cachedDepthExposure = qRound(tmp.toFloat());
 
             getCameraPara(PARA_DEPTH_GAIN, tmp);
-            cachedDepthGain = qRound(tmp.toFloat());
+            m_cachedDepthGain = qRound(tmp.toFloat());
+
+            qDebug() << "HDR is close, cached depth exposure : " << m_cachedDepthExposure << ", gain : " << m_cachedDepthGain;
         }
         // update HDR mode
-        hdrMode = (CAMERA_HDR_MODE)value.toInt();
-        int autoHdrMode = getAutoHdrMode(hdrMode);
+        m_hdrMode = (CAMERA_HDR_MODE)value.toInt();
+        int autoHdrMode = getAutoHdrMode(m_hdrMode);
         propExt.hdrMode = (HDR_MODE)autoHdrMode;
         break;
     }
@@ -1384,42 +1394,58 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
     case PROPERTY_EXT_CAMERA_IP:
         propExt.cameraIp = value.value<CameraIpSetting>();
         break;
+    case PROPERTY_EXT_EXPOSURE_TIME_RGB:
+        propExt.uiExposureTime = value.toFloat();
+        break;
     default:
         Q_ASSERT(false);
         return;
     }
 
-    ERROR_CODE ret = cameraPtr->setPropertyExtension(type, propExt);
+    ERROR_CODE ret = m_cameraPtr->setPropertyExtension(type, propExt);
     if (ret != SUCCESS)
     {
         qWarning() << "set the camera extension property failed," << "paraId:" << paraId << ",ret:" << ret;
         Q_ASSERT(false);
     }
-
-    onParaUpdatedDelay(paraId, 200);
 }
 
 void CSCamera::getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step)
 {
-    PROPERTY_TYPE_EXTENSION type = (PROPERTY_TYPE_EXTENSION)CAMERA_EXTENSION_PROPERTY_MAP[paraId];
-
-    switch (type)
+    switch (paraId)
     {
-    case PROPERTY_EXT_CONTRAST_MIN:
+    case PARA_DEPTH_THRESHOLD:
         min = 0;
         max = 40;
         step = 1;
         break;
-    case PROPERTY_EXT_DEPTH_RANGE:
+    case PARA_DEPTH_RANGE:
         min = DEPTH_RANGE_LIMIT.min;
         max = DEPTH_RANGE_LIMIT.max;
         step = 1;
         break;
-    case PROPERTY_EXT_HDR_SCALE_SETTING:
+    case PARA_DEPTH_HDR_LEVEL:
         min = CAMERA_HDR_LEVEL_RANGE.min;
         max = CAMERA_HDR_LEVEL_RANGE.max;
         step = 1;
         break;
+    case PARA_RGB_EXPOSURE:
+    {
+        PropertyExtension propExt;
+        ERROR_CODE ret = m_cameraPtr->getPropertyExtension(PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB, propExt);
+        if (ret != SUCCESS)
+        {
+            qWarning() << "get the camera extension property failed, type:" << PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB << ",ret:" << ret;
+            Q_ASSERT(false);
+        }
+        else 
+        {
+            min = propExt.objVRange_.fMin_;
+            max = propExt.objVRange_.fMax_;
+            step = propExt.objVRange_.fStep_;
+        }
+        break;
+    }
     default:
         break;
     }
@@ -1431,7 +1457,7 @@ void CSCamera::getFromats(STREAM_TYPE sType, QList<QPair<QString, QVariant>>& fo
     ERROR_CODE ret;
     std::vector<StreamInfo> streamInfos;
 
-    ret = cameraPtr->getStreamInfos(sType, streamInfos);
+    ret = m_cameraPtr->getStreamInfos(sType, streamInfos);
     if (ret != SUCCESS)
     {
         qWarning("camera get stream info failed(%d)!\n", ret);
@@ -1454,9 +1480,9 @@ void CSCamera::getResolutions(STREAM_TYPE sType, QList<QPair<QString, QVariant>>
     ERROR_CODE ret;
     std::vector<StreamInfo> streamInfos;
 
-    STREAM_FORMAT dstFormat = (sType == STREAM_TYPE_DEPTH) ? depthFormat : rgbFormat;
+    STREAM_FORMAT dstFormat = (sType == STREAM_TYPE_DEPTH) ? m_depthFormat : m_rgbFormat;
 
-    ret = cameraPtr->getStreamInfos(sType, streamInfos);
+    ret = m_cameraPtr->getStreamInfos(sType, streamInfos);
     if (ret != SUCCESS)
     {
         qInfo("camera get stream info failed(%d)!\n", ret);
@@ -1529,44 +1555,9 @@ void CSCamera::getGains(CAMERA_PARA_ID paraId, QList<QPair<QString, QVariant>>& 
     }
 }
 
-#define RGB_EXPOSURE_MAX 30000
-#define RGB_EXPOSURE_MIN 1
-
-void CSCamera::correctExposureRange(float& min, float& max, float& step)
-{
-    if (cameraInfo.connectType == CONNECT_TYPE_USB)
-    {
-        float d = max - min;
-        rgbExposureMin = min;
-        rgbExposureMax = max;
-
-        min = RGB_EXPOSURE_MIN;
-        step = 1;
-
-        rgbExposureStep = (RGB_EXPOSURE_MAX - min) / d;
-        max = min + rgbExposureStep * d;
-    }
-}
-
-void CSCamera::correctExposureValue(float& value)
-{
-    if (cameraInfo.connectType == CONNECT_TYPE_USB)
-    {
-        value = RGB_EXPOSURE_MIN + qRound(rgbExposureStep * (value - rgbExposureMin));
-    }
-}
-
-void CSCamera::convertExposureValue(float& value)
-{
-    if (cameraInfo.connectType == CONNECT_TYPE_USB)
-    {
-        value = (value - RGB_EXPOSURE_MIN) / rgbExposureStep + rgbExposureMin;
-    }
-}
-
 void CSCamera::setDepthFormat(STREAM_FORMAT format)
 {
-    if (format == depthFormat)
+    if (format == m_depthFormat)
     {
         return;
     }
@@ -1574,12 +1565,18 @@ void CSCamera::setDepthFormat(STREAM_FORMAT format)
     updateStreamType();
 
     // 1. update format
-    depthFormat = format;
-    emit cameraParaUpdated(PARA_DEPTH_STREAM_FORMAT, (int)depthFormat);
+    m_depthFormat = format;
+    emit cameraParaUpdated(PARA_DEPTH_STREAM_FORMAT, (int)m_depthFormat);
 
     // 2. update resolution items
     QList<QPair<QString, QVariant>> resolutions;
     getResolutions(STREAM_TYPE_DEPTH, resolutions);
+    
+    if(resolutions.size() <= 0)
+    {
+        qWarning() << "Error, the depth resolutions is empty";
+        return;
+    }
     
     emit cameraParaItemsUpdated(PARA_DEPTH_RESOLUTION);
 
@@ -1587,7 +1584,7 @@ void CSCamera::setDepthFormat(STREAM_FORMAT format)
     bool findRes = false;
     for (auto pair : resolutions)
     {
-        if (pair.second.toSize() == depthResolution)
+        if (pair.second.toSize() == m_depthResolution)
         {
             findRes = true;
             break;
@@ -1596,15 +1593,15 @@ void CSCamera::setDepthFormat(STREAM_FORMAT format)
     
     if (!findRes)
     {
-        depthResolution = resolutions.first().second.toSize();
+        m_depthResolution = resolutions.first().second.toSize();
     }
 
-    emit cameraParaUpdated(PARA_DEPTH_RESOLUTION, depthResolution);
+    emit cameraParaUpdated(PARA_DEPTH_RESOLUTION, m_depthResolution);
 }
 
 void CSCamera::setDepthResolution(QSize res)
 {
-    if (res == depthResolution)
+    if (res == m_depthResolution)
     {
         return;
     }
@@ -1613,13 +1610,13 @@ void CSCamera::setDepthResolution(QSize res)
     updateStreamType();
 
     // update resolution
-    depthResolution = res;
-    emit cameraParaUpdated(PARA_DEPTH_RESOLUTION, depthResolution);
+    m_depthResolution = res;
+    emit cameraParaUpdated(PARA_DEPTH_RESOLUTION, m_depthResolution);
 }
 
 void CSCamera::setRgbFormat(STREAM_FORMAT format)
 {
-    if (format == rgbFormat)
+    if (format == m_rgbFormat)
     {
         return;
     }
@@ -1628,12 +1625,17 @@ void CSCamera::setRgbFormat(STREAM_FORMAT format)
     updateStreamType();
 
     // 1. update format
-    rgbFormat = format;
-    emit cameraParaUpdated(PARA_RGB_STREAM_FORMAT, (int)rgbFormat);
+    m_rgbFormat = format;
+    emit cameraParaUpdated(PARA_RGB_STREAM_FORMAT, (int)m_rgbFormat);
 
     // 2. update resolution items
     QList<QPair<QString, QVariant>> resolutions;
     getResolutions(STREAM_TYPE_RGB, resolutions);
+    if(resolutions.size() <= 0)
+    {
+        qWarning() << "Error, the RGB resolutions is empty";
+        return;
+    }
 
     emit cameraParaItemsUpdated(PARA_RGB_RESOLUTION);
 
@@ -1641,7 +1643,7 @@ void CSCamera::setRgbFormat(STREAM_FORMAT format)
     bool findRes = false;
     for (auto pair : resolutions)
     {
-        if (pair.second.toSize() == rgbResolution)
+        if (pair.second.toSize() == m_rgbResolution)
         {
             findRes = true;
         }
@@ -1649,15 +1651,15 @@ void CSCamera::setRgbFormat(STREAM_FORMAT format)
 
     if (!findRes)
     {
-        rgbResolution = resolutions.first().second.toSize();
+        m_rgbResolution = resolutions.first().second.toSize();
     }
 
-    emit cameraParaUpdated(PARA_RGB_RESOLUTION, rgbResolution);
+    emit cameraParaUpdated(PARA_RGB_RESOLUTION, m_rgbResolution);
 }
 
 void CSCamera::setRgbResolution(QSize res)
 {
-    if (res == rgbResolution)
+    if (res == m_rgbResolution)
     {
         return;
     }
@@ -1666,21 +1668,21 @@ void CSCamera::setRgbResolution(QSize res)
     updateStreamType();
 
     // update resolution
-    rgbResolution = res;
-    emit cameraParaUpdated(PARA_RGB_RESOLUTION, rgbResolution);
+    m_rgbResolution = res;
+    emit cameraParaUpdated(PARA_RGB_RESOLUTION, m_rgbResolution);
 }
 
 void CSCamera::setDepthFilterValue(int value)
 {
-    const int min = FILTER_RANGE_MAP[filterType].min;
-    const int max = FILTER_RANGE_MAP[filterType].max;
+    const int min = FILTER_RANGE_MAP[m_filterType].min;
+    const int max = FILTER_RANGE_MAP[m_filterType].max;
 
     value = (value < min) ? min : value;
     value = (value > max) ? max : value;
     
-    filterValue = value;
+    m_filterValue = value;
 
-    emit cameraParaUpdated(PARA_DEPTH_FILTER, filterValue);
+    emit cameraParaUpdated(PARA_DEPTH_FILTER, m_filterValue);
 }
 
 // update frame time before set exposure
@@ -1694,7 +1696,7 @@ void CSCamera::updateFrametime(float exposure)
 
 void CSCamera::getHdrMode(int value)
 {
-    if (hdrMode == HDR_MODE_MANUAL)
+    if (m_hdrMode == HDR_MODE_MANUAL)
     {
         return;
     }
@@ -1703,16 +1705,16 @@ void CSCamera::getHdrMode(int value)
     switch (hdrM)
     {
     case HDR_MODE_OFF:
-        hdrMode = HDR_MODE_CLOSE;
+        m_hdrMode = HDR_MODE_CLOSE;
         break;
     case HDR_MODE_HIGH_RELECT:
-        hdrMode = HDR_MODE_SHINE;
+        m_hdrMode = HDR_MODE_SHINE;
         break;
     case HDR_MODE_LOW_RELECT:
-        hdrMode = HDR_MODE_DARK;
+        m_hdrMode = HDR_MODE_DARK;
         break;
     case HDR_MODE_ALL_RELECT:
-        hdrMode = HDR_MODE_BOTH;
+        m_hdrMode = HDR_MODE_BOTH;
         break;
     default:
         Q_ASSERT(false);
@@ -1750,18 +1752,18 @@ int CSCamera::getAutoHdrMode(int mode)
 
 void CSCamera::getHdrTimes(const HdrScaleSetting& settings)
 {
-    switch (hdrMode)
+    switch (m_hdrMode)
     {
     case HDR_MODE_SHINE:
-        hdrTimes = settings.highReflectModeCount + 1;
+        m_hdrTimes = settings.highReflectModeCount + 1;
         break;
     case HDR_MODE_DARK:
-        hdrTimes = settings.lowReflectModeCount + 1;
+        m_hdrTimes = settings.lowReflectModeCount + 1;
         break;
     case HDR_MODE_CLOSE:
     case HDR_MODE_BOTH:
     case HDR_MODE_MANUAL:
-        hdrTimes = (settings.lowReflectModeCount + settings.highReflectModeCount + 1);
+        m_hdrTimes = (settings.lowReflectModeCount + settings.highReflectModeCount + 1);
         break;
     default:
         Q_ASSERT(false);
@@ -1775,7 +1777,7 @@ void CSCamera::setHdrTimes(HdrScaleSetting& settings, int times)
     times = (times > 8) ? 8 : times;
 
     const int scale = HDR_SCALE_DEFAULT;
-    switch (hdrMode)
+    switch (m_hdrMode)
     {
     case HDR_MODE_SHINE:
         settings = { (unsigned int)(times - 1), scale, 0, scale };
@@ -1800,25 +1802,25 @@ void CSCamera::setHdrTimes(HdrScaleSetting& settings, int times)
 
 CSCameraInfo CSCamera::getCameraInfo() const
 {
-    return cameraInfo;
+    return m_cameraInfo;
 }
 
 int CSCamera::getCameraState() const
 {
-    lock.lockForRead();
-    int result = cameraState;
-    lock.unlock();
+    m_lock.lockForRead();
+    int result = m_cameraState;
+    m_lock.unlock();
 
     return result;
 }
 
 void CSCamera::setCameraState(CAMERA_STATE state)
 {
-    lock.lockForWrite();
-    cameraState = state;
-    lock.unlock();
+    m_lock.lockForWrite();
+    m_cameraState = state;
+    m_lock.unlock();
 
-    emit cameraStateChanged(cameraState);
+    emit cameraStateChanged(m_cameraState);
 }
 
 void CSCamera::updateStreamType()
@@ -1844,20 +1846,22 @@ void CSCamera::onTriggerModeChanged(bool isSoftTrigger)
 
 void CSCamera::stopStreamThread()
 {
-    if (streamThread->isRunning())
+    if (m_streamThread->isRunning())
     {
         qInfo() << "stop stream thread";
-        streamThread->requestInterruption();
-        streamThread->wait();
+        m_streamThread->requestInterruption();
+        m_streamThread->wait();
     }
 }
 
 void CSCamera::startStreamThread()
 {
-    if (!streamThread->isRunning())
+    qInfo() << "start stream thread";
+
+    if (!m_streamThread->isRunning())
     {
         qInfo() << "start stream thread";
-        streamThread->start();
+        m_streamThread->start();
     }
 }
 

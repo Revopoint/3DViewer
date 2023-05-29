@@ -90,7 +90,7 @@ set(LIB_DIR ${CMAKE_BINARY_DIR}/lib)
 
 # version
 if("${APP_VERSION}" STREQUAL "")
-    set(APP_VERSION "V1.0.0-test")
+    set(APP_VERSION "1.0.0-test")
 endif()
 
 if("${APP_NAME}" STREQUAL "")

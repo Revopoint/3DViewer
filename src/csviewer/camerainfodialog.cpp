@@ -22,38 +22,38 @@
 
 CameraInfoDialog::CameraInfoDialog(QWidget* parent)
     : QDialog(parent)
-    , cameraInfoUi(new Ui::CameraInfoWidget)
+    , m_cameraInfoUi(new Ui::CameraInfoWidget)
 {
-    cameraInfoUi->setupUi(this);
+    m_cameraInfoUi->setupUi(this);
     setWindowFlags(this->windowFlags() & Qt::WindowCloseButtonHint);
     setModal(true);
 }
 
 CameraInfoDialog::~CameraInfoDialog()
 {
-    delete cameraInfoUi;
+    delete m_cameraInfoUi;
 }
 
 void CameraInfoDialog::updateCameraInfo(const CSCameraInfo& info)
 {
-    cameraInfoUi->modelLabel->setText(info.model);
-    cameraInfoUi->snLabel->setText(info.cameraInfo.serial);
-    cameraInfoUi->sdkVerLabel->setText(info.sdkVersion);
-    cameraInfoUi->firmwareVerLabel->setText(info.cameraInfo.firmwareVersion);
-    cameraInfoUi->algoVerLabel->setText(info.cameraInfo.algorithmVersion);
+    m_cameraInfoUi->modelLabel->setText(info.model);
+    m_cameraInfoUi->snLabel->setText(info.cameraInfo.serial);
+    m_cameraInfoUi->sdkVerLabel->setText(info.sdkVersion);
+    m_cameraInfoUi->firmwareVerLabel->setText(info.cameraInfo.firmwareVersion);
+    m_cameraInfoUi->algoVerLabel->setText(info.cameraInfo.algorithmVersion);
 
     CSConnectType connectMode = (CSConnectType)info.connectType;
     if (connectMode == CONNECT_TYPE_NET)
     {
-        cameraInfoUi->connectionMode->setText("Network");
+        m_cameraInfoUi->connectionMode->setText("Network");
     }
     else
     {
-        cameraInfoUi->connectionMode->setText("USB");
+        m_cameraInfoUi->connectionMode->setText("USB");
     }
 }
 
 void CameraInfoDialog::onTranslate()
 {
-    cameraInfoUi->retranslateUi(this);
+    m_cameraInfoUi->retranslateUi(this);
 }

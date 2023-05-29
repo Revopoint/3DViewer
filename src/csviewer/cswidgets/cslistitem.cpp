@@ -24,10 +24,10 @@
 
 CSListItem::CSListItem(const QIcon& icon, const QString& text, const char* onText, const char* offText, const char* context,QListWidget* view)
     : QWidget(view)
-    , listWidgetItem(new QListWidgetItem)
-    , actionOnText(onText)
-    , actionOffText(offText)
-    , context(context)
+    , m_listWidgetItem(new QListWidgetItem)
+    , m_actionOnText(onText)
+    , m_actionOffText(offText)
+    , m_context(context)
 {
     setAttribute(Qt::WA_StyledBackground);
     setObjectName("CSListItem");
@@ -35,27 +35,27 @@ CSListItem::CSListItem(const QIcon& icon, const QString& text, const char* onTex
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setSpacing(15);
     layout->setContentsMargins(20, 0, 20, 0);
-    iconLabel = new QLabel(this);
+    m_iconLabel = new QLabel(this);
 
     auto size = icon.availableSizes().first();
-    iconLabel->setFixedSize(size);
-    iconLabel->setPixmap(icon.pixmap(size));
+    m_iconLabel->setFixedSize(size);
+    m_iconLabel->setPixmap(icon.pixmap(size));
 
-    layout->addWidget(iconLabel);
+    layout->addWidget(m_iconLabel);
     
-    textLabel = new QLabel(text, this);
-    layout->addWidget(textLabel);
+    m_textLabel = new QLabel(text, this);
+    layout->addWidget(m_textLabel);
     layout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
 
-    actionLabel = new QLabel(this);
-    layout->addWidget(actionLabel);
+    m_actionLabel = new QLabel(this);
+    layout->addWidget(m_actionLabel);
 
-    actionLabel->setVisible(false);
-    iconLabel->setVisible(isSelected);
+    m_actionLabel->setVisible(false);
+    m_iconLabel->setVisible(m_isSelected);
 
     QSizePolicy sizePilicy;
     sizePilicy.setRetainSizeWhenHidden(true);
-    iconLabel->setSizePolicy(sizePilicy);
+    m_iconLabel->setSizePolicy(sizePilicy);
 }
 
 CSListItem::~CSListItem()
@@ -65,31 +65,31 @@ CSListItem::~CSListItem()
 
 QListWidgetItem* CSListItem::getListWidgetItem() const
 {
-    return listWidgetItem;
+    return m_listWidgetItem;
 }
 
 void CSListItem::enterEvent(QEvent* event)
 {
-    actionLabel->setVisible(true);
-    if (isSelected)
+    m_actionLabel->setVisible(true);
+    if (m_isSelected)
     {
-        actionLabel->setText(getTranslate(actionOnText));
+        m_actionLabel->setText(getTranslate(m_actionOnText));
     }
     else
     {
-        actionLabel->setText(getTranslate(actionOffText));
+        m_actionLabel->setText(getTranslate(m_actionOffText));
     }
 
-    textLabel->setStyleSheet("color:rgb(0, 164, 255)");
-    actionLabel->setStyleSheet("color:rgb(0, 164, 255)");
+    m_textLabel->setStyleSheet("color:rgb(0, 164, 255)");
+    m_actionLabel->setStyleSheet("color:rgb(0, 164, 255)");
     QWidget::enterEvent(event);
 }
 
 void CSListItem::leaveEvent(QEvent* event)
 {
-    actionLabel->setVisible(false);
-    actionLabel->setStyleSheet("color:rgb(77, 77, 77)");
-    textLabel->setStyleSheet("color:rgb(77, 77, 77)");
+    m_actionLabel->setVisible(false);
+    m_actionLabel->setStyleSheet("color:rgb(77, 77, 77)");
+    m_textLabel->setStyleSheet("color:rgb(77, 77, 77)");
 
     QWidget::leaveEvent(event);
 }
@@ -98,7 +98,7 @@ void CSListItem::mouseReleaseEvent(QMouseEvent* event)
 {
     //QWidget::mouseReleaseEvent(event);
 
-    emit toggled(isSelected, getText(), listWidgetItem);
+    emit toggled(m_isSelected, getText(), m_listWidgetItem);
 }
 
 void CSListItem::mousePressEvent(QMouseEvent* event)
@@ -108,29 +108,29 @@ void CSListItem::mousePressEvent(QMouseEvent* event)
 
 void CSListItem::setSelected(bool select)
 {
-    isSelected = select;
-    iconLabel->setVisible(isSelected);
-    if (isSelected)
+    m_isSelected = select;
+    m_iconLabel->setVisible(m_isSelected);
+    if (m_isSelected)
     {
-        actionLabel->setText(getTranslate(actionOnText));
+        m_actionLabel->setText(getTranslate(m_actionOnText));
     }
     else
     {
-        actionLabel->setText(getTranslate(actionOffText));
+        m_actionLabel->setText(getTranslate(m_actionOffText));
     }
 }
 
 bool CSListItem::isSelect()
 {
-    return isSelected;
+    return m_isSelected;
 }
 
 QString CSListItem::getText() const
 {
-    return textLabel->text();
+    return m_textLabel->text();
 }
 
 QString CSListItem::getTranslate(const char* text)
 {
-    return QApplication::translate(context, text);
+    return QApplication::translate(m_context, text);
 }

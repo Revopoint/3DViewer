@@ -22,8 +22,8 @@ namespace cs
 class IFrame;
 /**
 * @~chinese
-* \defgroup Frame Êı¾İÖ¡²Ù×÷ 
-* @brief Êı¾İÖ¡¶ÔÏó½Ó¿Ú
+* \defgroup Frame æ•°æ®å¸§æ“ä½œ 
+* @brief æ•°æ®å¸§å¯¹è±¡æ¥å£
 * @{
 * @~english
 * \defgroup Frame Frame Operations
@@ -34,7 +34,7 @@ typedef std::shared_ptr<IFrame> IFramePtr;
 
 /*!\class IFrame
 * @~chinese
-* @brief Êı¾İÖ¡½Ó¿Ú
+* @brief æ•°æ®å¸§æ¥å£
 * @~english
 * @brief Frame interface
 */
@@ -46,17 +46,17 @@ public:
 
 	/** 
 	* @~chinese		
-	* @brief		ÅĞ¶ÏÖ¡ÊÇ·ñÎª¿Õ
-	* @ return Èç¹ûÖ¡Îª¿Õ·µ»Øtrue, ·ñÔò·µ»Øfalse
+	* @brief		åˆ¤æ–­å¸§æ˜¯å¦ä¸ºç©º
+	* @ return å¦‚æœå¸§ä¸ºç©ºè¿”å›true, å¦åˆ™è¿”å›false
 	* @~english
 	* @brief		Check frame is valid
-	* @return true if frame is empty£¬otherwise return false
+	* @return true if frame is emptyï¼Œotherwise return false
 	*/
 	virtual const bool empty() const = 0;
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡¸ÃÖ¡Êı¾İµÄÊ±¼ä´Á£¬µ¥Î»ÎªºÁÃë
+	* @brief      è·å–è¯¥å¸§æ•°æ®çš„æ—¶é—´æˆ³ï¼Œå•ä½ä¸ºæ¯«ç§’
 	* @~english
 	* @brief      Retrieve the time at which the frame was captured in milliseconds
 	**/
@@ -64,7 +64,7 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡¸ÃÖ¡Êı¾İµÄÊ×µØÖ·Ö¸Õë
+	* @brief      è·å–è¯¥å¸§æ•°æ®çš„é¦–åœ°å€æŒ‡é’ˆ
 	* @~english
 	* @brief      Retrieve the pointer to the start of the frame data
 	**/
@@ -72,7 +72,7 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡¸ÃÖ¡Êı¾İÖ¸¶¨²¿·ÖµÄÆğÊ¼Ö¸Õë
+	* @brief      è·å–è¯¥å¸§æ•°æ®æŒ‡å®šéƒ¨åˆ†çš„èµ·å§‹æŒ‡é’ˆ
 	* @~english
 	* @brief      Retrieve the pointer to the start of the specified format data
 	**/
@@ -80,7 +80,7 @@ public:
 	
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡¸ÃÖ¡Êı¾İµÄ×Ö½ÚÊı
+	* @brief      è·å–è¯¥å¸§æ•°æ®çš„å­—èŠ‚æ•°
 	* @~english
 	* @brief      Retrieve size of frame in bytes
 	**/
@@ -88,7 +88,7 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡¸ÃÖ¡¿í¶È
+	* @brief      è·å–è¯¥å¸§å®½åº¦
 	* @~english
 	* @brief      Retrieve frame width in pixels
 	**/
@@ -96,7 +96,7 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡¸ÃÖ¡¸ß¶È
+	* @brief      è·å–è¯¥å¸§é«˜åº¦
 	* @~english
 	* @brief      Retrieve frame height in pixels
 	**/
@@ -104,7 +104,7 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡Ö¡µÄ¸ñÊ½
+	* @brief      è·å–å¸§çš„æ ¼å¼
 	* @~english
 	* @brief      Retrieve format of frame
 	**/
@@ -112,7 +112,7 @@ public:
 
     /**
     * @~chinese
-    * @brief      »ñÈ¡Ö¡Í·Ô­Ê¼Êı¾İ
+    * @brief      è·å–å¸§å¤´åŸå§‹æ•°æ®
     * @~english
     * @brief      Retrieve header of frame
     **/

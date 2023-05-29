@@ -111,6 +111,7 @@ private:
     void startStreamThread();
 
     bool isNetworkConnect(QString uuid);
+    void restoreExposureGain();
 signals:
     void updateParaSignal(int paraId);
 private slots:
@@ -132,10 +133,6 @@ private:
     void getExtensionPropertyRangePrivate(CAMERA_PARA_ID paraId, QVariant& min, QVariant& max, QVariant& step);
 
 private:
-    void correctExposureRange(float& min, float& max, float& step);
-    void correctExposureValue(float& value);
-    void convertExposureValue(float& value);
-private:
     class StreamThread : public QThread
     {
     public:
@@ -143,7 +140,7 @@ private:
         ~StreamThread();
         void run() override;
     private:
-        CSCamera& camera;
+        CSCamera& m_camera;
     };
 
 private:
@@ -152,48 +149,44 @@ private:
     static const QMap<CAMERA_HDR_MODE, const char*> CAMERA_HDR_MAP;
     static QMetaEnum metaEnum;
 private:
-    CAMERA_STATE cameraState;
-    ICameraPtr cameraPtr;
-    CSCameraInfo cameraInfo;
+    CAMERA_STATE m_cameraState;
+    ICameraPtr m_cameraPtr;
+    CSCameraInfo m_cameraInfo;
 
-    STREAM_FORMAT depthFormat;
-    STREAM_FORMAT rgbFormat;
-    QSize depthResolution;
-    QSize rgbResolution;
-    TRIGGER_MODE triggerMode;
+    STREAM_FORMAT m_depthFormat;
+    STREAM_FORMAT m_rgbFormat;
+    QSize m_depthResolution;
+    QSize m_rgbResolution;
+    TRIGGER_MODE m_triggerMode;
 
-    int filterValue;
-    int filterType;
-    bool fillHole;
+    int m_filterValue;
+    int m_filterType;
+    bool m_fillHole;
 
-    bool hasIrStream;
-    bool hasDepthStream;
+    bool m_hasIrStream;
+    bool m_hasDepthStream;
 
-    bool isRgbStreamSup;
-    bool isDepthStreamSup;
+    bool m_isRgbStreamSup;
+    bool m_isDepthStreamSup;
 
     //hdr
-    CAMERA_HDR_MODE hdrMode;
-    int hdrTimes;
-    HdrExposureSetting manualHdrSetting;
+    CAMERA_HDR_MODE m_hdrMode;
+    int m_hdrTimes;
+    HdrExposureSetting m_manualHdrSetting;
     //for restoring exposure and gain when cloing HDR
-    int cachedDepthExposure;
-    int cachedDepthGain;
+    int m_cachedDepthExposure;
+    int m_cachedDepthGain;
 
-    Intrinsics depthIntrinsics;
-    Intrinsics rgbIntrinsics;
-    Extrinsics extrinsics;
-    float depthScale;
+    Intrinsics m_depthIntrinsics;
+    Intrinsics m_rgbIntrinsics;
+    Extrinsics m_extrinsics;
+    float m_depthScale;
 
-    StreamThread* streamThread;
+    StreamThread* m_streamThread;
     friend StreamThread;
 
-    QThread* cameraThread;
-    mutable QReadWriteLock lock;
-
-    int rgbExposureStep = 1;
-    int rgbExposureMin = 0;
-    int rgbExposureMax = 0;
+    QThread* m_cameraThread;
+    mutable QReadWriteLock m_lock;
 };
 }
 

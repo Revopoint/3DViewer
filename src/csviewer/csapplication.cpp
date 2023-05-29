@@ -46,37 +46,38 @@ CSApplication* CSApplication::getInstance()
 }
 
 CSApplication::CSApplication()
-    : processor(std::make_shared<Processor>())
-    , processThread(std::make_shared<ProcessThread>(processor))
-    , cameraCaptureTool(std::make_shared<CameraCaptureTool>())
-    , appConfig(std::make_shared<AppConfig>())
+    : m_processor(std::make_shared<Processor>())
+    , m_processThread(std::make_shared<ProcessThread>(m_processor))
+    , m_cameraCaptureTool(std::make_shared<CameraCaptureTool>())
+    , m_appConfig(std::make_shared<AppConfig>())
 {
-    CameraThread::setSdkLogPath(LOG_ROOT_DIR + "/sdk.log");
-    cameraThread = std::make_shared<CameraThread>();
+    CameraThread::enableSdkLog(LOG_ROOT_DIR);
+
+    m_cameraThread = std::make_shared<CameraThread>();
 
     qRegisterMetaType<StreamData>("StreamData");
     qRegisterMetaType<FrameData>("FrameData");
     qRegisterMetaType<OutputData2D>("OutputData2D");
     qRegisterMetaType<cs::Pointcloud>("cs::Pointcloud");
 
-    processStrategys[cs::STRATEGY_DEPTH] = nullptr;
-    processStrategys[cs::STRATEGY_RGB] = nullptr;
-    processStrategys[cs::STRATEGY_CLOUD_POINT] = nullptr;
+    m_processStrategys[cs::STRATEGY_DEPTH] = nullptr;
+    m_processStrategys[cs::STRATEGY_RGB] = nullptr;
+    m_processStrategys[cs::STRATEGY_CLOUD_POINT] = nullptr;
 }
 
 CSApplication::~CSApplication()
 {
     disconnections();
 
-    processor->removeProcessEndLisener(cameraCaptureTool.get());
+    m_processor->removeProcessEndLisener(m_cameraCaptureTool.get());
 
-    for (auto straType : processStrategys.keys())
+    for (auto straType : m_processStrategys.keys())
     {
-        auto stra = processStrategys[straType];
+        auto stra = m_processStrategys[straType];
         if (stra)
         {
-            processor->removeProcessStrategy(stra);
-            processStrategys[straType] = nullptr;
+            m_processor->removeProcessStrategy(stra);
+            m_processStrategys[straType] = nullptr;
             delete stra;
         }
     }
@@ -87,51 +88,58 @@ CSApplication::~CSApplication()
 void CSApplication::start()
 {
     initConnections();
-    cameraThread->start();
 
-    auto camera = cameraThread->getCamera();
-    cameraCaptureTool->setCamera(camera);
+    m_cameraThread->start();
 
-    processor->addProcessEndLisener(cameraCaptureTool.get());
+    auto camera = m_cameraThread->getCamera();
+    m_cameraCaptureTool->setCamera(camera);
+
+    m_processor->addProcessEndLisener(m_cameraCaptureTool.get());
+}
+
+void CSApplication::stop()
+{
+    getCamera()->disconnectCamera();
+    CameraThread::deInitialize();
 }
 
 std::shared_ptr<ICSCamera> CSApplication::getCamera() const
 {
-    return cameraThread->getCamera();
+    return m_cameraThread->getCamera();
 }
 
 void CSApplication::initConnections()
 {
-    auto cameraProxy = cameraThread->getCamera();
+    auto cameraProxy = m_cameraThread->getCamera();
 
     bool suc = true;
-    suc &= (bool)connect(cameraThread.get(), &CameraThread::cameraListUpdated,    this,  &CSApplication::cameraListUpdated);
-    suc &= (bool)connect(cameraThread.get(), &CameraThread::cameraStateChanged,   this,  &CSApplication::cameraStateChanged);
-    suc &= (bool)connect(cameraThread.get(), &CameraThread::cameraStateChanged,   this,  &CSApplication::onCameraStateChanged);
-    suc &= (bool)connect(cameraThread.get(), &CameraThread::removedCurrentCamera, this,  &CSApplication::removedCurrentCamera);
+    suc &= (bool)connect(m_cameraThread.get(), &CameraThread::cameraListUpdated,    this,  &CSApplication::cameraListUpdated);
+    suc &= (bool)connect(m_cameraThread.get(), &CameraThread::cameraStateChanged,   this,  &CSApplication::cameraStateChanged);
+    suc &= (bool)connect(m_cameraThread.get(), &CameraThread::cameraStateChanged,   this,  &CSApplication::onCameraStateChanged);
+    suc &= (bool)connect(m_cameraThread.get(), &CameraThread::removedCurrentCamera, this,  &CSApplication::removedCurrentCamera);
     suc &= (bool)connect(cameraProxy.get(),  &ICSCamera::cameraParaUpdated,       this, &CSApplication::onCameraParaUpdated);
 
-    suc &= (bool)connect(cameraCaptureTool.get(), &CameraCaptureTool::captureNumberUpdated, this, &CSApplication::captureNumberUpdated);
-    suc &= (bool)connect(cameraCaptureTool.get(), &CameraCaptureTool::captureStateChanged,  this, &CSApplication::captureStateChanged);
+    suc &= (bool)connect(m_cameraCaptureTool.get(), &CameraCaptureTool::captureNumberUpdated, this, &CSApplication::captureNumberUpdated);
+    suc &= (bool)connect(m_cameraCaptureTool.get(), &CameraCaptureTool::captureStateChanged,  this, &CSApplication::captureStateChanged);
 
-    suc &= (bool)connect(this,  &CSApplication::connectCamera,      cameraThread.get(),  &CameraThread::onConnectCamera);
-    suc &= (bool)connect(this,  &CSApplication::disconnectCamera,   cameraThread.get(),  &CameraThread::onDisconnectCamera);
-    suc &= (bool)connect(this,  &CSApplication::restartCamera,      cameraThread.get(),  &CameraThread::onRestartCamera);
-    suc &= (bool)connect(this,  &CSApplication::startStream,        cameraThread.get(),  &CameraThread::onStartStream);
-    suc &= (bool)connect(this,  &CSApplication::stopStream,         cameraThread.get(),  &CameraThread::onStopStream);
-    suc &= (bool)connect(this,  &CSApplication::pausedStream,       cameraThread.get(),  &CameraThread::onPausedStream);
-    suc &= (bool)connect(this,  &CSApplication::resumeStream,       cameraThread.get(),  &CameraThread::onResumeStream);
-    suc &= (bool)connect(this,  &CSApplication::queryCameras,       cameraThread.get(),  &CameraThread::onQueryCameras);
+    suc &= (bool)connect(this,  &CSApplication::connectCamera,      m_cameraThread.get(),  &CameraThread::onConnectCamera);
+    suc &= (bool)connect(this,  &CSApplication::disconnectCamera,   m_cameraThread.get(),  &CameraThread::onDisconnectCamera);
+    suc &= (bool)connect(this,  &CSApplication::restartCamera,      m_cameraThread.get(),  &CameraThread::onRestartCamera);
+    suc &= (bool)connect(this,  &CSApplication::startStream,        m_cameraThread.get(),  &CameraThread::onStartStream);
+    suc &= (bool)connect(this,  &CSApplication::stopStream,         m_cameraThread.get(),  &CameraThread::onStopStream);
+    suc &= (bool)connect(this,  &CSApplication::pausedStream,       m_cameraThread.get(),  &CameraThread::onPausedStream);
+    suc &= (bool)connect(this,  &CSApplication::resumeStream,       m_cameraThread.get(),  &CameraThread::onResumeStream);
+    suc &= (bool)connect(this,  &CSApplication::queryCameras,       m_cameraThread.get(),  &CameraThread::onQueryCameras);
    
-    suc &= (bool)connect(cameraProxy.get(),  &ICSCamera::framedDataUpdated,          processThread.get(), &ProcessThread::onFrameDataUpdated, Qt::DirectConnection);
+    suc &= (bool)connect(cameraProxy.get(),  &ICSCamera::framedDataUpdated,          m_processThread.get(), &ProcessThread::onFrameDataUpdated, Qt::DirectConnection);
     
     Q_ASSERT(suc);
 }
 
 void CSApplication::disconnections()
 {
-    auto cameraProxy = cameraThread->getCamera();
-    disconnect(cameraProxy.get(), &ICSCamera::framedDataUpdated, processThread.get(), &ProcessThread::onFrameDataUpdated);
+    auto cameraProxy = m_cameraThread->getCamera();
+    disconnect(cameraProxy.get(), &ICSCamera::framedDataUpdated, m_processThread.get(), &ProcessThread::onFrameDataUpdated);
 }
 
 void CSApplication::onCameraStateChanged(int state)
@@ -149,12 +157,12 @@ void CSApplication::onCameraStateChanged(int state)
 
 void CSApplication::onCameraParaUpdated(int paraId, QVariant value)
 {
-    for (auto straType : processStrategys.keys())
+    for (auto straType : m_processStrategys.keys())
     {
-        auto stra = processStrategys[straType];
+        auto stra = m_processStrategys[straType];
         if (stra)
         {
-            stra->setCameraParaState(true);
+            stra->setCameraParaState(paraId, true);
         }
     }
 }
@@ -162,31 +170,31 @@ void CSApplication::onCameraParaUpdated(int paraId, QVariant value)
 void CSApplication::updateProcessStrategys()
 {
     // remove all process strategys
-    for (auto straType : processStrategys.keys())
+    for (auto straType : m_processStrategys.keys())
     {
-        auto stra = processStrategys[straType];
+        auto stra = m_processStrategys[straType];
         if (stra)
         {
-            processor->removeProcessStrategy(stra);
-            processStrategys[straType] = nullptr;
+            m_processor->removeProcessStrategy(stra);
+            m_processStrategys[straType] = nullptr;
             delete stra;
         }
     }
 
-    processStrategys[cs::STRATEGY_CLOUD_POINT] = new PointCloudProcessStrategy();
-    processStrategys[cs::STRATEGY_DEPTH] = new DepthProcessStrategy();
+    m_processStrategys[cs::STRATEGY_CLOUD_POINT] = new PointCloudProcessStrategy();
+    m_processStrategys[cs::STRATEGY_DEPTH] = new DepthProcessStrategy();
 
     QVariant hasRgbV;
-    cameraThread->getCamera()->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+    m_cameraThread->getCamera()->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
     if (hasRgbV.toBool())
     {
-        processStrategys[cs::STRATEGY_RGB] = new RgbProcessStrategy();
+        m_processStrategys[cs::STRATEGY_RGB] = new RgbProcessStrategy();
     }
 
     // add process strategys
-    for (auto straType : processStrategys.keys())
+    for (auto straType : m_processStrategys.keys())
     {
-        auto stra = processStrategys[straType];
+        auto stra = m_processStrategys[straType];
         if (stra)
         {
             // init connections
@@ -196,17 +204,17 @@ void CSApplication::updateProcessStrategys()
 
             Q_ASSERT(suc);
 
-            stra->setCamera(cameraThread->getCamera());
-            processor->addProcessStrategy(stra);
+            stra->setCamera(m_cameraThread->getCamera());
+            m_processor->addProcessStrategy(stra);
         }
     }
 }
 
 void CSApplication::onWindowLayoutChanged(QVector<int> windows)
 {
-    for (auto straType : processStrategys.keys())
+    for (auto straType : m_processStrategys.keys())
     {
-        auto stra = processStrategys[straType];
+        auto stra = m_processStrategys[straType];
         if (stra)
         {
             if (straType == STRATEGY_DEPTH)
@@ -229,14 +237,14 @@ void CSApplication::onWindowLayoutChanged(QVector<int> windows)
 
 void CSApplication::onShow3DTextureChanged(bool texture)
 {
-    show3DTexture = texture;
+    m_show3DTexture = texture;
 
-    emit show3DTextureChanged(show3DTexture);
+    emit show3DTextureChanged(m_show3DTexture);
 }
 
 void CSApplication::onShowCoordChanged(bool show, QPointF pos)
 {
-    auto stra = processStrategys[STRATEGY_DEPTH];
+    auto stra = m_processStrategys[STRATEGY_DEPTH];
 
     if (stra)
     {
@@ -247,25 +255,25 @@ void CSApplication::onShowCoordChanged(bool show, QPointF pos)
 
 void CSApplication::startCapture(CameraCaptureConfig config, bool autoName)
 {
-    cameraCaptureTool->startCapture(config, autoName);
+    m_cameraCaptureTool->startCapture(config, autoName);
 }
 
 void CSApplication::setCurOutputData(const CameraCaptureConfig& config)
 {
-    cameraCaptureTool->setCurOutputData(config);
+    m_cameraCaptureTool->setCurOutputData(config);
 }
 
 void CSApplication::stopCapture()
 {
-    cameraCaptureTool->stopCapture();
+    m_cameraCaptureTool->stopCapture();
 }
 
 std::shared_ptr<AppConfig> CSApplication::getAppConfig()
 {
-    return appConfig;
+    return m_appConfig;
 }
 
 bool CSApplication::getShow3DTexture() const
 {
-    return show3DTexture;
+    return m_show3DTexture;
 }

@@ -55,13 +55,13 @@ private slots:
     void onSliderClicked(int value);
     void onLinEditFocusOut();
 private:
-    QLabel* titleLabel;
-    CSLineEdit* lineEdit;
-    CustomSlider* slider;
-    QLabel* minLabel;
-    QLabel* maxLabel;
-    QIntValidator* intValidator;
+    QLabel* m_titleLabel;
+    CSLineEdit* m_lineEdit;
+    CustomSlider* m_slider;
+    QLabel* m_minLabel;
+    QLabel* m_maxLabel;
+    QIntValidator* m_intValidator;
     
-    int step;
+    int m_step;
 };
 #endif // _CS_CSSLIDER_H

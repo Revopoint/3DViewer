@@ -30,7 +30,7 @@ Processor::Processor()
 
 Processor::~Processor()
 {
-    processStrategys.clear();
+    m_processStrategys.clear();
     qDebug() << "~Processor";
 }
 
@@ -42,14 +42,14 @@ void Processor::addProcessStrategy(ProcessStrategy* strategy)
         return;
     }
 
-    QMutexLocker locker(&mutex);
-    if (processStrategys.contains(strategy))
+    QMutexLocker locker(&m_mutex);
+    if (m_processStrategys.contains(strategy))
     {
         qWarning() << "Already contained strategy : " << strategy;
     }
     else 
     {
-        processStrategys.push_back(strategy);
+        m_processStrategys.push_back(strategy);
     }
 }
 
@@ -61,14 +61,14 @@ void Processor::removeProcessStrategy(ProcessStrategy* strategy)
         return;
     }
 
-    QMutexLocker locker(&mutex);
-    if (!processStrategys.contains(strategy))
+    QMutexLocker locker(&m_mutex);
+    if (!m_processStrategys.contains(strategy))
     {
         qWarning() << "processStrategys do not contain strategy type: " << strategy->getProcessStraType();
     }
     else 
     {
-        processStrategys.removeAll(strategy);
+        m_processStrategys.removeAll(strategy);
     }
 }
 
@@ -80,14 +80,14 @@ void Processor::addProcessEndLisener(ProcessEndListener* listener)
         return;
     }
 
-    QMutexLocker locker(&mutex);
-    if (processEndLiseners.contains(listener))
+    QMutexLocker locker(&m_mutex);
+    if (m_processEndLiseners.contains(listener))
     {
         qWarning() << "Already contained listener : " << listener;
     }
     else
     {
-        processEndLiseners.push_back(listener);
+        m_processEndLiseners.push_back(listener);
     }
 }
 
@@ -99,23 +99,23 @@ void Processor::removeProcessEndLisener(ProcessEndListener* listener)
         return;
     }
 
-    QMutexLocker locker(&mutex);
-    if (!processEndLiseners.contains(listener))
+    QMutexLocker locker(&m_mutex);
+    if (!m_processEndLiseners.contains(listener))
     {
         qWarning() << "processEndLiseners do not contain listener: " << listener;
     }
     else
     {
-        processEndLiseners.removeAll(listener);
+        m_processEndLiseners.removeAll(listener);
     }
 }
 
 void Processor::process(const FrameData& frameData)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_mutex);
 
     OutputDataPort outputDataPort(frameData);
-    for (auto stra : processStrategys)
+    for (auto stra : m_processStrategys)
     {
         if (stra->isStrategyEnable())
         {
@@ -124,7 +124,7 @@ void Processor::process(const FrameData& frameData)
     }
 
     // to do some thing after process, for example save data
-    for (auto lisener : processEndLiseners)
+    for (auto lisener : m_processEndLiseners)
     {
         lisener->process(outputDataPort);
     }

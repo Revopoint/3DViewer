@@ -23,19 +23,19 @@
 
 AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent)
-    , ui(new Ui::AboutWidget)
+    , m_ui(new Ui::AboutWidget)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    ui->closeButton->setProperty("isCSStyle", true);
+    m_ui->closeButton->setProperty("isCSStyle", true);
 
-    QString appName = QString("<strong>%1 %2</strong>").arg(APP_NAME).arg(APP_VERSION);
-    ui->appNameLabel->setText(appName);
+    QString appName = QString("<strong>%1 V%2</strong>").arg(APP_NAME).arg(APP_VERSION);
+    m_ui->appNameLabel->setText(appName);
 
     QString appBuiltTime = QString(tr("Built on %1")).arg(APP_BUILD_TIME);
-    ui->builtInfo->setText(appBuiltTime);
+    m_ui->builtInfo->setText(appBuiltTime);
 
-    connect(ui->closeButton, &QPushButton::clicked, this, [=]()
+    connect(m_ui->closeButton, &QPushButton::clicked, this, [=]()
         {
             close();
         });
@@ -43,15 +43,15 @@ AboutDialog::AboutDialog(QWidget* parent)
 
 AboutDialog::~AboutDialog()
 {
-    delete ui;
+    delete m_ui;
 }
 
 void AboutDialog::onTranslate()
 {
-    ui->retranslateUi(this);
+    m_ui->retranslateUi(this);
     QString appName = QString("<strong>%1 %2</strong>").arg(APP_NAME).arg(APP_VERSION);
-    ui->appNameLabel->setText(appName);
+    m_ui->appNameLabel->setText(appName);
 
     QString appBuiltTime = QString(tr("Built on %1")).arg(APP_BUILD_TIME);
-    ui->builtInfo->setText(appBuiltTime);
+    m_ui->builtInfo->setText(appBuiltTime);
 }

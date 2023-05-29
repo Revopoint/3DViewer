@@ -44,8 +44,8 @@ protected:
 signals:
     void valueChanged(int, QVariant value);
 protected:
-    int paraId;
-    const char* paraName;
+    int m_paraId;
+    const char* m_paraName;
 };
 
 #endif //_CS_CSPARATWIDGET_H

@@ -33,8 +33,8 @@ public:
     void updateMessage(QString msg);
     void retranslate();
 private:
-    QPushButton* confirmButton;
-    QLabel* msgLabel;
+    QPushButton* m_confirmButton;
+    QLabel* m_msgLabel;
 };
 
 #endif // _CS_CSMESSAGEBOX_H

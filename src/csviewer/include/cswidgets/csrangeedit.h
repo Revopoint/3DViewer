@@ -44,13 +44,13 @@ private slots:
     void onMinFocusOut();
     void onMaxFocusOut();
 private:
-    CSLineEdit* rangeMinEdit;
-    CSLineEdit* rangeMaxEdit;
-    QLabel* titleLabel;
-    QIntValidator* intValidator;
+    CSLineEdit* m_rangeMinEdit;
+    CSLineEdit* m_rangeMaxEdit;
+    QLabel* m_titleLabel;
+    QIntValidator* m_intValidator;
 
-    int rangeBottom;
-    int rangeTop;
+    int m_rangeBottom;
+    int m_rangeTop;
 };
 
 #endif // _CS_CSRANGEEDIT_H

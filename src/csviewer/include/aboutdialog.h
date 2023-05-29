@@ -35,7 +35,7 @@ public:
     
     void onTranslate();
 private:
-    Ui::AboutWidget* ui;
+    Ui::AboutWidget* m_ui;
 };
 
 #endif // _CS_ABOUT_DIALOG_H

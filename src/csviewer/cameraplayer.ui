@@ -132,6 +132,9 @@
       </item>
       <item>
        <widget class="CSLineEdit" name="frameEdit">
+        <property name="focusPolicy">
+         <enum>Qt::ClickFocus</enum>
+        </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
         </property>

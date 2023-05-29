@@ -45,7 +45,10 @@ public:
     void updateCameraInfoList(const std::vector<CameraInfo>& added, const std::vector<CameraInfo>& removed);
     std::shared_ptr<ICSCamera> getCamera() const;
     
-    static void setSdkLogPath(QString path);
+    static void enableSdkLog(QString logDir);
+    static void initialize(void* user);
+    static void deInitialize();
+
 public slots:
     void onConnectCamera(QString serial);
     void onDisconnectCamera();
@@ -68,7 +71,6 @@ private:
     void run() override;
 
     void initConnections();
-    void initialize();
     
     void onAddCameras(const std::vector<CameraInfo>& added);
     void onRemoveCameras(const std::vector<CameraInfo>& removed);
@@ -81,10 +83,10 @@ private:
     bool isNetConnect(QString uuid);
     QString splitCameraInfo(QString info);
 private:
-    std::shared_ptr<ICSCamera> cameraProxy;
-    QList<CameraInfo> cameraInfoList;
-    QReadWriteLock lock;
-    QTimer cameraRestartTimer;
+    std::shared_ptr<ICSCamera> m_cameraProxy;
+    QList<CameraInfo> m_cameraInfoList;
+    QReadWriteLock m_lock;
+    QTimer m_cameraRestartTimer;
 };
 
 }

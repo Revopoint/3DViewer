@@ -28,7 +28,7 @@ using namespace cs;
 
 CameraPlayer::CameraPlayer(QObject* parent)
     : QThread(parent)
-    , zipParser(new CapturedZipParser())
+    , m_zipParser(new CapturedZipParser())
 {
     moveToThread(this);
     start();
@@ -36,15 +36,15 @@ CameraPlayer::CameraPlayer(QObject* parent)
 
 CameraPlayer::~CameraPlayer()
 {
-    delete zipParser;
+    delete m_zipParser;
 }
 
 void CameraPlayer::onLoadFile(QString file)
 {
     emit playerStateChanged(PLAYER_LOADING, tr("Loading file..."));
-    zipParser->setZipFile(file);
+    m_zipParser->setZipFile(file);
 
-    if (!zipParser->checkFileValid())
+    if (!m_zipParser->checkFileValid())
     {
         qWarning() << "Illegal zip file, or the zip file does not contain CaptureParameters.yaml";
         // notify to ui
@@ -53,7 +53,7 @@ void CameraPlayer::onLoadFile(QString file)
     }
 
     // parse the zip file
-    if (!zipParser->parseCaptureInfo())
+    if (!m_zipParser->parseCaptureInfo())
     {
         emit playerStateChanged(PLAYER_ERROR, tr("Parse zip file failed"));
         return;
@@ -69,18 +69,18 @@ void CameraPlayer::onPalyFrameUpdated(int curFrame, bool force)
         return;
     }
 
-    if (currentFrame != curFrame || force)
+    if (m_currentFrame != curFrame || force)
     {
-        currentFrame = curFrame;
+        m_currentFrame = curFrame;
         updateCurrentFrame();
     }
 }
 
 void CameraPlayer::updateCurrentFrame()
 {
-    QReadLocker locker(&lock);
+    QReadLocker locker(&m_lock);
    
-    for (auto type : currentDataTypes)
+    for (auto type : m_currentDataTypes)
     {
         switch (type)
         {
@@ -101,7 +101,7 @@ void CameraPlayer::updateCurrentFrame()
 
 QVector<int> CameraPlayer::getDataTypes()
 {
-    QVector<int> dataTypes = zipParser->getDataTypes();
+    QVector<int> dataTypes = m_zipParser->getDataTypes();
     if (dataTypes.contains(CAMERA_DATA_DEPTH) && !dataTypes.contains(CAMERA_DATA_POINT_CLOUD))
     {
         dataTypes.push_back(CAMERA_DATA_POINT_CLOUD);
@@ -112,28 +112,28 @@ QVector<int> CameraPlayer::getDataTypes()
 
 int CameraPlayer::getFrameNumber()
 {
-    return zipParser->getFrameCount();
+    return m_zipParser->getFrameCount();
 }
 
 void CameraPlayer::currentDataTypesUpdated(QVector<int> dataTypes)
 {
-    QWriteLocker locker(&lock);
-    currentDataTypes = dataTypes;
+    QWriteLocker locker(&m_lock);
+    m_currentDataTypes = dataTypes;
 }
 
 void CameraPlayer::updateCurrentImage(int type)
 {
     // If the timestamp is valid, find the RGB frame index through the timestamp
-    int frameIndex = currentFrame - 1;
-    if (type == CAMERA_DATA_RGB && zipParser->getIsTimeStampsValid())
+    int frameIndex = m_currentFrame - 1;
+    if (type == CAMERA_DATA_RGB && m_zipParser->getIsTimeStampsValid())
     {
-        int rgbIndex = zipParser->getRgbFrameIndexByTimeStamp(frameIndex);
+        int rgbIndex = m_zipParser->getRgbFrameIndexByTimeStamp(frameIndex);
         qInfo() << "update rgb frame, depth index : " << frameIndex << ", rgb index:" << rgbIndex;
 
         frameIndex = rgbIndex;
     }
 
-    QImage image = zipParser->getImageOfFrame(frameIndex, type);
+    QImage image = m_zipParser->getImageOfFrame(frameIndex, type);
     if (image.isNull())
     {
         qWarning() << "Failed to generate image";
@@ -150,14 +150,14 @@ void CameraPlayer::updateCurrentImage(int type)
 
 void CameraPlayer::updateCurrentPointCloud()
 {
-    auto dataTypes = zipParser->getDataTypes();
+    auto dataTypes = m_zipParser->getDataTypes();
     Pointcloud pc;
     QImage texImage;
 
     if (dataTypes.contains(CAMERA_DATA_POINT_CLOUD))
     {
         // generate Pointcloud from ply file
-        if (!zipParser->getPointCloud(currentFrame - 1, pc, texImage))
+        if (!m_zipParser->getPointCloud(m_currentFrame - 1, pc, texImage))
         {
             emit playerStateChanged(PLAYER_ERROR, tr("Failed to generate point cloud"));
             return;
@@ -166,27 +166,27 @@ void CameraPlayer::updateCurrentPointCloud()
         if (texImage.isNull())
         {
             // generate Pointcloud from depth data 
-            int rgbFrame = currentFrame - 1;
+            int rgbFrame = m_currentFrame - 1;
             // If the timestamp is valid, find the RGB frame index through the timestamp
-            if (show3dTexture && zipParser->getIsTimeStampsValid())
+            if (m_show3dTexture && m_zipParser->getIsTimeStampsValid())
             {
-                rgbFrame = zipParser->getRgbFrameIndexByTimeStamp(currentFrame - 1);
+                rgbFrame = m_zipParser->getRgbFrameIndexByTimeStamp(m_currentFrame - 1);
             }
 
-            texImage = zipParser->getImageOfFrame(rgbFrame, CAMERA_DATA_RGB);
+            texImage = m_zipParser->getImageOfFrame(rgbFrame, CAMERA_DATA_RGB);
         }
     }
     else 
     {
         // generate Pointcloud from depth data 
-        int rgbFrame = currentFrame - 1;
+        int rgbFrame = m_currentFrame - 1;
         // If the timestamp is valid, find the RGB frame index through the timestamp
-        if (show3dTexture && zipParser->getIsTimeStampsValid())
+        if (m_show3dTexture && m_zipParser->getIsTimeStampsValid())
         {
-            rgbFrame = zipParser->getRgbFrameIndexByTimeStamp(currentFrame - 1);
+            rgbFrame = m_zipParser->getRgbFrameIndexByTimeStamp(m_currentFrame - 1);
         }
 
-        if (!zipParser->generatePointCloud(currentFrame - 1, rgbFrame, show3dTexture, pc, texImage))
+        if (!m_zipParser->generatePointCloud(m_currentFrame - 1, rgbFrame, m_show3dTexture, pc, texImage))
         {
             qWarning() << "Failed to generate point cloud";
             emit playerStateChanged(PLAYER_ERROR, tr("Failed to generate point cloud"));
@@ -199,14 +199,14 @@ void CameraPlayer::updateCurrentPointCloud()
 
 void CameraPlayer::onShow3DTextureChanged(bool show)
 {
-    show3dTexture = show;
+    m_show3dTexture = show;
 }
 
 void CameraPlayer::onSaveCurrentFrame(QString filePath)
 {
     emit playerStateChanged(PLAYER_SAVING, tr("Saving current frame"));
 
-    if (zipParser->saveFrameToLocal(currentFrame - 1, show3dTexture, filePath))
+    if (m_zipParser->saveFrameToLocal(m_currentFrame - 1, m_show3dTexture, filePath))
     {
         emit playerStateChanged(PLAYER_SAVE_SUCCESS, tr("Save current frame successfuly"));
     }
@@ -218,5 +218,5 @@ void CameraPlayer::onSaveCurrentFrame(QString filePath)
 
 bool CameraPlayer::enablePointCloudTexture()
 {
-    return zipParser->enablePointCloudTexture();
+    return m_zipParser->enablePointCloudTexture();
 }

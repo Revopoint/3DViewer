@@ -39,8 +39,8 @@ signals:
     void clickedFullScreen();
     void clickedEditRoi();
 private:
-    QPushButton* fullScreenButton;
-    QPushButton* roiEditButton;
+    QPushButton* m_fullScreenButton;
+    QPushButton* m_roiEditButton;
 };
 
 #endif //_CS_CSPARATWIDGET_H

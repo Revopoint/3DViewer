@@ -41,9 +41,9 @@ public:
 public slots:
     void onFrameDataUpdated(FrameData frameData);
 private:
-    QMutex mutex;
-    QQueue<FrameData> cachedFrameData;
-    std::shared_ptr<Processor> processorPtr;
+    QMutex m_mutex;
+    QQueue<FrameData> m_cachedFrameData;
+    std::shared_ptr<Processor> m_processorPtr;
 };
 }
 

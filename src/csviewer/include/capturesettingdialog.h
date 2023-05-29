@@ -55,18 +55,18 @@ private:
     void initDialog();
     void initConnections();
 private:
-    Ui::CaptureSettingWidget* ui;
-    CameraCaptureConfig captureConfig;
+    Ui::CaptureSettingWidget* m_ui;
+    CameraCaptureConfig m_captureConfig;
 
-    QIntValidator* intValidator = nullptr;
+    QIntValidator* m_intValidator = nullptr;
 
     // min / max capture count
-    int minCaptureCount = 1;
-    int maxCaptureCount = 10000;
-    int defaultCaptureCount = 30;
+    int m_minCaptureCount = 1;
+    int m_maxCaptureCount = 10000;
+    int m_defaultCaptureCount = 30;
 
-    QVector<QCheckBox*> dataTypeCheckBoxs;
-    bool isCapturing = false;
+    QVector<QCheckBox*> m_dataTypeCheckBoxs;
+    bool m_isCapturing = false;
 };
 
 #endif //_CS_CAPTURE_SETTING_DIALOG_H

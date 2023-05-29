@@ -53,9 +53,9 @@ public:
     void addProcessEndLisener(ProcessEndListener* listener);
     void removeProcessEndLisener(ProcessEndListener* listener);
 private:
-    QVector<ProcessStrategy*> processStrategys; 
-    QMutex mutex;
-    QVector<ProcessEndListener*> processEndLiseners;
+    QVector<ProcessStrategy*> m_processStrategys; 
+    QMutex m_mutex;
+    QVector<ProcessEndListener*> m_processEndLiseners;
 };
 }
 

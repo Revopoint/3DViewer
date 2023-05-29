@@ -39,15 +39,15 @@ public:
 private:
     void save();
 private:
-    QSettings* settings;
+    QSettings* m_settings;
     
     //settings
     // frame save path
-    QString defaultSavePath;
+    QString m_defaultSavePath;
     // current language
-    QString language;
+    QString m_language;
     // Auto name when capturing
-    bool autoNameWhenCaptring = false;
+    bool m_autoNameWhenCaptring = false;
 };
 
 #endif //_CS_APP_CONFIG_H

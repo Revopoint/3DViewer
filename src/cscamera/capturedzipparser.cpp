@@ -101,7 +101,7 @@ QMap<QString, int> dataTypeMap =
 };
 
 CapturedZipParser::CapturedZipParser(QString filePath)
-    : zipFile(filePath)
+    : m_zipFile(filePath)
 {
 
 }
@@ -113,18 +113,18 @@ CapturedZipParser::~CapturedZipParser()
 
 void CapturedZipParser::setZipFile(QString filePath)
 {
-    zipFile = filePath;
+    m_zipFile = filePath;
 }
 
 bool CapturedZipParser::checkFileValid()
 {
     qInfo() << "check zip file is valid or not";
 
-    QuaZip zip(zipFile);
+    QuaZip zip(m_zipFile);
     zip.open(QuaZip::mdUnzip);
     if (!zip.isOpen())
     {
-        qWarning() << "Open zip file failed, file:" << zipFile;
+        qWarning() << "Open zip file failed, file:" << m_zipFile;
         return false;
     }
 
@@ -141,11 +141,11 @@ QByteArray CapturedZipParser::getFrameData(int frameIndex, int dataType)
     {
         bool result = true;
 
-        QuaZip zip(zipFile);
+        QuaZip zip(m_zipFile);
         result = zip.open(QuaZip::mdUnzip);
         if (!result)
         {
-            qWarning() << "open zip file failed, file:" << zipFile;
+            qWarning() << "open zip file failed, file:" << m_zipFile;
             break;
         }
 
@@ -198,11 +198,11 @@ bool CapturedZipParser::getPointCloud(int frameIndex, Pointcloud& pc, QImage& te
     bool result = true;
     do 
     {
-        QuaZip zip(zipFile);
+        QuaZip zip(m_zipFile);
         result = zip.open(QuaZip::mdUnzip);
         if (!result)
         {
-            qWarning() << "open zip file failed, file:" << zipFile;
+            qWarning() << "open zip file failed, file:" << m_zipFile;
             break;
         }
 
@@ -270,7 +270,7 @@ bool CapturedZipParser::getPointCloud(int frameIndex, Pointcloud& pc, QImage& te
         QByteArray textureData;
         if (hasTexture)
         {
-            texWidth = depthResolution.width();
+            texWidth = m_depthResolution.width();
             texHeight = vertexCount / texWidth + ((vertexCount % texWidth) == 0 ? 0 : 1);
             textureData.resize(texWidth * texHeight * 3); // RGB888
         }
@@ -356,17 +356,17 @@ bool CapturedZipParser::generatePointCloud(int depthIndex, int rgbIndex, bool wi
     }
     dataPtr = (ushort*)pixData.data();
 
-    int width = depthResolution.width();
-    int height = depthResolution.height();
+    int width = m_depthResolution.width();
+    int height = m_depthResolution.height();
 
     if (withTexture)
     {
         tex = getImageOfFrame(rgbIndex, CAMERA_DATA_RGB);
-        pc.generatePoints<ushort>((ushort*)pixData.data(), width, height, depthScale, &depthIntrinsics, &rgbIntrinsics, &extrinsics, true);
+        pc.generatePoints<ushort>((ushort*)pixData.data(), width, height, m_depthScale, &m_depthIntrinsics, &m_rgbIntrinsics, &m_extrinsics, true);
     }
     else
     {
-        pc.generatePoints<ushort>((ushort*)pixData.data(), width, height, depthScale, &depthIntrinsics, nullptr, nullptr, true);
+        pc.generatePoints<ushort>((ushort*)pixData.data(), width, height, m_depthScale, &m_depthIntrinsics, nullptr, nullptr, true);
     }
 
     return true;
@@ -400,8 +400,8 @@ QImage CapturedZipParser::convertPixels2QImage(QByteArray data, int dataType)
 {
     QImage image;
 
-    int width = (dataType == CAMERA_DATA_RGB) ? rgbResolution.width() : depthResolution.width();
-    int height = (dataType == CAMERA_DATA_RGB) ? rgbResolution.height() : depthResolution.height();
+    int width = (dataType == CAMERA_DATA_RGB) ? m_rgbResolution.width() : m_depthResolution.width();
+    int height = (dataType == CAMERA_DATA_RGB) ? m_rgbResolution.height() : m_depthResolution.height();
 
     if (dataType == CAMERA_DATA_DEPTH)
     {
@@ -426,10 +426,10 @@ QImage CapturedZipParser::convertPixels2QImage(QByteArray data, int dataType)
 QImage CapturedZipParser::convertData2QImage(int width, int height, QByteArray data)
 {
     cs::colorizer color;
-    color.setRange(depthMin, depthMax);
+    color.setRange(m_depthMin, m_depthMax);
 
     QImage image = QImage(width, height, QImage::Format_RGB888);
-    color.process<ushort>((ushort*)data.data(), depthScale, image.bits(), width * height);
+    color.process<ushort>((ushort*)data.data(), m_depthScale, image.bits(), width * height);
     return image;
 }
 
@@ -439,7 +439,7 @@ bool CapturedZipParser::parseCaptureInfo()
 
     bool result = true;
 
-    QuaZip zip(zipFile);
+    QuaZip zip(m_zipFile);
     zip.open(QuaZip::mdUnzip);
     zip.setCurrentFile("CaptureParameters.yaml");
 
@@ -453,31 +453,31 @@ bool CapturedZipParser::parseCaptureInfo()
     try
     {
         // name
-        captureName = node["Name"].as<std::string>().c_str();
+        m_captureName = node["Name"].as<std::string>().c_str();
 
         // frame number
-        capturedFrameCount = node["Frame Number"].as<int>();
+        m_capturedFrameCount = node["Frame Number"].as<int>();
 
         // data types
         YAML::Node data = node["Data Types"].as<YAML::Node>();
-        dataTypes.clear();
+        m_dataTypes.clear();
         for (int i = 0; i < data.size(); i++)
         {
             std::string s = data[i].as<std::string>();
 
             QString type = s.c_str();
             Q_ASSERT(dataTypeMap.contains(type));
-            dataTypes.push_back(dataTypeMap[type]);
+            m_dataTypes.push_back(dataTypeMap[type]);
         }
 
         // data format
-        dataFormat = node["Save Format"].as<std::string>().c_str();
+        m_dataFormat = node["Save Format"].as<std::string>().c_str();
 
         // with texture or not
         YAML::Node nodeTmp = node["With Texture"];
         if (nodeTmp.IsDefined())
         {
-            enableTexture = nodeTmp.as<bool>();
+            m_enableTexture = nodeTmp.as<bool>();
         }
     }
     catch (const YAML::Exception& e)
@@ -496,8 +496,8 @@ bool CapturedZipParser::parseCaptureInfo()
             int width = nodeTmp["width"].as<int>();
             int height = nodeTmp["height"].as<int>();;
 
-            depthResolution.setWidth(width);
-            depthResolution.setHeight(height);
+            m_depthResolution.setWidth(width);
+            m_depthResolution.setHeight(height);
         }
 
         // RGB resolution
@@ -507,35 +507,35 @@ bool CapturedZipParser::parseCaptureInfo()
             int width = nodeTmp["width"].as<int>();
             int height = nodeTmp["height"].as<int>();;
 
-            rgbResolution.setWidth(width);
-            rgbResolution.setHeight(height);
+            m_rgbResolution.setWidth(width);
+            m_rgbResolution.setHeight(height);
         }
 
         // depth intrinsics
         nodeTmp = node["Depth intrinsics"];
         if (nodeTmp.IsDefined())
         {
-            depthIntrinsics = genIntrinsicsFromNode(nodeTmp);
+            m_depthIntrinsics = genIntrinsicsFromNode(nodeTmp);
         }
 
         // rgb intrinsics
         nodeTmp = node["RGB intrinsics"];
         if (nodeTmp.IsDefined())
         {
-            rgbIntrinsics = genIntrinsicsFromNode(nodeTmp);
+            m_rgbIntrinsics = genIntrinsicsFromNode(nodeTmp);
         }
 
         // extrinsics
         nodeTmp = node["Extrinsics"];
         if (nodeTmp.IsDefined())
         {
-            extrinsics = genExtrinsicsFromNode(nodeTmp);
+            m_extrinsics = genExtrinsicsFromNode(nodeTmp);
         }
 
         // depth scale
-        depthScale = node["Depth Scale"].as<float>();
-        depthMin = node["Depth Min"].as<float>();
-        depthMax = node["Depth Max"].as<float>();
+        m_depthScale = node["Depth Scale"].as<float>();
+        m_depthMin = node["Depth Min"].as<float>();
+        m_depthMax = node["Depth Max"].as<float>();
 
     }
     catch (const YAML::Exception& e)
@@ -560,7 +560,7 @@ bool CapturedZipParser::parseTimeStamps()
 
     do
     {
-        QuaZip zip(zipFile);
+        QuaZip zip(m_zipFile);
         if (!zip.open(QuaZip::mdUnzip))
         {
             result = false;
@@ -587,8 +587,8 @@ bool CapturedZipParser::parseTimeStamps()
         int i = 0;
         bool findHeader = false;
         // depth time stamps
-        depthTimeStamps.clear();
-        while (!ss.atEnd() && i < capturedFrameCount)
+        m_depthTimeStamps.clear();
+        while (!ss.atEnd() && i < m_capturedFrameCount)
         {
             QString line = ss.readLine();
             if (!findHeader)
@@ -600,22 +600,27 @@ bool CapturedZipParser::parseTimeStamps()
                 continue;
             }
 
+            if (line.isEmpty())
+            {
+                break;
+            }
+
             // get time stamp
             auto arr = line.split("=");
             if (arr.size() >= 2)
             {
                 int timeStamp = arr.last().toInt();
-                depthTimeStamps.push_back(timeStamp);
+                m_depthTimeStamps.push_back(timeStamp);
             }
 
             i++;
         }
 
         // rgb time stamps
-        rgbTimeStamps.clear();
+        m_rgbTimeStamps.clear();
         findHeader = false;
         i = 0;
-        while (!ss.atEnd() && i < capturedFrameCount)
+        while (!ss.atEnd() && i < m_capturedFrameCount)
         {
             QString line = ss.readLine();
             if (!findHeader)
@@ -633,7 +638,7 @@ bool CapturedZipParser::parseTimeStamps()
             if (arr.size() >= 2)
             {
                 int timeStamp = arr.last().toInt();
-                rgbTimeStamps.push_back(timeStamp);
+                m_rgbTimeStamps.push_back(timeStamp);
             }
 
             i++;
@@ -643,7 +648,7 @@ bool CapturedZipParser::parseTimeStamps()
 
 
     // check the time stamps in zip file 
-    if (!checkTimeStampsValid())
+    if (checkTimeStampsValid())
     {
         qInfo() << "Time stamps is valid";
     }
@@ -661,10 +666,10 @@ bool CapturedZipParser::checkTimeStampsValid()
     const qreal oneQuarter = 0.25;
 
     // Check 20 timestamps at most.If one quarter is 0, it is illegal
-    const int maxCheckTimeStamp = (depthTimeStamps.size() > 20) ? 20 : depthTimeStamps.size();
+    const int maxCheckTimeStamp = (m_depthTimeStamps.size() > 20) ? 20 : m_depthTimeStamps.size();
     for (int i = 0; i < maxCheckTimeStamp; i++)
     {
-        int timeStamp = depthTimeStamps.at(i);
+        int timeStamp = m_depthTimeStamps.at(i);
         if (timeStamp == 0)
         {
             zeroCount++;
@@ -672,34 +677,34 @@ bool CapturedZipParser::checkTimeStampsValid()
     }
 
     //If one quarter is 0, the timestamps are illegal
-    isTimeStampsValid = (zeroCount * 1.0 / maxCheckTimeStamp) < oneQuarter;
+    m_isTimeStampsValid = (zeroCount * 1.0 / maxCheckTimeStamp) < oneQuarter;
 
-    return isTimeStampsValid;
+    return m_isTimeStampsValid;
 }
 
 QVector<int> CapturedZipParser::getDataTypes()
 {
-    return dataTypes;
+    return m_dataTypes;
 }
 
 int CapturedZipParser::getFrameCount()
 {
-    return capturedFrameCount;
+    return m_capturedFrameCount;
 }
 
 bool CapturedZipParser::isRawFormat()
 {
-    return dataFormat == "raw";
+    return m_dataFormat == "raw";
 }
 
 QString CapturedZipParser::getCaptureName()
 {
-    return captureName;
+    return m_captureName;
 }
 
 bool CapturedZipParser::getIsTimeStampsValid()
 {
-    return isTimeStampsValid;
+    return m_isTimeStampsValid;
 }
 
 QString CapturedZipParser::getFileName(int frameIndex, int dataType)
@@ -709,19 +714,19 @@ QString CapturedZipParser::getFileName(int frameIndex, int dataType)
     switch (dataType)
     {
     case CAMERA_DATA_L:
-        fileName = QString("%1-ir-L-%2").arg(captureName).arg(frameIndex, 4, 10, QChar('0'));
+        fileName = QString("%1-ir-L-%2").arg(m_captureName).arg(frameIndex, 4, 10, QChar('0'));
         break;
     case CAMERA_DATA_R:
-        fileName = QString("%1-ir-R-%2").arg(captureName).arg(frameIndex, 4, 10, QChar('0'));
+        fileName = QString("%1-ir-R-%2").arg(m_captureName).arg(frameIndex, 4, 10, QChar('0'));
         break;
     case CAMERA_DATA_DEPTH:
-        fileName = QString("%1-depth-%2").arg(captureName).arg(frameIndex, 4, 10, QChar('0'));
+        fileName = QString("%1-depth-%2").arg(m_captureName).arg(frameIndex, 4, 10, QChar('0'));
         break;
     case CAMERA_DATA_RGB:
-        fileName = QString("%1-RGB-%2").arg(captureName).arg(frameIndex, 4, 10, QChar('0'));
+        fileName = QString("%1-RGB-%2").arg(m_captureName).arg(frameIndex, 4, 10, QChar('0'));
         break;
     case CAMERA_DATA_POINT_CLOUD:
-        fileName = QString("%1-%2.ply").arg(captureName).arg(frameIndex, 4, 10, QChar('0'));
+        fileName = QString("%1-%2.ply").arg(m_captureName).arg(frameIndex, 4, 10, QChar('0'));
         suffix = "";
         break;
     default:
@@ -771,7 +776,7 @@ bool CapturedZipParser::saveFrameToLocal(int frameIndex, bool withTexture, QStri
 
     bool result = true;
 
-    auto newDataTypes = dataTypes;
+    auto newDataTypes = m_dataTypes;
     if (!newDataTypes.contains(CAMERA_DATA_POINT_CLOUD) && newDataTypes.contains(CAMERA_DATA_DEPTH))
     {
         newDataTypes.push_back(CAMERA_DATA_POINT_CLOUD);
@@ -813,16 +818,16 @@ bool CapturedZipParser::saveImageData(int frameIndex, int dataType, QString file
     {
         if (dataType == CAMERA_DATA_DEPTH)
         {
-            return ImageUtil::saveGrayScale16ByLibpng(depthResolution.width(), depthResolution.height(), data, filePath);
+            return ImageUtil::saveGrayScale16ByLibpng(m_depthResolution.width(), m_depthResolution.height(), data, filePath);
         }
         else if (dataType == CAMERA_DATA_RGB)
         {
-            QImage image = QImage((uchar*)data.data(), rgbResolution.width(), rgbResolution.height(), QImage::Format_RGB888);
+            QImage image = QImage((uchar*)data.data(), m_rgbResolution.width(), m_rgbResolution.height(), QImage::Format_RGB888);
             return image.save(filePath, "PNG");
         }
         else 
         {
-            QImage image = QImage((uchar*)data.data(), depthResolution.width(), depthResolution.height(), QImage::Format_Grayscale8);
+            QImage image = QImage((uchar*)data.data(), m_depthResolution.width(), m_depthResolution.height(), QImage::Format_Grayscale8);
             return image.save(filePath, "PNG");
         }
     }
@@ -883,8 +888,13 @@ int CapturedZipParser::getRgbFrameIndexByTimeStamp(int depthIndex)
 
 int CapturedZipParser::getNearestRgbFrame(int depthIndex, int timeStamp)
 {
+    if (m_rgbTimeStamps.size() <= 0)
+    {
+        return depthIndex;
+    }
+
     int start = 0;
-    int end = rgbTimeStamps.size() - 1;
+    int end = m_rgbTimeStamps.size() - 1;
     int mid;
 
     if (depthIndex < start || depthIndex > end)
@@ -900,7 +910,7 @@ int CapturedZipParser::getNearestRgbFrame(int depthIndex, int timeStamp)
     do 
     {
         // in left
-        if (timeStamp < rgbTimeStamps.at(mid))
+        if (timeStamp < m_rgbTimeStamps.at(mid))
         {
             end = mid;
         }
@@ -913,7 +923,7 @@ int CapturedZipParser::getNearestRgbFrame(int depthIndex, int timeStamp)
 
     } while (end - start > 1);
 
-    return (std::abs(timeStamp - rgbTimeStamps.at(start)) <= std::abs(timeStamp - rgbTimeStamps.at(end))) ? start  : end;
+    return (std::abs(timeStamp - m_rgbTimeStamps.at(start)) <= std::abs(timeStamp - m_rgbTimeStamps.at(end))) ? start  : end;
 }
 
 int CapturedZipParser::getTimeStampOfFrame(int frameIndex, int dataType)
@@ -925,16 +935,16 @@ int CapturedZipParser::getTimeStampOfFrame(int frameIndex, int dataType)
 
     if (dataType == CAMERA_DATA_DEPTH)
     {
-        if (frameIndex < depthTimeStamps.size() && frameIndex >= 0)
+        if (frameIndex < m_depthTimeStamps.size() && frameIndex >= 0)
         {
-            return depthTimeStamps.at(frameIndex);
+            return m_depthTimeStamps.at(frameIndex);
         }
     }
     else 
     {
-        if (frameIndex < rgbTimeStamps.size() && frameIndex >= 0)
+        if (frameIndex < m_rgbTimeStamps.size() && frameIndex >= 0)
         {
-            return rgbTimeStamps.at(frameIndex);
+            return m_rgbTimeStamps.at(frameIndex);
         }
     }
 
@@ -943,5 +953,5 @@ int CapturedZipParser::getTimeStampOfFrame(int frameIndex, int dataType)
 
 bool CapturedZipParser::enablePointCloudTexture()
 {
-    return enableTexture || (dataTypes.contains(CAMERA_DATA_RGB) && dataTypes.contains(CAMERA_DATA_DEPTH));
+    return m_enableTexture || (m_dataTypes.contains(CAMERA_DATA_RGB) && m_dataTypes.contains(CAMERA_DATA_DEPTH));
 }

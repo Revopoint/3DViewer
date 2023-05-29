@@ -45,12 +45,12 @@ signals:
     void updateHdrSetting();
     void progressStateChanged(bool active);
 private:
-    CSParaWidget* hdrModeWidget;
-    CSParaWidget* hdrLevelWidget;
-    CSParaWidget* hdrTableWidget;
-    QPushButton* hdrMeterButton;
-    QPushButton* hdrOkButton;
-    CSProgressBar* circleProgressBar;
+    CSParaWidget* m_hdrModeWidget;
+    CSParaWidget* m_hdrLevelWidget;
+    CSParaWidget* m_hdrTableWidget;
+    QPushButton* m_hdrMeterButton;
+    QPushButton* m_hdrOkButton;
+    CSProgressBar* m_circleProgressBar;
 };
 
 #endif // _CS_HDRSETTINGSDIALOG_H

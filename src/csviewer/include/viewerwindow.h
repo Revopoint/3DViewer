@@ -23,6 +23,7 @@
 #include <QMainWindow>
 #include <QMap>
 #include <QVector>
+#include <QCloseEvent>
 #include <cstypes.h>
 #include <hpp/Processing.hpp>
 
@@ -68,6 +69,8 @@ public:
 
     ViewerWindow(QWidget* parent = nullptr);
     ~ViewerWindow();
+
+    void closeEvent(QCloseEvent* event) override;
 private slots:
     void onRenderPageChanged(int idx);
     void onCameraStateChanged(int state);
@@ -78,6 +81,7 @@ private slots:
 
     // start the stream
     void onCameraStreamStarted();
+    void onCameraStreamStopped();
 private slots:
     // menu
     void onUpdateLanguage(QAction* action);
@@ -113,6 +117,8 @@ signals:
     void renderWindowUpdated(QVector<int> windows);
     void windowLayoutModeUpdated(int mode);
     void windowLayoutChanged(QVector<int> windows);
+
+    void showProgressBar(bool show);
 private:
     void initWindow();
     void initConnections();
@@ -121,23 +127,23 @@ private:
     void updateWindowActions();
     void destoryRenderWindows();
 private:
-    Ui::ViewerWindow* ui;
-    CS_LANGUAGE language;
-    QTranslator* translator;
+    Ui::ViewerWindow* m_ui;
+    CS_LANGUAGE m_language;
+    QTranslator* m_translator;
 
-    CameraInfoDialog* cameraInfoDialog;
-    CSProgressBar* circleProgressBar;
-    CSMessageBox* globalMessageBox;
+    CameraInfoDialog* m_cameraInfoDialog;
+    CSProgressBar* m_circleProgressBar;
+    CSMessageBox* m_globalMessageBox;
 
-    QVector<CSAction*> windowActions;
-    WINDOWLAYOUT_MODE renderLayoutMode = LAYOUT_TILE;
+    QVector<CSAction*> m_windowActions;
+    WINDOWLAYOUT_MODE m_renderLayoutMode = LAYOUT_TILE;
 
     // set ip dialog
-    IpSettingDialog* ipSettingDialog = nullptr;
-    CameraPlayerDialog* cameraPlayerDialog = nullptr;
-    FormatConvertDialog* formatConvertDialog = nullptr;
+    IpSettingDialog* m_ipSettingDialog = nullptr;
+    CameraPlayerDialog* m_cameraPlayerDialog = nullptr;
+    FormatConvertDialog* m_formatConvertDialog = nullptr;
 
     // about dialog
-    AboutDialog* aboutDialog = nullptr;
+    AboutDialog* m_aboutDialog = nullptr;
 };
 #endif // _CS_VIEWERWINDOW_H

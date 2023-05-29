@@ -41,38 +41,38 @@ extern "C" {
 
 /**
 * @~chinese
-* @brief      ÔİÍ£Êı¾İÁ÷
-* @param[in]  streamType		£ºĞèÒªÔİÍ£µÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+* @brief      æš‚åœæ•°æ®æµ
+* @param[in]  streamType		ï¼šéœ€è¦æš‚åœçš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 * @~english
 * @brief      Pause stream
-* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
+* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
 * @return success:return SUCCESS, fail:other error code
 **/
 	CS_API ERROR_CODE cameraPauseStream(CStream* sp);
 
 /**
 * @~chinese
-* @brief      »Ö¸´Êı¾İÁ÷
-* @param[in]  streamType		£ºĞèÒªÍ£Ö¹µÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+* @brief      æ¢å¤æ•°æ®æµ
+* @param[in]  streamType		ï¼šéœ€è¦åœæ­¢çš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 * @~english
 * @brief      Resume stream
-* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
+* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
 * @return success:return SUCCESS, fail:other error code
 **/
 	CS_API ERROR_CODE cameraResumeStream(CStream* sp);
 
 /**
 * @~chinese
-* @brief      ÉèÖÃÁ÷µÄ»Øµ÷Í¨µÀ
-* @param[in]  streamType		£ºĞèÒª´ò¿ªµÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-* @param[in]  callback          : ·µ»ØÖ¡Êı¾İµÄ»Øµ÷º¯Êı
-* @param[in]  userData          : ÓÃ»§Êı¾İ
-* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+* @brief      è®¾ç½®æµçš„å›è°ƒé€šé“
+* @param[in]  streamType		ï¼šéœ€è¦æ‰“å¼€çš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+* @param[in]  callback          : è¿”å›å¸§æ•°æ®çš„å›è°ƒå‡½æ•°
+* @param[in]  userData          : ç”¨æˆ·æ•°æ®
+* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 * @~english
 * @brief      setting the stream callback
-* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
+* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
 * @param[in]  callback          : frame callback
 * @param[in]  userData          : the user data
 * @return success:return SUCCESS, fail:other error code
@@ -81,17 +81,17 @@ extern "C" {
 
 /**
 * @~chinese
-* @brief      Ö÷¶¯»ñÈ¡µ±Ç°Á÷Êä³öµÄÖ¡Êı¾İ
-* @param[in]  streamType		£ºĞèÒª»ñÈ¡µÄÁ÷ÀàĞÍ
-* @param[out] frame				£º·µ»ØÖ¡Êı¾İ
-* @param[in]  timeout_ms		£º³¬Ê±Ê±¼ä£¬µ¥Î»ÎªºÁÃë
-* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
-* @notes		»ñÈ¡µÄframe±ØĞëÍ¨¹ıcameraReleaseFrameÊÍ·Å
+* @brief      ä¸»åŠ¨è·å–å½“å‰æµè¾“å‡ºçš„å¸§æ•°æ®
+* @param[in]  streamType		ï¼šéœ€è¦è·å–çš„æµç±»å‹
+* @param[out] frame				ï¼šè¿”å›å¸§æ•°æ®
+* @param[in]  timeout_ms		ï¼šè¶…æ—¶æ—¶é—´ï¼Œå•ä½ä¸ºæ¯«ç§’
+* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
+* @notes		è·å–çš„frameå¿…é¡»é€šè¿‡cameraReleaseFrameé‡Šæ”¾
 * @~english
 * @brief      Get frame manually
-* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-* @param[out] frame				£ºreturn the captured frame
-* @param[in]  timeout_ms		£ºtimeout in millisecond
+* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+* @param[out] frame				ï¼šreturn the captured frame
+* @param[in]  timeout_ms		ï¼štimeout in millisecond
 * @return success:return SUCCESS, fail:other error code
 * @notes	the got frame must be release by cameraReleaseFrame;
 **/
@@ -99,17 +99,17 @@ extern "C" {
 
 /**
 * @~chinese
-* @brief      »ñÈ¡³É¶ÔµÄÉî¶ÈºÍRGBÖ¡
-* @param[out] depthFrame		£º·µ»ØÉî¶ÈÖ¡
-* @param[out] rgbFrame			: ·µ»ØRGBÖ¡
-* @param[in]  timeout_ms		£º³¬Ê±Ê±¼ä£¬µ¥Î»ÎªºÁÃë
-* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
-* @notes		»ñÈ¡µÄframe±ØĞëÍ¨¹ıcameraReleaseFrameÊÍ·Å
+* @brief      è·å–æˆå¯¹çš„æ·±åº¦å’ŒRGBå¸§
+* @param[out] depthFrame		ï¼šè¿”å›æ·±åº¦å¸§
+* @param[out] rgbFrame			: è¿”å›RGBå¸§
+* @param[in]  timeout_ms		ï¼šè¶…æ—¶æ—¶é—´ï¼Œå•ä½ä¸ºæ¯«ç§’
+* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
+* @notes		è·å–çš„frameå¿…é¡»é€šè¿‡cameraReleaseFrameé‡Šæ”¾
 * @~english
 * @brief      Get the paired frame of depth and rgb
-* @param[in]  depthFrame		£ºreturn the paired depth frame
-* @param[out] frame				£ºreturn the paired rgb frame
-* @param[in]  timeout_ms		£ºtimeout in millisecond
+* @param[in]  depthFrame		ï¼šreturn the paired depth frame
+* @param[out] frame				ï¼šreturn the paired rgb frame
+* @param[in]  timeout_ms		ï¼štimeout in millisecond
 * @return success:return SUCCESS, fail:other error code
 * @notes	the got frame must be release by cameraReleaseFrame;
 **/
@@ -152,9 +152,9 @@ extern "C" {
 
 	/**
 	* @~chinese
-	* @brief      ³õÊ¼»¯Çı¶¯
-	* @code		³õÊ¼»¯ĞòÁĞºÅ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      åˆå§‹åŒ–é©±åŠ¨
+	* @code		åˆå§‹åŒ–åºåˆ—å·
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief		initializate the driver
 	* @code	the initializate code of driver

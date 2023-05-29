@@ -43,9 +43,9 @@ private:
     void generatePointCloud(const StreamData& depthData, Pointcloud& pc);
     void generateTexture(const StreamData& rgbData, QImage& texImage);
 private:
-    Intrinsics rgbIntrinsics;
-    Extrinsics extrinsics;
-    bool withTexture;
+    Intrinsics m_rgbIntrinsics;
+    Extrinsics m_extrinsics;
+    bool m_withTexture;
 };
 
 }

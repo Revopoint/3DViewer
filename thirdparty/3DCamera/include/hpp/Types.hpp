@@ -18,12 +18,67 @@ extern "C" {
 
 	typedef struct CS_SDK_VERSION_TAG
 	{			
-		const char*	version;		//°æ±¾ºÅ
-		const char*	name;			//Ä£¿éÃû³Æ
-		const char*	author;			//´´½¨Õß
-		const char*	date;			//´´½¨ÈÕÆÚ
-		const char*	desc;			//ÃèÊö£¬Ã¿´ÎĞŞ¸Ä¶¼ĞèÒªÃèÊö
+		const char*	version;		//ç‰ˆæœ¬å·
+		const char*	name;			//æ¨¡å—åç§°
+		const char*	author;			//åˆ›å»ºè€…
+		const char*	date;			//åˆ›å»ºæ—¥æœŸ
+		const char*	desc;			//æè¿°ï¼Œæ¯æ¬¡ä¿®æ”¹éƒ½éœ€è¦æè¿°
 	}CS_SDK_VERSION, PCS_SDK_VERSION;
+
+	//ProbeType
+	typedef enum
+	{
+		PT_START,
+		PT_STOP
+	}ProbeType;
+
+	/**
+	 * @~chinese
+	 * @brief	IMUæ ‡å®šå¹³é¢
+	 * @~english
+	 * @brief	IMU CalibrationPlane
+	 */
+	typedef enum {
+		IMU_XY = 0,			//XYå¹³é¢
+		IMU_XZ = 1,			//XZå¹³é¢
+		IMU_YZ = 2,			//YZå¹³é¢
+	}IMU_CALIBRATTION_PLANE;
+
+	/**
+	 * @~chinese
+	 * @brief	IMUæ ‡å®šçŠ¶æ€
+	 * @~english
+	 * @brief	IMU Calibration state
+	 */
+	typedef enum {
+		CALIBRATION_STATE_ING,			//æœªå®Œæˆ
+		CALIBRATION_STATE_FIN			//å·²å®Œæˆ
+	}IMU_CALIBRATTION_STATE;
+
+	/**
+	 * @~chinese
+	 * @brief	LEDæ ‡è¯†
+	 * @~english
+	 * @brief	LED ID
+	 */
+	typedef enum {
+		IR_LED,				//IR LED
+		RGB_LED,			//RGB LED
+		LASER_LED,			//æ¿€å…‰å™¨ LED
+	}LED_ID;
+
+	/**
+	 * @~chinese
+	 * @brief	LEDæ§åˆ¶ç±»å‹
+	 * @~english
+	 * @brief	LED contrl type
+	 */
+	typedef enum {
+		OFTEN_BRIGHT_LED,	//å¸¸äº®
+		TWINKLE_LED,		//é—ªçƒ
+		ENABLE_LED,			//ä½¿èƒ½LED
+		DISABLE_LED,		//å¤±èƒ½LED
+	}LED_CTRL_TYPE;
 
 	//CameraType
 	typedef enum
@@ -36,8 +91,10 @@ extern "C" {
 		CAMERA_POP_2 = 10,		    //pop2
 		CAMERA_MINI_NO_RGB,			//mini camera without rgb sensor
 		CAMERA_MINI_NORMAL,			//
-        CAMERA_TRACER_P1,            //tracer p1
+        CAMERA_TRACER_P1,           //tracer p1
 		CAMERA_RANGE,				//Range
+		CAMERA_TRACER_P2,           //tracer p2
+		CAMERA_POP_3,               //pop3
 	}CameraType;
 
 #define FRAMERATE_ANY 0
@@ -55,32 +112,32 @@ extern "C" {
 
 typedef enum CAMERA_STATUS
 {
-	CS_NONE,			/**< @~chinese ÎŞĞ§µÄÏà»ú             @~english invalid camera*/
-	CS_IDLE,			/**< @~chinese ¿ÕÏĞÖĞ             @~english in idle status*/
-	CS_CONNECTED_BY_SDK,		/**< @~chinese ±¾SDKÁ¬½ÓÖĞ             @~english current sdk connect to the camera.*/
-	CS_CONNECTED_BY_OTHER,		/**< @~chinese ÆäËûÊµÀı(½ø³Ì)Á¬½ÓÖĞ             @~english other instance connect to the camera*/
+	CS_NONE,			/**< @~chinese æ— æ•ˆçš„ç›¸æœº             @~english invalid camera*/
+	CS_IDLE,			/**< @~chinese ç©ºé—²ä¸­             @~english in idle status*/
+	CS_CONNECTED_BY_SDK,		/**< @~chinese æœ¬SDKè¿æ¥ä¸­             @~english current sdk connect to the camera.*/
+	CS_CONNECTED_BY_OTHER,		/**< @~chinese å…¶ä»–å®ä¾‹(è¿›ç¨‹)è¿æ¥ä¸­             @~english other instance connect to the camera*/
 }CAMERA_STATUS;
 
 /** 
 * @~chinese
-* Ã¶¾Ù: ·µ»ØµÄ´íÎóÂë
+* æšä¸¾: è¿”å›çš„é”™è¯¯ç 
 * @~english
 * enumeration: returned error code
 **/
 typedef enum ERROR_CODE
 {
-	SUCCESS = 0,					/**< @~chinese ³É¹¦             @~english success*/ 
-	ERROR_PARAM,					/**< @~chinese ²ÎÊıÊäÈë´íÎó     @~english param input error*/
-	ERROR_DEVICE_NOT_FOUND,			/**< @~chinese Î´ÕÒµ½Éè±¸       @~english device not found*/
-	ERROR_DEVICE_NOT_CONNECT,		/**< @~chinese Éè±¸Î´Á¬½Ó       @~english device not connected*/
-	ERROR_DEVICE_BUSY,				/**< @~chinese Éè±¸Ã¦           @~english device busy*/
-	ERROR_STREAM_NOT_START = 5,			/**< @~chinese Á÷ÉĞÎ´´ò¿ª       @~english stream not start*/
-	ERROR_STREAM_BUSY,				/**< @~chinese Á÷ÒÑ´ò¿ª         @~english stream had started*/
-	ERROR_FRAME_TIMEOUT,			/**< @~chinese »ñÈ¡Ö¡Êı¾İÊ§°Ü   @~english get frame failed*/
-	ERROR_NOT_SUPPORT,				/**< @~chinese ÉĞ²»Ö§³Ö         @~english not support*/
-	ERROR_PROPERTY_GET_FAILED,		/**< @~chinese »ñÈ¡ÊôĞÔÊ§°Ü     @~english get property failed*/
-	ERROR_PROPERTY_SET_FAILED=10,		/**< @~chinese ÉèÖÃÊôĞÔÊ§°Ü     @~english set property failed*/
-	ERROR_HID_CHANNEL_ERROR,		/**< @~chinese hid Í¨µÀÒì³£	     @~english hid channel error*/
+	SUCCESS = 0,					/**< @~chinese æˆåŠŸ             @~english success*/ 
+	ERROR_PARAM,					/**< @~chinese å‚æ•°è¾“å…¥é”™è¯¯     @~english param input error*/
+	ERROR_DEVICE_NOT_FOUND,			/**< @~chinese æœªæ‰¾åˆ°è®¾å¤‡       @~english device not found*/
+	ERROR_DEVICE_NOT_CONNECT,		/**< @~chinese è®¾å¤‡æœªè¿æ¥       @~english device not connected*/
+	ERROR_DEVICE_BUSY,				/**< @~chinese è®¾å¤‡å¿™           @~english device busy*/
+	ERROR_STREAM_NOT_START = 5,			/**< @~chinese æµå°šæœªæ‰“å¼€       @~english stream not start*/
+	ERROR_STREAM_BUSY,				/**< @~chinese æµå·²æ‰“å¼€         @~english stream had started*/
+	ERROR_FRAME_TIMEOUT,			/**< @~chinese è·å–å¸§æ•°æ®å¤±è´¥   @~english get frame failed*/
+	ERROR_NOT_SUPPORT,				/**< @~chinese å°šä¸æ”¯æŒ         @~english not support*/
+	ERROR_PROPERTY_GET_FAILED,		/**< @~chinese è·å–å±æ€§å¤±è´¥     @~english get property failed*/
+	ERROR_PROPERTY_SET_FAILED=10,		/**< @~chinese è®¾ç½®å±æ€§å¤±è´¥     @~english set property failed*/
+	ERROR_HID_CHANNEL_ERROR,		/**< @~chinese hid é€šé“å¼‚å¸¸	     @~english hid channel error*/
 	ERROR_HID_WRITE_ERROR,
 	ERROR_HID_READ_ERROR,
 	ERROR_UNKNOW
@@ -88,21 +145,21 @@ typedef enum ERROR_CODE
 
 /**
 * @~chinese
-* Ã¶¾Ù: Ïà»úÁ÷ÀàĞÍ
+* æšä¸¾: ç›¸æœºæµç±»å‹
 * @~english
 * enumeration: stream type
 **/
 typedef enum STREAM_TYPE
 {
-	STREAM_TYPE_DEPTH	= 0, /**<@~chinese Éî¶ÈÁ÷  @~english Depth camera stream */
-    STREAM_TYPE_RGB		= 1, /**<@~chinese RGBÁ÷   @~english RGB camera stream */
+	STREAM_TYPE_DEPTH	= 0, /**<@~chinese æ·±åº¦æµ  @~english Depth camera stream */
+    STREAM_TYPE_RGB		= 1, /**<@~chinese RGBæµ   @~english RGB camera stream */
 	STREAM_TYPE_COUNT
 }STREAM_TYPE;
 
 
 /// \~chinese
-/// \defgroup StreamFormat Êı¾İÁ÷¸ñÊ½
-/// \brief Éî¶ÈÁ÷ºÍRGBÁ÷ËùÖ§³ÖµÄËùÓĞ¸ñÊ½
+/// \defgroup StreamFormat æ•°æ®æµæ ¼å¼
+/// \brief æ·±åº¦æµå’ŒRGBæµæ‰€æ”¯æŒçš„æ‰€æœ‰æ ¼å¼
 /// @{
 /// \~english
 /// \defgroup StreamFormat Stream format
@@ -110,41 +167,41 @@ typedef enum STREAM_TYPE
 /// @{
 /**
 * @~chinese
-* Ã¶¾Ù: Á÷Êı¾İ¸ñÊ½
+* æšä¸¾: æµæ•°æ®æ ¼å¼
 * @~english
 * enumeration: stream format
 **/
 typedef enum STREAM_FORMAT
 {
-	STREAM_FORMAT_MJPG		= 0x00,		 /**< @~chinese RGBÁ÷µÄMJPGÑ¹ËõµÄÊı¾İ			
+	STREAM_FORMAT_MJPG		= 0x00,		 /**< @~chinese RGBæµçš„MJPGå‹ç¼©çš„æ•°æ®			
 											  @~english MJPG compressed data*/ 
-	STREAM_FORMAT_RGB8		= 0x01,		 /**< @~chinese RGBÁ÷µÄ8Î»ºì,ÂÌ,À¶3Í¨µÀÊı¾İ			
+	STREAM_FORMAT_RGB8		= 0x01,		 /**< @~chinese RGBæµçš„8ä½çº¢,ç»¿,è“3é€šé“æ•°æ®			
 											  @~english 8-bit red, green and blue channels*/ 
-	STREAM_FORMAT_Z16		= 0x02,		 /**< @~chinese Éî¶ÈÁ÷µÄÉî¶ÈÍ¼¸ñÊ½, Ã¿Ò»¸öÉî¶ÈÖµÒÔunsigned short±íÊ¾
+	STREAM_FORMAT_Z16		= 0x02,		 /**< @~chinese æ·±åº¦æµçš„æ·±åº¦å›¾æ ¼å¼, æ¯ä¸€ä¸ªæ·±åº¦å€¼ä»¥unsigned shortè¡¨ç¤º
 											  @~english 16-bit unsigned short depth values. The depth in millimeters is equal to depth scale * pixel value. */ 
-	STREAM_FORMAT_Z16Y8Y8	= 0x03,		 /**< @~chinese Éî¶ÈÁ÷µÄÉî¶ÈÍ¼+ºìÍâÍ¼×éºÏ¸ñÊ½,	
-														Í¨¹ıFRAME_DATA_FORMAT_Z16»ñµÃÉî¶ÈÊı¾İ£¬
-														Í¨¹ıFRAME_DATA_FORMAT_IR_LEFT»ñµÃ×óºìÍâÍ¼, 
-														Í¨¹ıFRAME_DATA_FORMAT_IR_RIGHT»ñµÃÓÒºìÍâÍ¼
+	STREAM_FORMAT_Z16Y8Y8	= 0x03,		 /**< @~chinese æ·±åº¦æµçš„æ·±åº¦å›¾+çº¢å¤–å›¾ç»„åˆæ ¼å¼,	
+														é€šè¿‡FRAME_DATA_FORMAT_Z16è·å¾—æ·±åº¦æ•°æ®ï¼Œ
+														é€šè¿‡FRAME_DATA_FORMAT_IR_LEFTè·å¾—å·¦çº¢å¤–å›¾, 
+														é€šè¿‡FRAME_DATA_FORMAT_IR_RIGHTè·å¾—å³çº¢å¤–å›¾
 											  @~english output depth map and infrared, 
 														get depth map by FRAME_DATA_FORMAT_Z16
 														get left infrared by FRAME_DATA_FORMAT_IR_LEFT,
 														get right infrared by FRAME_DATA_FORMAT_IR_RIGHT*/ 
-	STREAM_FORMAT_PAIR		= 0x04,		 /**< @~chinese Éî¶ÈÁ÷µÄºìÍâÍ¼¸ñÊ½£¬ÊÊÓÃÓÚË«Ä¿Ïà»ú
-														Í¨¹ıFRAME_DATA_FORMAT_IR_LEFT»ñµÃ×óºìÍâÍ¼, 
-														Í¨¹ıFRAME_DATA_FORMAT_IR_RIGHT»ñµÃÓÒºìÍâÍ¼	
-											  @~english output infrared£¬suitable for binocular camera
+	STREAM_FORMAT_PAIR		= 0x04,		 /**< @~chinese æ·±åº¦æµçš„çº¢å¤–å›¾æ ¼å¼ï¼Œé€‚ç”¨äºåŒç›®ç›¸æœº
+														é€šè¿‡FRAME_DATA_FORMAT_IR_LEFTè·å¾—å·¦çº¢å¤–å›¾, 
+														é€šè¿‡FRAME_DATA_FORMAT_IR_RIGHTè·å¾—å³çº¢å¤–å›¾	
+											  @~english output infraredï¼Œsuitable for binocular camera
 														get left infrared by FRAME_DATA_FORMAT_IR_LEFT,
 														get right infrared by FRAME_DATA_FORMAT_IR_RIGHT*/ 
-	STREAM_FORMAT_H264		= 0x05,		 /**< @~chinese RGBÁ÷µÄH264Ñ¹ËõµÄÊı¾İ			
+	STREAM_FORMAT_H264		= 0x05,		 /**< @~chinese RGBæµçš„H264å‹ç¼©çš„æ•°æ®			
 											  @~english H264 compressed data*/ 
-	STREAM_FORMAT_I8DS      = 0x100,	 /**< @~chinese ½µ²ÉÑùºìÍâÔ¤ÀÀ¸ñÊ½
-														Í¨¹ıFRAME_DATA_FORMAT_IR_LEFT»ñµÃ×óºìÍâÍ¼,
-														Í¨¹ıFRAME_DATA_FORMAT_IR_RIGHT»ñµÃÓÒºìÍâÍ¼£¬
-														Í¨¹ıFRAME_DATA_FORMAT_VCENTER_LEFT»ñµÃ×óºìÍâÍ¼ÖĞ¹âµ¶ÖĞĞÄµÄy×ø±êÊı×é,
-														Í¨¹ıFRAME_DATA_FORMAT_VCENTER_RIGHT»ñµÃÓÒºìÍâÍ¼ÖĞ¹âµ¶ÖĞĞÄµÄy×ø±êÊı×é£¬
-														Í¨¹ıFRAME_DATA_FORMAT_LASER_WIDTH_LEFT »ñµÃ×óºìÍâÍ¼¹âµ¶¿í¶ÈÊı×é,
-														Í¨¹ıFRAME_DATA_FORMAT_LASER_WIDTH_RIGHT»ñµÃÓÒºìÍâÍ¼¹âµ¶¿í¶ÈÊı×é
+	STREAM_FORMAT_I8DS      = 0x100,	 /**< @~chinese é™é‡‡æ ·çº¢å¤–é¢„è§ˆæ ¼å¼
+														é€šè¿‡FRAME_DATA_FORMAT_IR_LEFTè·å¾—å·¦çº¢å¤–å›¾,
+														é€šè¿‡FRAME_DATA_FORMAT_IR_RIGHTè·å¾—å³çº¢å¤–å›¾ï¼Œ
+														é€šè¿‡FRAME_DATA_FORMAT_VCENTER_LEFTè·å¾—å·¦çº¢å¤–å›¾ä¸­å…‰åˆ€ä¸­å¿ƒçš„yåæ ‡æ•°ç»„,
+														é€šè¿‡FRAME_DATA_FORMAT_VCENTER_RIGHTè·å¾—å³çº¢å¤–å›¾ä¸­å…‰åˆ€ä¸­å¿ƒçš„yåæ ‡æ•°ç»„ï¼Œ
+														é€šè¿‡FRAME_DATA_FORMAT_LASER_WIDTH_LEFT è·å¾—å·¦çº¢å¤–å›¾å…‰åˆ€å®½åº¦æ•°ç»„,
+														é€šè¿‡FRAME_DATA_FORMAT_LASER_WIDTH_RIGHTè·å¾—å³çº¢å¤–å›¾å…‰åˆ€å®½åº¦æ•°ç»„
 									    	  @~english output down sampled infrared for preview
 														get left infrared by FRAME_DATA_FORMAT_IR_LEFT, 
 														get right infrared by FRAME_DATA_FORMAT_IR_RIGHT,
@@ -152,42 +209,42 @@ typedef enum STREAM_FORMAT
 														get right laser center by FRAME_DATA_FORMAT_VCENTER_RIGHT,
 														get left laser width by FRAME_DATA_FORMAT_LASER_WIDTH_LEFT,
 														get right laser width by FRAME_DATA_FORMAT_LASER_WIDTH_RIGHT*/
-	STREAM_FORMAT_XZ32		= 0x101,	 /**< @~chinese µãÔÆÊä³ö¸ñÊ½, Í¨¹ıcs::Pointcloud::generatePointsFromXZ¼ÆËã³ÉµãÔÆ		
+	STREAM_FORMAT_XZ32		= 0x101,	 /**< @~chinese ç‚¹äº‘è¾“å‡ºæ ¼å¼, é€šè¿‡cs::Pointcloud::generatePointsFromXZè®¡ç®—æˆç‚¹äº‘		
 											  @~english output point cloud, call cs::Pointcloud::generatePointsFromXZ to compute a point cloud*/
-	STREAM_FORMAT_GRAY		= 0x102,	 /**< @~chinese Éî¶ÈÁ÷µÄºìÍâÍ¼¸ñÊ½£¬ÊÊÓÃÓÚµ¥Ä¿Ïà»ú
-											  @~english output infrared£¬suitable for monocular cameras */ 
+	STREAM_FORMAT_GRAY		= 0x102,	 /**< @~chinese æ·±åº¦æµçš„çº¢å¤–å›¾æ ¼å¼ï¼Œé€‚ç”¨äºå•ç›®ç›¸æœº
+											  @~english output infraredï¼Œsuitable for monocular cameras */ 
 	STREAM_FORMAT_COUNT
 }STREAM_FORMAT;
 
 /**
 * @~chinese
-* Ã¶¾Ù: Ö¡Êı¾İ¸ñÊ½£¬ÓÃÓÚ»ñÈ¡¸´ºÏÁ÷Êı¾İÖĞµÄÖ¸¶¨¸ñÊ½Êı¾İÆğÊ¼µØÖ·
+* æšä¸¾: å¸§æ•°æ®æ ¼å¼ï¼Œç”¨äºè·å–å¤åˆæµæ•°æ®ä¸­çš„æŒ‡å®šæ ¼å¼æ•°æ®èµ·å§‹åœ°å€
 * @~english
 * enumeration: format of frame data, used for get specified data in a composite frame
 **/
 typedef enum FRAME_DATA_FORMAT
 {
-	FRAME_DATA_FORMAT_Z16				= 0x00,		/**< @~chinese Éî¶ÈÁ÷µÄÉî¶ÈÍ¼¸ñÊ½, Ã¿Ò»¸öÉî¶ÈÖµÒÔunsigned short±íÊ¾
+	FRAME_DATA_FORMAT_Z16				= 0x00,		/**< @~chinese æ·±åº¦æµçš„æ·±åº¦å›¾æ ¼å¼, æ¯ä¸€ä¸ªæ·±åº¦å€¼ä»¥unsigned shortè¡¨ç¤º
 														 @~english 16-bit unsigned short depth values. The depth in millimeters is equal to depth scale * pixel value. */ 
-	FRAME_DATA_FORMAT_IR_LEFT			= 0x01,		/**< @~chinese ×óºìÍâÍ¼Êı¾İ£¬ 8-bit unsigned char±íÊ¾Ò»¸ö»Ò¶ÈÖµ				
+	FRAME_DATA_FORMAT_IR_LEFT			= 0x01,		/**< @~chinese å·¦çº¢å¤–å›¾æ•°æ®ï¼Œ 8-bit unsigned charè¡¨ç¤ºä¸€ä¸ªç°åº¦å€¼				
 														 @~english 8-bit unsigned char gray level of left infrared*/
-	FRAME_DATA_FORMAT_IR_RIGHT			= 0x02,		/**< @~chinese ÓÒºìÍâÍ¼Êı¾İ£¬ unsigned char±íÊ¾Ò»¸ö»Ò¶ÈÖµ				
+	FRAME_DATA_FORMAT_IR_RIGHT			= 0x02,		/**< @~chinese å³çº¢å¤–å›¾æ•°æ®ï¼Œ unsigned charè¡¨ç¤ºä¸€ä¸ªç°åº¦å€¼				
 														 @~english 8-bit unsigned char gray level of right infrared*/
-	FRAME_DATA_FORMAT_VCENTER_LEFT		= 0x03,		/**< @~chinese ×óºìÍâÍ¼¹âµ¶ÖĞĞÄ£¬ unsigned char±íÊ¾Ò»¸öy×ø±ê				
+	FRAME_DATA_FORMAT_VCENTER_LEFT		= 0x03,		/**< @~chinese å·¦çº¢å¤–å›¾å…‰åˆ€ä¸­å¿ƒï¼Œ unsigned charè¡¨ç¤ºä¸€ä¸ªyåæ ‡				
 														 @~english 8-bit unsigned char y coordinate of left laser center*/
-	FRAME_DATA_FORMAT_VCENTER_RIGHT		= 0x04,		/**< @~chinese ÓÒºìÍâÍ¼¹âµ¶ÖĞĞÄ£¬ unsigned char±íÊ¾Ò»¸öy×ø±ê				
+	FRAME_DATA_FORMAT_VCENTER_RIGHT		= 0x04,		/**< @~chinese å³çº¢å¤–å›¾å…‰åˆ€ä¸­å¿ƒï¼Œ unsigned charè¡¨ç¤ºä¸€ä¸ªyåæ ‡				
 														 @~english 8-bit unsigned char y coordinate of right laser center*/
-	FRAME_DATA_FORMAT_LASER_WIDTH_LEFT	= 0x05,		/**< @~chinese ×óºìÍâÍ¼¹âµ¶¿í¶È£¬ unsigned char±íÊ¾Ò»¸ö¿í¶ÈÖµ, ¹âµ¶Ì«¿íÊ±Ó°ÏìµãµÄ¾«È·¶È				
-														 @~english 8-bit unsigned char left laser width array£¬The accuracy of the point is affected when the laser is too wide*/
-	FRAME_DATA_FORMAT_LASER_WIDTH_RIGHT = 0x06,		/**< @~chinese ÓÒºìÍâÍ¼¹âµ¶¿í¶È£¬ unsigned char±íÊ¾Ò»¸ö¿í¶ÈÖµ, ¹âµ¶Ì«¿íÊ±Ó°ÏìµãµÄ¾«È·¶È					
-														 @~english 8-bit unsigned char right laser width array£¬The accuracy of the point is affected when the laser is too wide*/
+	FRAME_DATA_FORMAT_LASER_WIDTH_LEFT	= 0x05,		/**< @~chinese å·¦çº¢å¤–å›¾å…‰åˆ€å®½åº¦ï¼Œ unsigned charè¡¨ç¤ºä¸€ä¸ªå®½åº¦å€¼, å…‰åˆ€å¤ªå®½æ—¶å½±å“ç‚¹çš„ç²¾ç¡®åº¦				
+														 @~english 8-bit unsigned char left laser width arrayï¼ŒThe accuracy of the point is affected when the laser is too wide*/
+	FRAME_DATA_FORMAT_LASER_WIDTH_RIGHT = 0x06,		/**< @~chinese å³çº¢å¤–å›¾å…‰åˆ€å®½åº¦ï¼Œ unsigned charè¡¨ç¤ºä¸€ä¸ªå®½åº¦å€¼, å…‰åˆ€å¤ªå®½æ—¶å½±å“ç‚¹çš„ç²¾ç¡®åº¦					
+														 @~english 8-bit unsigned char right laser width arrayï¼ŒThe accuracy of the point is affected when the laser is too wide*/
 }FRAME_DATA_FORMAT;
 /// @}
 
 
 /// \~chinese
-/// \defgroup PropertyType »ù´¡ÊôĞÔ
-/// \brief ÁĞ¾ÙËùÓĞ¿ÉÉèÖÃµÄ»ù´¡ÊôĞÔ
+/// \defgroup PropertyType åŸºç¡€å±æ€§
+/// \brief åˆ—ä¸¾æ‰€æœ‰å¯è®¾ç½®çš„åŸºç¡€å±æ€§
 /// @{
 /// \~english
 /// \defgroup PropertyType Basic property
@@ -196,154 +253,154 @@ typedef enum FRAME_DATA_FORMAT
 
 /**
 * @~chinese
-* Ã¶¾Ù: Ïà»úµÄ»ù±¾ÊôĞÔ
+* æšä¸¾: ç›¸æœºçš„åŸºæœ¬å±æ€§
 * @~english
 * enumeration: basic property of camera
 **/
 typedef enum PROPERTY_TYPE
 {
-    PROPERTY_GAIN                       = 0x00,	/**<@~chinese ÔöÒæ
-                                                              µ÷½ÚÏà»úÁÁ¶È,Ìá¸ßÔöÒæ»áÒıÈëÔëÉù,µ¼ÖÂÉî¶È¾«¶ÈÏÂ½µ¡£µ÷½Ú·¶Î§1~16, ¸ß¾«¶ÈÊ±,½¨ÒéÔöÒæ¡Ü3
+    PROPERTY_GAIN                       = 0x00,	/**<@~chinese å¢ç›Š
+                                                              è°ƒèŠ‚ç›¸æœºäº®åº¦,æé«˜å¢ç›Šä¼šå¼•å…¥å™ªå£°,å¯¼è‡´æ·±åº¦ç²¾åº¦ä¸‹é™ã€‚è°ƒèŠ‚èŒƒå›´1~16, é«˜ç²¾åº¦æ—¶,å»ºè®®å¢ç›Šâ‰¤3
                                                     @~english gain of depth camera or RGB camera*/
-    PROPERTY_EXPOSURE                   = 0x01,	/**<@~chinese ÆØ¹âÖµ
-                                                              ÓÃÓÚµ÷½ÚÏà»úÁÁ¶È,ÊıÖµÔ½´óÁÁ¶ÈÔ½¸ß,²»»áÒıÈëÔëÉù,µ«ÊÇÖ¡ÂÊ»áËæ×ÅÆØ¹âÊ±¼äÔö´ó¶ø½µµÍ,µ÷½Ú·¶Î§3000~60000Î¢Ãë
+    PROPERTY_EXPOSURE                   = 0x01,	/**<@~chinese æ›å…‰å€¼
+                                                              ç”¨äºè°ƒèŠ‚ç›¸æœºäº®åº¦,æ•°å€¼è¶Šå¤§äº®åº¦è¶Šé«˜,ä¸ä¼šå¼•å…¥å™ªå£°,ä½†æ˜¯å¸§ç‡ä¼šéšç€æ›å…‰æ—¶é—´å¢å¤§è€Œé™ä½,è°ƒèŠ‚èŒƒå›´3000~60000å¾®ç§’
                                                     @~english Controls exposure time of depth camera or RGB camera*/
-	PROPERTY_FRAMETIME					= 0x02,	/**<@~chinese Ö¡Ê±¼ä            @~english Frame time of depth camera */
-	PROPERTY_FOCUS						= 0x03,	/**<@~chinese ½¹¾à              @~english Focus of RGB camera*/
-	PROPERTY_ENABLE_AUTO_FOCUS			= 0x04,	/**<@~chinese ÊÇ·ñ×Ô¶¯¶Ô½¹      @~english Enable / disable auto-focus of RGB camera*/
-	PROPERTY_ENABLE_AUTO_EXPOSURE		= 0x05, /**<@~chinese ÊÇ·ñ×Ô¶¯ÆØ¹â      @~english Enable / disable auto-exposure of RGB camera*/
-	PROPERTY_ENABLE_AUTO_WHITEBALANCE	= 0x06, /**<@~chinese ÊÇ·ñ×Ô¶¯°×Æ½ºâ    @~english White balance of RGB camera*/
-	PROPERTY_WHITEBALANCE				= 0x07,	/**<@~chinese °×Æ½ºâÖµ          @~english adjust white balance of RGB camera*/
-	PROPERTY_WHITEBALANCE_R				= 0x08,	/**<@~chinese °×Æ½ºâRÍ¨µÀ       @~english Channel r of RGB camera, adjust white balance*/
-	PROPERTY_WHITEBALANCE_B				= 0x09,	/**<@~chinese °×Æ½ºâBÍ¨µÀ       @~english Channel b of RGB camera, adjust white balance*/
-	PROPERTY_WHITEBALANCE_G				= 0x10,	/**<@~chinese °×Æ½ºâGÍ¨µÀ       @~english Channel g of RGB camera, adjust white balance*/
+	PROPERTY_FRAMETIME					= 0x02,	/**<@~chinese å¸§æ—¶é—´            @~english Frame time of depth camera */
+	PROPERTY_FOCUS						= 0x03,	/**<@~chinese ç„¦è·              @~english Focus of RGB camera*/
+	PROPERTY_ENABLE_AUTO_FOCUS			= 0x04,	/**<@~chinese æ˜¯å¦è‡ªåŠ¨å¯¹ç„¦      @~english Enable / disable auto-focus of RGB camera*/
+	PROPERTY_ENABLE_AUTO_EXPOSURE		= 0x05, /**<@~chinese æ˜¯å¦è‡ªåŠ¨æ›å…‰      @~english Enable / disable auto-exposure of RGB camera*/
+	PROPERTY_ENABLE_AUTO_WHITEBALANCE	= 0x06, /**<@~chinese æ˜¯å¦è‡ªåŠ¨ç™½å¹³è¡¡    @~english White balance of RGB camera*/
+	PROPERTY_WHITEBALANCE				= 0x07,	/**<@~chinese ç™½å¹³è¡¡å€¼          @~english adjust white balance of RGB camera*/
+	PROPERTY_WHITEBALANCE_R				= 0x08,	/**<@~chinese ç™½å¹³è¡¡Ré€šé“       @~english Channel r of RGB camera, adjust white balance*/
+	PROPERTY_WHITEBALANCE_B				= 0x09,	/**<@~chinese ç™½å¹³è¡¡Bé€šé“       @~english Channel b of RGB camera, adjust white balance*/
+	PROPERTY_WHITEBALANCE_G				= 0x10,	/**<@~chinese ç™½å¹³è¡¡Gé€šé“       @~english Channel g of RGB camera, adjust white balance*/
 	
 } PROPERTY_TYPE;
 /// @}
 
 /**
 * @~chinese
-* Ã¶¾Ù: Ïà»ú´¥·¢Ä£Ê½ 
+* æšä¸¾: ç›¸æœºè§¦å‘æ¨¡å¼ 
 * @~english
 * enumeration: trigger mode
 **/
 typedef enum TRIGGER_MODE
 {
-	TRIGGER_MODE_OFF		= 0, /**< @~chinese ¹Ø±Õ´¥·¢Ä£Ê½£¬³ÖĞøÊä³öÉî¶ÈÁ÷	
+	TRIGGER_MODE_OFF		= 0, /**< @~chinese å…³é—­è§¦å‘æ¨¡å¼ï¼ŒæŒç»­è¾“å‡ºæ·±åº¦æµ	
 									  @~english output depth map continuously*/ 
-	TRIGGER_MODE_HARDWAER	= 1, /**< @~chinese Íâ´¥·¢Ä£Ê½£¬ĞèÒªÔÚ´¥·¢¿ÚÊäÈëÓ²¼şĞÅºÅ²ÅÄÜ³öÍ¼
+	TRIGGER_MODE_HARDWAER	= 1, /**< @~chinese å¤–è§¦å‘æ¨¡å¼ï¼Œéœ€è¦åœ¨è§¦å‘å£è¾“å…¥ç¡¬ä»¶ä¿¡å·æ‰èƒ½å‡ºå›¾
 									  @~english external trigger mode,you should input hardware pulse to get depth frame*/
-	TRIGGER_MODE_SOFTWAER	= 2, /**< @~chinese Èí´¥·¢Ä£Ê½£¬ĞèÒªµ÷ÓÃcs::ICamera::softTrigger²ÅÄÜ³öÉî¶ÈÍ¼
+	TRIGGER_MODE_SOFTWAER	= 2, /**< @~chinese è½¯è§¦å‘æ¨¡å¼ï¼Œéœ€è¦è°ƒç”¨cs::ICamera::softTriggeræ‰èƒ½å‡ºæ·±åº¦å›¾
 									  @~english software trigger mode,you should call cs::ICamera::softTrigger to get depth frame*/
 }TRIGGER_MODE;
 
 /**
 * @~chinese
-* Ã¶¾Ù: ¸ß¶¯Ì¬µÄÄ£Ê½
+* æšä¸¾: é«˜åŠ¨æ€çš„æ¨¡å¼
 * @~english
 * enumeration: mode of HDR
 **/
 typedef enum HDR_MODE
 {
-	HDR_MODE_OFF			= 0,	/**< @~chinese ¹Ø±Õ				
+	HDR_MODE_OFF			= 0,	/**< @~chinese å…³é—­				
                                          @~english HDR off*/ 
-	HDR_MODE_HIGH_RELECT	= 1,	/**< @~chinese ¸ß·´Ä£Ê½ÊÊÓÃÓÚ²â¸ß·´ÎïÌå,	
-                                                   »á°´ÕÕÉè¶¨µÄÆØ¹â¼¶Êı,Ôö¼Ó½ÏµÍµÄÆØ¹â²ÎÊı½øĞĞ¶à´ÎÆØ¹âºó½øĞĞÈÚºÏÊä³ö¡£ÆØ¹â¼¶ÊıÓÉÓÃ»§Éè¶¨
+	HDR_MODE_HIGH_RELECT	= 1,	/**< @~chinese é«˜åæ¨¡å¼é€‚ç”¨äºæµ‹é«˜åç‰©ä½“,	
+                                                   ä¼šæŒ‰ç…§è®¾å®šçš„æ›å…‰çº§æ•°,å¢åŠ è¾ƒä½çš„æ›å…‰å‚æ•°è¿›è¡Œå¤šæ¬¡æ›å…‰åè¿›è¡Œèåˆè¾“å‡ºã€‚æ›å…‰çº§æ•°ç”±ç”¨æˆ·è®¾å®š
                                          @~english suitable for shiny object*/
-	HDR_MODE_LOW_RELECT		= 2,	/**< @~chinese °µÉ«Ä£Ê½ÊÊÓÃÓÚ²âÉîÉ«ÎïÌå,	
-                                                   »á°´ÕÕÉè¶¨µÄÆØ¹â¼¶Êı,Ôö¼Ó½Ï¸ßÆØ¹â²ÎÊı½øĞĞ¼¸´ÎÆØ¹âºó½øĞĞÈÚºÏÊä³ö¡£ÆØ¹â¼¶ÊıÓÉÓÃ»§Éè¶¨
+	HDR_MODE_LOW_RELECT		= 2,	/**< @~chinese æš—è‰²æ¨¡å¼é€‚ç”¨äºæµ‹æ·±è‰²ç‰©ä½“,	
+                                                   ä¼šæŒ‰ç…§è®¾å®šçš„æ›å…‰çº§æ•°,å¢åŠ è¾ƒé«˜æ›å…‰å‚æ•°è¿›è¡Œå‡ æ¬¡æ›å…‰åè¿›è¡Œèåˆè¾“å‡ºã€‚æ›å…‰çº§æ•°ç”±ç”¨æˆ·è®¾å®š
                                          @~english suitable for dark object*/
-	HDR_MODE_ALL_RELECT		= 3		/**< @~chinese ¸´ºÏÄ£Ê½ÊÊÓÃÓÚ²â¸´ºÏ±íÃæ	
-                                                   »áÆ½¾ù·ÖÅäÆØ¹â¼¶Êı,·Ö±ğÔö¼Ó½ÏµÍÆØ¹â²ÎÊıºÍ½Ï¸ßÆØ¹â²ÎÊıÀ´½øĞĞ¶à´ÎÆØ¹â²¢ÈÚºÏÊä³ö¡£ÆØ¹â¼¶ÊıÓÉÓÃ»§Éè¶¨
+	HDR_MODE_ALL_RELECT		= 3		/**< @~chinese å¤åˆæ¨¡å¼é€‚ç”¨äºæµ‹å¤åˆè¡¨é¢	
+                                                   ä¼šå¹³å‡åˆ†é…æ›å…‰çº§æ•°,åˆ†åˆ«å¢åŠ è¾ƒä½æ›å…‰å‚æ•°å’Œè¾ƒé«˜æ›å…‰å‚æ•°æ¥è¿›è¡Œå¤šæ¬¡æ›å…‰å¹¶èåˆè¾“å‡ºã€‚æ›å…‰çº§æ•°ç”±ç”¨æˆ·è®¾å®š
                                          @~english suitable for composite object*/
 }HDR_MODE;
 
 /**
 * @~chinese
-* @brief Ã¶¾Ù: ×Ô¶¯ÆØ¹âÄ£Ê½
+* @brief æšä¸¾: è‡ªåŠ¨æ›å…‰æ¨¡å¼
 * @~english
 * @brief enumeration: mode of auto exposure
 **/
 typedef enum AUTO_EXPOSURE_MODE
 {
-	AUTO_EXPOSURE_MODE_CLOSE = 0,			/**< @~chinese ¹Ø±Õ				
+	AUTO_EXPOSURE_MODE_CLOSE = 0,			/**< @~chinese å…³é—­				
                                                  @~english off*/
-	AUTO_EXPOSURE_MODE_FIX_FRAMETIME = 1,	/**< @~chinese ¹Ì¶¨Ö¡ÂÊÄ£Ê½£ºÔÚµ±Ç°Ö¡ÂÊÔÊĞí·¶Î§ÏÂ×Ô¶¯ÊµÊ±µ÷½ÚÏà»úµÄÆØ¹âÊ±¼äºÍÔöÒæ, ²»µ÷½ÚÏà»úµÄÊä³öÖ¡ÂÊ
+	AUTO_EXPOSURE_MODE_FIX_FRAMETIME = 1,	/**< @~chinese å›ºå®šå¸§ç‡æ¨¡å¼ï¼šåœ¨å½“å‰å¸§ç‡å…è®¸èŒƒå›´ä¸‹è‡ªåŠ¨å®æ—¶è°ƒèŠ‚ç›¸æœºçš„æ›å…‰æ—¶é—´å’Œå¢ç›Š, ä¸è°ƒèŠ‚ç›¸æœºçš„è¾“å‡ºå¸§ç‡
 											     @~english adjust exposure automatically and keep frame time unchanged*/
-	AUTO_EXPOSURE_MODE_HIGH_QUALITY = 2,	/**< @~chinese ¸ßÖÊÁ¿Ä£Ê½£ºÒÔ»ñµÃ×î¸ßÖÊÁ¿Ä£ĞÍÎªÄ¿±ê, ×Ô¶¯ÊµÊ±µ÷½ÚÏà»úµÄÆØ¹âÊ±¼äºÍÔöÒæ, Í¬Ê±»á°´Ğèµ÷½ÚÖ¡ÂÊ
+	AUTO_EXPOSURE_MODE_HIGH_QUALITY = 2,	/**< @~chinese é«˜è´¨é‡æ¨¡å¼ï¼šä»¥è·å¾—æœ€é«˜è´¨é‡æ¨¡å‹ä¸ºç›®æ ‡, è‡ªåŠ¨å®æ—¶è°ƒèŠ‚ç›¸æœºçš„æ›å…‰æ—¶é—´å’Œå¢ç›Š, åŒæ—¶ä¼šæŒ‰éœ€è°ƒèŠ‚å¸§ç‡
 											     @~english adjust exposure and frame time automatically*/
-    AUTO_EXPOSURE_MODE_FORE_GROUND = 3		/**< @~chinese ½ü¾°ÓÅÏÈÄ£Ê½£ºÒÔ»ñµÃ×î¸ßÖÊÁ¿Ä£ĞÍÎªÄ¿±ê, ×Ô¶¯ÊµÊ±µ÷½ÚÏà»úµÄÆØ¹âÊ±¼äºÍÔöÒæ, Í¬Ê±»á°´Ğèµ÷½ÚÖ¡ÂÊ
+    AUTO_EXPOSURE_MODE_FORE_GROUND = 3		/**< @~chinese è¿‘æ™¯ä¼˜å…ˆæ¨¡å¼ï¼šä»¥è·å¾—æœ€é«˜è´¨é‡æ¨¡å‹ä¸ºç›®æ ‡, è‡ªåŠ¨å®æ—¶è°ƒèŠ‚ç›¸æœºçš„æ›å…‰æ—¶é—´å’Œå¢ç›Š, åŒæ—¶ä¼šæŒ‰éœ€è°ƒèŠ‚å¸§ç‡
                                                  @~english adjust exposure and frame time automatically*/
 }AUTO_EXPOSURE_MODE;
 
 /**
 * @~chinese
-* @brief Ã¶¾Ù: ÍøÂç´«ÊäÑ¹Ëõ·½Ê½
+* @brief æšä¸¾: ç½‘ç»œä¼ è¾“å‹ç¼©æ–¹å¼
 * @~english
 * @brief enumeration: mode of compress
 **/
 typedef enum NETWORK_COMPRESS_MODE
 {
-	NETWORK_COMPRESS_MODE_CLOSE = 0,		/**< @~chinese ¹Ø±Õ               @~english off*/
-	NETWORK_COMPRESS_MODE_ZIP	= 1,		/**< @~chinese ZIP(Ä¬ÈÏÉèÖÃ)      @~english ZIP(Default)*/
+	NETWORK_COMPRESS_MODE_CLOSE = 0,		/**< @~chinese å…³é—­               @~english off*/
+	NETWORK_COMPRESS_MODE_ZIP	= 1,		/**< @~chinese ZIP(é»˜è®¤è®¾ç½®)      @~english ZIP(Default)*/
 }NETWORK_COMPRESS_MODE;
 
 
 /**
 * @~chinese
-* @brief ²âÁ¿Éî¶È·¶Î§£¬³¬³ö·¶Î§µÄÖµ½«±»ÖÃÁã
+* @brief æµ‹é‡æ·±åº¦èŒƒå›´ï¼Œè¶…å‡ºèŒƒå›´çš„å€¼å°†è¢«ç½®é›¶
 * @~english
 * @brief range of depth, value out of range will be set to zero
 **/
 typedef struct DepthRange
 {
-	int min;		/**< @~chinese Éî¶È×îĞ¡Öµ        @~english minimum of depth*/ 
-	int max;		/**< @~chinese Éî¶È×î´óÖµ        @~english maximum of depth*/ 
+	int min;		/**< @~chinese æ·±åº¦æœ€å°å€¼        @~english minimum of depth*/ 
+	int max;		/**< @~chinese æ·±åº¦æœ€å¤§å€¼        @~english maximum of depth*/ 
 }DepthRange;
 
 /**
 * @~chinese
-* @brief ÍøÂçÁ¬½ÓÊ±Éè±¸µÄIPÉèÖÃ£¬µ±autoEnableÉèÖÃÎªtrueÊ±£¬ÎŞĞèÉèÖÃipFourthByte
+* @brief ç½‘ç»œè¿æ¥æ—¶è®¾å¤‡çš„IPè®¾ç½®ï¼Œå½“autoEnableè®¾ç½®ä¸ºtrueæ—¶ï¼Œæ— éœ€è®¾ç½®ipFourthByte
 * @~english
 * @brief IP setting, when autoEnable is true, there is no need to set ipFourthByte
 **/
 typedef struct IpSetting
 {
-	unsigned int autoEnable;	/**< @~chinese ÊÇ·ñ¿ªÆôDHCP             @~english enable/disable DHCP*/ 
-	unsigned char ipFourthByte;	/**< @~chinese IPµØÖ·µÄµÚËÄÎ»           @~english the fourth byte of ip*/ 
+	unsigned int autoEnable;	/**< @~chinese æ˜¯å¦å¼€å¯DHCP             @~english enable/disable DHCP*/ 
+	unsigned char ipFourthByte;	/**< @~chinese IPåœ°å€çš„ç¬¬å››ä½           @~english the fourth byte of ip*/ 
 }IpSetting;
 
 typedef struct CameraIpSetting
 {
-    unsigned char autoEnable;	/**< @~chinese ÊÇ·ñ¿ªÆôDHCP             @~english enable/disable DHCP*/
-    unsigned char ipBytes[4];	/**< @~chinese IPµØÖ· {192,168,3,99}    @~english the first byte of ip*/
+    unsigned char autoEnable;	/**< @~chinese æ˜¯å¦å¼€å¯DHCP             @~english enable/disable DHCP*/
+    unsigned char ipBytes[4];	/**< @~chinese IPåœ°å€ {192,168,3,99}    @~english the first byte of ip*/
 }CameraIpSetting;
 
 /**
  * @~chinese
- * @brief	ÁªÍøÄ£Ê½
+ * @brief	è”ç½‘æ¨¡å¼
  * @~english
  * @brief	net working mode
  */
 typedef enum {
-	NET_WORKING_TERMINAL,			//ÖÕ¶ËÄ£Ê½
-	NET_WORKING_WIFI_HOST_AP,		//5G AP Ä£Ê½£¬Ä¬ÈÏÊÇ5GÄ£Ê½
-	NET_WORKING_WIFI_HOST_2_4G,		//2.4G APÄ£Ê½£¬2.4GÄ£Ê½²»¿ª·Å£¬ÏŞÄÚ²¿Ê¹ÓÃ
-	NET_WORKING_TERMINAL_ONLY,		//ÖÕ¶ËÄ£Ê½²¢¹Ø±ÕAP
-	NET_WORKING_WIFI_HOST_5GONLY,	//APÄ£Ê½²¢¹Ø±ÕÖÕ¶Ë
+	NET_WORKING_TERMINAL,			//ç»ˆç«¯æ¨¡å¼
+	NET_WORKING_WIFI_HOST_AP,		//5G AP æ¨¡å¼ï¼Œé»˜è®¤æ˜¯5Gæ¨¡å¼
+	NET_WORKING_WIFI_HOST_2_4G,		//2.4G APæ¨¡å¼ï¼Œ2.4Gæ¨¡å¼ä¸å¼€æ”¾ï¼Œé™å†…éƒ¨ä½¿ç”¨
+	NET_WORKING_TERMINAL_ONLY,		//ç»ˆç«¯æ¨¡å¼å¹¶å…³é—­AP
+	NET_WORKING_WIFI_HOST_5GONLY,	//APæ¨¡å¼å¹¶å…³é—­ç»ˆç«¯
 }NET_WORKING_MODE;
 
 #pragma pack(push, 4)
 typedef enum WifiChannel
 {
-	WIFI_CHANNEL_DEFAULT = 0,	//Ä¬ÈÏĞÅµÀ£¬ÄÚ²¿×ª»»ÎªWIFI_CHANNEL_44
+	WIFI_CHANNEL_DEFAULT = 0,	//é»˜è®¤ä¿¡é“ï¼Œå†…éƒ¨è½¬æ¢ä¸ºWIFI_CHANNEL_44
 	WIFI_CHANNEL_44 = 44,
 	WIFI_CHANNEL_149 = 149
 }WifiChannel;
 
 /**
  * @~chinese
- * @brief		ÁªÍø²ÎÊıĞÅÏ¢,¶ÔÓ¦ÃüÁîPROPERTY_EXT_NET_WORKING_INFO
+ * @brief		è”ç½‘å‚æ•°ä¿¡æ¯,å¯¹åº”å‘½ä»¤PROPERTY_EXT_NET_WORKING_INFO
  * @~english
  * @brief		net working info,corresponding PROPERTY_EXT_NET_WORKING_INFO
  */
@@ -354,84 +411,85 @@ typedef struct
 	char 				reserved[3];	//reserved
 	char 				ssid[100];		//ap name or wifi host name
 	char 				psk[100];		//password 
-	WifiChannel			channel;		//WIFIÍ¨µÀ
+	WifiChannel			channel;		//WIFIé€šé“
 }NetworkingInfo;
 
 #pragma pack(pop)
 
 /**
 * @~chinese
-* @brief HDR×Ô¶¯Ä£Ê½Ê±ÆØ¹â¼¶Êı¼°Á½¼¶ÆØ¹âÖ®¼äµÄ±¶ÊıÉèÖÃ
+* @brief HDRè‡ªåŠ¨æ¨¡å¼æ—¶æ›å…‰çº§æ•°åŠä¸¤çº§æ›å…‰ä¹‹é—´çš„å€æ•°è®¾ç½®
 * @~english
 * @brief exposure times and interstage scale of HDR
 **/
 typedef struct HdrScaleSetting
 {
-	unsigned int highReflectModeCount;	/**< @~chinese ¸ß·´Ä£Ê½ÆØ¹â¼¶Êı         @~english exposure times of high-reflective mode*/ 
-	unsigned int highReflectModeScale;	/**< @~chinese ¸ß·´Ä£Ê½Á½¼¶¼ä±¶Êı       @~english interstage scale of high-reflective mode*/ 
-	unsigned int lowReflectModeCount;	/**< @~chinese ÉîÉ«Ä£Ê½ÆØ¹â¼¶Êı         @~english exposure times of low-reflective mode*/ 
-	unsigned int lowReflectModeScale;	/**< @~chinese ÉîÉ«Ä£Ê½Á½¼¶¼ä±¶Êı       @~english interstage scale of low-reflective mode*/ 
+	unsigned int highReflectModeCount;	/**< @~chinese é«˜åæ¨¡å¼æ›å…‰çº§æ•°         @~english exposure times of high-reflective mode*/ 
+	unsigned int highReflectModeScale;	/**< @~chinese é«˜åæ¨¡å¼ä¸¤çº§é—´å€æ•°       @~english interstage scale of high-reflective mode*/ 
+	unsigned int lowReflectModeCount;	/**< @~chinese æ·±è‰²æ¨¡å¼æ›å…‰çº§æ•°         @~english exposure times of low-reflective mode*/ 
+	unsigned int lowReflectModeScale;	/**< @~chinese æ·±è‰²æ¨¡å¼ä¸¤çº§é—´å€æ•°       @~english interstage scale of low-reflective mode*/ 
 }HdrScaleSetting;
 
 #pragma pack(push, 1)
 
 /**
 * @~chinese
-* @brief HDRÄ³Ò»¼¶ÆØ¹âµÄ²ÎÊı
+* @brief HDRæŸä¸€çº§æ›å…‰çš„å‚æ•°
 * @~english
 * @brief exposure param of HDR
 **/
 typedef struct HdrExposureParam
 {
-	unsigned int  exposure;	/**< @~chinese ÆØ¹âÊ±¼ä         @~english exposure time*/ 
-	unsigned char gain;		/**< @~chinese ÔöÒæ             @~english gain*/ 
+	unsigned int  exposure;	/**< @~chinese æ›å…‰æ—¶é—´         @~english exposure time*/ 
+	unsigned char gain;		/**< @~chinese å¢ç›Š             @~english gain*/ 
 }HdrExposureParam;
 
 /**
 * @~chinese
-* @brief HDRÆØ¹â²ÎÊı
+* @brief HDRæ›å…‰å‚æ•°
 * @~english
 * @brief all exposure params of HDR
 **/
 typedef struct HdrExposureSetting
 {
-	unsigned char count;			/**< @~chinese ×ÜÆØ¹â¼¶Êı        @~english total exposure times of HDR*/ 
-	HdrExposureParam param[11];		/**< @~chinese ¸÷¼¶ÆØ¹â²ÎÊı      @~english all params of HDR*/ 
+	unsigned char count;			/**< @~chinese æ€»æ›å…‰çº§æ•°        @~english total exposure times of HDR*/ 
+	HdrExposureParam param[11];		/**< @~chinese å„çº§æ›å…‰å‚æ•°      @~english all params of HDR*/ 
 }HdrExposureSetting;
 
 /**
 * @~chinese
-* @brief HDRÄ³Ò»¼¶µÄÆØ¹âÊ±¼ä¼°¹â»úÁÁ¶ÈÉèÖÃ
+* @brief HDRæŸä¸€çº§çš„æ›å…‰æ—¶é—´åŠå…‰æœºäº®åº¦è®¾ç½®
 * @~english
 * @brief exposure and laser level of HDR
 **/
 typedef struct HdrBrightnessParam
 {
-	unsigned char laserLevel;		/**< @~chinese ¼¤¹âÆ÷µÈ¼¶        @~english brightness of laser*/ 
-	float exposure;					/**< @~chinese ÆØ¹âÊ±¼ä          @~english exposure time*/ 
+	unsigned char laserLevel;		/**< @~chinese æ¿€å…‰å™¨ç­‰çº§        @~english brightness of laser*/ 
+	float exposure;					/**< @~chinese æ›å…‰æ—¶é—´          @~english exposure time*/ 
 }HdrBrightnessParam;
 
 /**
 * @~chinese
-* @brief HDRËùÓĞ¼¶±ğµÄÆØ¹âÊ±¼ä¼°¹â»úÁÁ¶ÈÉèÖÃ
+* @brief HDRæ‰€æœ‰çº§åˆ«çš„æ›å…‰æ—¶é—´åŠå…‰æœºäº®åº¦è®¾ç½®
 * @~english
 * @brief all settings of exposure and laser level
 **/
 typedef struct HdrBrightnessSetting
 {
-	unsigned char count;			/**< @~chinese ×ÜÆØ¹â¼¶Êı        @~english total exposure times of HDR*/
-	HdrBrightnessParam param[11];	/**< @~chinese ¸÷¼¶ÆØ¹â²ÎÊı      @~english all params of HDR*/
+	unsigned char count;			/**< @~chinese æ€»æ›å…‰çº§æ•°        @~english total exposure times of HDR*/
+	HdrBrightnessParam param[11];	/**< @~chinese å„çº§æ›å…‰å‚æ•°      @~english all params of HDR*/
 }HdrBrightnessSetting;
 
 typedef struct DepthRgbMatchParam
 {
-	int		iRgbOffset;				/**< @~chinese Æ¥ÅäÊ±RGBÊ±¼ä´ÁµÄÆ«ÒÆÖµ     @~english the offset of rgb frame's timestamp when matching*/
-	int		iDifThreshold;			/**< @~chinese Éî¶ÈÓërgbÊ±¼ä´ÁµÄÎó²îãĞÖµ   @~english the threshold of depth and rgb frame's timestamp*/
-	bool	bMakeSureRgbIsAfterDepth;	/**< @~chinese È·±£RGBÊ±¼ä´ÁÔÚdepthÖ®ºó   @~english make sure rgb's timestamp is after depth.*/
+	int		iRgbOffset;				/**< @~chinese åŒ¹é…æ—¶RGBæ—¶é—´æˆ³çš„åç§»å€¼     @~english the offset of rgb frame's timestamp when matching*/
+	int		iDifThreshold;			/**< @~chinese æ·±åº¦ä¸rgbæ—¶é—´æˆ³çš„è¯¯å·®é˜ˆå€¼   @~english the threshold of depth and rgb frame's timestamp*/
+	bool	bMakeSureRgbIsAfterDepth;	/**< @~chinese ç¡®ä¿RGBæ—¶é—´æˆ³åœ¨depthä¹‹å   @~english make sure rgb's timestamp is after depth.*/
 }DepthRgbMatchParam;
 
-//ÌõÎÆpatternÇĞ»»Ç°ºóĞèÒªstop_stream[0x483]ºÍstart_stream[0x481],sdkÖĞÒÑ¾­´¦ÀíºÃÁË£¬Íâ²¿²»ĞèÒªÖØ¸´µ÷ÓÃ483ºÍ481
-//POP2µÄËã·¨ÔÚ1ºÍ3ÇĞ»»£¬µ±±êÖ¾µãÄ£Ê½Ê±Ê¹ÓÃ1£¬µ±ÆäËüÄ£Ê½Ê±Ê¹ÓÃ3--ÅíÀÚ
+//æ¡çº¹patternåˆ‡æ¢å‰åéœ€è¦stop_stream[0x483]å’Œstart_stream[0x481],sdkä¸­å·²ç»å¤„ç†å¥½äº†ï¼Œå¤–éƒ¨ä¸éœ€è¦é‡å¤è°ƒç”¨483å’Œ481
+//POP2çš„ç®—æ³•åœ¨1å’Œ3åˆ‡æ¢ï¼Œå½“æ ‡å¿—ç‚¹æ¨¡å¼æ—¶ä½¿ç”¨1ï¼Œå½“å…¶å®ƒæ¨¡å¼æ—¶ä½¿ç”¨3--å½­ç£Š
+//EN_FRINGE_PATTERN_TYPE_3FREQ4STEP_MULTIæ˜¯18å¸§é«˜å¸§ç‡
 const int id_msg_set_fringe_pattern_t = 0xa05;
 typedef enum EN_FRINGE_PATTERN_TYPE_T 
 {
@@ -439,7 +497,10 @@ typedef enum EN_FRINGE_PATTERN_TYPE_T
 	EN_FRINGE_PATTERN_TYPE_STANDARD_WHITE_ADDED = 0x01,
 	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH = 0x02,
 	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH_WHITE_ADDED = 0x03,
-	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH_DOUBLE_WHITE_ADDED = 0x04
+	EN_FRINGE_PATTERN_TYPE_MULTI_DEPTH_DOUBLE_WHITE_ADDED = 0x04,
+	EN_FRINGE_PATTERN_TYPE_3FREQ4STEP = 0x05,
+	EN_FRINGE_PATTERN_TYPE_3FREQ4STEP_MULTI_DEPTH = 0x06,
+
 }FRINGE_PATTERN_TYPE;
 
 typedef struct MaxFrameTimeGain_tag
@@ -467,23 +528,28 @@ typedef struct HidHeader_tag
 	int		magic;
 	int		type;
 	char	checksum[32]; // 0 not check, other check
-	int		iDataLen;//Ö¸Ê¾acDataÖĞµÄÓĞĞ§Êı¾İ´óĞ¡
+	int		iDataLen;//æŒ‡ç¤ºacDataä¸­çš„æœ‰æ•ˆæ•°æ®å¤§å°
 }HidHeader;
 
 typedef struct WriteReadHidData_tag
 {
-	int iDataMax;		//Ö¸Ê¾acData×î´ó¿ÉÓÃ¿Õ¼ä
-	int iTimeoutMs;		//Ö¸Ê¾¶ÁÈ¡Êı¾İµÄ³¬Ê±Ê±¼ä£¬µ¥Î»ºÁÃë
+	int iDataMax;		//æŒ‡ç¤ºacDataæœ€å¤§å¯ç”¨ç©ºé—´
+	int iTimeoutMs;		//æŒ‡ç¤ºè¯»å–æ•°æ®çš„è¶…æ—¶æ—¶é—´ï¼Œå•ä½æ¯«ç§’
 
-	unsigned char	reportId;//ÌØ±ğ+1(ReportId)
+	unsigned char	reportId;//ç‰¹åˆ«+1(ReportId)
 	HidHeader		hidHeader;
-	char	acData[1];		//Ö¸Ê¾¾ßÌåÊı¾İ
+	char	acData[1];		//æŒ‡ç¤ºå…·ä½“æ•°æ®
 
 }WriteReadHidData;
 
+//é€è§†å˜æ¢çŸ©é˜µè¡Œæ•°,åˆ—æ•°
+#define PER_TRANSF_MATRIX_ROW	4
+#define PER_TRANSF_MATRIX_COL	4
+#define PER_TRANSF_MATRIX_SIZE	16
+
 /**
 * @~chinese
-* @brief Í¸ÊÓ±ä»»¾ØÕó
+* @brief é€è§†å˜æ¢çŸ©é˜µ
 * @~english
 * @brief Perspective transformation matrix
 **/
@@ -493,15 +559,15 @@ typedef struct PerspectiveTransformationMatrix
 	short height;
 	union 
 	{
-		float matrix[4][4];
-		float mat_[16];
+		float matrix[PER_TRANSF_MATRIX_ROW][PER_TRANSF_MATRIX_COL];
+		float mat_[PER_TRANSF_MATRIX_SIZE];
 	};
 	
 } PerspectiveTransformationMatrix;
 
 /**
 * @~chinese
-* @brief Öµ·¶Î§
+* @brief å€¼èŒƒå›´
 * @~english
 * @brief Value range
 **/
@@ -511,14 +577,25 @@ typedef struct ValueRange {
 	float fStep_;
 }*ValueRange_PTR;
 
+/**
+* @~chinese
+* @brief LEDæ§åˆ¶å‚æ•°
+* @~english
+* @brief LED Contrl param
+**/
+typedef struct LedCtrlParam {
+	LED_ID emLedId;
+	LED_CTRL_TYPE emCtrlType;
+}*LedCtrlParam_ptr;
+
 #pragma pack(pop)
 
 
 
 
 /// \~chinese
-/// \defgroup PropertyExtensionType À©Õ¹ÊôĞÔ
-/// \brief ÁĞ¾ÙËùÓĞ¿ÉÉèÖÃµÄÀ©Õ¹ÊôĞÔ
+/// \defgroup PropertyExtensionType æ‰©å±•å±æ€§
+/// \brief åˆ—ä¸¾æ‰€æœ‰å¯è®¾ç½®çš„æ‰©å±•å±æ€§
 /// @{
 /// \~english
 /// \defgroup PropertyExtensionType Extensional property
@@ -527,144 +604,156 @@ typedef struct ValueRange {
 
 /**
 * @~chinese
-* @brief Ã¶¾Ù: À©Õ¹ÊôĞÔ
+* @brief æšä¸¾: æ‰©å±•å±æ€§
 * @~english
 * @brief enumeration: extensional of property
 **/
 typedef enum PROPERTY_TYPE_EXTENSION
 {
-	PROPERTY_EXT_DEPTH_SCALE			= 0x0,	 /**< @~chinese Éî¶ÈÖµËõ·ÅÏµÊı                @~english depth unit for real distance */
-	PROPERTY_EXT_TRIGGER_MODE			= 0x1,	 /**< @~chinese ´¥·¢Ä£Ê½                      @~english/PROPERTY_EXT_TRIGGER_OUT_MODE set trigger mode ,normal or trigge mode, value 1 stands for software trigger mode, value 2 stands for hardware trigger mode, other stands for trigger off(default)*/
-	PROPERTY_EXT_TRIGGER_OUT_MODE		= 0x2,	 /**< @~chinese ÊÇ·ñ¿ªÆôÂö³åÊä³ö              @~english enable/disable trigger out*/
-	PROPERTY_EXT_HDR_BRIGHTNESS			= 0x3,	 /**< @~chinese HDR¸÷¼¶²ÎÊı                   @~english all params of HDR*/
-	PROPERTY_EXT_IP_SETTING				= 0x4,	 /**< @~chinese deprecated IPÉèÖÃ             @~english IP setting*/
-	PROPERTY_EXT_NETWORK_COMPRESS		= 0x5,	 /**< @~chinese ÍøÂç´«ÊäÊ±Á÷ÊÇ·ñÑ¹Ëõ
+	PROPERTY_EXT_DEPTH_SCALE			= 0x0,	 /**< @~chinese æ·±åº¦å€¼ç¼©æ”¾ç³»æ•°                @~english depth unit for real distance */
+	PROPERTY_EXT_TRIGGER_MODE			= 0x1,	 /**< @~chinese è§¦å‘æ¨¡å¼                      @~english/PROPERTY_EXT_TRIGGER_OUT_MODE set trigger mode ,normal or trigge mode, value 1 stands for software trigger mode, value 2 stands for hardware trigger mode, other stands for trigger off(default)*/
+	PROPERTY_EXT_TRIGGER_OUT_MODE		= 0x2,	 /**< @~chinese æ˜¯å¦å¼€å¯è„‰å†²è¾“å‡º              @~english enable/disable trigger out*/
+	PROPERTY_EXT_HDR_BRIGHTNESS			= 0x3,	 /**< @~chinese HDRå„çº§å‚æ•°                   @~english all params of HDR*/
+	PROPERTY_EXT_IP_SETTING				= 0x4,	 /**< @~chinese deprecated IPè®¾ç½®             @~english IP setting*/
+	PROPERTY_EXT_NETWORK_COMPRESS		= 0x5,	 /**< @~chinese ç½‘ç»œä¼ è¾“æ—¶æµæ˜¯å¦å‹ç¼©
 													  @~english whether the stream compresses when transmited by network*/
-    PROPERTY_EXT_SERIAL_NUMBER          = 0x6,   /**< @~chinese ĞŞ¸ÄĞòÁĞºÅ*/
-    PROPERTY_EXT_MAC_ADDRESS            = 0x7,   /**< @~chinese ĞŞ¸ÄmacµØÖ·*/
-    PROPERTY_EXT_CAMERA_IP              = 0x8,	 /**< @~chinese IPÉèÖÃ                        @~english IP setting*/
-	PROPERTY_EXT_AP_NET_WORKING_INFO	= 0x9,   /**<@~chinese apÄ£Ê½ÁªÍø ÊôĞÔ,²Î¿¼NetworkingInfo	  @~english property of net working,reference NetworkingInfo*/
-	PROPERTY_EXT_FAST_SCAN_MODE			= 0x0A,   /**<@~chinese  ¿ìËÙÉ¨ÃèÄ£Ê½,²Î¿¼bFastScanMode	  @~english property of fast scan mode ,reference bFastScanMode*/
-	PROPERTY_EXT_HARDSYNCSWITCH			= 0x0B,		/**<@~chinese  Ó²Í¬²½¿ª¹Ø,²Î¿¼bHardSyncSwitch	  @~english property of hard synchronization ,reference bHardSyncSwitch*/
-	PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM	= 0x0C,		/**<@~chinese  Éî¶ÈºÍRGBÖ¡Æ¥Åä²ÎÊı,²Î¿¼DepthRgbMatchParam	  @~english property of depth and rgb match param ,reference DepthRgbMatchParam*/
-	PROPERTY_EXT_PAUSE_DEPTH_STREAM		= 0x0D,		/**<@~chinese  ÔİÍ£Éî¶ÈÁ÷	  @~english pause the depth stream*/
-	PROPERTY_EXT_RESUME_DEPTH_STREAM	= 0x0E,		/**<@~chinese  »Ö¸´Éî¶ÈÁ÷	  @~english resume the depth stream*/
-	PROPERTY_EXT_TERMINAL_NET_WORKING_INFO = 0x10,   /**<@~chinese ÖÕ¶ËÄ£Ê½ÁªÍø ÊôĞÔ,²Î¿¼NetworkingInfo	  @~english property of net working,reference NetworkingInfo*/
-	PROPERTY_EXT_IS_WIFI_HOST_MODE		= 0x11,   /**<@~chinese ÅĞ¶ÏÊÇ·ñÔÚwifi-hostÄ£Ê½ ÊôĞÔ,bIsWifiHostMode	  @~english property of bool ,which is in wifi host mode,reference bIsWifiHostMode*/
-	PROPERTY_EXT_CLEAR_FRAME_BUFFER		= 0x13,   /**<@~chinese Çå³ıSDKÄÚ²¿µÄFrame¶ÓÁĞ	  @~english empty sdk frame buffer*/
-	PROPERTY_EXT_GET_RECONSTRUCTIONMAT	= 0x14,	 /**<@~chinese »ñÈ¡ÊÓ²îÖØ½¨µãÔÆµÄ¾ØÕó	  @~english get parallax reconstruction point cloud.*/
+    PROPERTY_EXT_SERIAL_NUMBER          = 0x6,   /**< @~chinese ä¿®æ”¹åºåˆ—å·*/
+    PROPERTY_EXT_MAC_ADDRESS            = 0x7,   /**< @~chinese ä¿®æ”¹macåœ°å€*/
+    PROPERTY_EXT_CAMERA_IP              = 0x8,	 /**< @~chinese IPè®¾ç½®                        @~english IP setting*/
+	PROPERTY_EXT_AP_NET_WORKING_INFO	= 0x9,   /**<@~chinese apæ¨¡å¼è”ç½‘ å±æ€§,å‚è€ƒNetworkingInfo	  @~english property of net working,reference NetworkingInfo*/
+	PROPERTY_EXT_FAST_SCAN_MODE			= 0x0A,   /**<@~chinese  å¿«é€Ÿæ‰«ææ¨¡å¼,å‚è€ƒbFastScanMode	  @~english property of fast scan mode ,reference bFastScanMode*/
+	PROPERTY_EXT_HARDSYNCSWITCH			= 0x0B,		/**<@~chinese  ç¡¬åŒæ­¥å¼€å…³,å‚è€ƒbHardSyncSwitch	  @~english property of hard synchronization ,reference bHardSyncSwitch*/
+	PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM	= 0x0C,		/**<@~chinese  æ·±åº¦å’ŒRGBå¸§åŒ¹é…å‚æ•°,å‚è€ƒDepthRgbMatchParam	  @~english property of depth and rgb match param ,reference DepthRgbMatchParam*/
+	PROPERTY_EXT_PAUSE_DEPTH_STREAM		= 0x0D,		/**<@~chinese  æš‚åœæ·±åº¦æµ	  @~english pause the depth stream*/
+	PROPERTY_EXT_RESUME_DEPTH_STREAM	= 0x0E,		/**<@~chinese  æ¢å¤æ·±åº¦æµ	  @~english resume the depth stream*/
+	PROPERTY_EXT_TERMINAL_NET_WORKING_INFO = 0x10,   /**<@~chinese ç»ˆç«¯æ¨¡å¼è”ç½‘ å±æ€§,å‚è€ƒNetworkingInfo	  @~english property of net working,reference NetworkingInfo*/
+	PROPERTY_EXT_IS_WIFI_HOST_MODE		= 0x11,   /**<@~chinese åˆ¤æ–­æ˜¯å¦åœ¨wifi-hostæ¨¡å¼ å±æ€§,bIsWifiHostMode	  @~english property of bool ,which is in wifi host mode,reference bIsWifiHostMode*/
+	PROPERTY_EXT_CLEAR_FRAME_BUFFER		= 0x13,   /**<@~chinese æ¸…é™¤SDKå†…éƒ¨çš„Frameé˜Ÿåˆ—	  @~english empty sdk frame buffer*/
+	PROPERTY_EXT_GET_RECONSTRUCTIONMAT	= 0x14,	 /**<@~chinese è·å–è§†å·®é‡å»ºç‚¹äº‘çš„çŸ©é˜µ	  @~english get parallax reconstruction point cloud.*/
 
-	PROPERTY_EXT_EXPOSURE_TIME_RGB      = 0x15,	 /**<@~chinese ÆØ¹âÊ±¼ä,µ¥Î»ºÁÃë,½öÏŞRGBÁ÷	  @~english exposure time,unit ms.*/
-	PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB = 0x16, /**<@~chinese ÆØ¹âÊ±¼ä·¶Î§,µ¥Î»ºÁÃë,½öÏŞRGBÁ÷	  @~english exposure time,unit ms.*/
-	PROPERTY_EXT_CPU_TEMPRATRUE			= 0x17,  /**<@~chinese CPUÎÂ¶È,µ¥Î»ÉãÊÏ¶È,	  @~english CPU tempratrue,unit degree Celsius */
-	PROPERTY_EXT_GET_CAMERA_STATE		= 0x18,	 /**<@~chinese »ñÈ¡Ïà»úµ±Ç°×´Ì¬,	  @~english Get camera current state */
-    
-	PROPERTY_EXT_SET_FAKE_MODE			= 0x904, /**< @~chinese ÉèÖÃÕæ¼Ù·Ö±æÂÊ                @~english set fake mode */
-	PROPERTY_EXT_AUTO_EXPOSURE_MODE		= 0x912, /**< @~chinese Éî¶ÈÏà»ú×Ô¶¯ÆØ¹âÄ£Ê½,²Î¿¼AUTO_EXPOSURE_MODE         @~english auto exposure mode of depth camera£¬reference AUTO_EXPOSURE_MODE*/
-	PROPERTY_EXT_DEPTH_ROI				= 0x913, /**< @~chinese Éî¶ÈÊı¾İµÄROI,²Î¿¼DepthRoi            @~english roi of depth data,reference DepthRoi*/
-	PROPERTY_EXT_HDR_MODE				= 0x914, /**< @~chinese HDRÄ£Ê½                       @~english HDR mode*/
-	PROPERTY_EXT_HDR_SCALE_SETTING		= 0x915, /**< @~chinese HDR×Ô¶¯Ä£Ê½µÄÅäÖÃ             @~english setting of auto-HDR*/
-	PROPERTY_EXT_HDR_EXPOSURE			= 0x916, /**< @~chinese HDR¸÷¼¶²ÎÊı                   @~english all params of HDR*/
-	PRPOERTY_EXT_MAX_FRAMETIME_GAIN		= 0x917, /**< @~chinese ×î´óÖ¡Ê±¼äºÍÔöÒæ,²Î¿¼MaxFrameTimeGain              @~english set the max frame and gran,reference MaxFrameTimeGain*/
-	PROPERTY_EXT_LASER_BRIGHTNESS		= 0x920, /**< @~chinese ¼¤¹âÆ÷ÁÁ¶È                    @~english brightness level of laser*/
-	PROPERTY_EXT_LASER_ON_OFF			= 0x922, /**< @~chinese ¼¤¹âÆ÷¿ª/¹Ø                   @~english turn on/off laser*/
-	PROPERTY_EXT_SPEED					= 0x924, /**< @~chinese ÅÄÍ¼ËÙ¶È                      @~english speed of shot*/
+	PROPERTY_EXT_EXPOSURE_TIME_RGB      = 0x15,	 /**<@~chinese æ›å…‰æ—¶é—´,å•ä½å¾®ç§’,ä»…é™RGBæµ	  @~english exposure time,unit us.*/
+	PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB = 0x16, /**<@~chinese æ›å…‰æ—¶é—´èŒƒå›´,å•ä½å¾®ç§’,ä»…é™RGBæµ	  @~english exposure time,unit us.*/
+	PROPERTY_EXT_CPU_TEMPRATRUE			= 0x17,  /**<@~chinese CPUæ¸©åº¦,å•ä½æ‘„æ°åº¦,	  @~english CPU tempratrue,unit degree Celsius */
+	//PROPERTY_EXT_GET_CAMERA_STATE       = 0x18, /**< @~chinese è·å–ç›¸æœºå½“å‰çŠ¶æ€,	  @~english Get camera current state */
+	PROPERTY_EXT_IS_SUPPORT_GYRO        = 0x19,   /**< @~chinese åˆ¤æ–­ç›¸æœºæ˜¯å¦æ”¯æŒé™€èºä»ª, å‚è€ƒbSupportGyro	  @~english the camera supports gyroscope or not, reference bSupportGyro*/
+	PROPERTY_EXT_GET_GYRO_VERSION       = 0x20,   /**< @~chinese è·å–ç›¸æœºé™€èºä»ªç‰ˆæœ¬ä¿¡æ¯, å‚è€ƒgyroVersion	  @~english get camera gyroscope version information,reference gyroVersion */
+ 
+	PROPERTY_EXT_SET_FAKE_MODE			= 0x904, /**< @~chinese è®¾ç½®çœŸå‡åˆ†è¾¨ç‡                @~english set fake mode */
+	PROPERTY_EXT_AUTO_EXPOSURE_MODE		= 0x912, /**< @~chinese æ·±åº¦ç›¸æœºè‡ªåŠ¨æ›å…‰æ¨¡å¼,å‚è€ƒAUTO_EXPOSURE_MODE         @~english auto exposure mode of depth cameraï¼Œreference AUTO_EXPOSURE_MODE*/
+	PROPERTY_EXT_DEPTH_ROI				= 0x913, /**< @~chinese æ·±åº¦æ•°æ®çš„ROI,å‚è€ƒDepthRoi            @~english roi of depth data,reference DepthRoi*/
+	PROPERTY_EXT_HDR_MODE				= 0x914, /**< @~chinese HDRæ¨¡å¼                       @~english HDR mode*/
+	PROPERTY_EXT_HDR_SCALE_SETTING		= 0x915, /**< @~chinese HDRè‡ªåŠ¨æ¨¡å¼çš„é…ç½®             @~english setting of auto-HDR*/
+	PROPERTY_EXT_HDR_EXPOSURE			= 0x916, /**< @~chinese HDRå„çº§å‚æ•°                   @~english all params of HDR*/
+	PRPOERTY_EXT_MAX_FRAMETIME_GAIN		= 0x917, /**< @~chinese æœ€å¤§å¸§æ—¶é—´å’Œå¢ç›Š,å‚è€ƒMaxFrameTimeGain              @~english set the max frame and gran,reference MaxFrameTimeGain*/
+	PROPERTY_EXT_LASER_BRIGHTNESS		= 0x920, /**< @~chinese æ¿€å…‰å™¨äº®åº¦                    @~english brightness level of laser*/
+	PROPERTY_EXT_LASER_ON_OFF			= 0x922, /**< @~chinese æ¿€å…‰å™¨å¼€/å…³                   @~english turn on/off laser*/
+	PROPERTY_EXT_SPEED					= 0x924, /**< @~chinese æ‹å›¾é€Ÿåº¦                      @~english speed of shot*/
 	
-	PROPERTY_EXT_SET_STREAM_RESOLUTION	= 0x702, /**< @~chinese ÉèÖÃ·Ö±æÂÊ,²Î¿¼StreamResolution                    @~english set resolution of depth stream£¬reference StreamResolution*/
-	PROPERTY_EXT_CONTRAST_MIN			= 0x705, /**< @~chinese ¶Ô±È¶ÈãĞÖµ£¬´ËãĞÖµÓÃÓÚÉ¾³ıÔ­Ê¼Í¼ÏñÖĞµÍÆØ¹âÇøÓò,½«É¾³ı»Ò¶ÈµÍÓÚ¸ÃãĞÖµµÄÇøÓò,ãĞÖµÔ½´óµÍÆØ¹âÇøÓòÉ¾³ıÔ½¶à.µ÷½Ú·¶Î§0~40»Ò½×,½¨ÒéÉèÖÃÎª5
+	PROPERTY_EXT_SET_STREAM_RESOLUTION	= 0x702, /**< @~chinese è®¾ç½®åˆ†è¾¨ç‡,å‚è€ƒStreamResolution                    @~english set resolution of depth streamï¼Œreference StreamResolution*/
+	PROPERTY_EXT_CONTRAST_MIN			= 0x705, /**< @~chinese å¯¹æ¯”åº¦é˜ˆå€¼ï¼Œæ­¤é˜ˆå€¼ç”¨äºåˆ é™¤åŸå§‹å›¾åƒä¸­ä½æ›å…‰åŒºåŸŸ,å°†åˆ é™¤ç°åº¦ä½äºè¯¥é˜ˆå€¼çš„åŒºåŸŸ,é˜ˆå€¼è¶Šå¤§ä½æ›å…‰åŒºåŸŸåˆ é™¤è¶Šå¤š.è°ƒèŠ‚èŒƒå›´0~40ç°é˜¶,å»ºè®®è®¾ç½®ä¸º5
                                                       @~english remove where fringe contrast below this value*/
-	PROPERTY_EXT_ALGO_SET_BACKGROUND	= 0x705, /**< @~chinese ±³¾°ãĞÖµ,·¶Î§[0-40],²Î¿¼algoSetBackground @~english background threshold,[0,40]£¬reference algoSetBackground*/
-	PROPERTY_EXT_DEPTH_RANGE			= 0x707, /**< @~chinese Éî¶È·¶Î§                      @~english depth range of camera*/
+	PROPERTY_EXT_ALGO_SET_BACKGROUND	= 0x705, /**< @~chinese èƒŒæ™¯é˜ˆå€¼,èŒƒå›´[0-40],å‚è€ƒalgoSetBackground @~english background threshold,[0,40]ï¼Œreference algoSetBackground*/
+	PROPERTY_EXT_DEPTH_RANGE			= 0x707, /**< @~chinese æ·±åº¦èŒƒå›´                      @~english depth range of camera*/
 	
 	PROPERTY_EXT_UNKNOWA00				= 0xa00, /**< @~chinese                 @~english */
-	PROPERTY_EXT_MULTIFRAME_FUSION		= 0xa04, /**< @~chinese ¶àÖ¡ÈÚºÏ(Ë«ÆØ¹â)£¬È¡Öµ0/1,²Î¿¼multiframeFusion                @~english multiframe fusion,reference multiframeFusion*/
-	PROPERTY_EXT_SET_FRINGE_PATTERN		= 0xa05, /**< @~chinese ÌõÎÆpattern²ÎÊı£¬²Î¿¼FRINGE_PATTERN_TYPE  @~english fringe pattern,reference FRINGE_PATTERN_TYPE*/
-	PROPERTY_EXT_LED_ON_OFF				= 0xb00, /**< @~chinese ÊÇ·ñ´ò¿ªLEDµÆ                 @~english turn on/off led*/
+	PROPERTY_EXT_MULTIFRAME_FUSION		= 0xa04, /**< @~chinese å¤šå¸§èåˆ(åŒæ›å…‰)ï¼Œå–å€¼0/1,å‚è€ƒmultiframeFusion                @~english multiframe fusion,reference multiframeFusion*/
+	PROPERTY_EXT_SET_FRINGE_PATTERN		= 0xa05, /**< @~chinese æ¡çº¹patternå‚æ•°ï¼Œå‚è€ƒFRINGE_PATTERN_TYPE  @~english fringe pattern,reference FRINGE_PATTERN_TYPE*/
+	PROPERTY_EXT_LED_ON_OFF				= 0xb00, /**< @~chinese æ˜¯å¦æ‰“å¼€LEDç¯                 @~english turn on/off led*/
+	PROPERTY_EXT_LED_CTRL				= 0xb01, /**< @~chinese LEDç¯æ§åˆ¶					  @~english led contrl*/
 	
 	
-	PROPERTY_EXT_TRIGGER_IN_MODE		= 0x106, /**< @~chinese ´¥·¢Ä£Ê½                      @~english trigger mode*/
+	PROPERTY_EXT_TRIGGER_IN_MODE		= 0x106, /**< @~chinese è§¦å‘æ¨¡å¼                      @~english trigger mode*/
 	
-	//²»¶ÔÍâÊôĞÔ
-	PROPERTY_EXT_EXECUTE_CMD			= 0xffff,/**< @~chinese Ö´ĞĞÈÎÒâÃüÁî*/
-	PROPERTY_EXT_SYS_CMD				= 0xaaaa,/**< @~chinese °´¹æ¶¨¸ñÊ½Ö´ĞĞÃüÁî,¾ßÌå²Î¿¼ÓÃÀı*/
-	PROPERTY_EXT_WRITE_READ_HID			= 0x1111,/**< @~chinese Ğ´²¢µÈ´ı¶ÁÈ¡hidÊı¾İ*/
+	//ä¸å¯¹å¤–å±æ€§
+	PROPERTY_EXT_EXECUTE_CMD			= 0xffff,/**< @~chinese æ‰§è¡Œä»»æ„å‘½ä»¤*/
+	PROPERTY_EXT_SYS_CMD				= 0xaaaa,/**< @~chinese æŒ‰è§„å®šæ ¼å¼æ‰§è¡Œå‘½ä»¤,å…·ä½“å‚è€ƒç”¨ä¾‹*/
+	PROPERTY_EXT_WRITE_READ_HID			= 0x1111,/**< @~chinese å†™å¹¶ç­‰å¾…è¯»å–hidæ•°æ®*/
 } PROPERTY_TYPE_EXTENSION;
 /// @}
 
 /**
 * @~chinese
-* @brief À©Õ¹ÊôĞÔÖµ£¬ÁªºÏÌå±íÊ¾£¬ÉèÖÃºÍ»ñÈ¡Ê±Ö»È¡Ö¸¶¨ÊôĞÔ¶ÔÓ¦µÄ×Ö¶Î¼´¿É
+* @brief æ‰©å±•å±æ€§å€¼ï¼Œè”åˆä½“è¡¨ç¤ºï¼Œè®¾ç½®å’Œè·å–æ—¶åªå–æŒ‡å®šå±æ€§å¯¹åº”çš„å­—æ®µå³å¯
 * @~english
 * @brief union of extensional property
 **/
 typedef union PropertyExtension
 {
-	float depthScale;							/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_DEPTH_SCALE			    @~english corresponding PROPERTY_EXT_DEPTH_SCALE			*/
-	TRIGGER_MODE triggerMode;					/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_TRIGGER_MODE			@~english corresponding PROPERTY_EXT_TRIGGER_MODE			*/
-	int algorithmContrast;						/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_CONTRAST_MIN			@~english corresponding PROPERTY_EXT_CONTRAST_MIN			*/
-	AUTO_EXPOSURE_MODE autoExposureMode;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_AUTO_EXPOSURE_MODE	    @~english corresponding PROPERTY_EXT_AUTO_EXPOSURE_MODE	*/
-	HdrScaleSetting hdrScaleSetting;			/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_HDR_SCALE_SETTING	    @~english corresponding PROPERTY_EXT_HDR_SCALE_SETTING	*/
-	HdrExposureSetting hdrExposureSetting;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_HDR_EXPOSURE			@~english corresponding PROPERTY_EXT_HDR_EXPOSURE			*/
-	int ledOnOff;								/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_LED_ON_OFF			@~english corresponding PROPERTY_EXT_LED_ON_OFF			*/
+	float depthScale;							/**< @~chinese å¯¹åº”PROPERTY_EXT_DEPTH_SCALE			    @~english corresponding PROPERTY_EXT_DEPTH_SCALE			*/
+	TRIGGER_MODE triggerMode;					/**< @~chinese å¯¹åº”PROPERTY_EXT_TRIGGER_MODE			@~english corresponding PROPERTY_EXT_TRIGGER_MODE			*/
+	int algorithmContrast;						/**< @~chinese å¯¹åº”PROPERTY_EXT_CONTRAST_MIN			@~english corresponding PROPERTY_EXT_CONTRAST_MIN			*/
+	AUTO_EXPOSURE_MODE autoExposureMode;		/**< @~chinese å¯¹åº”PROPERTY_EXT_AUTO_EXPOSURE_MODE	    @~english corresponding PROPERTY_EXT_AUTO_EXPOSURE_MODE	*/
+	HdrScaleSetting hdrScaleSetting;			/**< @~chinese å¯¹åº”PROPERTY_EXT_HDR_SCALE_SETTING	    @~english corresponding PROPERTY_EXT_HDR_SCALE_SETTING	*/
+	HdrExposureSetting hdrExposureSetting;		/**< @~chinese å¯¹åº”PROPERTY_EXT_HDR_EXPOSURE			@~english corresponding PROPERTY_EXT_HDR_EXPOSURE			*/
+	int ledOnOff;								/**< @~chinese å¯¹åº”PROPERTY_EXT_LED_ON_OFF			@~english corresponding PROPERTY_EXT_LED_ON_OFF			*/
 	
-	TRIGGER_MODE triggerInMode;					/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_TRIGGER_OUT_MODE		@~english corresponding PROPERTY_EXT_TRIGGER_OUT_MODE	 */
-	int triggerOutEnable;						/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_TRIGGER_IN_MODE		    @~english corresponding PROPERTY_EXT_TRIGGER_IN_MODE	 */
-	int laserBrightness;						/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_LASER_BRIGHTNESS		@~english corresponding PROPERTY_EXT_LASER_BRIGHTNESS	 */
-	int laserOnOff;								/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_LASER_ON_OFF			@~english corresponding PROPERTY_EXT_LASER_ON_OFF		 */
-	int speed;									/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_SPEED				    @~english corresponding PROPERTY_EXT_SPEED				 */
-	HdrBrightnessSetting hdrBrightnessSetting;	/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_HDR_BRIGHTNESS		    @~english corresponding PROPERTY_EXT_HDR_BRIGHTNESS		 */
+	TRIGGER_MODE triggerInMode;					/**< @~chinese å¯¹åº”PROPERTY_EXT_TRIGGER_OUT_MODE		@~english corresponding PROPERTY_EXT_TRIGGER_OUT_MODE	 */
+	int triggerOutEnable;						/**< @~chinese å¯¹åº”PROPERTY_EXT_TRIGGER_IN_MODE		    @~english corresponding PROPERTY_EXT_TRIGGER_IN_MODE	 */
+	int laserBrightness;						/**< @~chinese å¯¹åº”PROPERTY_EXT_LASER_BRIGHTNESS		@~english corresponding PROPERTY_EXT_LASER_BRIGHTNESS	 */
+	int laserOnOff;								/**< @~chinese å¯¹åº”PROPERTY_EXT_LASER_ON_OFF			@~english corresponding PROPERTY_EXT_LASER_ON_OFF		 */
+	int speed;									/**< @~chinese å¯¹åº”PROPERTY_EXT_SPEED				    @~english corresponding PROPERTY_EXT_SPEED				 */
+	HdrBrightnessSetting hdrBrightnessSetting;	/**< @~chinese å¯¹åº”PROPERTY_EXT_HDR_BRIGHTNESS		    @~english corresponding PROPERTY_EXT_HDR_BRIGHTNESS		 */
 
-	HDR_MODE hdrMode;							/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_HDR_MODE				@~english corresponding PROPERTY_EXT_HDR_MODE				*/
-	DepthRange depthRange;						/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_DEPTH_RANGE			    @~english corresponding PROPERTY_EXT_DEPTH_RANGE			*/
-	IpSetting ipSetting;						/**< @~chinese deprecated ¶ÔÓ¦PROPERTY_EXT_IP_SETTING	@~english deprecated corresponding PROPERTY_EXT_IP_SETTING*/
-    CameraIpSetting cameraIp;                         /**< @~chinese ¶ÔÓ¦PROPERTY_EXT_CAMERA_IP		    @~english corresponding PROPERTY_EXT_CAMERA_IP*/
-    NETWORK_COMPRESS_MODE networkCompressMode;	/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_NETWORK_COMPRESS		@~english corresponding PROPERTY_EXT_NETWORK_COMPRESS	*/
-	NetworkingInfo		networkingInfo;			/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_AP_NET_WORKING_INFO/PROPERTY_EXT_TERMINAL_NET_WORKING_INFO		@~english corresponding PROPERTY_EXT_AP_NET_WORKING_INFO/PROPERTY_EXT_TERMINAL_NET_WORKING_INFO	*/
-	bool				bFastScanMode;			/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_FAST_SCAN_MODE			@~english corresponding PROPERTY_EXT_FAST_SCAN_MODE	*/
-	bool				bHardSyncSwitch;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_HARDSYNCSWITCH			@~english corresponding PROPERTY_EXT_HARDSYNCSWITCH	*/
-	DepthRgbMatchParam	depthRgbMatchParam;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM	@~english corresponding PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM	*/
-	FRINGE_PATTERN_TYPE	fringePatternType;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_SET_FRINGE_PATTERN	@~english corresponding PROPERTY_EXT_SET_FRINGE_PATTERN	*/
-	int					algoSetBackground;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_ALGO_SET_BACKGROUND	@~english corresponding PROPERTY_EXT_ALGO_SET_BACKGROUND	*/
-	bool				multiframeFusion;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_MULTIFRAME_FUSION	@~english corresponding PROPERTY_EXT_MULTIFRAME_FUSION	*/
-	bool				bIsWifiHostMode;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_IS_WIFI_HOST_MODE	@~english corresponding PROPERTY_EXT_IS_WIFI_HOST_MODE	*/
-	MaxFrameTimeGain	maxFrameTimeGain;		/**< @~chinese ¶ÔÓ¦PRPOERTY_EXT_MAX_FRAMETIME_GAIN	@~english corresponding PRPOERTY_EXT_MAX_FRAMETIME_GAIN	*/
-	StreamResolution	streamResolution;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_SET_STREAM_RESOLUTION	@~english corresponding PROPERTY_EXT_SET_STREAM_RESOLUTION	*/
-	char acSerialNumber[60];					/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_SERIAL_NUMBER	@~english corresponding PROPERTY_EXT_SERIAL_NUMBER	*/
-	char acMac[60];								/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_MAC_ADDRESS	@~english corresponding PROPERTY_EXT_MAC_ADDRESS	*/
-	DepthRoi	depthRoi;						/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_DEPTH_ROI	@~english corresponding PROPERTY_EXT_DEPTH_ROI	*/
-	WriteReadHidData*	writeReadHidData;		/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_WRITE_READ_HID	@~english corresponding PROPERTY_EXT_WRITE_READ_HID	*/
-	PerspectiveTransformationMatrix	reconstructionMat; /**< @~chinese ¶ÔÓ¦PROPERTY_EXT_GET_RECONSTRUCTIONMAT	@~english corresponding PROPERTY_EXT_GET_RECONSTRUCTIONMAT	*/
+	HDR_MODE hdrMode;							/**< @~chinese å¯¹åº”PROPERTY_EXT_HDR_MODE				@~english corresponding PROPERTY_EXT_HDR_MODE				*/
+	DepthRange depthRange;						/**< @~chinese å¯¹åº”PROPERTY_EXT_DEPTH_RANGE			    @~english corresponding PROPERTY_EXT_DEPTH_RANGE			*/
+	IpSetting ipSetting;						/**< @~chinese deprecated å¯¹åº”PROPERTY_EXT_IP_SETTING	@~english deprecated corresponding PROPERTY_EXT_IP_SETTING*/
+    CameraIpSetting cameraIp;                         /**< @~chinese å¯¹åº”PROPERTY_EXT_CAMERA_IP		    @~english corresponding PROPERTY_EXT_CAMERA_IP*/
+    NETWORK_COMPRESS_MODE networkCompressMode;	/**< @~chinese å¯¹åº”PROPERTY_EXT_NETWORK_COMPRESS		@~english corresponding PROPERTY_EXT_NETWORK_COMPRESS	*/
+	NetworkingInfo		networkingInfo;			/**< @~chinese å¯¹åº”PROPERTY_EXT_AP_NET_WORKING_INFO/PROPERTY_EXT_TERMINAL_NET_WORKING_INFO		@~english corresponding PROPERTY_EXT_AP_NET_WORKING_INFO/PROPERTY_EXT_TERMINAL_NET_WORKING_INFO	*/
+	bool				bFastScanMode;			/**< @~chinese å¯¹åº”PROPERTY_EXT_FAST_SCAN_MODE			@~english corresponding PROPERTY_EXT_FAST_SCAN_MODE	*/
+	bool				bHardSyncSwitch;		/**< @~chinese å¯¹åº”PROPERTY_EXT_HARDSYNCSWITCH			@~english corresponding PROPERTY_EXT_HARDSYNCSWITCH	*/
+	DepthRgbMatchParam	depthRgbMatchParam;		/**< @~chinese å¯¹åº”PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM	@~english corresponding PROPERTY_EXT_DEPTH_RGB_MATCH_PARAM	*/
+	FRINGE_PATTERN_TYPE	fringePatternType;		/**< @~chinese å¯¹åº”PROPERTY_EXT_SET_FRINGE_PATTERN	@~english corresponding PROPERTY_EXT_SET_FRINGE_PATTERN	*/
+	int					algoSetBackground;		/**< @~chinese å¯¹åº”PROPERTY_EXT_ALGO_SET_BACKGROUND	@~english corresponding PROPERTY_EXT_ALGO_SET_BACKGROUND	*/
+	bool				multiframeFusion;		/**< @~chinese å¯¹åº”PROPERTY_EXT_MULTIFRAME_FUSION	@~english corresponding PROPERTY_EXT_MULTIFRAME_FUSION	*/
+	bool				bIsWifiHostMode;		/**< @~chinese å¯¹åº”PROPERTY_EXT_IS_WIFI_HOST_MODE	@~english corresponding PROPERTY_EXT_IS_WIFI_HOST_MODE	*/
+	MaxFrameTimeGain	maxFrameTimeGain;		/**< @~chinese å¯¹åº”PRPOERTY_EXT_MAX_FRAMETIME_GAIN	@~english corresponding PRPOERTY_EXT_MAX_FRAMETIME_GAIN	*/
+	StreamResolution	streamResolution;		/**< @~chinese å¯¹åº”PROPERTY_EXT_SET_STREAM_RESOLUTION	@~english corresponding PROPERTY_EXT_SET_STREAM_RESOLUTION	*/
+	char acSerialNumber[60];					/**< @~chinese å¯¹åº”PROPERTY_EXT_SERIAL_NUMBER	@~english corresponding PROPERTY_EXT_SERIAL_NUMBER	*/
+	char acMac[60];								/**< @~chinese å¯¹åº”PROPERTY_EXT_MAC_ADDRESS	@~english corresponding PROPERTY_EXT_MAC_ADDRESS	*/
+	DepthRoi	depthRoi;						/**< @~chinese å¯¹åº”PROPERTY_EXT_DEPTH_ROI	@~english corresponding PROPERTY_EXT_DEPTH_ROI	*/
+	WriteReadHidData*	writeReadHidData;		/**< @~chinese å¯¹åº”PROPERTY_EXT_WRITE_READ_HID	@~english corresponding PROPERTY_EXT_WRITE_READ_HID	*/
+	PerspectiveTransformationMatrix	reconstructionMat; /**< @~chinese å¯¹åº”PROPERTY_EXT_GET_RECONSTRUCTIONMAT	@~english corresponding PROPERTY_EXT_GET_RECONSTRUCTIONMAT	*/
 
-	unsigned int  uiExposureTime;	            /**< @~chinese ¶ÔÓ¦PROPERTY_EXT_EXPOSURE_TIME ÆØ¹âÊ±¼ä,µ¥Î»ºÁÃë  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME exposure time,unit ms*/
-	ValueRange objVRange_;						/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_EXPOSURE_TIME_RANGE ÆØ¹âÊ±¼ä·¶Î§,µ¥Î»ºÁÃë  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME_RANGE exposure time range,unit ms*/
-	unsigned int uiTempratrue_;					/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_CPU_TEMPRATRUE ÎÂ¶È,µ¥Î»ÉãÊÏ¶È  @~english corresponding PROPERTY_EXT_CPU_TEMPRATRUE exposure tempratrue,unit degree Celsius*/
+	unsigned int  uiExposureTime;	            /**< @~chinese å¯¹åº”PROPERTY_EXT_EXPOSURE_TIME_RGB æ›å…‰æ—¶é—´,å•ä½å¾®ç§’  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME exposure time,unit us*/
+	ValueRange objVRange_;						/**< @~chinese å¯¹åº”PROPERTY_EXT_EXPOSURE_TIME_RANGE_RGB æ›å…‰æ—¶é—´èŒƒå›´,å•ä½å¾®ç§’  @~english corresponding PROPERTY_EXT_EXPOSURE_TIME_RANGE exposure time range,unit us*/
+	unsigned int uiTempratrue_;					/**< @~chinese å¯¹åº”PROPERTY_EXT_CPU_TEMPRATRUE æ¸©åº¦,å•ä½æ‘„æ°åº¦  @~english corresponding PROPERTY_EXT_CPU_TEMPRATRUE exposure tempratrue,unit degree Celsius*/
 
-	bool boolCameraState;						/**< @~chinese ¶ÔÓ¦PROPERTY_EXT_GET_CAMERA_STATE Ïà»úµ±Ç°Á¬½Ó×´Ì¬  @~english Camera current connect state*/
+	bool boolCameraState;						/**< @~chinese å¯¹åº”PROPERTY_EXT_GET_CAMERA_STATE ç›¸æœºå½“å‰è¿æ¥çŠ¶æ€  @~english Camera current connect state*/
 
-	char reservedStr[60];                       /**< @~chinese Ô¤Áô									    @~english reserved */
-    int reserved[15];							/**< @~chinese Ô¤Áô									    @~english reserved */
+	bool bSupportGyro;                          /**< @~chinese å¯¹åº”PROPERTY_EXT_IS_SUPPORT_GYRO   @~english corresponding PROPERTY_EXT_IS_SUPPORT_GYRO */
+	unsigned short gyroVersion;                 /**< @~chinese å¯¹åº”PROPERTY_EXT_GET_GYRO_VERSION  @~english corresponding PROPERTY_EXT_GET_GYRO_VERSION */
+	
+	LedCtrlParam ledCtrlParam;					/**< @~chinese å¯¹åº”PROPERTY_EXT_LED_CTRL  @~english corresponding PROPERTY_EXT_LED_CTRL */
+
+
+	char reservedStr[60];                       /**< @~chinese é¢„ç•™									    @~english reserved */
+    int reserved[15];							/**< @~chinese é¢„ç•™									    @~english reserved */
 }PropertyExtension;		
+
+#define KEY_INFO_RESERVED_LEN	2
 
 #pragma pack(push, 1)
 /**
 * @~chinese
-* @brief °´¼üĞÅÏ¢
+* @brief æŒ‰é”®ä¿¡æ¯
 * @~english
 * @brief key information
 **/
 typedef struct KeyInfo {
     char   key_num;
 	char   key_level;	//KEY_EVENT_DOWN = 0,KEY_EVENT_UP = 1
-	char   reserved[2];	//reserved fot 2 bytes
-    int   key_time;		//°´¼üÊ±¼ä£¬ÌØ±ğËµÃ÷£ºÉè±¸ÉÏµçµ½µÚÒ»´Î°´¼üÖµÒ»Ö±Îª0
+	char   reserved[KEY_INFO_RESERVED_LEN];	//reserved fot 2 bytes
+    int   key_time;		//æŒ‰é”®æ—¶é—´ï¼Œç‰¹åˆ«è¯´æ˜ï¼šè®¾å¤‡ä¸Šç”µåˆ°ç¬¬ä¸€æ¬¡æŒ‰é”®å€¼ä¸€ç›´ä¸º0
 }KeyInfo;
 
 /**
 * @~chinese
-* @brief	ÍÓÂİÒÇÎ»ÖÃºÍÎ»×Ë
+* @brief	é™€èºä»ªä½ç½®å’Œä½å§¿
 * @~english
 * @brief position and pose of gyro
 */
+/*
 typedef struct GyroPositionAndPose_tag
 {
 	float	x;
@@ -674,69 +763,91 @@ typedef struct GyroPositionAndPose_tag
 	float	pitch;
 	float	yaw;
 }GyroPositionAndPose;
+*/
+typedef struct GyroPositionAndPose_tag
+{	
+	float q0; // w					/**< (q0,q1,q2,q3)->(w,x,y,z): @~chinese é™€èºä»ªå§¿æ€ï¼Œä½¿ç”¨å››å…ƒç´ è¡¨ç¤º  @~english pose of gyroï¼ŒUse four elements to represent */
+	float q1; // x
+	float q2; // y
+	float q3; // z
+	float gx;						/**< @~chinese é™€èºä»ªç»•Xè½´è½¬åŠ¨è§’é€Ÿåº¦ï¼Œå•ä½ä¸ºï¼šradian/second   @~english  Gyroscope rotates angular velocity around the X axis, unit: radian/second */
+	float gy;						/**< @~chinese  é™€èºä»ªç»•Yè½´è½¬åŠ¨è§’é€Ÿåº¦ï¼Œå•ä½ä¸ºï¼šradian/second   @~english  Gyroscope rotates angular velocity around the Y axis, unit: radian/second */
+	float gz;						/**< @~chinese  é™€èºä»ªç»•Zè½´è½¬åŠ¨è§’é€Ÿåº¦ï¼Œå•ä½ä¸ºï¼šradian/second  @~english  Gyroscope rotates angular velocity around the Z axis, unit: radian/second */
+	float ax;						/**< @~chinese  é™€èºä»ªXæ–¹å‘åŠ é€Ÿåº¦ï¼Œå•ä½ä¸ºï¼šg  @~english  Acceleration in the X direction of the gyroscope, unit: g */
+	float ay;						/**< @~chinese  é™€èºä»ªYæ–¹å‘åŠ é€Ÿåº¦ï¼Œå•ä½ä¸ºï¼šg  @~english  Acceleration in the Y direction of the gyroscope, unit: g */
+	float az;						/**< @~chinese  é™€èºä»ªZæ–¹å‘åŠ é€Ÿåº¦ï¼Œå•ä½ä¸ºï¼šg  @~english  Acceleration in the Z direction of the gyroscope, unit: g */
+	float mx;						/**< @~chinese  é™€èºä»ªXæ–¹å‘ç£åœºï¼Œå•ä½ä¸ºï¼šuT  @~english  The magnetic field in the X direction of the gyroscope, unit: uT */
+	float my;						/**< @~chinese  é™€èºä»ªYæ–¹å‘ç£åœºï¼Œå•ä½ä¸ºï¼šuT  @~english  The magnetic field in the Y direction of the gyroscope, unit: uT */
+	float mz;						/**< @~chinese  é™€èºä»ªZæ–¹å‘ç£åœºï¼Œå•ä½ä¸ºï¼šuT  @~english  The magnetic field in the Z direction of the gyroscope, unit: uT */
+	float score;					/**< @~chinese  è¿åŠ¨åˆ†æ•°ï¼ŒèŒƒå›´ä¸ºï¼š[0-1], æ•°å€¼è¶Šå¤§è¶Šç¨³å®š  @~english  Sports score, the range is: [0-1], the larger the value, the more stable */
+}GyroPositionAndPose;
 
+#define ADDITION_RESERVED_LEN	8
+#define ADDITION_RESERVED_LEN2	4
 
 typedef struct AdditionData
 {
-    char    reserved[8];
+    char    reserved[ADDITION_RESERVED_LEN];
     KeyInfo keyInfo;
-    char    reserved2[4];
+    char    reserved2[ADDITION_RESERVED_LEN2];
     int     timestamp;
 	GyroPositionAndPose	gyroPosAndPos;
 }AdditionData;
 
+#define EXTRA_INFO_RESERVED_LEN	24
+
 /**
 * @~chinese
-* @brief Ö¡µÄ¸½¼ÓÊı¾İ
+* @brief å¸§çš„é™„åŠ æ•°æ®
 * @~english
 * @brief extra information of frame
 **/
 typedef union ExtraInfo
 {
     AdditionData addition;
-    char reserved[24];
+    char reserved[EXTRA_INFO_RESERVED_LEN];
 }ExtraInfo;
 #pragma pack(pop)
 
 /**
 * @~chinese
-* @brief Á÷ĞÅÏ¢×éºÏ£¬ÓÃÓÚ´ò¿ªÁ÷Ê±Ê¹ÓÃ£¬¿ÉÍ¨¹ıICamera::getStreamInfos»ñµÃ
+* @brief æµä¿¡æ¯ç»„åˆï¼Œç”¨äºæ‰“å¼€æµæ—¶ä½¿ç”¨ï¼Œå¯é€šè¿‡ICamera::getStreamInfosè·å¾—
 * @~english
 * @brief stream information, returned by ICamera::getStreamInfos
 **/
 typedef struct StreamInfo
 {
-	STREAM_FORMAT format;	/**< @~chinese Á÷ĞÅÏ¢         @~english stream format*/ 
-	int width;				/**< @~chinese ¿í¶È           @~english stream width*/
-	int height;				/**< @~chinese ¸ß¶È           @~english stream height*/
-	float fps;				/**< @~chinese Ö¡ÂÊ           @~english stream framerate*/
+	STREAM_FORMAT format;	/**< @~chinese æµä¿¡æ¯         @~english stream format*/ 
+	int width;				/**< @~chinese å®½åº¦           @~english stream width*/
+	int height;				/**< @~chinese é«˜åº¦           @~english stream height*/
+	float fps;				/**< @~chinese å¸§ç‡           @~english stream framerate*/
 }StreamInfo;
 
 /**
 * @~chinese
-* @brief Ïà»úĞÅÏ¢£¬¿ÉÍ¨¹ıICamera::getInfo»òISystem::queryCameras»ñµÃ
+* @brief ç›¸æœºä¿¡æ¯ï¼Œå¯é€šè¿‡ICamera::getInfoæˆ–ISystem::queryCamerasè·å¾—
 * @~english
 * @brief camera informations, returned by ICamera::getStreamInfos or ISystem::queryCameras
 **/
 typedef struct CameraInfo
 {
-	char name[32];					/**< @~chinese Ïà»úÀàĞÍ         @~english type of camera*/ 
-	char serial[CAMERA_SERIAL_MAX];				/**< @~chinese ĞòÁĞºÅ           @~english serial number of camera*/
-	char uniqueId[32];				/**< @~chinese Ïà»ú±êÊ¶         @~english unique Id of camera*/
-	char firmwareVersion[FIRMWARE_VERSION_MAX];		/**< @~chinese ¹Ì¼ş°æ±¾         @~english version of firmware*/
-	char algorithmVersion[ALGORITHM_VERSION_MAX];		/**< @~chinese Ëã·¨°æ±¾         @~english version of algorithm*/
+	char name[32];					/**< @~chinese ç›¸æœºç±»å‹         @~english type of camera*/ 
+	char serial[CAMERA_SERIAL_MAX];				/**< @~chinese åºåˆ—å·           @~english serial number of camera*/
+	char uniqueId[32];				/**< @~chinese ç›¸æœºæ ‡è¯†         @~english unique Id of camera*/
+	char firmwareVersion[FIRMWARE_VERSION_MAX];		/**< @~chinese å›ºä»¶ç‰ˆæœ¬         @~english version of firmware*/
+	char algorithmVersion[ALGORITHM_VERSION_MAX];		/**< @~chinese ç®—æ³•ç‰ˆæœ¬         @~english version of algorithm*/
 }CameraInfo;
 
 /**
 * @~chinese
-* @brief Ïà»úÄÚ²Î
+* @brief ç›¸æœºå†…å‚
 * @~english
 * @brief Intrinsics of depth camera or RGB camera
 **/
 typedef struct Intrinsics
 {
-	short width;	/**< @~chinese ±ê¶¨·Ö±æÂÊ-¿í¶È		@~english calibration resolution-width*/ 
-	short height;	/**< @~chinese ±ê¶¨·Ö±æÂÊ-¸ß¶È		@~english calibration resolution-height*/ 
+	short width;	/**< @~chinese æ ‡å®šåˆ†è¾¨ç‡-å®½åº¦		@~english calibration resolution-width*/ 
+	short height;	/**< @~chinese æ ‡å®šåˆ†è¾¨ç‡-é«˜åº¦		@~english calibration resolution-height*/ 
 	float fx;
 	float zero01;
 	float cx;
@@ -750,19 +861,22 @@ typedef struct Intrinsics
 
 /**
 * @~chinese
-* @brief Éî¶ÈÏà»úµ½RGBÏà»ú¼äµÄĞı×ªÆ½ÒÆĞÅÏ¢
+* @brief æ·±åº¦ç›¸æœºåˆ°RGBç›¸æœºé—´çš„æ—‹è½¬å¹³ç§»ä¿¡æ¯
 * @~english
 * @brief Rotation and translation offrom depth camera to RGB camera
 **/
 typedef struct Extrinsics
 {
-	float rotation[9];                           /**<@~chinese 3x3Ğı×ª¾ØÕó      @~english column-major 3x3 rotation matrix */
-	float translation[3];                        /**<@~chinese 3ÔªËØµÄÆ½ÒÆ¾ØÕó  @~english three-element translation vector */
+	float rotation[9];                           /**<@~chinese 3x3æ—‹è½¬çŸ©é˜µ      @~english column-major 3x3 rotation matrix */
+	float translation[3];                        /**<@~chinese 3å…ƒç´ çš„å¹³ç§»çŸ©é˜µ  @~english three-element translation vector */
 }Extrinsics;
+
+//ç•¸å˜å‚æ•°ä¸ªæ•°
+#define DISTORT_PARAM_CNT	5
 
 /**
 * @~chinese
-* @brief Éî¶ÈÏà»ú»òRGBÏà»ú»û±ä²ÎÊı
+* @brief æ·±åº¦ç›¸æœºæˆ–RGBç›¸æœºç•¸å˜å‚æ•°
 * @~english
 * @brief Distort of depth camera or RGB camera
 **/
@@ -785,7 +899,7 @@ typedef struct Distort
 namespace cs {
 	/**
 	* @~chinese
-	* @brief ¶şÎ¬µã×ø±ê
+	* @brief äºŒç»´ç‚¹åæ ‡
 	* @~english
 	* @brief 2D point coordinates
 	**/
@@ -799,7 +913,7 @@ namespace cs {
 #endif
 	/**
 	* @~chinese
-	* @brief ÈıÎ¬µã×ø±ê
+	* @brief ä¸‰ç»´ç‚¹åæ ‡
 	* @~english
 	* @brief 3D point coordinates
 	**/

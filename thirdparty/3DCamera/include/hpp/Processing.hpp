@@ -40,8 +40,8 @@ namespace cs
     }int3;
 /**
 * @~chinese
-* \defgroup Process Éî¶ÈÍ¼ºó´¦Àí
-* @brief Éî¶ÈÍ¼ºó´¦Àí½Ó¿Ú
+* \defgroup Process æ·±åº¦å›¾åå¤„ç†
+* @brief æ·±åº¦å›¾åå¤„ç†æ¥å£
 * @{
 * @~english
 * \defgroup Process Depth map's common operation
@@ -51,7 +51,7 @@ namespace cs
 
 	/*!\class Pointcloud
 	* @~chinese
-	* @brief µãÔÆÀà
+	* @brief ç‚¹äº‘ç±»
 	* @~english 
 	* @brief Pointcloud class 
 	**/
@@ -63,17 +63,17 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief ½«Éî¶ÈÍ¼¼ÆËãÎªµãÔÆ
-		* @param[in] depthMap			Éî¶ÈÍ¼µØÖ·
-		* @param[in] width				Éî¶ÈÍ¼¿í¶È
-		* @param[in] height				Éî¶ÈÍ¼¸ß¶È
-		* @param[in] depthScale			Éî¶ÈÊı¾İµÄËõ·ÅÏµÊı,Í¨¹ıICamera::getPropertyExtension(PROPERTY_EXT_DEPTH_SCALE, ...)»ñµÃ
-		* @param[in] intrinsicsDepth	Éî¶ÈÁ÷µÄÄÚ²Î, Í¨¹ıICamera::getIntrinsic(STREAM_TYPE_DEPTH, ...)»ñµÃ
-		* @param[in] intrinsicsRgb		RGBÁ÷ÄÚ²Î,Í¨¹ıICamera::getIntrinsics(STREAM_TYPE_RGB, ...)»ñµÃ£¬
-		* @								Èç¹û²»´øÎÆÀíÔò´«Èënullptr
-		* @param[in] extrinsics			Éî¶ÈÁ÷µ½RGBÁ÷µÄĞı×ªÆ½ÒÆ¾ØÕó, Í¨¹ıICamera::getExtrinsics»ñµÃ
-		*								Èç¹û²»´øÎÆÀíÔò´«Èënullptr
-		* @param[in] removeInvalid		true: ÒÆ³ıÎŞĞ§µã, false: ½«ÎŞĞ§µãÉèÖÃÎª(0,0,0)
+		* @brief å°†æ·±åº¦å›¾è®¡ç®—ä¸ºç‚¹äº‘
+		* @param[in] depthMap			æ·±åº¦å›¾åœ°å€
+		* @param[in] width				æ·±åº¦å›¾å®½åº¦
+		* @param[in] height				æ·±åº¦å›¾é«˜åº¦
+		* @param[in] depthScale			æ·±åº¦æ•°æ®çš„ç¼©æ”¾ç³»æ•°,é€šè¿‡ICamera::getPropertyExtension(PROPERTY_EXT_DEPTH_SCALE, ...)è·å¾—
+		* @param[in] intrinsicsDepth	æ·±åº¦æµçš„å†…å‚, é€šè¿‡ICamera::getIntrinsic(STREAM_TYPE_DEPTH, ...)è·å¾—
+		* @param[in] intrinsicsRgb		RGBæµå†…å‚,é€šè¿‡ICamera::getIntrinsics(STREAM_TYPE_RGB, ...)è·å¾—ï¼Œ
+		* @								å¦‚æœä¸å¸¦çº¹ç†åˆ™ä¼ å…¥nullptr
+		* @param[in] extrinsics			æ·±åº¦æµåˆ°RGBæµçš„æ—‹è½¬å¹³ç§»çŸ©é˜µ, é€šè¿‡ICamera::getExtrinsicsè·å¾—
+		*								å¦‚æœä¸å¸¦çº¹ç†åˆ™ä¼ å…¥nullptr
+		* @param[in] removeInvalid		true: ç§»é™¤æ— æ•ˆç‚¹, false: å°†æ— æ•ˆç‚¹è®¾ç½®ä¸º(0,0,0)
 		* @~english
 		* @brief Calculate pointcloud from depth map
 		* @param[in] depthMap			The address of the depth map
@@ -135,19 +135,19 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief Éú³ÉrgbÍ¼Ïñ£¨×ª»»µ½Éî¶ÈÍ¼´óĞ¡£©Î»ÖÃµ½Éî¶ÈÍ¼Î»ÖÃµÄÓ³Éä±í
-		* @		 ±ØĞëÏÈµ÷ÓÃgeneratePoints£¬´«ÈërgbÏà»úµÄ²ÎÊı£¬ÇÒremoveInvalidÉèÖÃÎªfalseÉú³ÉÎÆÀí×ø±ê£¬·ñÔò·µ»ØÊ§°Ü
-		* @param[in]  depthWidth		Éî¶ÈÍ¼¿í¶È
-		* @param[in]  depthHeight		Éî¶ÈÍ¼¸ß¶È
-		* @param[out] rgbToDepth		Êä³öÓ³Éä±í
-		* @return     ³É¹¦:true, Ê§°Ü:false
+		* @brief ç”Ÿæˆrgbå›¾åƒï¼ˆè½¬æ¢åˆ°æ·±åº¦å›¾å¤§å°ï¼‰ä½ç½®åˆ°æ·±åº¦å›¾ä½ç½®çš„æ˜ å°„è¡¨
+		* @		 å¿…é¡»å…ˆè°ƒç”¨generatePointsï¼Œä¼ å…¥rgbç›¸æœºçš„å‚æ•°ï¼Œä¸”removeInvalidè®¾ç½®ä¸ºfalseç”Ÿæˆçº¹ç†åæ ‡ï¼Œå¦åˆ™è¿”å›å¤±è´¥
+		* @param[in]  depthWidth		æ·±åº¦å›¾å®½åº¦
+		* @param[in]  depthHeight		æ·±åº¦å›¾é«˜åº¦
+		* @param[out] rgbToDepth		è¾“å‡ºæ˜ å°„è¡¨
+		* @return     æˆåŠŸ:true, å¤±è´¥:false
 		* @~english
 		* @brief Generate a map of RGB image (converted to depth map size) coords to depth map coords
 		* @		 You must call generatePoints and pass in rgb parameters, and removeInvalid is set to false to generate texture coordinates, otherwise false is returned
 		* @param[in]  depthWidth		The width of the depth map
 		* @param[in]  depthHeight		The height of the depth map
 		* @param[out] rgbToDepth		output the map rgb coord to depth coord
-		* @return     ³É¹¦:true, Ê§°Ü:false
+		* @return     æˆåŠŸ:true, å¤±è´¥:false
 		*/
 		bool generateTextureToDepthMap(int depthWidth, int depthHeight, std::map<int, int> &rgbToDepth)
 		{
@@ -168,18 +168,18 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief ¼ÆËãrgb×ø±ê¶ÔÓ¦µÄÉî¶ÈÍ¼×ø±ê
-		* @		 ±ØĞëÏÈµ÷ÓÃgenerateTextureToDepthMapÉú³Émap±í
-		* @param[in]  rgbToDepth		Ó³Éä±í
-		* @param[in]  rgbX				rgbÍ¼X×ø±ê
-		* @param[in]  rgbY				rgbÍ¼Y×ø±ê
-		* @param[in]  rgbWidth			rgbÍ¼¿í¶È
-		* @param[in]  rgbHeight			rgbÍ¼¸ß¶È
-		* @param[in]  depthWidth		Éî¶ÈÍ¼¿í¶È
-		* @param[in]  depthHeight		Éî¶ÈÍ¼¸ß¶È
-		* @param[out] depthX			Êä³öÉî¶ÈÍ¼X×ø±ê
-		* @param[out] depthY			Êä³öÉî¶ÈÍ¼Y×ø±ê
-		* @return     ³É¹¦:true, Ê§°Ü:false
+		* @brief è®¡ç®—rgbåæ ‡å¯¹åº”çš„æ·±åº¦å›¾åæ ‡
+		* @		 å¿…é¡»å…ˆè°ƒç”¨generateTextureToDepthMapç”Ÿæˆmapè¡¨
+		* @param[in]  rgbToDepth		æ˜ å°„è¡¨
+		* @param[in]  rgbX				rgbå›¾Xåæ ‡
+		* @param[in]  rgbY				rgbå›¾Yåæ ‡
+		* @param[in]  rgbWidth			rgbå›¾å®½åº¦
+		* @param[in]  rgbHeight			rgbå›¾é«˜åº¦
+		* @param[in]  depthWidth		æ·±åº¦å›¾å®½åº¦
+		* @param[in]  depthHeight		æ·±åº¦å›¾é«˜åº¦
+		* @param[out] depthX			è¾“å‡ºæ·±åº¦å›¾Xåæ ‡
+		* @param[out] depthY			è¾“å‡ºæ·±åº¦å›¾Yåæ ‡
+		* @return     æˆåŠŸ:true, å¤±è´¥:false
 		* @~english
 		* @brief Calculate the depth map coordinates corresponding to the RGB coordinates
 		* @		 You must call generateTextureToDepthMap to generate map first
@@ -192,7 +192,7 @@ namespace cs
 		* @param[in]  depthHeight		The height of the depth map
 		* @param[out] depthX			Output the x-coordinates of depth map
 		* @param[out] depthY			Output the y-coordinates of depth map
-		* @return    ³É¹¦:true, Ê§°Ü:false
+		* @return    æˆåŠŸ:true, å¤±è´¥:false
 		*/
 		bool getDepthCoordFromMap(std::map<int, int> &rgbToDepth, int rgbX, int rgbY, int rgbWidth, int rgbHeight,
 			int depthWidth, int depthHeight, int &depthX, int &depthY)
@@ -237,15 +237,15 @@ namespace cs
 	
 		/**
 		* @~chinese
-		* @brief ½«Éî¶ÈÍ¼+¹âµ¶ÖĞĞÄÍ¼µÄÊı¾İ×ª»»ÎªµãÔÆ
-		* @param[in] data				Êı¾İÆğÊ¼µØÖ·
-		* @param[in] width				Éî¶ÈÍ¼¿í¶È
-		* @param[in] height				Éî¶ÈÍ¼¸ß¶È
-		* @param[in] intrinsicsDepth	Éî¶ÈÁ÷µÄÄÚ²Î, Í¨¹ıICamera::getIntrinsic(STREAM_TYPE_DEPTH, ...)»ñµÃ
-		* @param[in] intrinsicsRgb		RGBÁ÷ÄÚ²Î,Í¨¹ıICamera::getIntrinsics(STREAM_TYPE_RGB, ...)»ñµÃ£¬
-		* @								Èç¹û²»´øÎÆÀíÔò´«Èënullptr
-		* @param[in] extrinsics			Éî¶ÈÁ÷µ½RGBÁ÷µÄĞı×ªÆ½ÒÆ¾ØÕó, Í¨¹ıICamera::getExtrinsics»ñµÃ
-		*								Èç¹û²»´øÎÆÀíÔò´«Èënullptr
+		* @brief å°†æ·±åº¦å›¾+å…‰åˆ€ä¸­å¿ƒå›¾çš„æ•°æ®è½¬æ¢ä¸ºç‚¹äº‘
+		* @param[in] data				æ•°æ®èµ·å§‹åœ°å€
+		* @param[in] width				æ·±åº¦å›¾å®½åº¦
+		* @param[in] height				æ·±åº¦å›¾é«˜åº¦
+		* @param[in] intrinsicsDepth	æ·±åº¦æµçš„å†…å‚, é€šè¿‡ICamera::getIntrinsic(STREAM_TYPE_DEPTH, ...)è·å¾—
+		* @param[in] intrinsicsRgb		RGBæµå†…å‚,é€šè¿‡ICamera::getIntrinsics(STREAM_TYPE_RGB, ...)è·å¾—ï¼Œ
+		* @								å¦‚æœä¸å¸¦çº¹ç†åˆ™ä¼ å…¥nullptr
+		* @param[in] extrinsics			æ·±åº¦æµåˆ°RGBæµçš„æ—‹è½¬å¹³ç§»çŸ©é˜µ, é€šè¿‡ICamera::getExtrinsicsè·å¾—
+		*								å¦‚æœä¸å¸¦çº¹ç†åˆ™ä¼ å…¥nullptr
 		* @~english
 		* @brief Calculate pointcloud from depth map and x-offset map of laser
 		* @param[in] data				The address of data
@@ -317,18 +317,18 @@ namespace cs
 		}
 		
 		/**
-		* @~chinese ½«STREAM_FORMAT_XZ32¸ñÊ½Êä³öµÄÖ¡Êı¾İ×ª»»ÎªµãÔÆ
-		* \param[in] data				Êı¾İÖ¸Õë
-		* \param[in] width				Ô­Ê¼Í¼Ïñ¿í¶È
+		* @~chinese å°†STREAM_FORMAT_XZ32æ ¼å¼è¾“å‡ºçš„å¸§æ•°æ®è½¬æ¢ä¸ºç‚¹äº‘
+		* \param[in] data				æ•°æ®æŒ‡é’ˆ
+		* \param[in] width				åŸå§‹å›¾åƒå®½åº¦
 		* @~english
 		* @brief Convert frame data which format is STREAM_FORMAT_XZ32 to point cloud
 		* \param[in] data				The address of data
 		* \param[in] width				The width of image
 		**/
         /**
-        * @~chinese ½«STREAM_FORMAT_XZ32¸ñÊ½Êä³öµÄÖ¡Êı¾İ×ª»»ÎªµãÔÆ
-        * \param[in] data				Êı¾İÖ¸Õë
-        * \param[in] width				Ô­Ê¼Í¼Ïñ¿í¶È
+        * @~chinese å°†STREAM_FORMAT_XZ32æ ¼å¼è¾“å‡ºçš„å¸§æ•°æ®è½¬æ¢ä¸ºç‚¹äº‘
+        * \param[in] data				æ•°æ®æŒ‡é’ˆ
+        * \param[in] width				åŸå§‹å›¾åƒå®½åº¦
         * @~english
         * @brief Convert frame data which format is STREAM_FORMAT_XZ32 to point cloud
         * \param[in] data				The address of data
@@ -363,20 +363,20 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief ¼ÆËãÉî¶ÈÍ¼ÉÏµÄÒ»¸öµã
-		* @param[out] vertex			·µ»Ø¶¥µã×ø±ê
-		* @param[out] textureCoord		·µ»ØRGBÍ¼ÏñµÄÓ³Éä×ø±ê(ÒÑ¹éÒ»»¯ÖÁ0~1.f)£¬³ËÒÔRGBÍ¼ÏñµÄ·Ö±æÂÊ¼´¿ÉµÃµ½¾ø¶Ô×ø±êÖµ
-		* @param[in] u					Éî¶ÈÍ¼ÉÏµÄÁĞ×ø±ê
-		* @param[in] v					Éî¶ÈÍ¼ÉÏµÄĞĞ×ø±ê
-		* @param[in] depth				Éî¶ÈÍ¼Êı¾İÖ¸Õë
-		* @param[in] width				Éî¶ÈÍ¼¿í¶È
-		* @param[in] height				Éî¶ÈÍ¼¸ß¶È
-		* @param[in] depthScale			Éî¶ÈÍ¼Ò»¸öµ¥Î»±íÊ¾µÄÎïÀí³¤¶È£¨µ¥Î»ºÁÃ×£©
-		* @param[in] intrinsicsDepth	Éî¶ÈÁ÷µÄÄÚ²Î, Í¨¹ıICamera::getIntrinsic(STREAM_TYPE_DEPTH, ...)»ñµÃ
-		* @param[in] intrinsicsRgb		RGBÁ÷ÄÚ²Î,Í¨¹ıICamera::getIntrinsics(STREAM_TYPE_RGB, ...)»ñµÃ£¬
-		* @								Èç¹û²»´øÎÆÀíÔò´«Èënullptr
-		* @param[in] extrinsics			Éî¶ÈÁ÷µ½RGBÁ÷µÄĞı×ªÆ½ÒÆ¾ØÕó, Í¨¹ıgetExtrinsics»ñµÃ
-		*								Èç¹û²»´øÎÆÀíÔò´«Èënullptr
+		* @brief è®¡ç®—æ·±åº¦å›¾ä¸Šçš„ä¸€ä¸ªç‚¹
+		* @param[out] vertex			è¿”å›é¡¶ç‚¹åæ ‡
+		* @param[out] textureCoord		è¿”å›RGBå›¾åƒçš„æ˜ å°„åæ ‡(å·²å½’ä¸€åŒ–è‡³0~1.f)ï¼Œä¹˜ä»¥RGBå›¾åƒçš„åˆ†è¾¨ç‡å³å¯å¾—åˆ°ç»å¯¹åæ ‡å€¼
+		* @param[in] u					æ·±åº¦å›¾ä¸Šçš„åˆ—åæ ‡
+		* @param[in] v					æ·±åº¦å›¾ä¸Šçš„è¡Œåæ ‡
+		* @param[in] depth				æ·±åº¦å›¾æ•°æ®æŒ‡é’ˆ
+		* @param[in] width				æ·±åº¦å›¾å®½åº¦
+		* @param[in] height				æ·±åº¦å›¾é«˜åº¦
+		* @param[in] depthScale			æ·±åº¦å›¾ä¸€ä¸ªå•ä½è¡¨ç¤ºçš„ç‰©ç†é•¿åº¦ï¼ˆå•ä½æ¯«ç±³ï¼‰
+		* @param[in] intrinsicsDepth	æ·±åº¦æµçš„å†…å‚, é€šè¿‡ICamera::getIntrinsic(STREAM_TYPE_DEPTH, ...)è·å¾—
+		* @param[in] intrinsicsRgb		RGBæµå†…å‚,é€šè¿‡ICamera::getIntrinsics(STREAM_TYPE_RGB, ...)è·å¾—ï¼Œ
+		* @								å¦‚æœä¸å¸¦çº¹ç†åˆ™ä¼ å…¥nullptr
+		* @param[in] extrinsics			æ·±åº¦æµåˆ°RGBæµçš„æ—‹è½¬å¹³ç§»çŸ©é˜µ, é€šè¿‡getExtrinsicsè·å¾—
+		*								å¦‚æœä¸å¸¦çº¹ç†åˆ™ä¼ å…¥nullptr
 		* @~english
 		* @brief Calculate one point
 		* @param[out] vertex			return coordinate of point
@@ -437,12 +437,12 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief ½«µãÔÆÊı¾İµ¼³öµ½ÎÄ¼ş
-		* @param[in] filename			±£´æÎÄ¼şÃû
-		* @param[in] texture			RGBÍ¼ÏñµÄµØÖ·£¬Èç¹û²»´øÑÕÉ«Ôò´«Èë¿Õ
-		* @param[in] textureWidth		RGBÍ¼ÏñµÄ¿í¶È
-		* @param[in] textureHeight		RGBÍ¼ÏñµÄ¸ß¶È
-		* @param[in] binary				Êı¾İ¸ñÊ½, ¶ş½øÖÆ/ÎÄ±¾
+		* @brief å°†ç‚¹äº‘æ•°æ®å¯¼å‡ºåˆ°æ–‡ä»¶
+		* @param[in] filename			ä¿å­˜æ–‡ä»¶å
+		* @param[in] texture			RGBå›¾åƒçš„åœ°å€ï¼Œå¦‚æœä¸å¸¦é¢œè‰²åˆ™ä¼ å…¥ç©º
+		* @param[in] textureWidth		RGBå›¾åƒçš„å®½åº¦
+		* @param[in] textureHeight		RGBå›¾åƒçš„é«˜åº¦
+		* @param[in] binary				æ•°æ®æ ¼å¼, äºŒè¿›åˆ¶/æ–‡æœ¬
 		* @~english
 		* @brief Export pointcloud to file
 		* @param[in] filename			Target save filename
@@ -588,7 +588,7 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief »ñÈ¡×ÜµãÊı
+		* @brief è·å–æ€»ç‚¹æ•°
 		* @~english
 		* @brief Return the size of points(inclue size of invalid points)
 		**/
@@ -598,7 +598,7 @@ namespace cs
 		}
 		/**
 		* @~chinese
-		* @brief »ñÈ¡ÓĞĞ§µÄµãÊı
+		* @brief è·å–æœ‰æ•ˆçš„ç‚¹æ•°
 		* @~english
 		* @brief Return the size of valid points(exclude size of invalid points)
 		**/
@@ -608,7 +608,7 @@ namespace cs
 		}
 		/**
 		* @~chinese
-		* @brief »ñÈ¡µãÔÆµÄ¶¥µã×ø±ê
+		* @brief è·å–ç‚¹äº‘çš„é¡¶ç‚¹åæ ‡
 		* @~english
 		* @brief Return the vertices of pointcloud
 		**/
@@ -619,7 +619,7 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief »ñÈ¡¶ÔÓ¦µ½RGBÍ¼ÏñÉÏµÄ×ø±ê(ÒÑ¹éÒ»»¯ÖÁ0~1.f)£¬³ËÒÔRGBÍ¼ÏñµÄ·Ö±æÂÊ¼´¿ÉµÃµ½¾ø¶Ô×ø±êÖµ
+		* @brief è·å–å¯¹åº”åˆ°RGBå›¾åƒä¸Šçš„åæ ‡(å·²å½’ä¸€åŒ–è‡³0~1.f)ï¼Œä¹˜ä»¥RGBå›¾åƒçš„åˆ†è¾¨ç‡å³å¯å¾—åˆ°ç»å¯¹åæ ‡å€¼
 		* @~english
 		* Return the corresponding texture coordinates of pointcloud (0~1.f), multiply the image width/height to get the coordinates in image
 		*/
@@ -629,7 +629,7 @@ namespace cs
 		}
 		/**
 		* @~chinese
-		* @brief »ñÈ¡·¨Ïß
+		* @brief è·å–æ³•çº¿
 		* @~english
 		* @brief Return the normals of pointcloud.
 		**/
@@ -894,7 +894,7 @@ namespace cs
         } RGBQUAD;
 #pragma  pack()
 
-        BITMAPINFOHEADER pHeader; //¶¨ÒåĞÅÏ¢Í·        
+        BITMAPINFOHEADER pHeader; //å®šä¹‰ä¿¡æ¯å¤´        
         pHeader.biSize = sizeof(BITMAPINFOHEADER);
         pHeader.biWidth = width;
         pHeader.biHeight = -height;
@@ -917,7 +917,7 @@ namespace cs
             if (channel == 1)
             {
                 quads.resize(256);
-                for (int i = 0; i < 256; i++)                        //±éÀúÔ´Í¼ÏñµÄÑÕÉ«±í²¢×ª»»£¬È»ºóĞ´ÈëÄ¿±êÎÄ¼ş
+                for (int i = 0; i < 256; i++)                        //éå†æºå›¾åƒçš„é¢œè‰²è¡¨å¹¶è½¬æ¢ï¼Œç„¶åå†™å…¥ç›®æ ‡æ–‡ä»¶
                 {
                     quads[i].rgbBlue = quads[i].rgbGreen = quads[i].rgbRed = i;
                     quads[i].rgbReserved = 0;
@@ -1229,7 +1229,7 @@ namespace cs
 
 	/**
 	* @~chinese
-	* @brief ½«Éî¶ÈÍ¼×ª»»ÎªRGBÍ¼
+	* @brief å°†æ·±åº¦å›¾è½¬æ¢ä¸ºRGBå›¾
 	* @~english
 	* @brief Convert depth map to RGB image
 	**/
@@ -1242,13 +1242,13 @@ namespace cs
 		}
 		/**
 		* @~chinese
-		* @brief      ÉèÖÃäÖÈ¾É«´ø¶ÔÓ¦µÄ×î´óÉî¶ÈÖµºÍ×îĞ¡Éî¶ÈÖµ
-		* @param[in]  zmin				£º×îĞ¡Éî¶ÈÖµ
-		* @param[in]  zmax				£º×î´óÉî¶ÈÖµ
+		* @brief      è®¾ç½®æ¸²æŸ“è‰²å¸¦å¯¹åº”çš„æœ€å¤§æ·±åº¦å€¼å’Œæœ€å°æ·±åº¦å€¼
+		* @param[in]  zmin				ï¼šæœ€å°æ·±åº¦å€¼
+		* @param[in]  zmax				ï¼šæœ€å¤§æ·±åº¦å€¼
 		* @~english
 		* @brief      set maximum depth and minimum depth corresponding to color map
-		* @param[in]  zmin				£ºthe minimum depth
-		* @param[in]  zmax				£ºthe maximum depth
+		* @param[in]  zmin				ï¼šthe minimum depth
+		* @param[in]  zmax				ï¼šthe maximum depth
 		**/
 		void setRange(int zmin, int zmax)
 		{
@@ -1258,17 +1258,17 @@ namespace cs
 
 		/**
 		* @~chinese
-		* @brief      ½«Éî¶ÈÍ¼×ª»»ÎªRGBÍ¼
-		* @param[in]  depthData			£ºÉî¶ÈÊı¾İ
-		* @param[in]  scale				£ºÉî¶ÈËõ·ÅÏµÊı
-		* @param[in]  rgbData			£ºRGBÊı¾İ±£´æµØÖ·
-		* @param[in]  dataSize			£ºÔªËØ×ÜÊı
+		* @brief      å°†æ·±åº¦å›¾è½¬æ¢ä¸ºRGBå›¾
+		* @param[in]  depthData			ï¼šæ·±åº¦æ•°æ®
+		* @param[in]  scale				ï¼šæ·±åº¦ç¼©æ”¾ç³»æ•°
+		* @param[in]  rgbData			ï¼šRGBæ•°æ®ä¿å­˜åœ°å€
+		* @param[in]  dataSize			ï¼šå…ƒç´ æ€»æ•°
 		* @~english
 		* @brief      set maximum depth and minimum depth corresponding to color map
-		* @param[in]  depthData			£ºthe pointer of depth data
-		* @param[in]  scale				£ºthe scale of depth
-		* @param[in]  rgbData			£ºthe pointer of RGB data
-		* @param[in]  dataSize			£ºelement size
+		* @param[in]  depthData			ï¼šthe pointer of depth data
+		* @param[in]  scale				ï¼šthe scale of depth
+		* @param[in]  rgbData			ï¼šthe pointer of RGB data
+		* @param[in]  dataSize			ï¼šelement size
 		**/
 		template < typename T >
 		void process(T* depthData, float scale, unsigned char *rgbData, int dataSize)
@@ -1359,7 +1359,7 @@ namespace cs
 	{
 	/**
 	* @~chinese
-	* @brief Ã¶¾Ù: ÂË²¨·½Ê½
+	* @brief æšä¸¾: æ»¤æ³¢æ–¹å¼
 	* @~english
 	* @brief enumeration: type of filter
 	**/
@@ -1410,20 +1410,20 @@ namespace cs
 	}
 	/**
 	* @~chinese
-	* @brief      ¸ßË¹ÂË²¨
-	* @param[in]  depthData			£ºÉî¶ÈÊı¾İ
-	* @param[in]  width				£ºÍ¼Ïñ¿í¶È
-	* @param[in]  height			£ºÍ¼Ïñ¸ß¶È
-	* @param[in]  filterSize		£ºÄ£°å³ß´ç£¬±ØĞëÎªÆæÊı£¬ÊıÖµÔ½´óÂË²¨³Ì¶ÈÔ½´ó
-	* @param[in]  sigma				£ºÏµÊı
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      é«˜æ–¯æ»¤æ³¢
+	* @param[in]  depthData			ï¼šæ·±åº¦æ•°æ®
+	* @param[in]  width				ï¼šå›¾åƒå®½åº¦
+	* @param[in]  height			ï¼šå›¾åƒé«˜åº¦
+	* @param[in]  filterSize		ï¼šæ¨¡æ¿å°ºå¯¸ï¼Œå¿…é¡»ä¸ºå¥‡æ•°ï¼Œæ•°å€¼è¶Šå¤§æ»¤æ³¢ç¨‹åº¦è¶Šå¤§
+	* @param[in]  sigma				ï¼šç³»æ•°
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Execute gaussian filter
-	* @param[in]  depthData			£ºpointer of data
-	* @param[in]  width				£ºthe width of image
-	* @param[in]  height			£ºthe height of image
-	* @param[in]  filterSize		£ºthe size of filter template£¬it must be odd 
-	* @param[in]  sigma				£ºsigma
+	* @param[in]  depthData			ï¼špointer of data
+	* @param[in]  width				ï¼šthe width of image
+	* @param[in]  height			ï¼šthe height of image
+	* @param[in]  filterSize		ï¼šthe size of filter templateï¼Œit must be odd 
+	* @param[in]  sigma				ï¼šsigma
 	* @return success:return 0, fail:other error code
 	**/
 	template <typename T>
@@ -1509,18 +1509,18 @@ namespace cs
 	}
 	/**
 	* @~chinese
-	* @brief      ¾ùÖµÂË²¨
-	* @param[in]  depthData			£ºÉî¶ÈÊı¾İ
-	* @param[in]  width				£ºÍ¼Ïñ¿í¶È
-	* @param[in]  height			£ºÍ¼Ïñ¸ß¶È
-	* @param[in]  filterSize		£ºÄ£°å³ß´ç£¬±ØĞëÎªÆæÊı£¬ÊıÖµÔ½´óÂË²¨³Ì¶ÈÔ½´ó
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      å‡å€¼æ»¤æ³¢
+	* @param[in]  depthData			ï¼šæ·±åº¦æ•°æ®
+	* @param[in]  width				ï¼šå›¾åƒå®½åº¦
+	* @param[in]  height			ï¼šå›¾åƒé«˜åº¦
+	* @param[in]  filterSize		ï¼šæ¨¡æ¿å°ºå¯¸ï¼Œå¿…é¡»ä¸ºå¥‡æ•°ï¼Œæ•°å€¼è¶Šå¤§æ»¤æ³¢ç¨‹åº¦è¶Šå¤§
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Execute average filter
-	* @param[in]  depthData			£ºpointer of data
-	* @param[in]  width				£ºthe width of image
-	* @param[in]  height			£ºthe height of image
-	* @param[in]  filterSize		£ºthe size of filter template£¬it must be odd 
+	* @param[in]  depthData			ï¼špointer of data
+	* @param[in]  width				ï¼šthe width of image
+	* @param[in]  height			ï¼šthe height of image
+	* @param[in]  filterSize		ï¼šthe size of filter templateï¼Œit must be odd 
 	* @return success:return 0, fail:other error code
 	**/
 	template <typename T>
@@ -1606,18 +1606,18 @@ namespace cs
 
 	/**
 	* @~chinese
-	* @brief      ÖĞÖµÂË²¨
-	* @param[in]  depthData			£ºÉî¶ÈÊı¾İ
-	* @param[in]  width				£ºÍ¼Ïñ¿í¶È
-	* @param[in]  height			£ºÍ¼Ïñ¸ß¶È
-	* @param[in]  filterSize		£ºÄ£°å³ß´ç£¬±ØĞëÎªÆæÊı£¬ÊıÖµÔ½´óÂË²¨³Ì¶ÈÔ½´ó
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      ä¸­å€¼æ»¤æ³¢
+	* @param[in]  depthData			ï¼šæ·±åº¦æ•°æ®
+	* @param[in]  width				ï¼šå›¾åƒå®½åº¦
+	* @param[in]  height			ï¼šå›¾åƒé«˜åº¦
+	* @param[in]  filterSize		ï¼šæ¨¡æ¿å°ºå¯¸ï¼Œå¿…é¡»ä¸ºå¥‡æ•°ï¼Œæ•°å€¼è¶Šå¤§æ»¤æ³¢ç¨‹åº¦è¶Šå¤§
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Execute median filter
-	* @param[in]  depthData			£ºpointer of data
-	* @param[in]  width				£ºthe width of image
-	* @param[in]  height			£ºthe height of image
-	* @param[in]  filterSize		£ºthe size of filter template£¬it must be odd 
+	* @param[in]  depthData			ï¼špointer of data
+	* @param[in]  width				ï¼šthe width of image
+	* @param[in]  height			ï¼šthe height of image
+	* @param[in]  filterSize		ï¼šthe size of filter templateï¼Œit must be odd 
 	* @return success:return 0, fail:other error code
 	**/
 	template <typename T>

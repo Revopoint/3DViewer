@@ -24,8 +24,8 @@
 
 CSParaWidget::CSParaWidget(int paraId, const char* name, QWidget* parent)
     : QWidget(parent)
-    , paraId(paraId)
-    , paraName(name)
+    , m_paraId(paraId)
+    , m_paraName(name)
 {
     setAttribute(Qt::WA_StyledBackground, true);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -46,5 +46,5 @@ void CSParaWidget::paintEvent(QPaintEvent* event)
 
 int CSParaWidget::getParaId() const
 {
-    return paraId;
+    return m_paraId;
 }

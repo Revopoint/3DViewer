@@ -26,31 +26,34 @@ using namespace cs;
 
 ProcessStrategy::ProcessStrategy(PROCESS_STRA_TYPE type)
     : QObject()
-    , isCameraParaDirty(true)
-    , strategyType(type)
+    , m_isCameraParaDirty(true)
+    , m_strategyType(type)
 {
 
 }
 
 void ProcessStrategy::setCamera(std::shared_ptr<ICSCamera> camera)
 {
-    cameraPtr = camera;
+    m_cameraPtr = camera;
 }
 
-void ProcessStrategy::setCameraParaState(bool dirty)
+void ProcessStrategy::setCameraParaState(int paraId, bool dirty)
 {
-    QMutexLocker locker(&mutex);
-    isCameraParaDirty = dirty;
+    QMutexLocker locker(&m_mutex);
+    if (m_dependentParameters.contains(paraId))
+    {
+        m_isCameraParaDirty = dirty;
+    }
 }
 
 void ProcessStrategy::process(const FrameData& frameData, OutputDataPort& outputDataPort)
 {
     bool dirty = false;
     
-    mutex.lock();
-    dirty = isCameraParaDirty;
-    isCameraParaDirty = false;
-    mutex.unlock();
+    m_mutex.lock();
+    dirty = m_isCameraParaDirty;
+    m_isCameraParaDirty = false;
+    m_mutex.unlock();
 
     if (dirty)
     {
@@ -62,15 +65,15 @@ void ProcessStrategy::process(const FrameData& frameData, OutputDataPort& output
 
 PROCESS_STRA_TYPE ProcessStrategy::getProcessStraType()
 {
-    return strategyType;
+    return m_strategyType;
 }
 
 void ProcessStrategy::setStrategyEnable(bool enable)
 {
-    strategyEnable = enable;
+    m_strategyEnable = enable;
 }
 
 int ProcessStrategy::isStrategyEnable()
 {
-    return strategyEnable;
+    return m_strategyEnable;
 }

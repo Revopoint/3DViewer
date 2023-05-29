@@ -58,8 +58,8 @@ public:
     int getCameraState() const override;
 
 private:
-    ICSCamera* csCamera = nullptr;
-    mutable QReadWriteLock lock;
+    ICSCamera* m_csCamera = nullptr;
+    mutable QReadWriteLock m_lock;
 };
 }
 

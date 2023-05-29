@@ -27,29 +27,29 @@
 
 IpSettingDialog::IpSettingDialog(QWidget* parent)
     : QDialog(parent)
-    , ui(new Ui::IpSettingWidget)
+    , m_ui(new Ui::IpSettingWidget)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    ui->applyButton->setProperty("isCSStyle", true);
+    m_ui->applyButton->setProperty("isCSStyle", true);
     
     QIntValidator* intValidator = new QIntValidator(0, 255, this);
     QIntValidator* intValidator2 = new QIntValidator(1, 255, this);
     QIntValidator* intValidator3 = new QIntValidator(0, 254, this);
 
-    ui->ipEdit1->setValidator(intValidator2);
-    ui->ipEdit2->setValidator(intValidator);
-    ui->ipEdit3->setValidator(intValidator);
-    ui->ipEdit4->setValidator(intValidator3);
+    m_ui->ipEdit1->setValidator(intValidator2);
+    m_ui->ipEdit2->setValidator(intValidator);
+    m_ui->ipEdit3->setValidator(intValidator);
+    m_ui->ipEdit4->setValidator(intValidator3);
 
     bool suc = true;
-    suc &= (bool)connect(ui->applyButton, &QPushButton::clicked, this, &IpSettingDialog::onApply);
-    suc &= (bool)connect(ui->autoIPButton, &QRadioButton::toggled, this, [=](bool checked) 
+    suc &= (bool)connect(m_ui->applyButton, &QPushButton::clicked, this, &IpSettingDialog::onApply);
+    suc &= (bool)connect(m_ui->autoIPButton, &QRadioButton::toggled, this, [=](bool checked) 
         {
-            ui->ipArea->setEnabled(!checked);
+            m_ui->ipArea->setEnabled(!checked);
         });
     
-    QVector<CSLineEdit*> lineEdits = { ui->ipEdit1,  ui->ipEdit2 ,  ui->ipEdit3 ,  ui->ipEdit4 };
+    QVector<CSLineEdit*> lineEdits = { m_ui->ipEdit1,  m_ui->ipEdit2 ,  m_ui->ipEdit3 ,  m_ui->ipEdit4 };
     for (auto lineEdit : lineEdits)
     {
         suc &= (bool)connect(lineEdit, &CSLineEdit::focusOutSignal, this, &IpSettingDialog::onLineEditFocusOut);
@@ -83,26 +83,26 @@ void IpSettingDialog::updateIpInfo()
     uchar ip3 = cameraIp.ipBytes[2];
     uchar ip4 = cameraIp.ipBytes[3];
 
-    ui->autoIPButton->setChecked(autoEnable);
-    ui->manualIPButton->setChecked(!autoEnable);
+    m_ui->autoIPButton->setChecked(autoEnable);
+    m_ui->manualIPButton->setChecked(!autoEnable);
 
-    ui->ipEdit1->setText(QString::number(ip1));
-    ui->ipEdit2->setText(QString::number(ip2));
-    ui->ipEdit3->setText(QString::number(ip3));
-    ui->ipEdit4->setText(QString::number(ip4));
+    m_ui->ipEdit1->setText(QString::number(ip1));
+    m_ui->ipEdit2->setText(QString::number(ip2));
+    m_ui->ipEdit3->setText(QString::number(ip3));
+    m_ui->ipEdit4->setText(QString::number(ip4));
 
-    ui->ipArea->setEnabled(!autoEnable);
+    m_ui->ipArea->setEnabled(!autoEnable);
 }
 
 void IpSettingDialog::onApply()
 {
     CameraIpSetting cameraIp;
-    cameraIp.autoEnable = ui->autoIPButton->isChecked() ? 1 : 0;
+    cameraIp.autoEnable = m_ui->autoIPButton->isChecked() ? 1 : 0;
 
-    cameraIp.ipBytes[0] = (ui->ipEdit1->text().toInt()) & 0xFF;
-    cameraIp.ipBytes[1] = (ui->ipEdit2->text().toInt()) & 0xFF;
-    cameraIp.ipBytes[2] = (ui->ipEdit3->text().toInt()) & 0xFF;
-    cameraIp.ipBytes[3] = (ui->ipEdit4->text().toInt()) & 0xFF;
+    cameraIp.ipBytes[0] = (m_ui->ipEdit1->text().toInt()) & 0xFF;
+    cameraIp.ipBytes[1] = (m_ui->ipEdit2->text().toInt()) & 0xFF;
+    cameraIp.ipBytes[2] = (m_ui->ipEdit3->text().toInt()) & 0xFF;
+    cameraIp.ipBytes[3] = (m_ui->ipEdit4->text().toInt()) & 0xFF;
 
     // set IP
     auto camera = cs::CSApplication::getInstance()->getCamera();
@@ -147,7 +147,7 @@ void IpSettingDialog::onApply()
 
 void IpSettingDialog::onTranslate()
 {
-    ui->retranslateUi(this);
+    m_ui->retranslateUi(this);
 }
 
 void IpSettingDialog::onLineEditFocusOut()

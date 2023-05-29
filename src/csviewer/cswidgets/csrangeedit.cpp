@@ -31,24 +31,24 @@
 
 CSRangeEdit::CSRangeEdit(int paraId, const char* title, QWidget* parent)
     : CSParaWidget(paraId, title, parent)
-    , rangeMinEdit(new CSLineEdit(this))
-    , rangeMaxEdit(new CSLineEdit(this))
-    , titleLabel(new QLabel(this))
-    , intValidator(new QIntValidator(-10000000, 10000000, this))
-    , rangeBottom(0)
-    , rangeTop(0)
+    , m_rangeMinEdit(new CSLineEdit(this))
+    , m_rangeMaxEdit(new CSLineEdit(this))
+    , m_titleLabel(new QLabel(this))
+    , m_intValidator(new QIntValidator(-10000000, 10000000, this))
+    , m_rangeBottom(0)
+    , m_rangeTop(0)
 {
     setObjectName("CSRangeEdit");
-    titleLabel->setObjectName("TitleLabel");
+    m_titleLabel->setObjectName("TitleLabel");
 
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    titleLabel->setText(title);
-    titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
+    m_titleLabel->setText(title);
+    m_titleLabel->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Expanding);
 
-    layout->addWidget(titleLabel);
+    layout->addWidget(m_titleLabel);
     CSHLine* line = new CSHLine(this);
 
     QHBoxLayout* hLayout = new QHBoxLayout();
@@ -57,26 +57,26 @@ CSRangeEdit::CSRangeEdit(int paraId, const char* title, QWidget* parent)
     line->setFixedWidth(10);
     line->setProperty("isDark", true);
 
-    hLayout->addWidget(rangeMinEdit);
+    hLayout->addWidget(m_rangeMinEdit);
     hLayout->addWidget(line);
-    hLayout->addWidget(rangeMaxEdit);
+    hLayout->addWidget(m_rangeMaxEdit);
     hLayout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
     hLayout->setSpacing(10);
     hLayout->setContentsMargins(0, 0, 0, 0);
 
-    rangeMinEdit->setValidator(intValidator);
-    rangeMaxEdit->setValidator(intValidator);
+    m_rangeMinEdit->setValidator(m_intValidator);
+    m_rangeMaxEdit->setValidator(m_intValidator);
 
-    rangeMinEdit->setFixedWidth(86);
-    rangeMaxEdit->setFixedWidth(86);
+    m_rangeMinEdit->setFixedWidth(86);
+    m_rangeMaxEdit->setFixedWidth(86);
 
     bool suc = true;
 
-    suc &= (bool)connect(rangeMinEdit, &QLineEdit::editingFinished, this, &CSRangeEdit::onMinEditTextChanged);
-    suc &= (bool)connect(rangeMaxEdit, &QLineEdit::editingFinished, this, &CSRangeEdit::onMaxEditTextChanged);
+    suc &= (bool)connect(m_rangeMinEdit, &QLineEdit::editingFinished, this, &CSRangeEdit::onMinEditTextChanged);
+    suc &= (bool)connect(m_rangeMaxEdit, &QLineEdit::editingFinished, this, &CSRangeEdit::onMaxEditTextChanged);
 
-    suc &= (bool)connect(rangeMinEdit, &CSLineEdit::focusOutSignal, this, &CSRangeEdit::onMinFocusOut);
-    suc &= (bool)connect(rangeMaxEdit, &CSLineEdit::focusOutSignal, this, &CSRangeEdit::onMaxFocusOut);
+    suc &= (bool)connect(m_rangeMinEdit, &CSLineEdit::focusOutSignal, this, &CSRangeEdit::onMinFocusOut);
+    suc &= (bool)connect(m_rangeMaxEdit, &CSLineEdit::focusOutSignal, this, &CSRangeEdit::onMaxFocusOut);
     Q_ASSERT(suc);
 }
 
@@ -86,45 +86,45 @@ CSRangeEdit::~CSRangeEdit()
 
 void CSRangeEdit::setParaRange(const QVariant& min, const QVariant& max, const QVariant& step)
 {
-    rangeBottom = qRound(min.toFloat());
-    rangeTop = qRound(max.toFloat());
+    m_rangeBottom = qRound(min.toFloat());
+    m_rangeTop = qRound(max.toFloat());
 }
 
 void CSRangeEdit::setValue(const QVariant& value)
 {
     QPair<float, float> range = value.value< QPair<float, float>>();
-    const int min = rangeMinEdit->text().toInt();
-    const int max = rangeMaxEdit->text().toInt();
+    const int min = m_rangeMinEdit->text().toInt();
+    const int max = m_rangeMaxEdit->text().toInt();
 
     const int rangeMin = qRound(range.first);
     const int rangeMax = qRound(range.second);
 
     if (min != rangeMin)
     {
-       rangeMinEdit->setText(QString::number(rangeMin));
+       m_rangeMinEdit->setText(QString::number(rangeMin));
     }   
     
     if (max != rangeMax)
     {
-        rangeMaxEdit->setText(QString::number(rangeMax));
+        m_rangeMaxEdit->setText(QString::number(rangeMax));
     }
 }
 
 void CSRangeEdit::onMaxEditTextChanged()
 {   
-    const int min = rangeMinEdit->text().toInt();
-    int max = rangeMaxEdit->text().toInt();
+    const int min = m_rangeMinEdit->text().toInt();
+    int max = m_rangeMaxEdit->text().toInt();
 
-    if (max > rangeTop)
+    if (max > m_rangeTop)
     {
-        max = rangeTop;
-        rangeMaxEdit->setText(QString::number(max));
+        max = m_rangeTop;
+        m_rangeMaxEdit->setText(QString::number(max));
     }
 
     if (max < min) 
     {
-        max = rangeTop;
-        rangeMaxEdit->setText(QString::number(max));
+        max = m_rangeTop;
+        m_rangeMaxEdit->setText(QString::number(max));
     }
 
     emit valueChanged(getParaId(), QVariant::fromValue(QPair<float, float>(min, max)));
@@ -132,19 +132,19 @@ void CSRangeEdit::onMaxEditTextChanged()
 
 void CSRangeEdit::onMinEditTextChanged()
 {
-    int min = rangeMinEdit->text().toInt();
-    const int max = rangeMaxEdit->text().toInt();
+    int min = m_rangeMinEdit->text().toInt();
+    const int max = m_rangeMaxEdit->text().toInt();
 
-    if (min < rangeBottom)
+    if (min < m_rangeBottom)
     {
-        min = rangeBottom;
-        rangeMinEdit->setText(QString::number(min));
+        min = m_rangeBottom;
+        m_rangeMinEdit->setText(QString::number(min));
     }
 
     if (min > max)
     {
-        min = rangeBottom;
-        rangeMinEdit->setText(QString::number(min));
+        min = m_rangeBottom;
+        m_rangeMinEdit->setText(QString::number(min));
     }
 
     emit valueChanged(getParaId(), QVariant::fromValue(QPair<float, float>(min, max)));
@@ -152,36 +152,36 @@ void CSRangeEdit::onMinEditTextChanged()
 
 void CSRangeEdit::retranslate(const char* context)
 {
-    if (strlen(paraName) > 0)
+    if (strlen(m_paraName) > 0)
     {
-        titleLabel->setText(QApplication::translate(context, paraName));
+        m_titleLabel->setText(QApplication::translate(context, m_paraName));
     }
 }
 
 void CSRangeEdit::onMinFocusOut()
 {
-    auto tex = rangeMinEdit->text();
+    auto tex = m_rangeMinEdit->text();
     int num = 0;
-    if (intValidator->validate(tex, num) != QIntValidator::Acceptable)
+    if (m_intValidator->validate(tex, num) != QIntValidator::Acceptable)
     {
-        rangeMinEdit->setText(QString::number(rangeBottom));
-        emit rangeMinEdit->editingFinished();
+        m_rangeMinEdit->setText(QString::number(m_rangeBottom));
+        emit m_rangeMinEdit->editingFinished();
     }
 }
 
 void CSRangeEdit::onMaxFocusOut()
 {
-    auto tex = rangeMaxEdit->text();
+    auto tex = m_rangeMaxEdit->text();
     int num = 0;
-    if (intValidator->validate(tex, num) != QIntValidator::Acceptable)
+    if (m_intValidator->validate(tex, num) != QIntValidator::Acceptable)
     {
-        rangeMaxEdit->setText(QString::number(rangeTop));
-        emit rangeMaxEdit->editingFinished();
+        m_rangeMaxEdit->setText(QString::number(m_rangeTop));
+        emit m_rangeMaxEdit->editingFinished();
     }
 }
 
 void CSRangeEdit::clearValues()
 {
-    rangeMinEdit->setText("");
-    rangeMaxEdit->setText("");
+    m_rangeMinEdit->setText("");
+    m_rangeMaxEdit->setText("");
 }

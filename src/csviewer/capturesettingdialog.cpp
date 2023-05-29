@@ -39,12 +39,12 @@ static QStringList captureSaveFormats = { "images", "raw" };
 
 CaptureSettingDialog::CaptureSettingDialog(QWidget* parent)
     : QDialog(parent)
-    , ui(new Ui::CaptureSettingWidget)
+    , m_ui(new Ui::CaptureSettingWidget)
 {
     setWindowFlags(this->windowFlags() & Qt::WindowCloseButtonHint);
 
-    ui->setupUi(this);
-    dataTypeCheckBoxs = { ui->rgbCheckBox, ui->irCheckBox, ui->depthCheckBox, ui->pointCloudCheckBox, };
+    m_ui->setupUi(this);
+    m_dataTypeCheckBoxs = { m_ui->rgbCheckBox, m_ui->irCheckBox, m_ui->depthCheckBox, m_ui->pointCloudCheckBox, };
 
     // init default capture setting
     initDefaultCaptureConfig();
@@ -58,7 +58,7 @@ CaptureSettingDialog::CaptureSettingDialog(QWidget* parent)
 
 CaptureSettingDialog::~CaptureSettingDialog()
 {
-    delete ui;
+    delete m_ui;
 }
 
 void CaptureSettingDialog::showEvent(QShowEvent* event)
@@ -73,25 +73,25 @@ void CaptureSettingDialog::showEvent(QShowEvent* event)
     const bool hasIr = hasIrV.toBool();
     const bool hasDepth = hasDepthV.toBool();
 
-    for (auto checkBox : dataTypeCheckBoxs)
+    for (auto checkBox : m_dataTypeCheckBoxs)
     {
         checkBox->setChecked(false);
     }
 
-    ui->rgbCheckBox->setEnabled(hasRgb);
-    ui->rgbCheckBox->setChecked(hasRgb);
+    m_ui->rgbCheckBox->setEnabled(hasRgb);
+    m_ui->rgbCheckBox->setChecked(hasRgb);
 
-    ui->depthCheckBox->setEnabled(hasDepth);
-    ui->depthCheckBox->setChecked(hasDepth);
+    m_ui->depthCheckBox->setEnabled(hasDepth);
+    m_ui->depthCheckBox->setChecked(hasDepth);
 
 
-    ui->irCheckBox->setEnabled(hasIr);
-    ui->pointCloudCheckBox->setEnabled(hasDepth);
-    ui->captureInfo->setText("");
+    m_ui->irCheckBox->setEnabled(hasIr);
+    m_ui->pointCloudCheckBox->setEnabled(hasDepth);
+    m_ui->captureInfo->setText("");
 
-    ui->startCaptureButton->setEnabled(true);
-    ui->stopCaptureButton->setEnabled(false);
-    ui->statusBarText->setText("");
+    m_ui->startCaptureButton->setEnabled(true);
+    m_ui->stopCaptureButton->setEnabled(false);
+    m_ui->statusBarText->setText("");
 
     QDialog::showEvent(event);
 }
@@ -100,11 +100,11 @@ void CaptureSettingDialog::onStartCapture()
 {
     qInfo() << "onStartCapture";
 
-    if (captureConfig.captureDataTypes.size() <= 0)
+    if (m_captureConfig.captureDataTypes.size() <= 0)
     {
         qInfo() << "At least one data needs to be selected";
 
-        ui->statusBarText->setText(tr("Capture failed ! At least one data needs to be selected"));
+        m_ui->statusBarText->setText(tr("Capture failed ! At least one data needs to be selected"));
         return;
     }
 
@@ -116,19 +116,19 @@ void CaptureSettingDialog::onStartCapture()
     {
         QFileInfo fileInfo(url.toLocalFile());
 
-        captureConfig.saveDir = fileInfo.absolutePath();
+        m_captureConfig.saveDir = fileInfo.absolutePath();
 
         QString name = fileInfo.fileName();
 
-        captureConfig.saveName = name.endsWith(".zip") ? (name.replace(name.lastIndexOf(".zip"), 4, "")) : name;
-        captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
+        m_captureConfig.saveName = name.endsWith(".zip") ? (name.replace(name.lastIndexOf(".zip"), 4, "")) : name;
+        m_captureConfig.savePointCloudWithTexture = cs::CSApplication::getInstance()->getShow3DTexture();
 
-        isCapturing = true;
-        cs::CSApplication::getInstance()->startCapture(captureConfig);
-        ui->captureInfo->setText("");
+        m_isCapturing = true;
+        cs::CSApplication::getInstance()->startCapture(m_captureConfig);
+        m_ui->captureInfo->setText("");
 
-        ui->startCaptureButton->setEnabled(false);
-        ui->stopCaptureButton->setEnabled(true);
+        m_ui->startCaptureButton->setEnabled(false);
+        m_ui->stopCaptureButton->setEnabled(true);
     }
     else
     {
@@ -140,44 +140,44 @@ void CaptureSettingDialog::onStartCapture()
 void CaptureSettingDialog::onStopCapture()
 {
     qInfo() << "onStopCapture";
-    isCapturing = false;
+    m_isCapturing = false;
 
-    ui->startCaptureButton->setEnabled(true);
-    ui->stopCaptureButton->setEnabled(false);
+    m_ui->startCaptureButton->setEnabled(true);
+    m_ui->stopCaptureButton->setEnabled(false);
     cs::CSApplication::getInstance()->stopCapture();
 }
 
 void CaptureSettingDialog::initDefaultCaptureConfig()
 {
-    captureConfig.captureNumber = defaultCaptureCount;
-    captureConfig.captureDataTypes = { CAMERA_DATA_DEPTH, CAMERA_DATA_RGB };
-    captureConfig.saveFormat = captureSaveFormats.first();
-    captureConfig.captureType = CAPTURE_TYPE_MULTIPLE;
+    m_captureConfig.captureNumber = m_defaultCaptureCount;
+    m_captureConfig.captureDataTypes = { CAMERA_DATA_DEPTH, CAMERA_DATA_RGB };
+    m_captureConfig.saveFormat = captureSaveFormats.first();
+    m_captureConfig.captureType = CAPTURE_TYPE_MULTIPLE;
 }
 
 void CaptureSettingDialog::onDataTypeChanged()
 {
-    captureConfig.captureDataTypes.clear();
+    m_captureConfig.captureDataTypes.clear();
 
-    if (ui->rgbCheckBox->isChecked())
+    if (m_ui->rgbCheckBox->isChecked())
     {
-        captureConfig.captureDataTypes.push_back(CAMERA_DATA_RGB);
+        m_captureConfig.captureDataTypes.push_back(CAMERA_DATA_RGB);
     }
 
-    if (ui->irCheckBox->isChecked())
+    if (m_ui->irCheckBox->isChecked())
     {
-        captureConfig.captureDataTypes.push_back(CAMERA_DATA_L);
-        captureConfig.captureDataTypes.push_back(CAMERA_DATA_R);
+        m_captureConfig.captureDataTypes.push_back(CAMERA_DATA_L);
+        m_captureConfig.captureDataTypes.push_back(CAMERA_DATA_R);
     }
 
-    if (ui->depthCheckBox->isChecked())
+    if (m_ui->depthCheckBox->isChecked())
     {
-        captureConfig.captureDataTypes.push_back(CAMERA_DATA_DEPTH);
+        m_captureConfig.captureDataTypes.push_back(CAMERA_DATA_DEPTH);
     }
 
-    if (ui->pointCloudCheckBox->isChecked())
+    if (m_ui->pointCloudCheckBox->isChecked())
     {
-        captureConfig.captureDataTypes.push_back(CAMERA_DATA_POINT_CLOUD);
+        m_captureConfig.captureDataTypes.push_back(CAMERA_DATA_POINT_CLOUD);
     }
 }
 
@@ -185,7 +185,7 @@ void CaptureSettingDialog::onSaveFormatChanged(int index)
 {
     if (index >=0 && index < captureSaveFormats.size())
     {
-        captureConfig.saveFormat = captureSaveFormats.at(index);
+        m_captureConfig.saveFormat = captureSaveFormats.at(index);
     }
     else 
     {
@@ -195,47 +195,47 @@ void CaptureSettingDialog::onSaveFormatChanged(int index)
 
 void CaptureSettingDialog::onCaptureFrameNumberChanged()
 {
-    auto tex = ui->frameNumberLineEdit->text();
+    auto tex = m_ui->frameNumberLineEdit->text();
     int pos = 0;
-    if (intValidator->validate(tex, pos) != QIntValidator::Acceptable)
+    if (m_intValidator->validate(tex, pos) != QIntValidator::Acceptable)
     {
-        ui->frameNumberLineEdit->setText(QString::number(1));
-        captureConfig.captureNumber = 1;
+        m_ui->frameNumberLineEdit->setText(QString::number(1));
+        m_captureConfig.captureNumber = 1;
     }
     else 
     {
-        captureConfig.captureNumber = tex.toInt();
+        m_captureConfig.captureNumber = tex.toInt();
     }
 }
 
 void CaptureSettingDialog::initDialog()
 {
-    ui->startCaptureButton->setProperty("isCSStyle", true);
-    ui->stopCaptureButton->setProperty("isCSStyle", true);
+    m_ui->startCaptureButton->setProperty("isCSStyle", true);
+    m_ui->stopCaptureButton->setProperty("isCSStyle", true);
     
-    QString frameRange = QString("[%1 - %2]").arg(minCaptureCount).arg(maxCaptureCount);
-    ui->frameNumberRange->setText(frameRange);
+    QString frameRange = QString("[%1 - %2]").arg(m_minCaptureCount).arg(m_maxCaptureCount);
+    m_ui->frameNumberRange->setText(frameRange);
 
-    intValidator = new QIntValidator(minCaptureCount, maxCaptureCount, this);
-    ui->frameNumberLineEdit->setValidator(intValidator);
+    m_intValidator = new QIntValidator(m_minCaptureCount, m_maxCaptureCount, this);
+    m_ui->frameNumberLineEdit->setValidator(m_intValidator);
 
     // default data types
-    for (auto type : captureConfig.captureDataTypes)
+    for (auto type : m_captureConfig.captureDataTypes)
     {
         switch (type)
         {
         case CAMERA_DATA_RGB:
-            ui->rgbCheckBox->setChecked(true);
+            m_ui->rgbCheckBox->setChecked(true);
             break;
         case CAMERA_DATA_L:
         case CAMERA_DATA_R:
-            ui->irCheckBox->setChecked(true);
+            m_ui->irCheckBox->setChecked(true);
             break;
         case CAMERA_DATA_DEPTH:
-            ui->depthCheckBox->setChecked(true);
+            m_ui->depthCheckBox->setChecked(true);
             break;
         case CAMERA_DATA_POINT_CLOUD:
-            ui->pointCloudCheckBox->setChecked(true);
+            m_ui->pointCloudCheckBox->setChecked(true);
             break;
         default:
             Q_ASSERT(false);
@@ -244,30 +244,30 @@ void CaptureSettingDialog::initDialog()
     }
 
     // save format combobox
-    ui->saveFormatComboBox->addItems(captureSaveFormats); 
-    ui->frameNumberLineEdit->setText(QString::number(captureConfig.captureNumber));
+    m_ui->saveFormatComboBox->addItems(captureSaveFormats); 
+    m_ui->frameNumberLineEdit->setText(QString::number(m_captureConfig.captureNumber));
 
-    ui->saveFormatComboBox->setView(new QListView(ui->saveFormatComboBox));
+    m_ui->saveFormatComboBox->setView(new QListView(m_ui->saveFormatComboBox));
 }
 
 void CaptureSettingDialog::initConnections()
 {
     bool suc = true;
-    suc &= (bool)connect(ui->startCaptureButton, &QPushButton::clicked, this, &CaptureSettingDialog::onStartCapture);
-    suc &= (bool)connect(ui->stopCaptureButton,  &QPushButton::clicked, this, &CaptureSettingDialog::onStopCapture);
+    suc &= (bool)connect(m_ui->startCaptureButton, &QPushButton::clicked, this, &CaptureSettingDialog::onStartCapture);
+    suc &= (bool)connect(m_ui->stopCaptureButton,  &QPushButton::clicked, this, &CaptureSettingDialog::onStopCapture);
 
-    for (auto checkBox : dataTypeCheckBoxs)
+    for (auto checkBox : m_dataTypeCheckBoxs)
     {
         suc &= (bool)connect(checkBox, &QCheckBox::toggled, this, &CaptureSettingDialog::onDataTypeChanged);
     }
 
-    suc &= (bool)connect(ui->saveFormatComboBox,  QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CaptureSettingDialog::onSaveFormatChanged);
+    suc &= (bool)connect(m_ui->saveFormatComboBox,  QOverload<int>::of(&QComboBox::currentIndexChanged), this, &CaptureSettingDialog::onSaveFormatChanged);
     auto app = cs::CSApplication::getInstance();
     suc &= (bool)connect(app, &cs::CSApplication::captureNumberUpdated, this, &CaptureSettingDialog::onCaptureNumberUpdated);
     suc &= (bool)connect(app, &cs::CSApplication::captureStateChanged,  this, &CaptureSettingDialog::onCaptureStateChanged);
 
-    suc &= (bool)connect(ui->frameNumberLineEdit,  &QLineEdit::editingFinished, this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
-    suc &= (bool)connect(ui->frameNumberLineEdit, &CSLineEdit::focusOutSignal,  this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
+    suc &= (bool)connect(m_ui->frameNumberLineEdit,  &QLineEdit::editingFinished, this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
+    suc &= (bool)connect(m_ui->frameNumberLineEdit, &CSLineEdit::focusOutSignal,  this, &CaptureSettingDialog::onCaptureFrameNumberChanged);
 
     Q_ASSERT(suc);
 }
@@ -275,7 +275,7 @@ void CaptureSettingDialog::initConnections()
 void CaptureSettingDialog::onCaptureNumberUpdated(int captured, int dropped)
 {
     QString msg = QString(tr("Captured %1 frames (%2 dropped)")).arg(captured).arg(dropped);
-    ui->captureInfo->setText(msg);
+    m_ui->captureInfo->setText(msg);
 }
 
 void CaptureSettingDialog::onCaptureStateChanged(int captureType, int state, QString message)
@@ -284,24 +284,24 @@ void CaptureSettingDialog::onCaptureStateChanged(int captureType, int state, QSt
     {
         return;
     }
-    ui->statusBarText->setText(message);
+    m_ui->statusBarText->setText(message);
 
     if (state == cs::CAPTURE_FINISHED)
     {
-        isCapturing = false;
-        ui->startCaptureButton->setEnabled(true);
-        ui->stopCaptureButton->setEnabled(false);
+        m_isCapturing = false;
+        m_ui->startCaptureButton->setEnabled(true);
+        m_ui->stopCaptureButton->setEnabled(false);
     }
 }
 
 void CaptureSettingDialog::onTranslate()
 {
-    ui->retranslateUi(this);
+    m_ui->retranslateUi(this);
 }
 
 void CaptureSettingDialog::reject()
 {
-    if (isCapturing)
+    if (m_isCapturing)
     {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Question);
@@ -319,7 +319,6 @@ void CaptureSettingDialog::reject()
         else if (button == QMessageBox::Yes)
         {
             onStopCapture();
-            QDialog::reject();
         }
     }
     else

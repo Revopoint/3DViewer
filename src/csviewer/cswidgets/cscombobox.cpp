@@ -26,27 +26,27 @@
 
 CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent, const char* tips)
     : CSParaWidget(paraId, title, parent)
-    , comboBox(new CustomComboBox(this))
-    , titleLabel(new QLabel(this))
-    , lastIndex(-1)
-    , tips(tips)
+    , m_comboBox(new CustomComboBox(this))
+    , m_titleLabel(new QLabel(this))
+    , m_lastIndex(-1)
+    , m_tips(tips)
 {
     //setAttribute(Qt::WA_StyledBackground);
     setObjectName("CSComboBox");
-    titleLabel->setObjectName("TitleLabel");
+    m_titleLabel->setObjectName("TitleLabel");
 
     QHBoxLayout* layout = new QHBoxLayout(this);
 
-    titleLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    layout->addWidget(titleLabel);
-    layout->addWidget(comboBox);
+    m_titleLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    layout->addWidget(m_titleLabel);
+    layout->addWidget(m_comboBox);
 
     // add tips button
     if (strlen(tips) > 0)
     {
-        tipsButton = new QPushButton(this);
-        tipsButton->setObjectName("tipsButton");
-        layout->addWidget(tipsButton);
+        m_tipsButton = new QPushButton(this);
+        m_tipsButton->setObjectName("tipsButton");
+        layout->addWidget(m_tipsButton);
     }
 
     layout->addItem(new QSpacerItem(20, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
@@ -54,13 +54,13 @@ CSComboBox::CSComboBox(int paraId, const char* title, QWidget* parent, const cha
     layout->setSpacing(0);
 
     QListView* listView = new QListView(this);
-    comboBox->setFocusPolicy(Qt::NoFocus);
+    m_comboBox->setFocusPolicy(Qt::NoFocus);
     listView->setFocusPolicy(Qt::NoFocus);
 
-    comboBox->setView(listView);
+    m_comboBox->setView(listView);
 
     bool suc = true;
-    suc &= (bool)connect(comboBox, SIGNAL(activated(int)), this, SLOT(onComboBoxIndexChanged(int)));
+    suc &= (bool)connect(m_comboBox, SIGNAL(activated(int)), this, SLOT(onComboBoxIndexChanged(int)));
 
     Q_ASSERT(suc);
 }
@@ -72,27 +72,27 @@ CSComboBox::~CSComboBox()
 
 void CSComboBox::setItems(const QList<QPair<QString, QVariant>>& items)
 {
-    comboBox->clear();
+    m_comboBox->clear();
     for (const auto& item : items)
     {
-        comboBox->addItem(item.first, item.second);
+        m_comboBox->addItem(item.first, item.second);
     }
 }
 
 void CSComboBox::setValue(const QVariant& value)
 {
-    const int curIdx = comboBox->currentIndex();
-    lastIndex = curIdx;
+    const int curIdx = m_comboBox->currentIndex();
+    m_lastIndex = curIdx;
 
-    for (int i = 0; i < comboBox->count(); i++)
+    for (int i = 0; i < m_comboBox->count(); i++)
     {
-        auto itemData = comboBox->itemData(i);
+        auto itemData = m_comboBox->itemData(i);
         if (itemData == value)
         {
             if (i != curIdx)
             {
-                comboBox->setCurrentIndex(i);
-                lastIndex = comboBox->currentIndex();
+                m_comboBox->setCurrentIndex(i);
+                m_lastIndex = m_comboBox->currentIndex();
             }
             break;
         }
@@ -101,32 +101,32 @@ void CSComboBox::setValue(const QVariant& value)
 
 void CSComboBox::getValue(QVariant& value)
 {
-    value = comboBox->itemData(comboBox->currentIndex());
+    value = m_comboBox->itemData(m_comboBox->currentIndex());
 }
 
 void CSComboBox::onComboBoxIndexChanged(int index)
 {
-    if (lastIndex != index)
+    if (m_lastIndex != index)
     {
-        lastIndex = index;
-        emit valueChanged(getParaId(), comboBox->itemData(index));
+        m_lastIndex = index;
+        emit valueChanged(getParaId(), m_comboBox->itemData(index));
     }
 }
 
 void CSComboBox::retranslate(const char* context)
 {
-    if (strlen(paraName) > 0)
+    if (strlen(m_paraName) > 0)
     {       
-        titleLabel->setText(QApplication::translate(context, paraName));
+        m_titleLabel->setText(QApplication::translate(context, m_paraName));
     }
 
-    if(tipsButton)
+    if(m_tipsButton)
     {
-        tipsButton->setToolTip(QApplication::translate(context, tips));
+        m_tipsButton->setToolTip(QApplication::translate(context, m_tips));
     }
 }
 
 void CSComboBox::clearValues()
 {
-    comboBox->clear();
+    m_comboBox->clear();
 }

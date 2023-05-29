@@ -43,10 +43,10 @@ private:
     void redirect(const QString& msg);
     void delHistory();
 private:
-    QMutex mutex;
-    QString logRootDir;
-    QString logPrefix;
-    QFile logFile;
+    QMutex m_mutex;
+    QString m_logRootDir;
+    QString m_logPrefix;
+    QFile m_logFile;
 };
 
 #endif // _CS_LOGGER_H

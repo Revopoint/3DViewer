@@ -25,6 +25,7 @@
 #include <QMutex>
 #include <QString>
 #include <QThreadPool>
+#include <QList>
 
 #include "cstypes.h"
 #include "cscameraapi.h"
@@ -33,6 +34,7 @@
 namespace cs 
 {
 class ICSCamera;
+class OutputSaver;
 
 enum CAPTURE_TYPE
 {
@@ -58,10 +60,10 @@ public:
     virtual void addOutputData(const OutputDataPort& outputDataPort) {}
     virtual void setOutputData(const OutputDataPort& outputDataPort);
     
-    virtual void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) {}
+    virtual void getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) {}
 
     void run() override;
-    void saveFinished();
+    void saveFinished(OutputSaver* saver);
 
     void setCamera(std::shared_ptr<ICSCamera>& camera);
     void setCameraCaptureConfig(const CameraCaptureConfig& config);
@@ -71,31 +73,38 @@ signals:
 protected:
     virtual void onCaptureDataDone();
     void saveCameraPara(QString filePath);
+    int getCapturedCount();
+    int getSkipCount();
+
+    OutputSaver* genOutputSaver(const OutputDataPort& outputData);
 protected:
-    CameraCaptureConfig captureConfig;
-    CAPTURE_TYPE captureType;
+    CameraCaptureConfig m_captureConfig;
+    CAPTURE_TYPE m_captureType;
     // cached data count
-    int cachedDataCount = 0;
+    int m_cachedDataCount = 0;
     // not cached data count: skipDataCount + cachedDataCount <= captureConfig.captureNumber
-    int skipDataCount = 0;
+    int m_skipDataCount = 0;
 
     // captured data count
-    int capturedDataCount = 0;
+    int m_capturedDataCount = 0;
 
     // cached data
-    QQueue<OutputDataPort> outputDatas;
-    QMutex mutex;
-    QMutex saverMutex;
+    QQueue<OutputSaver*> m_outputDatas;
+    QMutex m_mutex;
+    QMutex m_saverMutex;
+    QList<OutputSaver*> m_outputSaverList;
 
-    const int maxCachedCount = 10;
-    bool captureFinished = false;
+    const int m_maxCachedCount;
+    const int m_maxSavingCount;
 
-    QThreadPool threadPool;
+    bool m_captureFinished = false;
 
-    std::shared_ptr<ICSCamera> camera;
+    QThreadPool m_threadPool;
+
+    std::shared_ptr<ICSCamera> m_camera;
 
     // real save folder
-    QString realSaveFolder;
+    QString m_realSaveFolder;
 };
 
 // save a frame of data
@@ -104,7 +113,7 @@ class CameraCaptureSingle : public CameraCaptureBase
     Q_OBJECT
 public:
     CameraCaptureSingle(const CameraCaptureConfig& config);
-    void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
+    void getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 protected:
 
 };
@@ -116,7 +125,7 @@ class CameraCaptureMultiple : public CameraCaptureBase
 public:
     CameraCaptureMultiple(const CameraCaptureConfig& config);
     void addOutputData(const OutputDataPort& outputDataPort) override;
-    void getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
+    void getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex) override;
 
 protected:
     void onCaptureDataDone() override;
@@ -124,14 +133,14 @@ protected:
     void compressToZip();
     QString genTmpSaveDir(QString saveDir);
 private:
-    int capturedRgbCount = 0;
-    int capturedDepthCount = 0;
-    int capturePointCloudCount = 0;
+    int m_capturedRgbCount = 0;
+    int m_capturedDepthCount = 0;
+    int m_capturePointCloudCount = 0;
     
     // RGB frame time stamps
-    QVector<double> rgbTimeStamps;
+    QVector<double> m_rgbTimeStamps;
     // depth frame time stamps
-    QVector<double> depthTimeStamps;
+    QVector<double> m_depthTimeStamps;
 };
 
 class CS_CAMERA_EXPORT CameraCaptureTool : public Processor::ProcessEndListener
@@ -143,7 +152,7 @@ public:
     void process(const OutputDataPort& outputDataPort) override;
     
     void startCapture(CameraCaptureConfig config, bool autoNaming = false);
-    void setCamera(std::shared_ptr<ICSCamera>& camera);
+    void setCamera(std::shared_ptr<ICSCamera>& m_camera);
     void setCurOutputData(const CameraCaptureConfig& config);
 public slots:
     void stopCapture();
@@ -151,11 +160,11 @@ signals:
     void captureNumberUpdated(int captured, int dropped);
     void captureStateChanged(int captureType, int state, QString message);
 private:
-    QMutex mutex;
+    QMutex m_mutex;
     // for saving data
-    OutputDataPort cachedOutputData;
-    CameraCaptureBase* cameraCapture = nullptr;
-    std::shared_ptr<ICSCamera> camera;
+    OutputDataPort m_cachedOutputData;
+    CameraCaptureBase* m_cameraCapture = nullptr;
+    std::shared_ptr<ICSCamera> m_camera;
 };
 }
 

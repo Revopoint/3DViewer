@@ -31,11 +31,15 @@ public:
 
     enum CONVERT_STATE
     {
+        CONVERT_LOADING,
+        CONVERT_READDY,
+        CONVERT_LOADING_FAILED,
         CONVERTING,
         CONVERT_SUCCESS,
         CONVERT_FAILED,
         CONVERT_ERROR
     };
+
     FormatConverter();
     ~FormatConverter();
 
@@ -47,22 +51,30 @@ public:
     void setIsConverting(bool value);
     void setInterruptConvert(bool value);
     bool getInterruptConvert();
+    
+    bool getHasRGBData() const;
+    void setHasRGBData(bool value);
 public slots:
     void onConvert();
+    void onLoadFile();
 signals:
     void convertStateChanged(int state, int progress, QString message);
+    void loadFileSignal();
 private:
     // zip file
-    QString sourceFile;
+    QString m_sourceFile;
     // output directory
-    QString outputDirectory;
+    QString m_outputDirectory;
 
-    bool withTexture = false;
+    bool m_withTexture = false;
 
-    CapturedZipParser* capturedZipParser = nullptr;
+    CapturedZipParser* m_capturedZipParser = nullptr;
 
-    bool isConverting = false;
-    bool interruptConvert = false;
+    bool m_isConverting = false;
+    bool m_interruptConvert = false;
+    
+    bool m_isFileValid = false;
+    bool m_hasRGBData = false;
 };
 
 }

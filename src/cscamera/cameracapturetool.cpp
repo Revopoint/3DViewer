@@ -36,6 +36,9 @@
 
 using namespace cs;
 
+#define MAX_CACHED_COUNT 20
+#define MAX_SAVING_COUNT 50
+
 CameraCaptureTool::CameraCaptureTool()
 {
     qInfo() << "CameraCaptureTool";
@@ -48,85 +51,88 @@ CameraCaptureTool::~CameraCaptureTool()
 
 void CameraCaptureTool::process(const OutputDataPort& outputDataPort)
 {
-    QMutexLocker locker(&mutex);
+    QMutexLocker locker(&m_mutex);
     if (outputDataPort.isEmpty())
     {
         qWarning() << "CameraCaptureTool, process, outputDataPort is empty";
         return;
     }
 
-    cachedOutputData = outputDataPort;
+    m_cachedOutputData = outputDataPort;
 
-    if (cameraCapture)
+    if (m_cameraCapture)
     {
-        cameraCapture->addOutputData(outputDataPort);
+        m_cameraCapture->addOutputData(outputDataPort);
     }
 }
 
 void CameraCaptureTool::startCapture(CameraCaptureConfig config, bool autoNaming)
 {
-    QMutexLocker locker(&mutex);
-    if (cameraCapture && cameraCapture->getCaptureType() != CAPTURE_TYPE_SINGLE)
+    QMutexLocker locker(&m_mutex);
+    if (m_cameraCapture && m_cameraCapture->getCaptureType() != CAPTURE_TYPE_SINGLE)
     {
         qInfo() << "captruing, please wait...";
         emit captureStateChanged(config.captureType, CAPTURE_WARNING, tr("captruing, please wait..."));
         return;
     }
 
-    if(!cameraCapture || (config.captureType != cameraCapture->getCaptureType()))
+    if(!m_cameraCapture || (config.captureType != m_cameraCapture->getCaptureType()))
     {
-        if (cameraCapture)
+        if (m_cameraCapture)
         {
-            delete cameraCapture;
+            delete m_cameraCapture;
         }
 
         if (config.captureType == CAPTURE_TYPE_MULTIPLE)
         {
-            cameraCapture = new CameraCaptureMultiple(config);
+            m_cameraCapture = new CameraCaptureMultiple(config);
         }
         else 
         {
-            cameraCapture = new CameraCaptureSingle(config);
+            m_cameraCapture = new CameraCaptureSingle(config);
         }
     }
     else 
     {
-        cameraCapture->setCameraCaptureConfig(config);
+        m_cameraCapture->setCameraCaptureConfig(config);
     }
 
-    cameraCapture->setCamera(camera);
+    m_cameraCapture->setCamera(m_camera);
 
     bool suc = true;
 
-    suc &= (bool)connect(cameraCapture, &CameraCaptureBase::captureStateChanged, this, &CameraCaptureTool::captureStateChanged);
-    suc &= (bool)connect(cameraCapture, &CameraCaptureBase::captureNumberUpdated, this, &CameraCaptureTool::captureNumberUpdated);
-    suc &= (bool)connect(cameraCapture, &CameraCaptureBase::finished, this, &CameraCaptureTool::stopCapture);
+    suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::captureStateChanged, this, &CameraCaptureTool::captureStateChanged);
+    suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::captureNumberUpdated, this, &CameraCaptureTool::captureNumberUpdated);
+    suc &= (bool)connect(m_cameraCapture, &CameraCaptureBase::finished, this, [=]() 
+        {
+            m_cameraCapture->deleteLater();
+            m_cameraCapture = nullptr;
+        });
 
     Q_ASSERT(suc);
 
     //start capture
-    cameraCapture->start();
+    m_cameraCapture->start();
 }
 
 void CameraCaptureTool::stopCapture()
 {
-    QMutexLocker locker(&mutex);
-    if (!cameraCapture)
+    QMutexLocker locker(&m_mutex);
+    if (!m_cameraCapture)
     {
         qWarning() << "cameraCapture is nullptr";
         return;
     }
 
-    cameraCapture->requestInterruption();
-    cameraCapture->wait();
+    m_cameraCapture->requestInterruption();
 
-    delete cameraCapture;
-    cameraCapture = nullptr;
+    //delete m_cameraCapture later
+    m_cameraCapture = nullptr;
 }
 
 void CameraCaptureTool::setCamera(std::shared_ptr<ICSCamera>& camera)
 {
-    this->camera = camera;
+    this->m_camera = camera;
 }
 
 void CameraCaptureTool::setCurOutputData(const CameraCaptureConfig& config)
@@ -137,24 +143,27 @@ void CameraCaptureTool::setCurOutputData(const CameraCaptureConfig& config)
         return;
     }
 
-    if (!cameraCapture)
+    if (!m_cameraCapture)
     {
-        cameraCapture = new CameraCaptureSingle(config);
+        m_cameraCapture = new CameraCaptureSingle(config);
     }
     
-    cameraCapture->setOutputData(cachedOutputData);
+    m_cameraCapture->setOutputData(m_cachedOutputData);
 }
 
 CameraCaptureBase::CameraCaptureBase(const CameraCaptureConfig& config, CAPTURE_TYPE captureType)
-    : captureConfig(config)
-    , captureType(captureType)
+    : m_captureConfig(config)
+    , m_captureType(captureType)
+    , m_maxCachedCount(MAX_CACHED_COUNT)
+    , m_maxSavingCount(MAX_SAVING_COUNT)
 {
-    //threadPool.setMaxThreadCount(1);
+    int maxThread = m_threadPool.maxThreadCount() > 4 ? 4 : m_threadPool.maxThreadCount();
+    m_threadPool.setMaxThreadCount(maxThread);
 }
 
 CAPTURE_TYPE CameraCaptureBase::getCaptureType() const
 {
-    return captureType;
+    return m_captureType;
 }
 
 void CameraCaptureBase::run()
@@ -163,103 +172,115 @@ void CameraCaptureBase::run()
     QTime time;
     time.start();
 
-    emit captureStateChanged(captureConfig.captureType, CAPTURING, tr("Start capturing"));
+    emit captureStateChanged(m_captureConfig.captureType, CAPTURING, tr("Start capturing"));
 
-    int captured = 0;
+    int captured = getCapturedCount();
+    int skip = getSkipCount();
+
+    emit captureNumberUpdated(captured, skip);
+
+    while (!isInterruptionRequested() && (skip + captured) < m_captureConfig.captureNumber)
     {
-        QMutexLocker locker(&saverMutex);
-        captured = capturedDataCount;
-    }
-
-    emit captureNumberUpdated(capturedDataCount, skipDataCount);
-
-    while (!isInterruptionRequested() && (skipDataCount + captured) < captureConfig.captureNumber)
-    {
-        mutex.lock();
-        if (outputDatas.isEmpty())
+        m_saverMutex.lock();
+        if (m_outputDatas.isEmpty() || m_outputSaverList.size() >= m_maxSavingCount)
         {
             QThread::msleep(2);
-            mutex.unlock();
+            m_saverMutex.unlock();
         }
         else 
-        {
-            OutputDataPort outputData;
-            outputData = outputDatas.dequeue();
-            mutex.unlock();
+        {   
+            OutputSaver* outputSaver = nullptr;
 
-            if (outputData.isEmpty())
-            {
-                emit captureStateChanged(captureConfig.captureType, CAPTURE_ERROR, tr("save frame data is empty"));
-                continue;
-            }
+            outputSaver = m_outputDatas.dequeue();
+            m_outputSaverList.push_back(outputSaver);
+            m_saverMutex.unlock();
 
-            int rgbFrameIndex = -1, depthFrameIndex = -1, pointCloudIndex = -1;
-            getCaptureIndex(outputData, rgbFrameIndex, depthFrameIndex, pointCloudIndex);
+            outputSaver->updateSaveIndex();
+            outputSaver->updateCaptureConfig(m_captureConfig);
 
             // save a frame in separate thread
-            OutputSaver* outputSaver = nullptr;
-            if (captureConfig.saveFormat == "raw")
-            {
-                outputSaver = new RawOutputSaver(this, captureConfig, outputData);
-            }
-            else 
-            {
-                outputSaver = new ImageOutputSaver(this, captureConfig, outputData);
-            }
-
-            outputSaver->setSaveIndex(rgbFrameIndex, depthFrameIndex, pointCloudIndex);
-
-            threadPool.start(outputSaver, QThread::NormalPriority);
+            m_threadPool.start(outputSaver, QThread::NormalPriority);
         }
 
-        {
-            QMutexLocker locker(&saverMutex);
-            captured = capturedDataCount;
-        }
+        captured = getCapturedCount();
+        skip = getSkipCount();
     }
     
-    captureFinished = true;
+    m_captureFinished = true;
 
     qInfo() << "wait all thread finished";
-
     //wait all thread finished
-    threadPool.waitForDone();
-
-    int timeMs = time.elapsed();
+    m_threadPool.clear();
+    m_threadPool.waitForDone();
 
     onCaptureDataDone();
 
-    qInfo("captured %d frames (%d dropped), spend time : %d ms", capturedDataCount, skipDataCount, timeMs);
+    int timeMs = time.elapsed();
+    qInfo("captured %d frames (%d dropped), spend time : %d ms", m_capturedDataCount, m_skipDataCount, timeMs);
 
-    QString msg = QString(tr("End capture, captured %1 frames (%2 dropped)")).arg(capturedDataCount).arg(skipDataCount);
-    emit captureStateChanged(captureConfig.captureType, CAPTURE_FINISHED, msg);
+    QString msg = QString(tr("End capture, captured %1 frames (%2 dropped)")).arg(m_capturedDataCount).arg(m_skipDataCount);
+    emit captureStateChanged(m_captureConfig.captureType, CAPTURE_FINISHED, msg);
 }
 
-void CameraCaptureBase::saveFinished()
+// called by OutputSaver
+void CameraCaptureBase::saveFinished(OutputSaver* saver)
 {
-    QMutexLocker locker(&saverMutex);
-    capturedDataCount++;
+    QMutexLocker locker(&m_saverMutex);
 
-    emit captureNumberUpdated(capturedDataCount, skipDataCount);
+    m_capturedDataCount++;
+    m_outputSaverList.removeAll(saver);
+
+    emit captureNumberUpdated(m_capturedDataCount, m_skipDataCount);
 }
 
-void CameraCaptureBase::setCamera(std::shared_ptr<ICSCamera>& camera)
+void CameraCaptureBase::setCamera(std::shared_ptr<ICSCamera>& m_camera)
 {
-    this->camera = camera;
+    this->m_camera = m_camera;
 }
 
 void CameraCaptureBase::setCameraCaptureConfig(const CameraCaptureConfig& config)
 {
-    captureConfig = config;
+    m_captureConfig = config;
 }
 
 void CameraCaptureBase::setOutputData(const OutputDataPort& outputDataPort)
 {
-    QMutexLocker locker(&mutex);
-    outputDatas.clear();
-    outputDatas.enqueue(outputDataPort);
+    QMutexLocker locker(&m_saverMutex);
+    while(!m_outputDatas.isEmpty())
+    {
+        auto output = m_outputDatas.dequeue();
+        delete output;
+    }
 
-    cachedDataCount++;
+    m_outputDatas.enqueue(genOutputSaver(outputDataPort));
+    m_cachedDataCount++;
+}
+
+OutputSaver* CameraCaptureBase::genOutputSaver(const OutputDataPort& outputData)
+{
+    OutputSaver* outputSaver = nullptr;
+    if (m_captureConfig.saveFormat == "raw")
+    {
+        outputSaver = new RawOutputSaver(this, m_captureConfig, outputData);
+    }
+    else
+    {
+        outputSaver = new ImageOutputSaver(this, m_captureConfig, outputData);
+    }
+
+    return outputSaver;
+}
+
+int CameraCaptureBase::getCapturedCount()
+{
+    QMutexLocker locker(&m_saverMutex);
+    return m_capturedDataCount;
+}
+
+int CameraCaptureBase::getSkipCount()
+{
+    QMutexLocker locker(&m_saverMutex);
+    return m_skipDataCount;
 }
 
 YAML::Node genYamlNodeFromIntrinsics(const Intrinsics& intrinsics)
@@ -392,12 +413,12 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
 
     // 
     rootNode["Version"] = "1.0.0";
-    rootNode["Frame Number"] = capturedDataCount;
-    rootNode["Data Types"] = genYamlNodeFromDataTypes(captureConfig.captureDataTypes);
-    rootNode["Save Format"] = captureConfig.saveFormat.toStdString();
-    rootNode["Name"] = captureConfig.saveName.toStdString();
+    rootNode["Frame Number"] = m_capturedDataCount;
+    rootNode["Data Types"] = genYamlNodeFromDataTypes(m_captureConfig.captureDataTypes);
+    rootNode["Save Format"] = m_captureConfig.saveFormat.toStdString();
+    rootNode["Name"] = m_captureConfig.saveName.toStdString();
 
-    if (captureConfig.captureDataTypes.contains(CAMERA_DATA_POINT_CLOUD) && captureConfig.savePointCloudWithTexture)
+    if (m_captureConfig.captureDataTypes.contains(CAMERA_DATA_POINT_CLOUD) && m_captureConfig.savePointCloudWithTexture)
     {
         rootNode["With Texture"] = true;
     }
@@ -405,7 +426,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
     // save depth resolution
     {
         QVariant value;
-        camera->getCameraPara(cs::parameter::PARA_DEPTH_RESOLUTION, value);
+        m_camera->getCameraPara(cs::parameter::PARA_DEPTH_RESOLUTION, value);
         QSize res = value.toSize();
 
         YAML::Node nodeRes;
@@ -418,7 +439,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         // Depth intrinsics
         Intrinsics depthIntrinsics;
         QVariant intrinsics;
-        camera->getCameraPara(cs::parameter::PARA_DEPTH_INTRINSICS, intrinsics);
+        m_camera->getCameraPara(cs::parameter::PARA_DEPTH_INTRINSICS, intrinsics);
         if (intrinsics.isValid())
         {
             depthIntrinsics = intrinsics.value<Intrinsics>();
@@ -432,7 +453,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         // save depth scale
         QVariant value;
         float depthScale;
-        camera->getCameraPara(cs::parameter::PARA_DEPTH_SCALE, value);
+        m_camera->getCameraPara(cs::parameter::PARA_DEPTH_SCALE, value);
         if (value.isValid())
         {
             depthScale = value.toFloat();
@@ -443,7 +464,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
     {
         // save depth range
         QVariant value;
-        camera->getCameraPara(cs::parameter::PARA_DEPTH_RANGE, value);
+        m_camera->getCameraPara(cs::parameter::PARA_DEPTH_RANGE, value);
         if (value.isValid())
         {
             auto range = value.value<QPair<float, float>>();
@@ -455,7 +476,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
     {
         // Depth exposure
         QVariant value;
-        camera->getCameraPara(cs::parameter::PARA_DEPTH_EXPOSURE, value);
+        m_camera->getCameraPara(cs::parameter::PARA_DEPTH_EXPOSURE, value);
         if (value.isValid())
         {
             rootNode["Depth Exposure Time"] = value.toFloat();
@@ -465,7 +486,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
     {
         // Depth gain
         QVariant value;
-        camera->getCameraPara(cs::parameter::PARA_DEPTH_GAIN, value);
+        m_camera->getCameraPara(cs::parameter::PARA_DEPTH_GAIN, value);
         if (value.isValid())
         {
             rootNode["Depth Gain"] = value.toFloat();
@@ -474,13 +495,13 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
 
     // RGB intrinsics
     QVariant hasRgbV;
-    camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
+    m_camera->getCameraPara(cs::parameter::PARA_HAS_RGB, hasRgbV);
 
     if (hasRgbV.isValid() && hasRgbV.toBool())
     {
         // save RGB resolution
         QVariant value;
-        camera->getCameraPara(cs::parameter::PARA_RGB_RESOLUTION, value);
+        m_camera->getCameraPara(cs::parameter::PARA_RGB_RESOLUTION, value);
         QSize res = value.toSize();
         {
             YAML::Node nodeRes;
@@ -491,7 +512,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
 
         Intrinsics rgbIntrinsics;
         QVariant intrinsics;
-        camera->getCameraPara(cs::parameter::PARA_RGB_INTRINSICS, intrinsics);
+        m_camera->getCameraPara(cs::parameter::PARA_RGB_INTRINSICS, intrinsics);
 
         if (intrinsics.isValid())
         {
@@ -508,7 +529,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         {
             // RGB exposure
             QVariant value;
-            camera->getCameraPara(cs::parameter::PARA_RGB_EXPOSURE, value);
+            m_camera->getCameraPara(cs::parameter::PARA_RGB_EXPOSURE, value);
             if (value.isValid())
             {
                 rootNode["RGB Exposure Time"] = value.toFloat();
@@ -518,7 +539,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         {
             // RGB gain
             QVariant value;
-            camera->getCameraPara(cs::parameter::PARA_RGB_GAIN, value);
+            m_camera->getCameraPara(cs::parameter::PARA_RGB_GAIN, value);
             if (value.isValid())
             {
                 rootNode["RGB Gain"] = value.toFloat();
@@ -530,7 +551,7 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
         // save extrinsics
         QVariant value;
         Extrinsics extrinsics;
-        camera->getCameraPara(cs::parameter::PARA_EXTRINSICS, value);
+        m_camera->getCameraPara(cs::parameter::PARA_EXTRINSICS, value);
         if (value.isValid())
         {
             extrinsics = value.value<Extrinsics>();
@@ -544,17 +565,17 @@ void CameraCaptureBase::saveCameraPara(QString filePath)
 void CameraCaptureBase::onCaptureDataDone()
 {
     // save camera parameters to file
-    QString savePath = captureConfig.saveDir + QDir::separator() + captureConfig.saveName + "-CaptureParameters.yaml";
+    QString savePath = m_captureConfig.saveDir + QDir::separator() + m_captureConfig.saveName + "-CaptureParameters.yaml";
     saveCameraPara(savePath);
 }
 
 CameraCaptureSingle::CameraCaptureSingle(const CameraCaptureConfig& config)
     : CameraCaptureBase(config, CAPTURE_TYPE_SINGLE)
 {
-    realSaveFolder = config.saveDir;
+    m_realSaveFolder = config.saveDir;
 }
 
-void CameraCaptureSingle::getCaptureIndex(OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex)
+void CameraCaptureSingle::getCaptureIndex(const OutputDataPort& output, int& rgbFrameIndex, int& depthFrameIndex, int& pointCloudIndex)
 {
     rgbFrameIndex = depthFrameIndex = pointCloudIndex = -1;
 }
@@ -562,8 +583,8 @@ void CameraCaptureSingle::getCaptureIndex(OutputDataPort& output, int& rgbFrameI
 CameraCaptureMultiple::CameraCaptureMultiple(const CameraCaptureConfig& config)
     : CameraCaptureBase(config, CAPTURE_TYPE_MULTIPLE)
 {
-    realSaveFolder = captureConfig.saveDir;
-    captureConfig.saveDir = genTmpSaveDir(config.saveDir);
+    m_realSaveFolder = m_captureConfig.saveDir;
+    m_captureConfig.saveDir = genTmpSaveDir(config.saveDir);
 }
 
 QString CameraCaptureMultiple::genTmpSaveDir(QString saveDir)
@@ -588,37 +609,37 @@ QString CameraCaptureMultiple::genTmpSaveDir(QString saveDir)
 
 void CameraCaptureMultiple::addOutputData(const OutputDataPort& outputDataPort)
 {
-    if (captureFinished)
+    if (m_captureFinished)
     {
         return;
     }
 
-    QMutexLocker locker(&mutex);
-    if (cachedDataCount + skipDataCount  >= captureConfig.captureNumber)
+    QMutexLocker locker(&m_saverMutex);
+    if (m_cachedDataCount + m_skipDataCount  >= m_captureConfig.captureNumber)
     {
         qInfo() << "output data count >= capture count, skip the output data";
         return;
     }
 
-    if (outputDatas.size() >= maxCachedCount)
+    if (m_outputDatas.size() >= m_maxCachedCount)
     {
-        skipDataCount++;
-        qWarning() << "skip one frame, skipDataCount=" << skipDataCount << ", (skipDataCount + cachedDataCount) = " << cachedDataCount + skipDataCount;
+        m_skipDataCount++;
+        qWarning() << "skip one frame, skipDataCount=" << m_skipDataCount << ", (skipDataCount + cachedDataCount) = " << m_cachedDataCount + m_skipDataCount;
 
-        emit captureStateChanged(captureConfig.captureType, CAPTURE_WARNING, tr("a frame dropped"));
+        emit captureStateChanged(m_captureConfig.captureType, CAPTURE_WARNING, tr("a frame dropped"));
     }
     else 
     {
-        outputDatas.enqueue(outputDataPort);
-        cachedDataCount++;
+        m_outputDatas.enqueue(genOutputSaver(outputDataPort));
+        m_cachedDataCount++;
     }
 }
 
-void CameraCaptureMultiple::getCaptureIndex(OutputDataPort& output, int& rgbFrameIdx, int& depthFrameIdx, int& pointCloudIdx)
+void CameraCaptureMultiple::getCaptureIndex(const OutputDataPort& output, int& rgbFrameIdx, int& depthFrameIdx, int& pointCloudIdx)
 {
-    rgbFrameIdx = capturedRgbCount;
-    depthFrameIdx = capturedDepthCount;
-    pointCloudIdx = capturePointCloudCount;
+    rgbFrameIdx = m_capturedRgbCount;
+    depthFrameIdx = m_capturedDepthCount;
+    pointCloudIdx = m_capturePointCloudCount;
 
     FrameData frameData = output.getFrameData();
     
@@ -626,15 +647,15 @@ void CameraCaptureMultiple::getCaptureIndex(OutputDataPort& output, int& rgbFram
     {
         if (streamData.dataInfo.streamDataType == TYPE_DEPTH)
         {
-            capturedDepthCount++;
-            capturePointCloudCount++;
+            m_capturedDepthCount++;
+            m_capturePointCloudCount++;
 
-            depthTimeStamps.push_back(streamData.dataInfo.timeStamp);
+            m_depthTimeStamps.push_back(streamData.dataInfo.timeStamp);
         }
         else if (streamData.dataInfo.streamDataType == TYPE_RGB)
         {
-            capturedRgbCount++;
-            rgbTimeStamps.push_back(streamData.dataInfo.timeStamp);
+            m_capturedRgbCount++;
+            m_rgbTimeStamps.push_back(streamData.dataInfo.timeStamp);
         }
     }
 }
@@ -645,7 +666,7 @@ void CameraCaptureMultiple::onCaptureDataDone()
     saveTimeStamps();
 
     // save camera parameters and capture information
-    QString savePath = captureConfig.saveDir + QDir::separator() + "CaptureParameters.yaml";
+    QString savePath = m_captureConfig.saveDir + QDir::separator() + "CaptureParameters.yaml";
     saveCameraPara(savePath);
 
     // compress to zip file
@@ -656,9 +677,9 @@ void CameraCaptureMultiple::saveTimeStamps()
 {
     qInfo() << "save time stamps";
 
-    QString savePath = captureConfig.saveDir + QDir::separator() + "TimeStamps.txt";
+    QString savePath = m_captureConfig.saveDir + QDir::separator() + "TimeStamps.txt";
 
-    if (depthTimeStamps.isEmpty() && rgbTimeStamps.isEmpty())
+    if (m_depthTimeStamps.isEmpty() && m_rgbTimeStamps.isEmpty())
     {
         return;
     }
@@ -674,13 +695,13 @@ void CameraCaptureMultiple::saveTimeStamps()
     QTextStream ts(&file);
 
     // save depth time stamps
-    if (!depthTimeStamps.isEmpty())
+    if (!m_depthTimeStamps.isEmpty())
     {
         ts << "[Depth Time Stamps]\n";
-        const int size = depthTimeStamps.size();
+        const int size = m_depthTimeStamps.size();
         for(int i = 0; i < size; i++)
         {
-            QString time = QString().setNum(qRound64(depthTimeStamps.at(i)));
+            QString time = QString().setNum(qRound64(m_depthTimeStamps.at(i)));
             QString s = QString("%1 = %2\n").arg(i, 4, 10,QChar('0')).arg(time);
             ts << s;
         }
@@ -689,13 +710,13 @@ void CameraCaptureMultiple::saveTimeStamps()
     }
 
     // save RGB time stamps
-    if (!rgbTimeStamps.isEmpty())
+    if (!m_rgbTimeStamps.isEmpty())
     {
         ts << "[RGB Time Stamps]\n";
-        const int size = rgbTimeStamps.size();
+        const int size = m_rgbTimeStamps.size();
         for (int i = 0; i < size; i++)
         {
-            QString time = QString().setNum(qRound64(rgbTimeStamps.at(i)));
+            QString time = QString().setNum(qRound64(m_rgbTimeStamps.at(i)));
             QString s = QString("%1 = %2\n").arg(i, 4, 10, QChar('0')).arg(time);
             ts << s;
         }
@@ -704,23 +725,23 @@ void CameraCaptureMultiple::saveTimeStamps()
 
 void CameraCaptureMultiple::compressToZip()
 {
-    emit captureStateChanged(captureConfig.captureType, CAPTURING, tr("Please wait for the file to be compressed to zip"));
+    emit captureStateChanged(m_captureConfig.captureType, CAPTURING, tr("Please wait for the file to be compressed to zip"));
 
-    QString zipFile = realSaveFolder + QDir::separator() + captureConfig.saveName + ".zip";
+    QString m_zipFile = m_realSaveFolder + QDir::separator() + m_captureConfig.saveName + ".zip";
 
-    int result = JlCompress::compressDir(zipFile, captureConfig.saveDir, false, QDir::Files);
+    int result = JlCompress::compressDir(m_zipFile, m_captureConfig.saveDir, false, QDir::Files);
     if (result)
     {
         qInfo() << "Compress zip file success.";
     }
     else 
     {
-        qWarning() << "Compress zip file failed, zip file : " << zipFile;
-        emit captureStateChanged(captureConfig.captureType, CAPTURE_ERROR, tr("Failed to compress zip file"));
+        qWarning() << "Compress zip file failed, zip file : " << m_zipFile;
+        emit captureStateChanged(m_captureConfig.captureType, CAPTURE_ERROR, tr("Failed to compress zip file"));
     }
 
     // delete tmp folder
-    qInfo() << "delete tmp dir:" << captureConfig.saveDir;
-    QDir dir(captureConfig.saveDir);
+    qInfo() << "delete tmp dir:" << m_captureConfig.saveDir;
+    QDir dir(m_captureConfig.saveDir);
     dir.removeRecursively();
 }

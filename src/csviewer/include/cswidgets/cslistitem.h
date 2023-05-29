@@ -45,16 +45,16 @@ signals:
 private:
     QString getTranslate(const char* text);
 private:
-    QLabel* iconLabel;
-    QLabel* actionLabel;
-    QLabel* textLabel;
+    QLabel* m_iconLabel;
+    QLabel* m_actionLabel;
+    QLabel* m_textLabel;
     
-    int itemIndex = 0;
-    bool isSelected = false;
-    const char* actionOnText;
-    const char* actionOffText;
-    const char* context;
-    QListWidgetItem* listWidgetItem;
+    int m_itemIndex = 0;
+    bool m_isSelected = false;
+    const char* m_actionOnText;
+    const char* m_actionOffText;
+    const char* m_context;
+    QListWidgetItem* m_listWidgetItem;
 };
 
 #endif // _CS_LIST_ITEM_H

@@ -36,7 +36,7 @@ public:
     void updateCameraInfo(const CSCameraInfo& info);
     void onTranslate();
 private:
-    Ui::CameraInfoWidget* cameraInfoUi;
+    Ui::CameraInfoWidget* m_cameraInfoUi;
 };
 
 #endif // _CS_CAMERAINFODIALOG_H

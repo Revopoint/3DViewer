@@ -26,9 +26,9 @@
 
 using namespace cs;
 OutputSaver::OutputSaver(CameraCaptureBase* cameraCapture, const CameraCaptureConfig& config, const OutputDataPort& output)
-    : cameraCapture(cameraCapture)
-    , captureConfig(config)
-    , outputDataPort(output)
+    : m_cameraCapture(cameraCapture)
+    , m_captureConfig(config)
+    , m_outputDataPort(output)
 {
     //qInfo() << "OutputSaver";
     setAutoDelete(true);
@@ -47,33 +47,45 @@ void OutputSaver::run()
     // save point cloud
     savePointCloud();
 
-    cameraCapture->saveFinished();
+    m_cameraCapture->saveFinished(this);
+}
+
+void OutputSaver::updateCaptureConfig(const CameraCaptureConfig& config)
+{
+    m_captureConfig = config;
+}
+
+void OutputSaver::updateSaveIndex()
+{
+    int rgbFrameIndex = -1, depthFrameIndex = -1, pointCloudIndex = -1;
+    m_cameraCapture->getCaptureIndex(m_outputDataPort, rgbFrameIndex, depthFrameIndex, pointCloudIndex);
+    setSaveIndex(rgbFrameIndex, depthFrameIndex, pointCloudIndex);
 }
 
 void OutputSaver::setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex)
 {
-    this->rgbFrameIndex = rgbFrameIndex;
-    this->depthFrameIndex = depthFrameIndex;
-    this->pointCloudIndex = pointCloudIndex;
+    this->m_rgbFrameIndex = rgbFrameIndex;
+    this->m_depthFrameIndex = depthFrameIndex;
+    this->m_pointCloudIndex = pointCloudIndex;
 }
 
 void OutputSaver::savePointCloud()
 {
-    if (!captureConfig.captureDataTypes.contains(CAMERA_DATA_POINT_CLOUD))
+    if (!m_captureConfig.captureDataTypes.contains(CAMERA_DATA_POINT_CLOUD))
     {
         return;
     }
 
-    if (!outputDataPort.hasData(CAMERA_DATA_POINT_CLOUD) && !outputDataPort.hasData(CAMERA_DATA_DEPTH))
+    if (!m_outputDataPort.hasData(CAMERA_DATA_POINT_CLOUD) && !m_outputDataPort.hasData(CAMERA_DATA_DEPTH))
     {
         return;
     }
 
     QImage texImage;
-    auto frameData = outputDataPort.getFrameData();
+    auto frameData = m_outputDataPort.getFrameData();
 
     // generate texture image from frame data
-    if (captureConfig.savePointCloudWithTexture)
+    if (m_captureConfig.savePointCloudWithTexture)
     {
         for (auto& streamData : frameData.data)
         {
@@ -95,9 +107,9 @@ void OutputSaver::savePointCloud()
 
     bool saveTexture = texImage.isNull();
 
-    if (outputDataPort.hasData(CAMERA_DATA_POINT_CLOUD))
+    if (m_outputDataPort.hasData(CAMERA_DATA_POINT_CLOUD))
     {
-        cs::Pointcloud pointCloud = outputDataPort.getPointCloud();
+        cs::Pointcloud pointCloud = m_outputDataPort.getPointCloud();
         savePointCloud(pointCloud, texImage);
     }
     else
@@ -140,7 +152,7 @@ void OutputSaver::savePointCloud()
 
 void OutputSaver::saveOutput2D()
 {
-    FrameData frameData = outputDataPort.getFrameData();
+    FrameData frameData = m_outputDataPort.getFrameData();
     for (auto& streamData : frameData.data)
     {
         saveOutput2D(streamData);
@@ -149,7 +161,7 @@ void OutputSaver::saveOutput2D()
 
 void OutputSaver::saveOutput2D(StreamData& streamData)
 {
-    auto captureTypes = captureConfig.captureDataTypes;
+    auto captureTypes = m_captureConfig.captureDataTypes;
     if (captureTypes.contains(CAMERA_DATA_RGB))
     {
         saveOutputRGB(streamData);
@@ -184,35 +196,35 @@ void OutputSaver::savePointCloud(cs::Pointcloud& pointCloud, QImage& texImage)
 
 QString OutputSaver::getSavePath(CS_CAMERA_DATA_TYPE dataType)
 {
-    QString fileName = captureConfig.saveName;
+    QString fileName = m_captureConfig.saveName;
     QString savePath;
 
     switch (dataType)
     {
     case CAMERA_DATA_L:
-        fileName = (depthFrameIndex < 0) ? QString("%1-ir-L").arg(fileName) : QString("%1-ir-L-%2").arg(fileName).arg(depthFrameIndex, 4, 10, QChar('0'));
-        fileName += suffix2D;
+        fileName = (m_depthFrameIndex < 0) ? QString("%1-ir-L").arg(fileName) : QString("%1-ir-L-%2").arg(fileName).arg(m_depthFrameIndex, 4, 10, QChar('0'));
+        fileName += m_suffix2D;
         break;
     case CAMERA_DATA_R:
-        fileName = (depthFrameIndex < 0) ? QString("%1-ir-R").arg(fileName) : QString("%1-ir-R-%2").arg(fileName).arg(depthFrameIndex, 4, 10, QChar('0'));
-        fileName += suffix2D;
+        fileName = (m_depthFrameIndex < 0) ? QString("%1-ir-R").arg(fileName) : QString("%1-ir-R-%2").arg(fileName).arg(m_depthFrameIndex, 4, 10, QChar('0'));
+        fileName += m_suffix2D;
         break;
     case CAMERA_DATA_DEPTH:
-        fileName = (depthFrameIndex < 0) ? QString("%1-depth").arg(fileName) : QString("%1-depth-%2").arg(fileName).arg(depthFrameIndex, 4, 10, QChar('0'));
-        fileName += suffix2D;
+        fileName = (m_depthFrameIndex < 0) ? QString("%1-depth").arg(fileName) : QString("%1-depth-%2").arg(fileName).arg(m_depthFrameIndex, 4, 10, QChar('0'));
+        fileName += m_suffix2D;
         break;
     case CAMERA_DATA_RGB:
-        fileName = (rgbFrameIndex < 0) ? QString("%1-RGB").arg(fileName) : QString("%1-RGB-%2").arg(fileName).arg(rgbFrameIndex, 4, 10, QChar('0'));
-        fileName += suffix2D;
+        fileName = (m_rgbFrameIndex < 0) ? QString("%1-RGB").arg(fileName) : QString("%1-RGB-%2").arg(fileName).arg(m_rgbFrameIndex, 4, 10, QChar('0'));
+        fileName += m_suffix2D;
         break;
     case CAMERA_DATA_POINT_CLOUD:
-        fileName = (pointCloudIndex < 0) ? QString("%1.ply").arg(fileName) : QString("%1-%2.ply").arg(fileName).arg(pointCloudIndex, 4, 10, QChar('0'));
+        fileName = (m_pointCloudIndex < 0) ? QString("%1.ply").arg(fileName) : QString("%1-%2.ply").arg(fileName).arg(m_pointCloudIndex, 4, 10, QChar('0'));
         break;
     default:
         break;
     }
 
-    savePath = QString("%1/%2").arg(captureConfig.saveDir).arg(fileName);
+    savePath = QString("%1/%2").arg(m_captureConfig.saveDir).arg(fileName);
 
     return savePath;
 }
@@ -220,7 +232,7 @@ QString OutputSaver::getSavePath(CS_CAMERA_DATA_TYPE dataType)
 ImageOutputSaver::ImageOutputSaver(CameraCaptureBase* cameraCapture, const CameraCaptureConfig& config, const OutputDataPort& output)
     : OutputSaver(cameraCapture, config, output)
 {
-    suffix2D = ".png";
+    m_suffix2D = ".png";
 }
 
 void ImageOutputSaver::saveOutputRGB(StreamData& streamData)
@@ -234,9 +246,9 @@ void ImageOutputSaver::saveOutputRGB(StreamData& streamData)
         QString savePath = getSavePath(dataType);
 
         QImage image;
-        if (outputDataPort.hasData(dataType))
+        if (m_outputDataPort.hasData(dataType))
         {
-            image = outputDataPort.getOutputData2D(dataType).image;
+            image = m_outputDataPort.getOutputData2D(dataType).image;
         }
         else
         {
@@ -311,9 +323,9 @@ void ImageOutputSaver::saveOutputIr(StreamData& streamData)
             const int offset2 = pair.second * width * height + offset;
 
             QImage image;
-            if (outputDataPort.hasData(dataType))
+            if (m_outputDataPort.hasData(dataType))
             {
-                image = outputDataPort.getOutputData2D(dataType).image;
+                image = m_outputDataPort.getOutputData2D(dataType).image;
             }
             else
             {
@@ -335,7 +347,7 @@ void ImageOutputSaver::saveOutputIr(StreamData& streamData)
 RawOutputSaver::RawOutputSaver(CameraCaptureBase* cameraCapture, const CameraCaptureConfig& config, const OutputDataPort& output)
     : OutputSaver(cameraCapture, config, output)
 {
-    suffix2D = ".raw";
+    m_suffix2D = ".raw";
 }
 
 void RawOutputSaver::saveOutputRGB(StreamData& streamData)

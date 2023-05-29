@@ -55,10 +55,10 @@ CSLogger::CSLogger()
 
 CSLogger::~CSLogger()
 {
-    if (logFile.isOpen())
+    if (m_logFile.isOpen())
     {
-        logFile.flush();
-        logFile.close();
+        m_logFile.flush();
+        m_logFile.close();
     }
 
     quit();
@@ -67,26 +67,26 @@ CSLogger::~CSLogger()
 
 void CSLogger::setLogRootDir(QString dir)
 {
-    logRootDir = dir;
+    m_logRootDir = dir;
 }
 
 void CSLogger::setLogPrefix(QString prefix)
 {
-    logPrefix = prefix;
+    m_logPrefix = prefix;
 }
 
 void CSLogger::initialize()
 {
-    if (logRootDir.isEmpty())
+    if (m_logRootDir.isEmpty())
     {
         qWarning() << "Please set log dir first.";
         return;
     }
 
-    QDir dir(logRootDir);
+    QDir dir(m_logRootDir);
     if (!dir.exists())
     {
-        dir.mkpath(logRootDir);
+        dir.mkpath(m_logRootDir);
     }
 
     // delete logs from a week ago
@@ -139,22 +139,22 @@ void CSLogger::onLog(int type, QString msg, QString file, QString line, QString 
 
 void CSLogger::redirect(const QString& msg)
 {
-    if (!logFile.isOpen())
+    if (!m_logFile.isOpen())
     {
         QDateTime now = QDateTime::currentDateTime();
         QString day = now.toString("yyyyMMdd");
-        QString logPath = logRootDir + "/" + logPrefix + "." + day + ".log";
+        QString logPath = m_logRootDir + "/" + m_logPrefix + "." + day + ".log";
 
-        logFile.setFileName(logPath);
-        if (!logFile.open(QIODevice::WriteOnly | QIODevice::Append))
+        m_logFile.setFileName(logPath);
+        if (!m_logFile.open(QIODevice::WriteOnly | QIODevice::Append))
         {
             return;
         }
     }
 
-    if (logFile.isOpen())
+    if (m_logFile.isOpen())
     {
-        QTextStream ts(&logFile);
+        QTextStream ts(&m_logFile);
         ts << msg << "\n";
     }
 }
@@ -162,12 +162,12 @@ void CSLogger::redirect(const QString& msg)
 // delete logs from a week ago
 void CSLogger::delHistory()
 {
-    QDir dir(logRootDir);
+    QDir dir(m_logRootDir);
 
     QString endDay = QDateTime::currentDateTime().addDays(-7).toString("yyyyMMdd");
 
     QStringList filters;
-    filters << (logPrefix + ".*.log");
+    filters << (m_logPrefix + ".*.log");
     dir.setNameFilters(filters);
 
     auto fileList = dir.entryList();

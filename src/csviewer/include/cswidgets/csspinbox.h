@@ -44,8 +44,8 @@ public:
 private slots:
     void onSpinBoxValueChanged(int);
 private:
-    QLabel* titleLabel;
-    CustomSpinBox* spinBox;
+    QLabel* m_titleLabel;
+    CustomSpinBox* m_spinBox;
 };
 
 #endif //_CS_CSSPINBOX_H

@@ -35,8 +35,10 @@ public:
     virtual ~OutputSaver();
     void run() override;
 
-    void setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex);
+    void updateCaptureConfig(const CameraCaptureConfig& config);
+    void updateSaveIndex();
 protected:
+    void setSaveIndex(int rgbFrameIndex, int depthFrameIndex, int pointCloudIndex);
     void savePointCloud();
 
     void saveOutput2D();
@@ -51,14 +53,14 @@ protected:
     QString getSavePath(CS_CAMERA_DATA_TYPE dataType);
 
 protected:
-    CameraCaptureBase* cameraCapture = nullptr;
-    CameraCaptureConfig captureConfig;
-    OutputDataPort outputDataPort;
-    QString suffix2D;
+    CameraCaptureBase* m_cameraCapture = nullptr;
+    CameraCaptureConfig m_captureConfig;
+    OutputDataPort m_outputDataPort;
+    QString m_suffix2D;
 
-    int rgbFrameIndex = -1;
-    int depthFrameIndex = -1;
-    int pointCloudIndex = -1;
+    int m_rgbFrameIndex = -1;
+    int m_depthFrameIndex = -1;
+    int m_pointCloudIndex = -1;
 };
 
 class ImageOutputSaver : public OutputSaver

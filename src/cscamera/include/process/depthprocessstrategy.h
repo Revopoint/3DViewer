@@ -49,8 +49,8 @@ public:
 protected:
     void onProcessDepthData(const ushort* dataPtr, int length, int width, int height, QByteArray& output, QImage& depthImage);
 protected:
-    float depthScale;
-    Intrinsics depthIntrinsics;
+    float m_depthScale;
+    Intrinsics m_depthIntrinsics;
 
 private:
     QVector<OutputData2D> onProcessZ16(const StreamData& frameData);
@@ -64,16 +64,16 @@ private:
     void timeDomainSmooth(const ushort* dataPtr, int length, int width, int height, float* output);
 
 protected:
-    bool calcDepthCoord;
-    QPointF depthCoordCalcPos;
+    bool m_calcDepthCoord;
+    QPointF m_depthCoordCalcPos;
     
     // for time domain smooth
-    QList<QByteArray> filterCachedData;
-    QPair<float, float> depthRange;
+    QList<QByteArray> m_filterCachedData;
+    QPair<float, float> m_depthRange;
 
-    bool fillHole;
-    int filterValue;
-    int filterType;
+    bool m_fillHole;
+    int m_filterValue;
+    int m_filterType;
 };
 
 }

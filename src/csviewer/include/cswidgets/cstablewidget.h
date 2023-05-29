@@ -36,7 +36,7 @@ public:
 private slots:
 
 private:
-    QTableWidget* tableWidget;
-    QStringList headers;
+    QTableWidget* m_tableWidget;
+    QStringList m_headers;
 };
 #endif //_CS_CSTABLEWIDGET_H

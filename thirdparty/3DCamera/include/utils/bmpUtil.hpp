@@ -42,7 +42,7 @@ typedef struct tagRGBQUAD {
 
 static bool saveBmp(const char *data, int width, int height, int channel, const char *filename)
 {
-	BITMAPINFOHEADER pHeader; //∂®“Â–≈œ¢Õ∑        
+	BITMAPINFOHEADER pHeader; //ÂÆö‰πâ‰ø°ÊÅØÂ§¥        
 	pHeader.biSize = sizeof(BITMAPINFOHEADER);
 	pHeader.biWidth = width;
 	pHeader.biHeight = -height;
@@ -65,7 +65,7 @@ static bool saveBmp(const char *data, int width, int height, int channel, const 
 		if (channel == 1)
 		{
 			quads.resize(256);
-			for (int i = 0; i < 256; i++)                        //±È¿˙‘¥ÕºœÒµƒ—’…´±Ì≤¢◊™ªª£¨»ª∫Û–¥»Îƒø±ÍŒƒº˛
+			for (int i = 0; i < 256; i++)                        //ÈÅçÂéÜÊ∫êÂõæÂÉèÁöÑÈ¢úËâ≤Ë°®Âπ∂ËΩ¨Êç¢ÔºåÁÑ∂ÂêéÂÜôÂÖ•ÁõÆÊ†áÊñá‰ª∂
 			{
 				quads[i].rgbBlue = quads[i].rgbGreen = quads[i].rgbRed = i;
 				quads[i].rgbReserved = 0;
@@ -109,16 +109,16 @@ static bool saveBmp(const char *data, int width, int height, int channel, const 
 static bool readBmp(char *bmpName, std::vector<char> &bgrData, int &width, int &height)
 {
     FILE *fp;
-    if ((fp = fopen(bmpName, "rb")) == NULL)  //“‘∂˛Ω¯÷∆µƒ∑Ω Ω¥Úø™Œƒº˛
+    if ((fp = fopen(bmpName, "rb")) == NULL)  //‰ª•‰∫åËøõÂà∂ÁöÑÊñπÂºèÊâìÂºÄÊñá‰ª∂
     {
         return false;
     }
-    if (fseek(fp, sizeof(BITMAPFILEHEADER), 0))  //Ã¯π˝BITMAPFILEHEADE
+    if (fseek(fp, sizeof(BITMAPFILEHEADER), 0))  //Ë∑≥ËøáBITMAPFILEHEADE
     {
         return false;
     }
     BITMAPINFOHEADER header;
-    fread(&header, sizeof(BITMAPINFOHEADER), 1, fp);   //¥”fp÷–∂¡»°BITMAPINFOHEADER–≈œ¢µΩheader÷–,Õ¨ ±fpµƒ÷∏’Î“∆∂Ø
+    fread(&header, sizeof(BITMAPINFOHEADER), 1, fp);   //‰ªéfp‰∏≠ËØªÂèñBITMAPINFOHEADER‰ø°ÊÅØÂà∞header‰∏≠,ÂêåÊó∂fpÁöÑÊåáÈíàÁßªÂä®
     width = header.biWidth;
     height = header.biHeight;
     int channel = header.biBitCount / 8;
@@ -212,11 +212,11 @@ static bool saveFrameData(const char* saveDir, cs::IFramePtr frame, int index)
 	}
 	else if (frame->getFormat() == STREAM_FORMAT_Z16Y8Y8)
 	{
-		//Z16Y8Y8∞¸∫¨“ª∏ˆz16 ˝æ›£¨“ª∏ˆ◊Û∫ÏÕ‚ ˝∫Õ“ª∏ˆ”“∫ÏÕ‚ ˝æ›
+		//Z16Y8Y8ÂåÖÂê´‰∏Ä‰∏™z16Êï∞ÊçÆÔºå‰∏Ä‰∏™Â∑¶Á∫¢Â§ñÊï∞Âíå‰∏Ä‰∏™Âè≥Á∫¢Â§ñÊï∞ÊçÆ
 		snprintf(acPath, sizeof(acPath), "%sz16y8y8-%dx%d-%d-%d.bmp", saveDir, frame->getWidth(), frame->getHeight()
 			, index, frame->getSize());
 		cs::colorizer color;
-		//’˚ÃÂµƒ ˝æ›≥§∂»Œ™ øÌ*∏ﬂ*4£¨z16 ˝æ›√ø∏ˆœÒÀÿ2◊÷Ω⁄£¨∫ÏÕ‚ ˝æ›√ø∏ˆœÒÀÿ1◊÷Ω⁄£¨2+1+1°£
+		//Êï¥‰ΩìÁöÑÊï∞ÊçÆÈïøÂ∫¶‰∏∫ ÂÆΩ*È´ò*4Ôºåz16Êï∞ÊçÆÊØè‰∏™ÂÉèÁ¥†2Â≠óËäÇÔºåÁ∫¢Â§ñÊï∞ÊçÆÊØè‰∏™ÂÉèÁ¥†1Â≠óËäÇÔºå2+1+1„ÄÇ
 		int iLen = frame->getWidth()*frame->getHeight() * 4;
 		if (frame->getSize() != iLen)
 		{
@@ -229,7 +229,7 @@ static bool saveFrameData(const char* saveDir, cs::IFramePtr frame, int index)
 		rgb.resize(length * 3);
 		float scale = 0.1f;
 
-		//getData(FRAME_DATA_FORMAT_Z16)ªÒ»°Z16 ˝æ›
+		//getData(FRAME_DATA_FORMAT_Z16)Ëé∑ÂèñZ16Êï∞ÊçÆ
 		color.process((unsigned short *)frame->getData(FRAME_DATA_FORMAT_Z16), scale, rgb.data(), length);
 		if (cs::saveBmp((const char *)rgb.data(), frame->getWidth(), frame->getHeight(), 3, acPath))
 		{
@@ -244,7 +244,7 @@ static bool saveFrameData(const char* saveDir, cs::IFramePtr frame, int index)
 			, frame->getWidth(), frame->getHeight()
 			, index, frame->getSize()/2);
 
-		//getData(FRAME_DATA_FORMAT_IR_LEFT)ªÒ»°◊Û∫ÏÕ‚ ˝æ›
+		//getData(FRAME_DATA_FORMAT_IR_LEFT)Ëé∑ÂèñÂ∑¶Á∫¢Â§ñÊï∞ÊçÆ
 		cs::saveBmp((const char *)frame->getData(FRAME_DATA_FORMAT_IR_LEFT)
 			, frame->getWidth(), frame->getHeight(), 1, acPath);
 
@@ -252,7 +252,7 @@ static bool saveFrameData(const char* saveDir, cs::IFramePtr frame, int index)
 			, frame->getWidth(), frame->getHeight()
 			, index, frame->getSize()/2);
 
-		//getData(FRAME_DATA_FORMAT_IR_RIGHT)ªÒ»°”“∫ÏÕ‚ ˝æ›
+		//getData(FRAME_DATA_FORMAT_IR_RIGHT)Ëé∑ÂèñÂè≥Á∫¢Â§ñÊï∞ÊçÆ
 		cs::saveBmp((const char *)frame->getData(FRAME_DATA_FORMAT_IR_RIGHT)
 			, frame->getWidth(), frame->getHeight(), 1, acPath);
 	}

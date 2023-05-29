@@ -15,6 +15,7 @@
 #include <vector>
 #include <queue>
 #include <memory>
+#include <string>
 #include "Frame.hpp"
 #include "hpp/APIExport.hpp"
 
@@ -24,8 +25,8 @@ class ICamera;
 
 /**
 * @~chinese
-* \defgroup Camera Ïà»ú²Ù×÷
-* @brief Ìá¹©Ïà»úÁ¬½Ó£¬´ò¿ªÊı¾İÁ÷£¬ÉèÖÃÊôĞÔ£¬¶ÁÈ¡²ÎÊıµÈ¹¦ÄÜ
+* \defgroup Camera ç›¸æœºæ“ä½œ
+* @brief æä¾›ç›¸æœºè¿æ¥ï¼Œæ‰“å¼€æ•°æ®æµï¼Œè®¾ç½®å±æ€§ï¼Œè¯»å–å‚æ•°ç­‰åŠŸèƒ½
 * @{
 * @~english
 * \defgroup Camera Camera operations
@@ -35,7 +36,7 @@ class ICamera;
 
 /**
 * @~chinese
-* @brief »ñµÃÖ¡Êı¾İ»Øµ÷º¯Êı
+* @brief è·å¾—å¸§æ•°æ®å›è°ƒå‡½æ•°
 * @~english
 * @brief callback of get frame
 */
@@ -43,15 +44,15 @@ typedef void (*FrameCallback)(IFramePtr frame, void *usrData);
 
 /**
 * @~chinese
-* @brief Ïà»ú¶ÔÏóµÄ¹²ÏíÖ¸Õë
+* @brief ç›¸æœºå¯¹è±¡çš„å…±äº«æŒ‡é’ˆ
 * @~english
 * @brief the shared pointer of camera
 */
 typedef std::shared_ptr<ICamera> ICameraPtr;
-	
+
 /*!\class ICamera
 * @~chinese
-* @brief Ïà»ú½Ó¿Ú
+* @brief ç›¸æœºæ¥å£
 * @~english
 * @brief Camera interface
 */
@@ -63,8 +64,8 @@ public:
 
 	/**
 	* @~chinese
-	* @brief     Á¬½ÓÈÎÒâÒ»¸öÏà»ú
-	* @return    ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief     è¿æ¥ä»»æ„ä¸€ä¸ªç›¸æœº
+	* @return    æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief     Connect to any camera
 	* @return    success:return SUCCESS, fail:other error code
@@ -73,21 +74,21 @@ public:
 	
 	/**
 	* @~chinese
-	* @brief     Á¬½ÓÖ¸¶¨ĞÅÏ¢µÄÏà»ú
-	* @param[in] info			:Ö¸¶¨µÄÏà»úĞÅÏ¢£¬¿ÉÍ¨¹ıISystem::queryCameras½Ó¿Ú»ñµÃĞÅÏ¢ÁĞ±í
-	* @return    ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief     è¿æ¥æŒ‡å®šä¿¡æ¯çš„ç›¸æœº
+	* @param[in] info			:æŒ‡å®šçš„ç›¸æœºä¿¡æ¯ï¼Œå¯é€šè¿‡ISystem::queryCamerasæ¥å£è·å¾—ä¿¡æ¯åˆ—è¡¨
+	* @return    æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief     Connect to the specified camera
-	* @param[in] info			:the information of specified camera£¬you can get the infomations by ISystem::queryCameras
+	* @param[in] info			:the information of specified cameraï¼Œyou can get the infomations by ISystem::queryCameras
 	* @return    success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE connect(CameraInfo info) = 0;
 
     /**
 	* @~chinese
-	* @brief	  »ñÈ¡µ±Ç°Á¬½ÓÏà»úµÄĞÅÏ¢£¬°üÀ¨ĞòÁĞºÅ£¬°æ±¾ĞÅÏ¢£¬±êÊ¶Id
-	* @param[out] info			:½ÓÊÕ·µ»ØµÄÏà»úĞÅÏ¢
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief	  è·å–å½“å‰è¿æ¥ç›¸æœºçš„ä¿¡æ¯ï¼ŒåŒ…æ‹¬åºåˆ—å·ï¼Œç‰ˆæœ¬ä¿¡æ¯ï¼Œæ ‡è¯†Id
+	* @param[out] info			:æ¥æ”¶è¿”å›çš„ç›¸æœºä¿¡æ¯
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief	  Get the information of 3DCamera,include serial number, version, unique id
 	* @param[out] info			:information of connected camera
@@ -97,8 +98,8 @@ public:
 
 	/** 
 	* @~chinese 
-	* @brief	  ¶Ï¿ªÏà»úÁ¬½Ó
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief	  æ–­å¼€ç›¸æœºè¿æ¥
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english 
 	* @brief	  Disconnect to camera
 	* @return     success:return SUCCESS, fail:other error code
@@ -107,30 +108,30 @@ public:
     
     /**
 	* @~chinese
-	* @brief      »ñÈ¡Ö¸¶¨ÀàĞÍµÄÊı¾İÁ÷ËùÖ§³ÖµÄÁ÷¸ñÊ½ĞÅÏ¢ÁĞ±í
-	* @param[in]  streamType		£ºÁ÷ÀàĞÍ
-	* @param[out] streamInfos		£º·µ»ØµÄÁ÷¸ñÊ½ĞÅÏ¢ÁĞ±í
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–æŒ‡å®šç±»å‹çš„æ•°æ®æµæ‰€æ”¯æŒçš„æµæ ¼å¼ä¿¡æ¯åˆ—è¡¨
+	* @param[in]  streamType		ï¼šæµç±»å‹
+	* @param[out] streamInfos		ï¼šè¿”å›çš„æµæ ¼å¼ä¿¡æ¯åˆ—è¡¨
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english 
 	* @brief      Get all supported stream informations of the specified stream 
-	* @param[in]  streamType		£ºthe type of stream
-	* @param[out] streamInfos		£ºreturn the list of supported stream informations
+	* @param[in]  streamType		ï¼šthe type of stream
+	* @param[out] streamInfos		ï¼šreturn the list of supported stream informations
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE getStreamInfos(STREAM_TYPE streamType, std::vector<StreamInfo> &streamInfos) = 0;
 
     /**
 	* @~chinese
-	* @brief      ´ò¿ªÊı¾İÁ÷²¢Í¨¹ı»Øµ÷º¯Êı·µ»ØÖ¡Êı¾İ
-	* @param[in]  streamType		£ºĞèÒª´ò¿ªµÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-	* @param[in]  info				£ºĞèÒª´ò¿ªµÄÁ÷¸ñÊ½ĞÅÏ¢, ¿ÉÓÉgetStreamInfos·µ»Ø
-	* @param[in]  callback          : ·µ»ØÖ¡Êı¾İµÄ»Øµ÷º¯Êı
-	* @param[in]  userData          : ÓÃ»§Êı¾İ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      æ‰“å¼€æ•°æ®æµå¹¶é€šè¿‡å›è°ƒå‡½æ•°è¿”å›å¸§æ•°æ®
+	* @param[in]  streamType		ï¼šéœ€è¦æ‰“å¼€çš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+	* @param[in]  info				ï¼šéœ€è¦æ‰“å¼€çš„æµæ ¼å¼ä¿¡æ¯, å¯ç”±getStreamInfosè¿”å›
+	* @param[in]  callback          : è¿”å›å¸§æ•°æ®çš„å›è°ƒå‡½æ•°
+	* @param[in]  userData          : ç”¨æˆ·æ•°æ®
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Start stream and return frame by callback
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[out] info      		£ºstream information, returned by getStreamInfos
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[out] info      		ï¼šstream information, returned by getStreamInfos
 	* @param[in]  callback          : frame callback
 	* @param[in]  userData          : the user data
 	* @return success:return SUCCESS, fail:other error code
@@ -139,64 +140,64 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      ´ò¿ªÊı¾İÁ÷²¢Í¨¹ıgetFrameÖ÷¶¯»ñÈ¡Ö¡Êı¾İ
-	* @param[in]  streamType		£ºĞèÒª´ò¿ªµÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-	* @param[in]  info				£ºĞèÒª´ò¿ªµÄÁ÷¸ñÊ½ĞÅÏ¢, ¿ÉÓÉgetStreamInfos·µ»Ø
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      æ‰“å¼€æ•°æ®æµå¹¶é€šè¿‡getFrameä¸»åŠ¨è·å–å¸§æ•°æ®
+	* @param[in]  streamType		ï¼šéœ€è¦æ‰“å¼€çš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+	* @param[in]  info				ï¼šéœ€è¦æ‰“å¼€çš„æµæ ¼å¼ä¿¡æ¯, å¯ç”±getStreamInfosè¿”å›
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Start stream without callback, you should get frame by getFrame
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[out] info      		£ºstream information, returned by getStreamInfos
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[out] info      		ï¼šstream information, returned by getStreamInfos
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE startStream(STREAM_TYPE streamType, StreamInfo info) = 0;
 
     /**
 	* @~chinese
-	* @brief      Í£Ö¹Êı¾İÁ÷
-	* @param[in]  streamType		£ºĞèÒªÍ£Ö¹µÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      åœæ­¢æ•°æ®æµ
+	* @param[in]  streamType		ï¼šéœ€è¦åœæ­¢çš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Stop stream
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE stopStream(STREAM_TYPE streamType) = 0;
 
 	/**
 	* @~chinese
-	* @brief      ÔİÍ£Êı¾İÁ÷
-	* @param[in]  streamType		£ºĞèÒªÔİÍ£µÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      æš‚åœæ•°æ®æµ
+	* @param[in]  streamType		ï¼šéœ€è¦æš‚åœçš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Pause stream
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
 	* @return success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE pauseStream(STREAM_TYPE streamType) = 0;
 
 	/**
 	* @~chinese
-	* @brief      »Ö¸´Êı¾İÁ÷
-	* @param[in]  streamType		£ºĞèÒªÍ£Ö¹µÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      æ¢å¤æ•°æ®æµ
+	* @param[in]  streamType		ï¼šéœ€è¦åœæ­¢çš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Resume stream
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
 	* @return success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE resumeStream(STREAM_TYPE streamType) = 0;
 
 	/**
 	* @~chinese
-	* @brief      ÉèÖÃÁ÷µÄ»Øµ÷Í¨µÀ
-	* @param[in]  streamType		£ºĞèÒª´ò¿ªµÄÁ÷ÀàĞÍ£¬ ¼ûSTREAM_TYPE
-	* @param[in]  callback          : ·µ»ØÖ¡Êı¾İµÄ»Øµ÷º¯Êı
-	* @param[in]  userData          : ÓÃ»§Êı¾İ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è®¾ç½®æµçš„å›è°ƒé€šé“
+	* @param[in]  streamType		ï¼šéœ€è¦æ‰“å¼€çš„æµç±»å‹ï¼Œ è§STREAM_TYPE
+	* @param[in]  callback          : è¿”å›å¸§æ•°æ®çš„å›è°ƒå‡½æ•°
+	* @param[in]  userData          : ç”¨æˆ·æ•°æ®
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      setting the stream callback
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
 	* @param[in]  callback          : frame callback
 	* @param[in]  userData          : the user data
 	* @return success:return SUCCESS, fail:other error code
@@ -205,172 +206,172 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      Ö÷¶¯»ñÈ¡µ±Ç°Á÷Êä³öµÄÖ¡Êı¾İ
-	* @param[in]  streamType		£ºĞèÒª»ñÈ¡µÄÁ÷ÀàĞÍ
-	* @param[out] frame				£º·µ»ØÖ¡Êı¾İ
-	* @param[in]  timeout_ms		£º³¬Ê±Ê±¼ä£¬µ¥Î»ÎªºÁÃë
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      ä¸»åŠ¨è·å–å½“å‰æµè¾“å‡ºçš„å¸§æ•°æ®
+	* @param[in]  streamType		ï¼šéœ€è¦è·å–çš„æµç±»å‹
+	* @param[out] frame				ï¼šè¿”å›å¸§æ•°æ®
+	* @param[in]  timeout_ms		ï¼šè¶…æ—¶æ—¶é—´ï¼Œå•ä½ä¸ºæ¯«ç§’
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get frame manually
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[out] frame				£ºreturn the captured frame
-	* @param[in]  timeout_ms		£ºtimeout in millisecond
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[out] frame				ï¼šreturn the captured frame
+	* @param[in]  timeout_ms		ï¼štimeout in millisecond
 	* @return success:return SUCCESS, fail:other error code
 	**/   
     virtual ERROR_CODE getFrame(STREAM_TYPE streamType, IFramePtr &frame, int timeout_ms = 5000) = 0;
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡³É¶ÔµÄÉî¶ÈºÍRGBÖ¡
-	* @param[out] depthFrame		£º·µ»ØÉî¶ÈÖ¡
-	* @param[out] rgbFrame			: ·µ»ØRGBÖ¡
-	* @param[in]  timeout_ms		£º³¬Ê±Ê±¼ä£¬µ¥Î»ÎªºÁÃë
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–æˆå¯¹çš„æ·±åº¦å’ŒRGBå¸§
+	* @param[out] depthFrame		ï¼šè¿”å›æ·±åº¦å¸§
+	* @param[out] rgbFrame			: è¿”å›RGBå¸§
+	* @param[in]  timeout_ms		ï¼šè¶…æ—¶æ—¶é—´ï¼Œå•ä½ä¸ºæ¯«ç§’
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the paired frame of depth and rgb 
-	* @param[in]  depthFrame		£ºreturn the paired depth frame
-	* @param[out] frame				£ºreturn the paired rgb frame 
-	* @param[in]  timeout_ms		£ºtimeout in millisecond
+	* @param[in]  depthFrame		ï¼šreturn the paired depth frame
+	* @param[out] frame				ï¼šreturn the paired rgb frame 
+	* @param[in]  timeout_ms		ï¼štimeout in millisecond
 	* @return success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE getPairedFrame(IFramePtr &depthFrame, IFramePtr &rgbFrame, int timeout_ms = 5000) = 0;
 
 	/**
 	* @~chinese
-	* @brief      Èí´¥·¢Ä£Ê½ÏÂ´¥·¢NÖ¡£¨ÔİÊ±Ö»Ö§³Ö1Ö¡£©
-	* @param[in]  count				£º´¥·¢Ö¡Êı
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è½¯è§¦å‘æ¨¡å¼ä¸‹è§¦å‘Nå¸§ï¼ˆæš‚æ—¶åªæ”¯æŒ1å¸§ï¼‰
+	* @param[in]  count				ï¼šè§¦å‘å¸§æ•°
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Trigger N frames in software trigger mode (only one frame is supported temporarily)
-	* @param[in]  count				£ºthe count of trigger times
+	* @param[in]  count				ï¼šthe count of trigger times
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE softTrigger(int count = 1) = 0;
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡Ö¸¶¨Á÷µÄÖ¸¶¨ÊôĞÔ·¶Î§
-	* @param[in]  streamType		£ºÖ¸¶¨µÄÊı¾İÁ÷ÀàĞÍ
-	* @param[in]  propertyType		£ºÊôĞÔÀàĞÍ
-	* @param[out] min				£ºÊôĞÔµÄ×îĞ¡Öµ
-	* @param[out] max				£ºÊôĞÔµÄ×î´óÖµ
-	* @param[out] step				£ºÊôĞÔµ÷ÕûÊ±µÄ½¨Òéµ÷½Ú²½½ø
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–æŒ‡å®šæµçš„æŒ‡å®šå±æ€§èŒƒå›´
+	* @param[in]  streamType		ï¼šæŒ‡å®šçš„æ•°æ®æµç±»å‹
+	* @param[in]  propertyType		ï¼šå±æ€§ç±»å‹
+	* @param[out] min				ï¼šå±æ€§çš„æœ€å°å€¼
+	* @param[out] max				ï¼šå±æ€§çš„æœ€å¤§å€¼
+	* @param[out] step				ï¼šå±æ€§è°ƒæ•´æ—¶çš„å»ºè®®è°ƒèŠ‚æ­¥è¿›
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the value range of property
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[in]  propertyType		£ºproperty type, @see PROPERTY_TYPE
-	* @param[out] min				£ºthe minimum of the property
-	* @param[out] max				£ºthe minimum of the property
-	* @param[out] step				£ºthe step of the property
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[in]  propertyType		ï¼šproperty type, @see PROPERTY_TYPE
+	* @param[out] min				ï¼šthe minimum of the property
+	* @param[out] max				ï¼šthe minimum of the property
+	* @param[out] step				ï¼šthe step of the property
 	* @return success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE getPropertyRange(STREAM_TYPE streamType, PROPERTY_TYPE propertyType, float &min, float &max, float &step) = 0;	
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡Ö¸¶¨Á÷µÄÊôĞÔÖµ
-	* @param[in]  streamType		£ºÖ¸¶¨µÄÊı¾İÁ÷ÀàĞÍ
-	* @param[in]  propertyType		£ºÊôĞÔÀàĞÍ
-	* @param[out] value				£ºÊôĞÔµ±Ç°Öµ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–æŒ‡å®šæµçš„å±æ€§å€¼
+	* @param[in]  streamType		ï¼šæŒ‡å®šçš„æ•°æ®æµç±»å‹
+	* @param[in]  propertyType		ï¼šå±æ€§ç±»å‹
+	* @param[out] value				ï¼šå±æ€§å½“å‰å€¼
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the value of property
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[in]  propertyType		£ºproperty type, @see PROPERTY_TYPE
-	* @param[out] value				£ºthe value of the property
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[in]  propertyType		ï¼šproperty type, @see PROPERTY_TYPE
+	* @param[out] value				ï¼šthe value of the property
 	* @return success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE getProperty(STREAM_TYPE streamType, PROPERTY_TYPE propertyType, float &value) = 0;
 
 	/**
 	* @~chinese
-	* @brief      ĞŞ¸ÄÖ¸¶¨Á÷µÄÊôĞÔÖµ
-	* @param[in]  streamType		£ºÖ¸¶¨µÄÊı¾İÁ÷ÀàĞÍ
-	* @param[in]  propertyType		£ºÊôĞÔÀàĞÍ
-	* @param[in]  value				£ºĞèÒªÉèÖÃµÄÊôĞÔÖµ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      ä¿®æ”¹æŒ‡å®šæµçš„å±æ€§å€¼
+	* @param[in]  streamType		ï¼šæŒ‡å®šçš„æ•°æ®æµç±»å‹
+	* @param[in]  propertyType		ï¼šå±æ€§ç±»å‹
+	* @param[in]  value				ï¼šéœ€è¦è®¾ç½®çš„å±æ€§å€¼
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Set the value of property
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[in]  propertyType		£ºproperty type, @see PROPERTY_TYPE
-	* @param[in]  value				£ºthe value of property
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[in]  propertyType		ï¼šproperty type, @see PROPERTY_TYPE
+	* @param[in]  value				ï¼šthe value of property
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE setProperty(STREAM_TYPE streamType, PROPERTY_TYPE propertyType, float value) = 0;	
 
 	/**
 	* @~chinese
-	* @brief      ĞŞ¸ÄÀ©Õ¹ÊôĞÔÖµ
-	* @param[in]  propertyType		£ºÊôĞÔÀàĞÍ
-	* @param[in]  value				£ºĞèÒªÉèÖÃµÄÊôĞÔÖµ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      ä¿®æ”¹æ‰©å±•å±æ€§å€¼
+	* @param[in]  propertyType		ï¼šå±æ€§ç±»å‹
+	* @param[in]  value				ï¼šéœ€è¦è®¾ç½®çš„å±æ€§å€¼
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Set the value of extensional property
-	* @param[in]  propertyType		£ºproperty type, @see PROPERTY_TYPE_EXTENSION
-	* @param[in]  value				£ºthe value of extensional property
+	* @param[in]  propertyType		ï¼šproperty type, @see PROPERTY_TYPE_EXTENSION
+	* @param[in]  value				ï¼šthe value of extensional property
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE setPropertyExtension(PROPERTY_TYPE_EXTENSION propertyType, PropertyExtension value) = 0;
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡À©Õ¹ÊôĞÔµÄµ±Ç°Öµ
-	* @param[in]  propertyType		£ºÊôĞÔÀàĞÍ
-	* @param[out] value				£º·µ»ØµÄÖµ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–æ‰©å±•å±æ€§çš„å½“å‰å€¼
+	* @param[in]  propertyType		ï¼šå±æ€§ç±»å‹
+	* @param[out] value				ï¼šè¿”å›çš„å€¼
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the value of extensional property
-	* @param[in]  propertyType		£ºproperty type, @see PROPERTY_TYPE_EXTENSION
-	* @param[out] value				£ºreturn the value of extensional property
+	* @param[in]  propertyType		ï¼šproperty type, @see PROPERTY_TYPE_EXTENSION
+	* @param[out] value				ï¼šreturn the value of extensional property
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE getPropertyExtension(PROPERTY_TYPE_EXTENSION propertyType, PropertyExtension &value) = 0;
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡Ö¸¶¨ÀàĞÍÊı¾İÁ÷µÄÄÚ²Î
-	* @param[in]  streamType		£ºÖ¸¶¨µÄÊı¾İÁ÷ÀàĞÍ
-	* @param[out] intrinsics		£º·µ»ØÄÚ²Î
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–æŒ‡å®šç±»å‹æ•°æ®æµçš„å†…å‚
+	* @param[in]  streamType		ï¼šæŒ‡å®šçš„æ•°æ®æµç±»å‹
+	* @param[out] intrinsics		ï¼šè¿”å›å†…å‚
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the intrinsic of specified stream
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[out] intrinsics		£ºreturn the intrinsic of specified stream
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[out] intrinsics		ï¼šreturn the intrinsic of specified stream
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE getIntrinsics(STREAM_TYPE streamType, Intrinsics &intrinsics) = 0;
     
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡´ÓÉî¶ÈÁ÷µ½RGBÁ÷µÄĞı×ªÆ½ÒÆ²ÎÊı
-	* @param[out] extrinsics		£º·µ»ØÍâ²Î
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–ä»æ·±åº¦æµåˆ°RGBæµçš„æ—‹è½¬å¹³ç§»å‚æ•°
+	* @param[out] extrinsics		ï¼šè¿”å›å¤–å‚
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the extrinsics from depth stream to RGB stream
-	* @param[out] extrinsics		£ºreturn the extrinsics
+	* @param[out] extrinsics		ï¼šreturn the extrinsics
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE getExtrinsics(Extrinsics &extrinsics) = 0;
     
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡Ö¸¶¨ÀàĞÍÊı¾İÁ÷µÄ»û±ä²ÎÊı
-	* @param[in]  streamType		£ºÖ¸¶¨µÄÊı¾İÁ÷ÀàĞÍ
-	* @param[out] distort			£º·µ»ØÄÚ²Î
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–æŒ‡å®šç±»å‹æ•°æ®æµçš„ç•¸å˜å‚æ•°
+	* @param[in]  streamType		ï¼šæŒ‡å®šçš„æ•°æ®æµç±»å‹
+	* @param[out] distort			ï¼šè¿”å›å†…å‚
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the distort of the specified stream
-	* @param[in]  streamType		£ºstream type, @see STREAM_TYPE
-	* @param[out] distort			£ºreturn the distort of the specified stream
+	* @param[in]  streamType		ï¼šstream type, @see STREAM_TYPE
+	* @param[out] distort			ï¼šreturn the distort of the specified stream
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE getDistort(STREAM_TYPE streamType, Distort &distort) = 0;
 
 	/**
 	* @~chinese
-	* @brief	  ÖØÆôÏà»ú
-	* @return ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief	  é‡å¯ç›¸æœº
+	* @return æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief	  reboot camera
 	* @return success:return SUCCESS, fail:other error code
@@ -379,37 +380,37 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      Ğ´ÈëÓÃ»§×Ô¶¨ÒåÊı¾İ£¬³¤¶È±ØĞëÒªĞ¡ÓÚ1024×Ö½Ú
-	* @param[in]  userData			£ºĞ´ÈëÊı¾İÖ¸Õë
-	* @param[in]  length			£ºĞ´ÈëÊı¾İ³¤¶È
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      å†™å…¥ç”¨æˆ·è‡ªå®šä¹‰æ•°æ®ï¼Œé•¿åº¦å¿…é¡»è¦å°äº1024å­—èŠ‚
+	* @param[in]  userData			ï¼šå†™å…¥æ•°æ®æŒ‡é’ˆ
+	* @param[in]  length			ï¼šå†™å…¥æ•°æ®é•¿åº¦
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Write the user defined data to camera, at most 1024 bytes
-	* @param[in]  userData			£ºthe pointer of user defined data
-	* @param[in]  length			£ºthe length of user defined data
+	* @param[in]  userData			ï¼šthe pointer of user defined data
+	* @param[in]  length			ï¼šthe length of user defined data
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE setUserData(char *userData, int length) = 0;
 
 	/**
 	* @~chinese
-	* @brief      ¶ÁÈ¡ÓÃ»§×Ô¶¨ÒåÊı¾İ£¬³¤¶È±ØĞëÒªĞ¡ÓÚ1024×Ö½Ú
-	* @param[in]  userData			£º±£´æÊı¾İÇøµÄÖ¸Õë
-	* @param[in out] length			£º´«ÈëÎªuserDataµÄSize£¬·µ»ØÎªÊı¾İ³¤¶È
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è¯»å–ç”¨æˆ·è‡ªå®šä¹‰æ•°æ®ï¼Œé•¿åº¦å¿…é¡»è¦å°äº1024å­—èŠ‚
+	* @param[in]  userData			ï¼šä¿å­˜æ•°æ®åŒºçš„æŒ‡é’ˆ
+	* @param[in out] length			ï¼šä¼ å…¥ä¸ºuserDataçš„Sizeï¼Œè¿”å›ä¸ºæ•°æ®é•¿åº¦
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Write the user defined data to camera, at most 1024 bytes
-	* @param[in]  userData			£ºthe pointer of buffer to save user defined data
-	* @param[in]  length			£ºsize of input paramer 'userData',return the length of user defined data
+	* @param[in]  userData			ï¼šthe pointer of buffer to save user defined data
+	* @param[in]  length			ï¼šsize of input paramer 'userData',return the length of user defined data
 	* @return success:return SUCCESS, fail:other error code
 	**/
     virtual ERROR_CODE getUserData(char *userData, int &inputBufSizeAndOutLen) = 0;
 
 	/**
 	 * @~chinese
-	 * @brief      ³õÊ¼»¯Çı¶¯
-	 * @code		³õÊ¼»¯ĞòÁĞºÅ
-	 * @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	 * @brief      åˆå§‹åŒ–é©±åŠ¨
+	 * @code		åˆå§‹åŒ–åºåˆ—å·
+	 * @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	 * @~english	
 	 * @brief		initializate the driver
 	 * @code	the initializate code of driver
@@ -419,52 +420,52 @@ public:
 
     /**
     * @~chinese
-    * @brief      ÅĞ¶ÏÏà»úÊÇ·ñÖ§³ÖÖ¸¶¨ÀàĞÍÁ÷
-    * @param[in]  streamType		£ºÁ÷ÀàĞÍ
-    * @param[out] support		    £º·µ»ØÅĞ¶Ï½á¹û
-    * @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+    * @brief      åˆ¤æ–­ç›¸æœºæ˜¯å¦æ”¯æŒæŒ‡å®šç±»å‹æµ
+    * @param[in]  streamType		ï¼šæµç±»å‹
+    * @param[out] support		    ï¼šè¿”å›åˆ¤æ–­ç»“æœ
+    * @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
     * @~english
     * @brief      judge whether the camera supports the specified type of stream
-    * @param[in]  streamType		£ºthe type of stream
-    * @param[out] support		    £ºreturn the judgment result
+    * @param[in]  streamType		ï¼šthe type of stream
+    * @param[out] support		    ï¼šreturn the judgment result
     * @return success:return SUCCESS, fail:other error code
     **/
     virtual ERROR_CODE isStreamSupport(STREAM_TYPE streamType, bool& support) = 0;
 
 	/**
 	* @~chinese
-	* @brief          ÌØÕ÷µãÖØ½¨
-	* @param[in]      frame		            £ºÁ÷Êı¾İ(½öÖ§³Ö£ºZ16Y8Y8)
-	* @param[in/out]  leftFeaturePoints		£º×óÏà»úÌØÕ÷µã¼¯ºÏ, Êä³öÆ¥ÅäºóµÄÌØÕ÷µã¼¯ºÏ
-	* @param[in/out]  rightFeaturePoints    £ºÓÒÏà»úÌØÕ÷µã¼¯ºÏ£¬Êä³öÆ¥ÅäºóµÄÌØÕ÷µã¼¯ºÏ
-	* @param[out]     reconstructPoints	    £ºÖØ½¨ÌØÕ÷µã¼¯ºÏ
-	* @return         ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief          ç‰¹å¾ç‚¹é‡å»º
+	* @param[in]      frame		            ï¼šæµæ•°æ®(ä»…æ”¯æŒï¼šZ16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		ï¼šå·¦ç›¸æœºç‰¹å¾ç‚¹é›†åˆ, è¾“å‡ºåŒ¹é…åçš„ç‰¹å¾ç‚¹é›†åˆ
+	* @param[in/out]  rightFeaturePoints    ï¼šå³ç›¸æœºç‰¹å¾ç‚¹é›†åˆï¼Œè¾“å‡ºåŒ¹é…åçš„ç‰¹å¾ç‚¹é›†åˆ
+	* @param[out]     reconstructPoints	    ï¼šé‡å»ºç‰¹å¾ç‚¹é›†åˆ
+	* @return         æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief          Feature point reconstruction
-	* @param[in]      frame		            £ºstream data(only support: Z16Y8Y8)
-	* @param[in/out]  leftFeaturePoints		£ºLeft camera feature point collection£¬ output the matched feature points
-	* @param[in/out]  rightFeaturePoints    £ºRight camera feature point collection, output the matched feature points
-	* @param[out]     reconstructPoints     £ºreturn the reconstruct point collection
+	* @param[in]      frame		            ï¼šstream data(only support: Z16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		ï¼šLeft camera feature point collectionï¼Œ output the matched feature points
+	* @param[in/out]  rightFeaturePoints    ï¼šRight camera feature point collection, output the matched feature points
+	* @param[out]     reconstructPoints     ï¼šreturn the reconstruct point collection
 	* @return         success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE featureReconstruct(IFramePtr frame, std::vector<Point2f>& leftFeaturePoints, std::vector<Point2f>& rightFeaturePoints, std::vector<Point3f>& reconstructPoints) = 0;
 
 	/**
 	* @~chinese
-	* @brief          ÌØÕ÷µãÖØ½¨
-	* @param[in]      frame		            £ºÁ÷Êı¾İ(½öÖ§³Ö£ºZ16Y8Y8)
-	* @param[in/out]  leftFeaturePoints		£º×óÏà»úÌØÕ÷µã¼¯ºÏ, Êä³öÆ¥ÅäºóµÄÌØÕ÷µã¼¯ºÏ
-	* @param[in/out]  rightFeaturePoints    £ºÓÒÏà»úÌØÕ÷µã¼¯ºÏ£¬Êä³öÆ¥ÅäºóµÄÌØÕ÷µã¼¯ºÏ
-	* @param[in]      confidenceThreshold   £º¿ÉĞÅ¶ÈãĞÖµ, ÖµÓò£º[0,1], ¿ÉĞÅ¶ÈĞ¡ÓÚconfidenceThresholdµÄÆ¥ÅäÌØÕ÷µã»á±»ÒÆ³ı
-	* @param[out]     reconstructPoints	    £ºÖØ½¨ÌØÕ÷µã¼¯ºÏ
-	* @return         ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief          ç‰¹å¾ç‚¹é‡å»º
+	* @param[in]      frame		            ï¼šæµæ•°æ®(ä»…æ”¯æŒï¼šZ16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		ï¼šå·¦ç›¸æœºç‰¹å¾ç‚¹é›†åˆ, è¾“å‡ºåŒ¹é…åçš„ç‰¹å¾ç‚¹é›†åˆ
+	* @param[in/out]  rightFeaturePoints    ï¼šå³ç›¸æœºç‰¹å¾ç‚¹é›†åˆï¼Œè¾“å‡ºåŒ¹é…åçš„ç‰¹å¾ç‚¹é›†åˆ
+	* @param[in]      confidenceThreshold   ï¼šå¯ä¿¡åº¦é˜ˆå€¼, å€¼åŸŸï¼š[0,1], å¯ä¿¡åº¦å°äºconfidenceThresholdçš„åŒ¹é…ç‰¹å¾ç‚¹ä¼šè¢«ç§»é™¤
+	* @param[out]     reconstructPoints	    ï¼šé‡å»ºç‰¹å¾ç‚¹é›†åˆ
+	* @return         æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief          Feature point reconstruction
-	* @param[in]      frame		            £ºstream data(only support: Z16Y8Y8)
-	* @param[in/out]  leftFeaturePoints		£ºLeft camera feature point collection£¬ output the matched feature points
-	* @param[in/out]  rightFeaturePoints    £ºRight camera feature point collection, output the matched feature points
-	* @param[in]      confidenceThreshold   £ºConfidence threshold, value range: [0,1], matching feature points smaller than confidenceThreshold will be removed
-	* @param[out]     reconstructPoints     £ºreturn the reconstruct point collection
+	* @param[in]      frame		            ï¼šstream data(only support: Z16Y8Y8)
+	* @param[in/out]  leftFeaturePoints		ï¼šLeft camera feature point collectionï¼Œ output the matched feature points
+	* @param[in/out]  rightFeaturePoints    ï¼šRight camera feature point collection, output the matched feature points
+	* @param[in]      confidenceThreshold   ï¼šConfidence threshold, value range: [0,1], matching feature points smaller than confidenceThreshold will be removed
+	* @param[out]     reconstructPoints     ï¼šreturn the reconstruct point collection
 	* @return         success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE featureReconstruct(IFramePtr frame, std::vector<Point2f>& leftFeaturePoints, std::vector<Point2f>& rightFeaturePoints, float confidenceThreshold
@@ -472,18 +473,18 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      Æ¥ÅäµÄÌØÕ÷µãÖØ½¨
-	* @param[in]  frame		                    £ºÁ÷Êı¾İ£¨½öÖ§³Ö£ºZ16Y8Y8£©
-	* @param[in]  matchedLeftFeaturePoints		£ºÆ¥ÅäµÄ×óÏà»úÌØÕ÷µã¼¯ºÏ
-	* @param[in]  matchedRightFeaturePoints     £ºÆ¥ÅäµÄÓÒÏà»úÌØÕ÷µã¼¯ºÏ
-	* @param[out] reconstructPoints	            £ºÖØ½¨ÌØÕ÷µã¼¯ºÏ
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      åŒ¹é…çš„ç‰¹å¾ç‚¹é‡å»º
+	* @param[in]  frame		                    ï¼šæµæ•°æ®ï¼ˆä»…æ”¯æŒï¼šZ16Y8Y8ï¼‰
+	* @param[in]  matchedLeftFeaturePoints		ï¼šåŒ¹é…çš„å·¦ç›¸æœºç‰¹å¾ç‚¹é›†åˆ
+	* @param[in]  matchedRightFeaturePoints     ï¼šåŒ¹é…çš„å³ç›¸æœºç‰¹å¾ç‚¹é›†åˆ
+	* @param[out] reconstructPoints	            ï¼šé‡å»ºç‰¹å¾ç‚¹é›†åˆ
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Matched feature point reconstruction
-	* @param[in]  frame		                    £ºstream data(only support: Z16Y8Y8)
-	* @param[in]  matchedLeftFeaturePoints		£ºMatched left camera feature point collection
-	* @param[in]  matchedRightFeaturePoints     £ºMatched right camera feature point collection
-	* @param[out] reconstructPoints             £ºreturn the reconstruct point collection
+	* @param[in]  frame		                    ï¼šstream data(only support: Z16Y8Y8)
+	* @param[in]  matchedLeftFeaturePoints		ï¼šMatched left camera feature point collection
+	* @param[in]  matchedRightFeaturePoints     ï¼šMatched right camera feature point collection
+	* @param[out] reconstructPoints             ï¼šreturn the reconstruct point collection
 	* @return     success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE matchedFeatureReconstruct(IFramePtr frame, const std::vector<Point2f>& matchedLeftFeaturePoints, const std::vector<Point2f>& matchedRightFeaturePoints
@@ -491,16 +492,71 @@ public:
 
 	/**
 	* @~chinese
-	* @brief      »ñÈ¡Í¸ÊÓ±ä»»¾ØÕó (Q ¾ØÕó)
-	* @param[out] matrix		£ºÍ¸ÊÓ±ä»»¾ØÕó
-	* @return     ³É¹¦:SUCCESS, Ê§°Ü:ÆäËû´íÎóÂë
+	* @brief      è·å–é€è§†å˜æ¢çŸ©é˜µ (Q çŸ©é˜µ)
+	* @param[out] matrix		ï¼šé€è§†å˜æ¢çŸ©é˜µ
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
 	* @~english
 	* @brief      Get the perspective transformation matrix (Q matrix)
-	* @param[out] matrix		£ºreturn the perspective transformation matrix
+	* @param[out] matrix		ï¼šreturn the perspective transformation matrix
 	* @return success:return SUCCESS, fail:other error code
 	**/
 	virtual ERROR_CODE getPerspectiveTransformationMatrix(PerspectiveTransformationMatrix& matrix) = 0;
 
+	/**
+	* @~chinese
+	* @brief      å¼€å¯IMUæ ‡å®š
+	* @param[in] imuCalibrationPlane		ï¼šæŒ‡å®šIMUæ ‡å®šå¹³é¢
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
+	* @~english
+	* @brief      start imu calibration
+	* @param[in] imuCalibrationPlane		ï¼šspecifi plane of imu calibration
+	* @return success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE startIMUCalibration(IMU_CALIBRATTION_PLANE imuCalibrationPlane) = 0;
+
+	/**
+	* @~chinese
+	* @brief      è·å–imuæ ‡å®šçŠ¶æ€
+	* @param[in] imuCalibrationPlane		ï¼šæŒ‡å®šIMUæ ‡å®šå¹³é¢
+	* @param[out] imuCalibrationState		ï¼šæ ‡å®šçŠ¶æ€
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
+	* @~english
+	* @brief      Get the perspective transformation matrix (Q matrix)
+	* @param[in] imuCalibrationPlane		ï¼šspecifi plane of imu calibration
+	* @param[out] imuCalibrationState		ï¼šstate of imu calibration
+	* @return success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE getIMUCalibrationState(IMU_CALIBRATTION_PLANE imuCalibrationPlane, IMU_CALIBRATTION_STATE& imuCalibrationState) = 0;
+
+	/**
+	* @~chinese
+	* @brief      åœæ­¢IMUæ ‡å®š
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
+	* @~english
+	* @brief      stop imu calibration
+	* @return success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE stopIMUCalibration() = 0;
+
+	/**
+	* @~chinese
+	* @brief      è®¾ç½®IMUæ ‡å®šæ—¥æœŸ
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
+	* @~english
+	* @brief      Set IMU calibration date
+	* @return success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE setIMUCalibrationDate(const std::string& calibrationDate) = 0;
+
+	/**
+	* @~chinese
+	* @brief      è·å–IMUæ ‡å®šæ—¥æœŸ
+	* @return     æˆåŠŸ:SUCCESS, å¤±è´¥:å…¶ä»–é”™è¯¯ç 
+	* @~english
+	* @brief      Get IMU calibration date
+	* @return success:return SUCCESS, fail:other error code
+	**/
+	virtual ERROR_CODE getIMUCalibrationDate(std::string& calibrationDate) = 0;
 };
 
 CS_API ICameraPtr getCameraPtr();
