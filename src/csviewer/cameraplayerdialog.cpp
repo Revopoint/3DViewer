@@ -22,6 +22,7 @@
 
 #include <QFileDialog>
 #include <QDebug>
+#include <QIntValidator>
 
 #include <cameraplayer.h>
 #include "appconfig.h"
