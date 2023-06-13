@@ -7,6 +7,9 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# use OpenMP or Not
+option(USE_OPENMP "Enable OpenMP" OFF)
+
 ## qt settings
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOUIC ON)
@@ -21,6 +24,7 @@ set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMakeTargets")
 if(MSVC)
     cmake_policy(SET CMP0074 NEW)
 endif()
+
 find_package(Qt5 
     COMPONENTS 
     Widgets
@@ -37,22 +41,25 @@ set(LUPDATE_OPTIONS -locations absolute -no-ui-lines -no-sort)
 set(LRELEASE ${_qt5_linguisttools_install_prefix}/bin/lrelease)
 
 # OpenMP
-find_package(OpenMP REQUIRED)
+if(USE_OPENMP)
+    message("--Use OpenMP")
+    find_package(OpenMP REQUIRED)
+endif()
 
 ## thirdparty
 set(THIRDPARTY_DIR ${PROJECT_SOURCE_DIR}/../thirdparty)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    message(status "current platform: linux ")
+    message(STATUS "--Current platform: linux ")
     set(PLATFORM "linux")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(status "current platform: windows")
+    message(STATUS "--Current platform: windows")
     set(PLATFORM "windows")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    message(status "current platform: mac")
+    message(STATUS "--Current platform: mac")
     set(PLATFORM "mac")
 else()
-    message(status "other platform: ${CMAKE_SYSTEM_NAME}")
+    message(STATUS "--Other platform: ${CMAKE_SYSTEM_NAME}")
 endif()
 
 set(PLATFORM_BITS x64)
@@ -106,4 +113,11 @@ set_target_properties(csutil cscamera PROPERTIES FOLDER libs)
 if(MSVC)
     set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
 endif()
+
+message(STATUS "--Target OS:${PLATFORM}")
+message(STATUS "--Target Platform:${PLATFORM_BITS}")
+message(STATUS "--C Complier:${CMAKE_C_COMPILER}")
+message(STATUS "--CXX Complier:${CMAKE_CXX_COMPILER}")
+message(STATUS "--C FLAGS:${CMAKE_C_FLAGS}")
+message(STATUS "--CXX FLAGS:${CMAKE_CXX_FLAGS}")
 

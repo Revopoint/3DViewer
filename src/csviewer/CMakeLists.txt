@@ -89,10 +89,10 @@ add_executable(${TARGET_NAME} MACOSX_BUNDLE
 )
 
 target_link_libraries(${TARGET_NAME} 
+    PRIVATE
     ${OSG_LIBRARY}
     Qt5::Widgets
     Qt5::OpenGL
-    OpenMP::OpenMP_CXX
     csutil
     cscamera
     )
