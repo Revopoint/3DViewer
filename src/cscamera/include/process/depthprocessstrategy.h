@@ -47,7 +47,8 @@ public:
     void  setDepthCoordCalcPos(QPointF pos);
 
 protected:
-    void onProcessDepthData(const ushort* dataPtr, int length, int width, int height, QByteArray& output, QImage& depthImage);
+    bool onProcessDepthData(const ushort* dataPtr, int length, int width, int height, QByteArray& output);
+    void generateDepthImage(const QByteArray& output, int width, int height, QImage& depthImage);
 protected:
     float m_depthScale;
     Intrinsics m_depthIntrinsics;
@@ -61,7 +62,7 @@ private:
     OutputData2D onProcessLData(const char* dataPtr, int length, int width, int height);
     OutputData2D onProcessRData(const char* dataPtr, int length, int width, int height);
 
-    void timeDomainSmooth(const ushort* dataPtr, int length, int width, int height, float* output);
+    bool timeDomainSmooth(float* dataPtr, int length, int width, int height);
 
 protected:
     bool m_calcDepthCoord;
@@ -74,6 +75,9 @@ protected:
     bool m_fillHole;
     int m_filterValue;
     int m_filterType;
+
+    TRIGGER_MODE m_trigger = TRIGGER_MODE_OFF;
+    cs::colorizer m_colorizer;
 };
 
 }

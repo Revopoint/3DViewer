@@ -175,7 +175,7 @@ static void depthCallback(cs::IFramePtr frame, void* usrData)
     CSCamera* camera = (CSCamera*)usrData;
 
     FrameData frameData;
-    camera->onProcessFrame(TYPE_DEPTH, frame, frameData);
+    camera->onProcessFrame(TYPE_DEPTH, frame, frameData.data);
    
     emit camera->framedDataUpdated(frameData);
 }
@@ -185,7 +185,7 @@ static void rgbCallback(cs::IFramePtr frame, void* usrData)
     CSCamera* camera = (CSCamera*)usrData;
 
     FrameData frameData;
-    camera->onProcessFrame(TYPE_RGB, frame, frameData);
+    camera->onProcessFrame(TYPE_RGB, frame, frameData.data);
     emit camera->framedDataUpdated(frameData);
 }
 
@@ -199,7 +199,24 @@ void CSCamera::StreamThread::run()
 {
     while (!isInterruptionRequested())
     {
-        m_camera.onGetFrame();
+        FrameData frameData;
+        auto ret = m_camera.onGetFrame(frameData);
+
+        if (frameData.data.size() > 0)
+        {
+            frameData.rgbIntrinsics = m_camera.m_rgbIntrinsics;
+            frameData.depthIntrinsics = m_camera.m_depthIntrinsics;
+            frameData.extrinsics = m_camera.m_extrinsics;
+            frameData.depthScale = m_camera.m_depthScale;
+
+            emit m_camera.framedDataUpdated(frameData);
+        }
+
+        if (ret == ERROR_DEVICE_NOT_CONNECT)
+        {
+            // If the return value indicates that the camera is not connected, add a delay.
+            QThread::msleep(200);
+        }
     }
 }
 
@@ -618,15 +635,36 @@ bool CSCamera::softTrigger()
         return false;
     }
 
-    ERROR_CODE ret = m_cameraPtr->softTrigger();
-    if (ret != SUCCESS)
+    int frameCount = (m_filterType == FILTER_TDSMOOTH) ? m_filterValue : 1;
+  
+    bool result = true;
+
+    FrameData frameData;
+
+    for(int i = 0; i < frameCount; i++)
     {
-        qWarning("camera soft trigger failed(%d)!", ret);
+        ERROR_CODE ret = m_cameraPtr->softTrigger();
+        if (ret != SUCCESS)
+        {
+            qWarning("camera soft trigger failed(%d)!", ret);
+            result = false;
+        }
+
+        doGetFrame(frameData.data, 3000);
     }
 
-    onGetFrame(3000);
+    // notify
+    if (frameData.data.size() > 0)
+    {
+        frameData.rgbIntrinsics = m_rgbIntrinsics;
+        frameData.depthIntrinsics = m_depthIntrinsics;
+        frameData.extrinsics = m_extrinsics;
+        frameData.depthScale = m_depthScale;
 
-    return ret == SUCCESS;
+        emit framedDataUpdated(frameData);
+    }
+
+    return result;
 }
 
 void CSCamera::initCameraInfo()
@@ -766,41 +804,45 @@ void CSCamera::initDefaultStreamInfo()
     }
 }
 
-// use getPairedFrame if has a RGB camera, or use getFrame
-void CSCamera::onGetFrame(int timeout)
+int CSCamera::doGetFrame(QVector<StreamData>& streamDatas, int timeout)
 {
-    FrameData frameData;
+    auto ret = SUCCESS;
 
     if (m_isRgbStreamSup)
     {
         IFramePtr depthFrame, rgbFrame;
 
-        m_cameraPtr->getPairedFrame(depthFrame, rgbFrame, timeout);
-        //cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
-        //cameraPtr->getFrame(STREAM_TYPE_RGB, rgbFrame, timeout);
+        ret = m_cameraPtr->getPairedFrame(depthFrame, rgbFrame, timeout);
+        if (ret != SUCCESS)
+        {
+            return ret;
+        }
 
-        onProcessFrame(TYPE_DEPTH, depthFrame, frameData);
-        onProcessFrame(TYPE_RGB, rgbFrame, frameData);
+        onProcessFrame(TYPE_DEPTH, depthFrame, streamDatas);
+        onProcessFrame(TYPE_RGB, rgbFrame, streamDatas);
     }
     else
     {
         IFramePtr depthFrame;
-        m_cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
-        onProcessFrame(TYPE_DEPTH, depthFrame, frameData);
+        ret = m_cameraPtr->getFrame(STREAM_TYPE_DEPTH, depthFrame, timeout);
+        if (ret != SUCCESS)
+        {
+            return ret;
+        }
+
+        onProcessFrame(TYPE_DEPTH, depthFrame, streamDatas);
     }
 
-    if (frameData.data.size() > 0)
-    {
-        frameData.rgbIntrinsics = m_rgbIntrinsics;
-        frameData.depthIntrinsics = m_depthIntrinsics;
-        frameData.extrinsics = m_extrinsics;
-        frameData.depthScale = m_depthScale;
-
-        emit framedDataUpdated(frameData);
-    }
+    return SUCCESS;
 }
 
-bool CSCamera::onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, FrameData& frameData)
+// use getPairedFrame if has a RGB camera, or use getFrame
+int CSCamera::onGetFrame(FrameData& frameData, int timeout)
+{
+    return doGetFrame(frameData.data, timeout);
+}
+
+bool CSCamera::onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, QVector<StreamData>& streamDatas)
 {
     if (!frame || frame->empty())
     {
@@ -817,7 +859,7 @@ bool CSCamera::onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& 
 
     StreamData streamData = { streamDataInfo, data };
 
-    frameData.data.push_back(streamData);
+    streamDatas.push_back(streamData);
 
     return true;
 }
@@ -1389,7 +1431,7 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
         break;
     }
     case PROPERTY_EXT_TRIGGER_MODE:
-        propExt.triggerMode = (TRIGGER_MODE)value.toInt();;
+        propExt.triggerMode = (TRIGGER_MODE)value.toInt();
         break;
     case PROPERTY_EXT_CAMERA_IP:
         propExt.cameraIp = value.value<CameraIpSetting>();
@@ -1860,7 +1902,7 @@ void CSCamera::startStreamThread()
 
     if (!m_streamThread->isRunning())
     {
-        qInfo() << "start stream thread";
+        qInfo() << "stream thread is not running, start stream thread";
         m_streamThread->start();
     }
 }
