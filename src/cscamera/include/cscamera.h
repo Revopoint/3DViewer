@@ -66,8 +66,10 @@ public:
     bool resumeStream() override;
     bool softTrigger() override;
 
-    void onGetFrame(int timeout = GET_FRAME_TIME_OUT);
-    bool onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, FrameData& frameData);
+    int onGetFrame(FrameData& frameData, int timeout = GET_FRAME_TIME_OUT);
+    int doGetFrame(QVector<StreamData>& streamDatas, int timeout = GET_FRAME_TIME_OUT);
+
+    bool onProcessFrame(STREAM_DATA_TYPE streamDataType, const IFramePtr& frame, QVector<StreamData>& streamDatas);
     void setCameraThread(QThread*  thread);
 
     CSCameraInfo getCameraInfo() const override;

@@ -48,14 +48,17 @@ else()
     set(QUAZIP_LIBRARY quazip)
 endif()
 
-target_link_libraries(${TARGET_NAME}  PRIVATE
+target_link_libraries(${TARGET_NAME} PRIVATE
     ${3DCAMERA_LIBRARY}
     ${YAMLCPP_LIBRARY}
     ${QUAZIP_LIBRARY}
     csutil
-    OpenMP::OpenMP_CXX
     Qt5::Core
     Qt5::Gui)
+
+if(USE_OPENMP)
+    target_link_libraries(${TARGET_NAME} PRIVATE OpenMP::OpenMP_CXX)
+endif()
 
 if(WIN32)
     set_target_properties(${TARGET_NAME} PROPERTIES

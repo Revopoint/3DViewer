@@ -48,6 +48,13 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
         return;
     }
 
+    // If in single-trigger mode and time-domain filtering is enabled, 
+    // the cached data of the time-domain filter needs to be cleared.
+    if (m_trigger != TRIGGER_MODE_OFF && m_filterType == FILTER_TDSMOOTH)
+    {
+        m_filterCachedData.clear();
+    }
+
     Pointcloud pc;
     QImage texImage;
     
@@ -81,6 +88,7 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
 void PointCloudProcessStrategy::onLoadCameraPara()
 {
     DepthProcessStrategy::onLoadCameraPara();
+
     for (auto para : m_dependentParameters)
     {
         auto emPara = (CAMERA_PARA_ID)para;
@@ -125,12 +133,14 @@ void PointCloudProcessStrategy::generatePointCloud(const StreamData& depthData, 
 
     // depth process
     QByteArray floatData;
-    QImage depthImage, texImage;
-    onProcessDepthData(dataPtr, width * height, width, height, floatData, depthImage);
-
+    if (!onProcessDepthData(dataPtr, width * height, width, height, floatData))
+    {
+        return;
+    }
+    
     float* floatPtr = (float*)floatData.data();
-
     bool hasTex = m_withTexture && depthData.data.size() > 1;
+
     switch (depthData.dataInfo.format)
     {
     case STREAM_FORMAT_Z16:

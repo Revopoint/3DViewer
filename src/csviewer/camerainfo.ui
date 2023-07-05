@@ -50,7 +50,14 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="modelLabel"/>
+       <widget class="QLabel" name="modelLabel">
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -79,7 +86,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="snLabel"/>
+       <widget class="QLabel" name="snLabel">
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -108,7 +119,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="sdkVerLabel"/>
+       <widget class="QLabel" name="sdkVerLabel">
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -137,7 +152,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="firmwareVerLabel"/>
+       <widget class="QLabel" name="firmwareVerLabel">
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -166,7 +185,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="algoVerLabel"/>
+       <widget class="QLabel" name="algoVerLabel">
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -195,7 +218,11 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="connectionMode"/>
+       <widget class="QLabel" name="connectionMode">
+        <property name="textInteractionFlags">
+         <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>

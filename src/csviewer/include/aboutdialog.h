@@ -29,6 +29,7 @@ namespace Ui
 
 class AboutDialog : public QDialog
 {
+    Q_OBJECT
 public:
     AboutDialog(QWidget* parent = nullptr);
     ~AboutDialog();

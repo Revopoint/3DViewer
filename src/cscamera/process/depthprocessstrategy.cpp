@@ -51,11 +51,19 @@ DepthProcessStrategy::DepthProcessStrategy(PROCESS_STRA_TYPE type)
     m_dependentParameters.push_back(PARA_DEPTH_FILL_HOLE);
     m_dependentParameters.push_back(PARA_DEPTH_FILTER_TYPE);
     m_dependentParameters.push_back(PARA_DEPTH_FILTER);
+    m_dependentParameters.push_back(PARA_TRIGGER_MODE);
 }
 
 void DepthProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort& outputDataPort)
 {
     const auto& streamDatas = frameData.data;
+    
+    // If in single-trigger mode and time-domain filtering is enabled, 
+    // the cached data of the time-domain filter needs to be cleared.
+    if (m_trigger != TRIGGER_MODE_OFF && m_filterType == FILTER_TDSMOOTH)
+    {
+        m_filterCachedData.clear();
+    }
 
     for (const auto& data : streamDatas)
     {
@@ -77,35 +85,46 @@ void DepthProcessStrategy::doProcess(const FrameData& frameData, OutputDataPort&
             break;
         }
 
-        outputDataPort.addOutputData2D(outputData2Ds);
+        if (!outputData2Ds.isEmpty())
+        {
+            outputDataPort.addOutputData2D(outputData2Ds);
+        }
     } 
 }
 
 OutputData2D DepthProcessStrategy::processDepthData(const ushort* dataPtr, int length, int width, int height)
 {
     QByteArray output;
-    QImage image;
 
-    onProcessDepthData(dataPtr, length, width, height, output, image);
+    if (!onProcessDepthData(dataPtr, length, width, height, output))
+    {
+        // return empty OutputData2D
+        return OutputData2D();
+    }
+
+    QImage image;
+    generateDepthImage(output, width, height, image);
 
     OutputData2D outputData;
     outputData.image = image;
+    outputData.info.cameraDataType = CAMERA_DATA_DEPTH;
 
     // calc point info
     if (m_calcDepthCoord)
     {
         int x = m_depthCoordCalcPos.x() * width;
         int y = m_depthCoordCalcPos.y() * height;
+        float* floatPtr = (float*)output.data();
 
         if (!(x < 0 || y < 0 || x >= width || y >= height))
         {
-            ushort d = dataPtr[y * width + x];
+            float d = floatPtr[y * width + x];
 
             cs::Pointcloud pc;
             cs::float3 point;
             cs::float2 texcoord;
 
-            pc.generatePoint(point, texcoord, x, y, d, width, height, m_depthScale, &m_depthIntrinsics);
+            pc.generatePoint<float>(point, texcoord, x, y, d, width, height, m_depthScale, &m_depthIntrinsics);
 
             outputData.info.vertex = QVector3D(point.x, point.y, point.z);
             outputData.info.depthScale = m_depthScale;
@@ -115,7 +134,17 @@ OutputData2D DepthProcessStrategy::processDepthData(const ushort* dataPtr, int l
     return outputData;
 }
 
-void DepthProcessStrategy::onProcessDepthData(const ushort* dataPtr, int length, int width, int height, QByteArray& output, QImage& depthImage)
+// generate depth image
+void DepthProcessStrategy::generateDepthImage(const QByteArray& output, int width, int height, QImage& depthImage)
+{
+    // Convert depth data into RGB image
+    m_colorizer.setRange(m_depthRange.first, m_depthRange.second);
+    depthImage = QImage(width, height, QImage::Format_RGB888);
+
+    m_colorizer.process<float>((float*)output.data(), m_depthScale, depthImage.bits(), width * height);
+}
+
+bool DepthProcessStrategy::onProcessDepthData(const ushort* dataPtr, int length, int width, int height, QByteArray& output)
 {
     //tran to float
     output.resize(length * sizeof(float));
@@ -139,42 +168,45 @@ void DepthProcessStrategy::onProcessDepthData(const ushort* dataPtr, int length,
         filter::MedianBlur<float>(floatPtr, width, height, m_filterValue);
         break;
     case FILTER_TDSMOOTH:
-        timeDomainSmooth(dataPtr, length, width, height, floatPtr);
+        if (!timeDomainSmooth(floatPtr, length, width, height))
+        {
+            return false;
+        }
         break;
     default:
         break;
     }
-   
-    // colorize
-    cs::colorizer color;
-    color.setRange(m_depthRange.first, m_depthRange.second);
-
-    depthImage =  QImage(width, height, QImage::Format_RGB888);
-    color.process<float>(floatPtr, m_depthScale, depthImage.bits(), length);
+ 
+    return true;
 }
 
-void DepthProcessStrategy::timeDomainSmooth(const ushort* dataPtr, int length, int width, int height, float* output)
+bool DepthProcessStrategy::timeDomainSmooth(float* dataPtr, int length, int width, int height)
 {
-    if (m_filterCachedData.size() >= m_filterValue)
+    while (m_filterCachedData.size() >= m_filterValue)
     {
         m_filterCachedData.pop_front();
     }
 
     //copy data
     QByteArray curFrame;
-    curFrame.resize(length * sizeof(ushort));
+    curFrame.resize(length * sizeof(float));
     memcpy(curFrame.data(), dataPtr, curFrame.size());
 
     m_filterCachedData.push_back(curFrame);
 
+    if (m_filterCachedData.size() < m_filterValue)
+    {
+        return false;
+    }
+
     // smooth
     const int size = width * height;
-    QList<ushort*> list;
+    QList<float*> list;
     for (auto& data : m_filterCachedData)
     {
-        if(data.size() == size * sizeof(ushort))
+        if(data.size() == size * sizeof(float))
         {
-            list.push_back((ushort*)data.data());
+            list.push_back((float*)data.data());
         }
     }
 
@@ -194,8 +226,16 @@ void DepthProcessStrategy::timeDomainSmooth(const ushort* dataPtr, int length, i
                 count++;
             }
         }
-        output[i] = count > 0 ? (sum / count) : 0;
+        dataPtr[i] = count > 0 ? (sum / count) : 0;
     }
+    
+    // clear data in trigger mode
+    if (m_trigger == TRIGGER_MODE_SOFTWAER && m_filterCachedData.size() >= m_filterValue)
+    {
+        m_filterCachedData.clear();
+    }
+
+    return true;
 }
 
 OutputData2D DepthProcessStrategy::onProcessLData(const char* dataPtr, int length, int width, int height)
@@ -231,12 +271,14 @@ QVector<OutputData2D> DepthProcessStrategy::onProcessZ16(const StreamData& strea
     Q_ASSERT(streamData.data.size() == width * height * sizeof(ushort));
 
     OutputData2D outputData = processDepthData((const ushort*)streamData.data.data(), width * height, width, height);
-    outputData.info.cameraDataType = CAMERA_DATA_DEPTH;
-
-    emit output2DUpdated(outputData);
-
     QVector<OutputData2D> outputDatas;
-    outputDatas.push_back(outputData);
+
+    // add to outputDatas if not empty
+    if (!outputData.isEmpty())
+    {
+        emit output2DUpdated(outputData);
+        outputDatas.push_back(outputData);
+    }
 
     return outputDatas;
 }
@@ -253,20 +295,29 @@ QVector<OutputData2D> DepthProcessStrategy::onProcessZ16Y8Y8(const StreamData& s
     QVector<OutputData2D> outputDatas;
     //depth
     OutputData2D outputData = processDepthData((const ushort*)streamData.data.data() + dataOffset, width * height, width, height);
-    outputData.info.cameraDataType = CAMERA_DATA_DEPTH;
-    outputDatas.push_back(outputData);
-
+    
+    // add to outputDatas if not empty
+    if (!outputData.isEmpty())
+    {
+        outputDatas.push_back(outputData);
+        emit output2DUpdated(outputData);
+    }
+    
+    // depth data size is width * height * 2 bytes
     dataOffset += width * height * sizeof(ushort);
-    emit output2DUpdated(outputData);
 
     //L
     outputData = onProcessLData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
     outputDatas.push_back(outputData);
+
+    // ir data size is width * height * 1 bytes
     dataOffset += width * height;
 
     //R
     outputData = onProcessRData((const char*)streamData.data.data() + dataOffset, width * height, width, height);
     outputDatas.push_back(outputData);
+
+    // ir data size is width * height * 1 bytes
     dataOffset += width * height;
 
     return outputDatas;
@@ -323,9 +374,22 @@ void DepthProcessStrategy::onLoadCameraPara()
             m_filterType = value.toInt();
             if (m_filterType != FILTER_TDSMOOTH)
             {
+                qInfo() << "Clear filter cached data";
                 m_filterCachedData.clear();
             }
             break;
+        case PARA_TRIGGER_MODE:
+        {
+            auto isTrigger = (TRIGGER_MODE)value.toInt();
+
+            if (m_filterType == FILTER_TDSMOOTH && m_trigger != isTrigger)
+            {
+                qInfo() << "Clear filter cached data";
+                m_filterCachedData.clear();
+            }
+            m_trigger = isTrigger;
+            break;
+        }
         default:
             break;
         }

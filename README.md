@@ -22,6 +22,7 @@ Dependent environment:
 - Dependent libraries:
   - 3DCamera
   - OpenSceneGraph 3.6.5 or higher
+  - OpenMP
 
 ### Compile under Windows platform
 
@@ -45,7 +46,7 @@ Dependent environment:
      cd D:\3DViewer-git\3DViewer\build
      ```
 
-   - To execute CMake, you need to modify ***-DQt5_Dir =‘……’*** which points to ***Qt5Config.cmake*** storage location, and ***-G "Visual Studio 14 2015 Win64"*** indicates to generate a Visual Studio 2015 project.
+   - To execute CMake, you need to modify ***-DQt5_DIR =‘……’*** which points to ***Qt5Config.cmake*** storage location, and ***-G "Visual Studio 14 2015 Win64"*** indicates to generate a Visual Studio 2015 project.
 
      ```
      cmake -DQt5_DIR=c:\Qt5.10.1\5.10.1\msvc2015_64\lib\cmake\Qt5 -G"Visual Studio 14 2015 Win64" ..\src\
@@ -59,7 +60,13 @@ Dependent environment:
 
 1. Installation [Qt5](https://download.qt.io/)、[CMake](https://cmake.org/download/)、[Git](https://git-scm.com/downloads)、Xcode.
 
-2. Open the terminal, create a new code storage folder, for example: ***~/3DViewer-git***. Then execute git clone to download the code.
+2. Open Terminal and run the following command to install OpenMP:
+
+   ```
+   brew install libomp
+   ```
+
+3. Open the terminal, create a new code storage folder, for example: ***~/3DViewer-git***. Then execute git clone to download the code.
 
    ```
    mkdir ~/3DViewer-git
@@ -67,7 +74,7 @@ Dependent environment:
    git clone https://github.com/Revopoint/3DViewer.git
    ```
 
-3. Create a new build directory in the code root directory, enter the directory and execute CMake command.  ***-DQt5_ Dir =‘……’*** points to Qt5Config.cmake storage location.
+4. Create a new build directory in the code root directory, enter the directory and execute CMake command.  ***-DQt5_ DIR =‘……’*** points to Qt5Config.cmake storage location.
 
    ```
    mkdir 3DViewer/build
@@ -75,16 +82,16 @@ Dependent environment:
    cmake -DQt5_DIR=~/Qt5.10.1/5.10.1/clang_64/lib/cmake/Qt5 ../src/
    ```
 
-4. Execute make in the build directory to complete the project compilation.
+5. Execute make in the build directory to complete the project compilation.
 
    ```
    make
    ```
 
-5. After compilation, double-click ***bin/3DViewer.app*** to run the program.
+6. After compilation, double-click ***bin/3DViewer.app*** to run the program.
 
    (When connecting the camera via USB, you need to run the ***scripts/cs_rpc_install.sh*** script under the code root directory first.)
-   
+
 
 ### Compile on Linux（Ubuntu） platform
 
@@ -116,7 +123,7 @@ Dependent environment:
    git clone https://github.com/Revopoint/3DViewer.git
    ```
 
-3. Create a new build directory in the code root directory, enter the directory and execute CMake command.  ***-DQt5_ Dir =‘……’*** points to the storage location of ***Qt5config.cmake***.
+3. Create a new build directory in the code root directory, enter the directory and execute CMake command.  ***-DQt5_ DIR =‘……’*** points to the storage location of ***Qt5config.cmake***.
 
    ```
    mkdir 3DViewer/build

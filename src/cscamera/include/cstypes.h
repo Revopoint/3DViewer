@@ -102,6 +102,11 @@ struct OutputData2D
 {
     QImage image;
     OutputInfo2D info;
+
+    bool isEmpty() const 
+    {
+        return info.cameraDataType == CAMERA_DATA_UNKNOW;
+    }
 };
 
 Q_DECLARE_METATYPE(OutputInfo2D)

@@ -1110,14 +1110,14 @@ and the image quality of objects farther away may become worse.</source>
 <context>
     <name>CameraPlayerDialog</name>
     <message>
-        <location filename="../cameraplayerdialog.cpp" line="41"/>
-        <location filename="../cameraplayerdialog.cpp" line="280"/>
-        <location filename="../cameraplayerdialog.cpp" line="295"/>
+        <location filename="../cameraplayerdialog.cpp" line="42"/>
+        <location filename="../cameraplayerdialog.cpp" line="281"/>
+        <location filename="../cameraplayerdialog.cpp" line="296"/>
         <source>Save current frame</source>
         <translation type="unfinished">保存当前帧</translation>
     </message>
     <message>
-        <location filename="../cameraplayerdialog.cpp" line="103"/>
+        <location filename="../cameraplayerdialog.cpp" line="104"/>
         <source>Load captured file</source>
         <translation type="unfinished">加载保存的文件</translation>
     </message>

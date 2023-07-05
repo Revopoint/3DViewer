@@ -664,10 +664,6 @@ typedef enum PROPERTY_TYPE_EXTENSION
 	
 	PROPERTY_EXT_TRIGGER_IN_MODE		= 0x106, /**< @~chinese 触发模式                      @~english trigger mode*/
 	
-	//不对外属性
-	PROPERTY_EXT_EXECUTE_CMD			= 0xffff,/**< @~chinese 执行任意命令*/
-	PROPERTY_EXT_SYS_CMD				= 0xaaaa,/**< @~chinese 按规定格式执行命令,具体参考用例*/
-	PROPERTY_EXT_WRITE_READ_HID			= 0x1111,/**< @~chinese 写并等待读取hid数据*/
 } PROPERTY_TYPE_EXTENSION;
 /// @}
 
