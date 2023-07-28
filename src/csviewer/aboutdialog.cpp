@@ -21,6 +21,10 @@
 #include "ui_about.h"
 #include "./app_version.h"
 
+#define GITHUB_URL "https://github.com/Revopoint/3DViewer"
+#define LICENSE_URL ("file:///" + QString(APP_PATH) + "/LICENSE.txt")
+#define TPM_LICENSE_URL ("file:///" + QString(APP_PATH) + "/third-party-module-license.html")
+
 AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent)
     , m_ui(new Ui::AboutWidget)
@@ -39,6 +43,8 @@ AboutDialog::AboutDialog(QWidget* parent)
         {
             close();
         });
+
+    onTranslate();
 }
 
 AboutDialog::~AboutDialog()
@@ -54,4 +60,7 @@ void AboutDialog::onTranslate()
 
     QString appBuiltTime = QString(tr("Built on %1")).arg(APP_BUILD_TIME);
     m_ui->builtInfo->setText(appBuiltTime);
+
+    QString codeSrc = QString(m_ui->codeSource->text()).arg(GITHUB_URL).arg(LICENSE_URL).arg(TPM_LICENSE_URL);
+    m_ui->codeSource->setText(codeSrc);
 }

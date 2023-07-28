@@ -1106,20 +1106,25 @@ and the image quality of objects farther away may become worse.</translation>
     </message>
     <message>
         <location filename="../about.ui"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Introduction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer is an open source application control software used with 3D cameras. It mainly includes functions such as obtaining camera list, connecting specified cameras, setting camera parameters, viewing 2D images and point cloud images acquired in different states, collecting camera data, playback, etc.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Source code is available on &lt;a href=&quot;https://github.com/Revopoint/3DViewer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt;(protected by GPL).&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../about.ui"/>
-        <source>Close</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Introduction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer is an open source application control software used with 3D cameras. It mainly includes functions such as obtaining camera list, connecting specified cameras, setting camera parameters, viewing 2D images and point cloud images acquired in different states, collecting camera data, playback, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../about.ui"/>
+        <source>Source code is available on Github (protected by GPL).Third-party components.</source>
+        <translation type="unfinished">Source code is available on &lt;a href=&quot;%1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt; (protected by &lt;a href=&quot;%2&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GPL &lt;/span&gt;&lt;/a&gt;).&lt;a href=&quot;%3&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Third-party components. &lt;/span&gt;&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../aboutdialog.cpp" line="35"/>
-        <location filename="../aboutdialog.cpp" line="55"/>
+        <location filename="../aboutdialog.cpp" line="39"/>
+        <location filename="../aboutdialog.cpp" line="61"/>
         <source>Built on %1</source>
         <translation type="unfinished"></translation>
     </message>
