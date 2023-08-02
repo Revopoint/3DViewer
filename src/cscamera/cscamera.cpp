@@ -1288,6 +1288,8 @@ void CSCamera::getExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant& valu
     PROPERTY_TYPE_EXTENSION type = (PROPERTY_TYPE_EXTENSION)CAMERA_EXTENSION_PROPERTY_MAP[paraId];
 
     PropertyExtension propExt;
+    memset(&propExt, 0, sizeof(propExt));
+
     ERROR_CODE ret = m_cameraPtr->getPropertyExtension(type, propExt);
     if (ret != SUCCESS)
     {
@@ -1376,6 +1378,8 @@ void CSCamera::setExtensionPropertyPrivate(CAMERA_PARA_ID paraId, QVariant value
     PROPERTY_TYPE_EXTENSION type = (PROPERTY_TYPE_EXTENSION)CAMERA_EXTENSION_PROPERTY_MAP[paraId];
 
     PropertyExtension propExt;
+    memset(&propExt, 0, sizeof(propExt));
+
     switch (type)
     {
     case PROPERTY_EXT_AUTO_EXPOSURE_MODE:

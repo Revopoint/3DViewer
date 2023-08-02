@@ -1298,21 +1298,30 @@ and the image quality of objects farther away may become worse.</source>
         <translation type="unfinished">关于</translation>
     </message>
     <message>
-        <location filename="../about.ui"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Introduction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer is an open source application control software used with 3D cameras. It mainly includes functions such as obtaining camera list, connecting specified cameras, setting camera parameters, viewing 2D images and point cloud images acquired in different states, collecting camera data, playback, etc.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;Source code is available on &lt;a href=&quot;https://github.com/Revopoint/3DViewer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt;(protected by GPL).&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;简介&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer是一款配合3D相机使用的开源应用控制软件，主要包含获取相机列表、连接指定相机、设置相机各个参数、查看不同状态下获取的2D图像与点云图像、采集相机数据、回放等功能。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;源代码位于 &lt;a href=&quot;https://github.com/Revopoint/3DViewer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt;（受GPL保护）.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;简介&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer是一款配合3D相机使用的开源应用控制软件，主要包含获取相机列表、连接指定相机、设置相机各个参数、查看不同状态下获取的2D图像与点云图像、采集相机数据、回放等功能。&lt;/p&gt;&lt;p&gt;&lt;br/&gt;源代码位于 &lt;a href=&quot;https://github.com/Revopoint/3DViewer&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt;（受GPL保护）.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="../about.ui"/>
         <source>Close</source>
         <translation type="unfinished">关闭</translation>
     </message>
+    <message>
+        <location filename="../about.ui"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Introduction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer is an open source application control software used with 3D cameras. It mainly includes functions such as obtaining camera list, connecting specified cameras, setting camera parameters, viewing 2D images and point cloud images acquired in different states, collecting camera data, playback, etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;简介&lt;/span&gt;&lt;/p&gt;&lt;p&gt;3DViewer是一款配合3D相机使用的开源应用控制软件，主要包含获取相机列表、连接指定相机、设置相机各个参数、查看不同状态下获取的2D图像与点云图像、采集相机数据、回放等功能。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="../about.ui"/>
+        <source>Source code is available on Github (protected by GPL).Third-party components.</source>
+        <translation type="unfinished">源代码位于&lt;a href=&quot;%1&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub &lt;/span&gt;&lt;/a&gt; 受(&lt;a href=&quot;%2&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;GPL&lt;/span&gt;&lt;/a&gt;)保护。&lt;a href=&quot;%3&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;第三方组件 &lt;/span&gt;&lt;/a&gt;</translation>
+    </message>
 </context>
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../aboutdialog.cpp" line="35"/>
-        <location filename="../aboutdialog.cpp" line="55"/>
+        <location filename="../aboutdialog.cpp" line="39"/>
+        <location filename="../aboutdialog.cpp" line="61"/>
         <source>Built on %1</source>
         <translation type="unfinished">构建于 %1</translation>
     </message>

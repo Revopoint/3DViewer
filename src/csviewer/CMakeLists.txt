@@ -115,6 +115,8 @@ execute_process(
     COMMAND ${LRELEASE} ${TS_FILES}
 )
 
+set(LICENSE_FILES ${CMAKE_SOURCE_DIR}/../document/third-party-module-license.html ${CMAKE_SOURCE_DIR}/../LICENSE.txt)
+
 if(APPLE)
     set(CP_RES_DIR ${BIN_DIR}/${TARGET_NAME}.app/Contents/MacOS)
 else()
@@ -129,6 +131,7 @@ add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy ${QM_FILES} "${CP_RES_DIR}/translations/"
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CP_RES_DIR}/document/"
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/../document/manual "${CP_RES_DIR}/document/manual"
+    COMMAND ${CMAKE_COMMAND} -E copy ${LICENSE_FILES} "${CP_RES_DIR}/"
 )
 
 if(WIN32)

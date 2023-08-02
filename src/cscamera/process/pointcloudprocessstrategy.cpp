@@ -56,8 +56,9 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
     }
 
     Pointcloud pc;
-    QImage texImage;
-    
+    bool processedDepth = false;
+
+    //Process depth data first.
     for (const StreamData& streamData : streamDatas)
     {
         switch (streamData.dataInfo.format)
@@ -66,19 +67,33 @@ void PointCloudProcessStrategy::doProcess(const FrameData& frameData, OutputData
         case STREAM_FORMAT_Z16Y8Y8:
         case STREAM_FORMAT_XZ32:
             generatePointCloud(streamData, pc);
-            break;
-        case STREAM_FORMAT_RGB8:
-        case STREAM_FORMAT_MJPG:
-            generateTexture(streamData, texImage);
+            processedDepth = true;
             break;
         default:
-            qDebug() << "invalid stream format.";
-            Q_ASSERT(false);
-            return;
+            break;
         }
     }
-    
-    if (pc.getVertices().size() > 0)
+
+    QImage texImage;
+
+    //Process RGB data second.
+    if (processedDepth)
+    {
+        for (const StreamData& streamData : streamDatas)
+        {
+            switch (streamData.dataInfo.format)
+            {
+            case STREAM_FORMAT_RGB8:
+            case STREAM_FORMAT_MJPG:
+                generateTexture(streamData, texImage);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    if (processedDepth)
     {
         emit output3DUpdated(pc, texImage);
         outputDataPort.setPointCloud(pc);
